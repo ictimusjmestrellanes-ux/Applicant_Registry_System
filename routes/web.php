@@ -34,4 +34,12 @@ Route::resource('applicants', ApplicantController::class);
 Route::get('applicants/archive', [ApplicantController::class, 'archive'])->name('applicants.archive');
 Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->name('applicants.restore');
 
+Route::get('/applicants/{applicant}/view-file/{field}', 
+    [ApplicantController::class, 'viewFile']
+)->name('applicants.view-file');
+
+Route::delete(
+    '/applicants/{applicant}/delete-file/{field}',
+    [ApplicantController::class, 'deleteFile']
+)->name('applicants.delete-file');
 

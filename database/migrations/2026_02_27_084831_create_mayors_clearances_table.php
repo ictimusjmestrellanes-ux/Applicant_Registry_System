@@ -15,11 +15,11 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->boolean('prosecutor_clearance')->default(false);
-            $table->boolean('mtc_clearance')->default(false);
-            $table->boolean('rtc_clearance')->default(false);
-            $table->boolean('nbi_clearance')->default(false);
-            $table->boolean('barangay_clearance')->default(false);
+            $table->string('prosecutor_clearance')->default(false);
+            $table->string('mtc_clearance')->default(false);
+            $table->string('rtc_clearance')->default(false);
+            $table->string('nbi_clearance')->default(false);
+            $table->string('barangay_clearance')->default(false);
 
             $table->timestamps();
         });

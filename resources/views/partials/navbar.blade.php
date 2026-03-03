@@ -2,17 +2,6 @@
 
     <div class="container-fluid">
 
-        <!-- Left Title -->
-        <div class="d-flex align-items-center">
-
-            <h5 class="mb-0 fw-semibold text-dark">
-                Dashboard
-            </h5>
-
-        </div>
-
-
-
         <!-- Right User Menu -->
         <ul class="navbar-nav ms-auto align-items-center">
 

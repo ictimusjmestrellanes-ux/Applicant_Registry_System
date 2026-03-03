@@ -555,7 +555,120 @@
 
         }
 
-        
+        /* ===== GLOBAL ===== */
+        body {
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* ===== PAGE TITLE ===== */
+        .page-title {
+            font-weight: 700;
+            font-size: 26px;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== MAIN CARD ===== */
+        .premium-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* ===== SECTION HEADERS ===== */
+        .section-title {
+            font-weight: 600;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        /* ===== TABS (Modern Pills) ===== */
+        .nav-tabs {
+            border: none;
+            gap: 10px;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #334155;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: #e2e8f0;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* ===== INPUTS ===== */
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        /* ===== FILE INPUT CUSTOM ===== */
+        input[type="file"] {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        /* ===== SECTION DIVIDER ===== */
+        .section-divider {
+            margin: 40px 0 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-premium {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: none;
+            color: white;
+            padding: 12px 26px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-light-premium {
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 26px;
+        }
+
+        .btn-light-premium:hover {
+            background: #cbd5e1;
+        }
     </style>
 </head>
 
@@ -573,12 +686,14 @@
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery (Required) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>

@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('applicant_id')->constrained()->onDelete('cascade');
 
-            $table->boolean('health_card')->default(0);
-            $table->boolean('nbi_or_police_clearance')->default(0);
-            $table->boolean('cedula')->default(0);
-            $table->boolean('referral_letter')->default(0);
+            $table->string('health_card')->default(0);
+            $table->string('nbi_or_police_clearance')->default(0);
+            $table->string('cedula')->default(0);
+            $table->string('referral_letter')->default(0);
 
             $table->timestamps();
         });
