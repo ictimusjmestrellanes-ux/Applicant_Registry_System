@@ -11,6 +11,8 @@ Route::get('/', function () {
 // Login/Logout routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/auth/azure/redirect', [AuthController::class, 'redirectToAzure'])->name('login.azure.redirect');
+Route::get('/auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('login.azure.callback');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
@@ -30,7 +32,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('applicants', ApplicantController::class);
 Route::get('applicants/archive', [ApplicantController::class, 'archive'])->name('applicants.archive');
-Route::post('applicants/restore/{id}',[ApplicantController::class, 'restore'])->name('applicants.restore');
+Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->name('applicants.restore');
 
 
-    

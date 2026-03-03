@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'azure' => [
+        'client_id' => env('AZURE_CLIENT_ID'),
+        'client_secret' => env('AZURE_CLIENT_SECRET'),
+        'redirect' => env('AZURE_REDIRECT_URI'),
+        'tenant' => env('AZURE_TENANT_ID'),
+        'allowed_domains' => env('AZURE_ALLOWED_DOMAINS', ''),
+        'logout_redirect' => env('AZURE_LOGOUT_REDIRECT_URI', env('APP_URL').'/login'),
+    ],
+
 ];
