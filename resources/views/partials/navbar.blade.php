@@ -7,29 +7,19 @@
 
             <!-- User Dropdown -->
             <li class="nav-item dropdown">
-
-                <a class="nav-link dropdown-toggle user-menu"
-                   href="#"
-                   id="userDropdown"
-                   role="button"
-                   data-bs-toggle="dropdown">
+                <a class="nav-link dropdown-toggle user-menu" href="#" id="userDropdown" role="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
 
                     <i class="bi bi-person-circle me-1"></i>
-
                     {{ auth()->user()->name ?? 'User' }}
-
                 </a>
 
-
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userDropdown">
 
                     <li class="dropdown-header">
                         Signed in as
-                        <strong>
-                            {{ auth()->user()->name ?? 'User' }}
-                        </strong>
+                        <strong>{{ auth()->user()->name ?? 'User' }}</strong>
                     </li>
-
 
                     <li>
                         <a class="dropdown-item" href="#">
@@ -38,31 +28,21 @@
                         </a>
                     </li>
 
-
                     <li>
                         <hr class="dropdown-divider">
                     </li>
 
-
                     <li>
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <button type="submit"
-                                    class="dropdown-item text-danger">
-
+                            <button type="submit" class="dropdown-item text-danger">
                                 <i class="bi bi-box-arrow-right me-2"></i>
                                 Logout
-
                             </button>
-
                         </form>
-
                     </li>
 
                 </ul>
-
             </li>
 
         </ul>

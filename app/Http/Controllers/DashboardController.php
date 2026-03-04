@@ -46,6 +46,12 @@ class DashboardController extends Controller
                 'icon' => 'bi bi-graph-up',
                 'route' => 'reports.index',
             ],
+
+            [
+                'label' => 'Activity Logs',
+                'icon' => 'bi bi-list-task',
+                'route' => 'activity.index',
+            ],
         ];
 
         return view('dashboard', compact('menuItems'));

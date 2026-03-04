@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('permits', function (Blueprint $table) {
+        Schema::create('mayors_permits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('applicant_id')->constrained()->onDelete('cascade');
 

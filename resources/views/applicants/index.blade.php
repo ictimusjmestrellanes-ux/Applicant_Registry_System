@@ -24,38 +24,63 @@
             </a>
 
         </div>
-
-
-
         <!-- SEARCH BAR -->
-        <div class="card search-card mb-3">
-
+        <div class="card border-0 shadow-sm mb-4">
             <div class="card-body">
 
-                <form method="GET">
+                <form method="GET" action="{{ route('applicants.index') }}">
+                    <div class="row g-3 align-items-end">
 
-                    <div class="input-group">
+                        {{-- Search --}}
+                        <div class="col-lg-5 col-md-6">
+                            <label class="form-label fw-semibold text-muted small">
+                                Search Applicant
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" name="search" class="form-control border-0 bg-light"
+                                    placeholder="Enter name or contact number..." value="{{ request('search') }}">
+                            </div>
+                        </div>
 
-                        <span class="input-group-text bg-white">
-                            <i class="bi bi-search"></i>
-                        </span>
+                        {{-- Status --}}
+                        <div class="col-lg-3 col-md-4">
+                            <label class="form-label fw-semibold text-muted small">
+                                Status
+                            </label>
+                            <select name="status" class="form-select bg-light border-0">
+                                <option value="">All Applicants</option>
+                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>
+                                    Active
+                                </option>
+                                <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>
+                                    Archived
+                                </option>
+                            </select>
+                        </div>
 
-                        <input type="text" name="search" class="form-control form-input"
-                            placeholder="Search applicant name or contact number..." value="{{ $search }}">
+                        {{-- Buttons --}}
+                        <div class="col-lg-4 col-md-12">
+                            <div class="d-flex gap-2 justify-content-lg-end">
 
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-funnel me-1"></i>
+                                    Apply Filter
+                                </button>
 
-                        <button class="btn btn-primary">
+                                <a href="{{ route('applicants.index') }}" class="btn btn-outline-secondary px-4">
+                                    Reset
+                                </a>
 
-                            Search
-
-                        </button>
+                            </div>
+                        </div>
 
                     </div>
-
                 </form>
 
             </div>
-
         </div>
 
 
@@ -80,16 +105,39 @@
             <div class="card-body p-0">
 
 
-                <table class="table table-modern mb-0">
+                <table class="table table-responsive table-hover mb-0">
 
-                    <thead>
-                        <tr>
-                            <th width="70">ID</th>
+                    <thead class="table-light">
+                        <tr class="align-middle text-nowrap">
+                            <th class="text-muted small">ID</th>
+
                             <th>Applicant Name</th>
-                            <th width="150">Contact</th>
-                            <th>Address</th>
 
-                            <th width="180">Actions</th>
+                            <th class="text-nowrap">Contact</th>
+
+                            <th class="text-truncate" style="max-width: 200px;">
+                                Address
+                            </th>
+
+                            <th class="text-center text-nowrap">
+                                Mayor's Permit
+                            </th>
+
+                            <th class="text-center text-nowrap">
+                                Mayor's Clearance
+                            </th>
+
+                            <th class="text-center text-nowrap">
+                                Mayor's Referral
+                            </th>
+
+                            <th class="text-nowrap">
+                                Date Created
+                            </th>
+
+                            <th class="text-center">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
 
@@ -124,22 +172,136 @@
                                     {{ $applicant->city }},
                                     {{ $applicant->province }}
                                 </td>
-
                                 <td>
-                                    <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-edit btn-sm">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    @php
+                                        $permit = optional($applicant->permit);
 
-                                    <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
-                                        style="display:inline-block">
+                                        $requirements = [
+                                            $permit->health_card,
+                                            $permit->nbi_or_police_clearance,
+                                            $permit->cedula,
+                                            $permit->referral_letter,
+                                        ];
 
-                                        @csrf
-                                        @method('DELETE')
+                                        $uploaded = collect($requirements)->filter()->count();
+                                        $total = count($requirements);
+                                        $percentage = $total > 0 ? ($uploaded / $total) * 100 : 0;
+                                    @endphp
 
-                                        <button onclick="return confirm('Archive applicant?')" class="btn btn-delete btn-sm">
-                                            <i class="bi bi-archive"></i>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar 
+                                                                    {{ $percentage == 100 ? 'bg-success' : ($percentage > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                            role="progressbar" style="width: {{ $percentage }}%;"
+                                            aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ $uploaded }} / {{ $total }} Submitted
+                                    </small>
+                                </td>
+                                <td>
+                                    @php
+                                        $clearance = optional($applicant->clearance);
+
+                                        $requirements = [
+                                            $clearance->prosecutor_clearance,
+                                            $clearance->mtc_clearance,
+                                            $clearance->rtc_clearance,
+                                            $clearance->nbi_clearance,
+                                            $clearance->barangay_clearance,
+                                        ];
+
+                                        $uploaded = collect($requirements)->filter()->count();
+                                        $total = count($requirements);
+                                        $percentage = $total > 0 ? ($uploaded / $total) * 100 : 0;
+                                    @endphp
+
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar 
+                                                                    {{ $percentage == 100 ? 'bg-success' : ($percentage > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                            role="progressbar" style="width: {{ $percentage }}%;"
+                                            aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ $uploaded }} / {{ $total }} Submitted
+                                    </small>
+                                </td>
+                                <td>
+                                    @php
+                                        $referral = optional($applicant->referral);
+
+                                        $hasResume = !empty($referral->resume);
+
+                                        $clearanceGroup = [
+                                            $referral->barangay_clearance,
+                                            $referral->police_clearance,
+                                            $referral->nbi_clearance,
+                                        ];
+
+                                        $hasAtLeastOneClearance = collect($clearanceGroup)->filter()->count() > 0;
+
+                                        // 2 main requirements:
+                                        $requirements = [
+                                            $hasResume,
+                                            $hasAtLeastOneClearance,
+                                        ];
+
+                                        $uploaded = collect($requirements)->filter()->count();
+                                        $total = count($requirements);
+                                        $percentage = ($uploaded / $total) * 100;
+                                    @endphp
+
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar 
+                                                                    {{ $percentage == 100 ? 'bg-success' : ($percentage > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                            role="progressbar" style="width: {{ $percentage }}%;"
+                                            aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+
+                                    <small class="text-muted">
+                                        {{ $uploaded }} / {{ $total }} Submitted
+                                    </small>
+                                </td>
+                                <td>
+                                    {{ $applicant->created_at }}
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                    </form>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            {{-- Edit --}}
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('applicants.edit', $applicant->id) }}">
+                                                    <i class="bi bi-pencil me-2"></i> Edit
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+
+                                            {{-- Archive --}}
+                                            <li>
+                                                <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
+                                                    onsubmit="return confirm('Archive applicant?')">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-archive me-2"></i> Archive
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
 
                             </tr>

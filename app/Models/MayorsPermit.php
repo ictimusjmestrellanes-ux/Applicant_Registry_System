@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MayorsPermit extends Model
 {
-    protected $table = 'permits';
+    protected $table = 'mayors_permits';
     protected $fillable = [
         'applicant_id',
         'health_card',

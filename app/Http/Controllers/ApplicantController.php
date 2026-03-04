@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applicant;
+use App\Models\MayorsClearance;
+use App\Models\MayorsPermit;
+use App\Models\MayorsReferral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ApplicantController extends Controller
 {
@@ -60,59 +64,67 @@ class ApplicantController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | VALIDATION
+        | 1. UPDATE PERSONAL INFORMATION
         |--------------------------------------------------------------------------
         */
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'contact_no' => 'required|string|max:20',
-            'address_line' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'barangay' => 'required|string|max:255',
 
-            // file validation
-            '*.pdf',
-            '*.jpg',
-            '*.jpeg',
-            '*.png',
+        $applicant->update([
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
+            'suffix' => $request->suffix,
+            'contact_no' => $request->contact_no,
+            'address_line' => $request->address_line,
+            'province' => $request->province,
+            'city' => $request->city,
+            'barangay' => $request->barangay,
         ]);
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE PERSONAL INFO
+        | PREPARE FULL NAME FOR FILE RENAMING
         |--------------------------------------------------------------------------
         */
-        $applicant->update($request->only([
-            'first_name',
-            'middle_name',
-            'last_name',
-            'suffix',
-            'contact_no',
-            'address_line',
-            'province',
-            'city',
-            'barangay',
-        ]));
+
+        $fullName = $applicant->first_name.'_'.
+                    ($applicant->middle_name ? $applicant->middle_name.'_' : '').
+                    $applicant->last_name;
+
+        $fullName = Str::slug($fullName, '_');
 
         /*
         |--------------------------------------------------------------------------
-        | PERMIT FILES
+        | 2. MAYOR'S PERMIT TO WORK FILES
         |--------------------------------------------------------------------------
         */
-        $permit = $applicant->permit()->firstOrCreate([]);
+
+        $permit = MayorsPermit::firstOrCreate([
+            'applicant_id' => $applicant->id,
+        ]);
 
         $permitFields = [
-            'health_card',
-            'nbi_or_police_clearance',
-            'cedula',
-            'referral_letter',
+            'health_card' => 'Health_Card',
+            'nbi_or_police_clearance' => 'NBI_or_Police_Clearance',
+            'cedula' => 'Cedula',
+            'referral_letter' => 'Referral_Letter',
         ];
 
-        foreach ($permitFields as $field) {
+        foreach ($permitFields as $field => $label) {
+
             if ($request->hasFile($field)) {
-                $permit->$field = $request->file($field)->store('permits', 'public');
+
+                if ($permit->$field && Storage::disk('public')->exists($permit->$field)) {
+                    Storage::disk('public')->delete($permit->$field);
+                }
+
+                $file = $request->file($field);
+                $extension = $file->getClientOriginalExtension();
+
+                $fileName = $label.'_'.$fullName.'.'.$extension;
+
+                $path = $file->storeAs('permits', $fileName, 'public');
+
+                $permit->$field = $path;
             }
         }
 
@@ -120,22 +132,38 @@ class ApplicantController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | CLEARANCE FILES
+        | 3. MAYOR'S CLEARANCE FILES
         |--------------------------------------------------------------------------
         */
-        $clearance = $applicant->clearance()->firstOrCreate([]);
+
+        $clearance = MayorsClearance::firstOrCreate([
+            'applicant_id' => $applicant->id,
+        ]);
 
         $clearanceFields = [
-            'prosecutor_clearance',
-            'mtc_clearance',
-            'rtc_clearance',
-            'nbi_clearance',
-            'barangay_clearance',
+            'prosecutor_clearance' => 'Prosecutor_Clearance',
+            'mtc_clearance' => 'MTC_Clearance',
+            'rtc_clearance' => 'RTC_Clearance',
+            'nbi_clearance' => 'NBI_Clearance',
+            'barangay_clearance' => 'Barangay_Clearance',
         ];
 
-        foreach ($clearanceFields as $field) {
+        foreach ($clearanceFields as $field => $label) {
+
             if ($request->hasFile($field)) {
-                $clearance->$field = $request->file($field)->store('clearances', 'public');
+
+                if ($clearance->$field && Storage::disk('public')->exists($clearance->$field)) {
+                    Storage::disk('public')->delete($clearance->$field);
+                }
+
+                $file = $request->file($field);
+                $extension = $file->getClientOriginalExtension();
+
+                $fileName = $label.'_'.$fullName.'.'.$extension;
+
+                $path = $file->storeAs('clearances', $fileName, 'public');
+
+                $clearance->$field = $path;
             }
         }
 
@@ -143,29 +171,51 @@ class ApplicantController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | REFERRAL FILES
+        | 4. MAYOR'S REFERRAL FILES
         |--------------------------------------------------------------------------
         */
-        $referral = $applicant->referral()->firstOrCreate([]);
+
+        $referral = MayorsReferral::firstOrCreate([
+            'applicant_id' => $applicant->id,
+        ]);
 
         $referralFields = [
-            'resume',
-            'barangay_clearance',
-            'police_clearance',
-            'nbi_clearance',
+            'resume' => 'Resume',
+            'barangay_clearance' => 'Barangay_Clearance',
+            'police_clearance' => 'Police_Clearance',
+            'nbi_clearance' => 'NBI_Clearance',
         ];
 
-        foreach ($referralFields as $field) {
+        foreach ($referralFields as $field => $label) {
+
             if ($request->hasFile($field)) {
-                $referral->$field = $request->file($field)->store('referrals', 'public');
+
+                if ($referral->$field && Storage::disk('public')->exists($referral->$field)) {
+                    Storage::disk('public')->delete($referral->$field);
+                }
+
+                $file = $request->file($field);
+                $extension = $file->getClientOriginalExtension();
+
+                $fileName = $label.'_'.$fullName.'.'.$extension;
+
+                $path = $file->storeAs('referrals', $fileName, 'public');
+
+                $referral->$field = $path;
             }
         }
 
         $referral->save();
 
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECT
+        |--------------------------------------------------------------------------
+        */
+
         return redirect()
             ->route('applicants.edit', $applicant->id)
-            ->with('success', 'Applicant updated successfully!');
+            ->with('success', 'Applicant updated successfully.');
     }
 
     public function destroy($id)
@@ -174,7 +224,7 @@ class ApplicantController extends Controller
 
         $applicant->delete(); // Moves to Archive
 
-        return redirect()->route('applicants.index')
+        return redirect()->route('applicants.archive')
             ->with('success', 'Applicant Archived');
     }
 
@@ -185,116 +235,12 @@ class ApplicantController extends Controller
         return view('applicants.archive', compact('applicants'));
     }
 
-    public function viewFile(Applicant $applicant, $field)
+    public function restore($id)
     {
-        $applicant->load(['permit', 'clearance', 'referral']);
+        $applicant = Applicant::withTrashed()->findOrFail($id);
+        $applicant->restore();
 
-        $filePath = null;
-
-        // Permit fields
-        $permitFields = [
-            'health_card',
-            'nbi_or_police_clearance',
-            'cedula',
-            'referral_letter',
-        ];
-
-        // Clearance fields
-        $clearanceFields = [
-            'prosecutor_clearance',
-            'mtc_clearance',
-            'rtc_clearance',
-            'nbi_clearance',
-            'barangay_clearance',
-        ];
-
-        // Referral fields
-        $referralFields = [
-            'resume',
-            'ref_barangay_clearance',
-            'ref_police_clearance',
-            'ref_nbi_clearance',
-        ];
-
-        if (in_array($field, $permitFields)) {
-            $filePath = optional($applicant->permit)->$field;
-        }
-
-        if (in_array($field, $clearanceFields)) {
-            $filePath = optional($applicant->clearance)->$field;
-        }
-
-        if (in_array($field, $referralFields)) {
-            $filePath = optional($applicant->referral)->$field;
-        }
-
-        if (! $filePath || ! Storage::disk('public')->exists($filePath)) {
-            abort(404);
-        }
-
-        $fullPath = storage_path('app/public/'.$filePath);
-
-        return response()->file($fullPath, [
-            'Content-Disposition' => 'inline',
-        ]);
-    }
-
-    public function deleteFile(Applicant $applicant, $field)
-    {
-        $applicant->load(['permit', 'clearance', 'referral']);
-
-        $filePath = null;
-        $model = null;
-
-        $permitFields = [
-            'health_card',
-            'nbi_or_police_clearance',
-            'cedula',
-            'referral_letter',
-        ];
-
-        $clearanceFields = [
-            'prosecutor_clearance',
-            'mtc_clearance',
-            'rtc_clearance',
-            'nbi_clearance',
-            'barangay_clearance',
-        ];
-
-        $referralFields = [
-            'resume',
-            'ref_barangay_clearance',
-            'ref_police_clearance',
-            'ref_nbi_clearance',
-        ];
-
-        if (in_array($field, $permitFields)) {
-            $model = $applicant->permit;
-        }
-
-        if (in_array($field, $clearanceFields)) {
-            $model = $applicant->clearance;
-        }
-
-        if (in_array($field, $referralFields)) {
-            $model = $applicant->referral;
-        }
-
-        if (! $model || ! $model->$field) {
-            return back()->with('error', 'File not found.');
-        }
-
-        $filePath = $model->$field;
-
-        // Delete file from storage
-        if (Storage::disk('public')->exists($filePath)) {
-            Storage::disk('public')->delete($filePath);
-        }
-
-        // Remove file path from database
-        $model->$field = null;
-        $model->save();
-
-        return back()->with('success', 'File deleted successfully.');
+        return redirect()->route('applicants.index')
+            ->with('success', 'Applicant restored successfully.');
     }
 }
