@@ -12,22 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('applicants', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->string('first_name');
-    $table->string('middle_name')->nullable();
-    $table->string('last_name');
-    $table->string('suffix')->nullable();
+            $table->string('first_name');
+            $table->string('middle_name')->nullable();
+            $table->string('last_name');
+            $table->string('suffix')->nullable();
 
-    $table->string('contact_no');
+            $table->string('contact_no');
 
-    $table->string('address_line');
-    $table->string('province');
-    $table->string('city');
-    $table->string('barangay');
+            $table->string('address_line');
+            $table->string('province');
+            $table->string('city');
+            $table->string('barangay');
 
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

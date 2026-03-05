@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class DashboardController extends Controller
 {
     public function index()
@@ -32,12 +30,17 @@ class DashboardController extends Controller
                 'children' => [
                     [
                         'label' => 'Add Applicant',
-                        'route' => 'applicants.create'
+                        'route' => 'applicants.create',
                     ],
                     [
                         'label' => 'List of Applicants',
-                        'route' => 'applicants.index'
+                        'route' => 'applicants.index',
                     ],
+                    [
+                        'label' => 'Archived Applicants',
+                        'route' => 'applicants.archive',
+                    ],
+
                 ],
             ],
 
@@ -45,12 +48,6 @@ class DashboardController extends Controller
                 'label' => 'Reports',
                 'icon' => 'bi bi-graph-up',
                 'route' => 'reports.index',
-            ],
-
-            [
-                'label' => 'Activity Logs',
-                'icon' => 'bi bi-list-task',
-                'route' => 'activity.index',
             ],
         ];
 

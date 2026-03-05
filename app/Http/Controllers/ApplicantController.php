@@ -9,6 +9,7 @@ use App\Models\MayorsReferral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ApplicantController extends Controller
 {
@@ -243,4 +244,5 @@ class ApplicantController extends Controller
         return redirect()->route('applicants.index')
             ->with('success', 'Applicant restored successfully.');
     }
+    
 }

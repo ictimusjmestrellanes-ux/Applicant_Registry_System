@@ -18,4 +18,5 @@ class MayorsReferral extends Model
     {
         return $this->belongsTo(Applicant::class);
     }
+    
 }

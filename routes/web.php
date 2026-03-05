@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ClearanceController;
+use App\Http\Controllers\PermitController;
+use App\Http\Controllers\ReferralController;
 
 // Redirect root to login page
 Route::get('/', function () {
@@ -39,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])
         ->name('applicants.restore');
 
-    Route::get('/applicants/{applicant}/view-file/{field}', 
+    Route::get('/applicants/{applicant}/view-file/{field}',
         [ApplicantController::class, 'viewFile']
     )->name('applicants.view-file');
 
@@ -50,18 +52,20 @@ Route::middleware('auth')->group(function () {
 
     // ✅ PUT RESOURCE LAST
     Route::resource('applicants', ApplicantController::class);
-    
-
-Route::middleware(['auth'])->group(function () {
-
-    Route::get('/activity-logs', [ActivityLogController::class, 'index'])
-        ->name('activity.index');
-
-    Route::delete('/activity-logs/{id}', [ActivityLogController::class, 'destroy'])
-        ->name('activity.logs.delete');
-
-    Route::delete('/activity-logs-clear', [ActivityLogController::class, 'clear'])
-        ->name('activity.logs.clear');
-
 });
-});
+
+Route::get('/applicants/{id}/generate-referral',
+    [ReferralController::class, 'generate'])
+    ->name('applicants.generateReferral');
+
+Route::get('/applicants/{id}/generate-permit',
+    [PermitController::class, 'generate'])
+    ->name('applicants.generatePermit');
+
+Route::get('/applicants/{id}/generate-clearance',
+    [ClearanceController::class, 'generate'])
+    ->name('applicants.generateClearance');
+
+Route::delete('/permit/{applicant}/{field}/delete',
+    [PermitController::class, 'deleteFile'])
+    ->name('permit.deleteFile');

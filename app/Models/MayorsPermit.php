@@ -19,4 +19,5 @@ class MayorsPermit extends Model
     {
         return $this->belongsTo(Applicant::class);
     }
+    
 }

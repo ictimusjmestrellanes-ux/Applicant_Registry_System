@@ -12,7 +12,7 @@ class MayorsClearance extends Model
         'mtc_clearance',
         'rtc_clearance',
         'nbi_clearance',
-        'barangay_clearance'
+        'barangay_clearance',
     ];
 
     public function applicant()
