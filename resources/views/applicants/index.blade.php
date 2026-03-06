@@ -5,11 +5,18 @@
 
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-light: #f8fafc;
-            --border-radius: 12px;
-        }
+        /* Primary Theme: Ocean Blue */
+        --primary-color: #0284c7; 
+        --primary-hover: #0369a1;
+        /* Success Theme: Emerald Green */
+        --success-color: #10b981;
+        --success-hover: #059669;
+        /* UI Neutrals */
+        --bg-light: #f0f4f8;
+        --border-radius: 12px;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
 
         body {
             background-color: var(--bg-light);
@@ -270,7 +277,7 @@
                                             @php
                                                 $referral = optional($applicant->referral);
                                                 $hasResume = !empty($referral->resume);
-                                                $hasOneClearance = collect([$referral->barangay_clearance, $referral->police_clearance, $referral->nbi_clearance])->filter()->count() > 0;
+                                                $hasOneClearance = collect([$referral->ref_barangay_clearance, $referral->ref_police_clearance, $referral->ref_nbi_clearance])->filter()->count() > 0;
                                                 $rUploaded = ($hasResume ? 1 : 0) + ($hasOneClearance ? 1 : 0);
                                                 $rPerc = ($rUploaded / 2) * 100;
                                             @endphp

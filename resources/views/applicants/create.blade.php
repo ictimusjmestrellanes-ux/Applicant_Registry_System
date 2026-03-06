@@ -1,15 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-light: #f8fafc;
-            --border-radius: 12px;
-            --section-bg: #ffffff;
-        }
+        /* Primary Theme: Ocean Blue */
+        --primary-color: #0284c7; 
+        --primary-hover: #0369a1;
+        /* Success Theme: Emerald Green */
+        --success-color: #10b981;
+        --success-hover: #059669;
+        /* UI Neutrals */
+        --bg-light: #f0f4f8;
+        --border-radius: 12px;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
 
         body {
             background-color: var(--bg-light);
@@ -20,7 +25,7 @@
 
         .page-title {
             font-weight: 800;
-            color: #0f172a;
+            color: var(--accent-blue);
             letter-spacing: -0.025em;
         }
 
@@ -28,7 +33,7 @@
         .form-card {
             border: none;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
             background: var(--section-bg);
             overflow: hidden;
             max-width: 1500px;
@@ -36,10 +41,10 @@
         }
 
         .section-header {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             padding: 1rem 1.5rem;
             font-weight: 700;
-            color: #334155;
+            color: var(--accent-blue);
             display: flex;
             align-items: center;
             border-bottom: 1px solid #e2e8f0;
@@ -73,7 +78,7 @@
 
         .form-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
         }
 
         /* Buttons */
@@ -114,127 +119,119 @@
 
         .btn-cancel:hover {
             background-color: #f1f5f9;
-            color: #1e293b;
+            color: var(--accent-blue);
         }
 
         /* Progress Step Visual (Optional) */
         .required-mark {
-            color: #ef4444;
+            color: #ef4444; /* Standard Red for required marks */
             margin-left: 2px;
         }
     </style>
-    </head>
 
-    <body>
+    <div class="container-fluid py-5">
 
-        <div class="container-fluid py-5">
-
-            <div class=" mx-auto mb-4 text-center text-md-start" >
-                <h3 class="page-title">Add Applicant</h3>
-                <p class="text-muted mb-0">
-                    Register a new applicant into the system. Ensure all required fields (<span
-                        class="text-danger">*</span>) are filled.
-                </p>
-            </div>
-
-            <form action="{{ route('applicants.store') }}" method="POST">
-                @csrf
-
-                <div class="card form-card">
-
-                    <div class="section-header">
-                        <i class="bi bi-person-circle"></i>
-                        Personal Information
-                    </div>
-
-                    <div class="section-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                <input type="text" name="first_name" class="form-control form-input" placeholder="e.g. John"
-                                    required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Middle Name</label>
-                                <input type="text" name="middle_name" class="form-control form-input"
-                                    placeholder="e.g. Quinto">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                <input type="text" name="last_name" class="form-control form-input" placeholder="e.g. Doe"
-                                    required>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Suffix</label>
-                                <select name="suffix" class="form-select form-input">
-                                    <option value="">None</option>
-                                    <option value="Jr.">Jr.</option>
-                                    <option value="Sr.">Sr.</option>
-                                    <option value="II">II</option>
-                                    <option value="III">III</option>
-                                    <option value="IV">IV</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Contact Number <span class="required-mark">*</span></label>
-                                <input type="text" name="contact_no" class="form-control form-input"
-                                    placeholder="09123456789" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="section-header">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        Address Information
-                    </div>
-
-                    <div class="section-body border-top">
-                        <div class="mb-4">
-                            <label class="form-label">Complete Address <span class="required-mark">*</span></label>
-                            <input type="text" name="address_line" class="form-control form-input"
-                                placeholder="House No. / Street / Phase / Block" required>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Province <span class="required-mark">*</span></label>
-                                <select name="province" id="province" class="form-select form-input" required>
-                                    <option value="">Select Province</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
-                                <select name="city" id="city" class="form-select form-input" required>
-                                    <option value="">Select City</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label">Barangay <span class="required-mark">*</span></label>
-                                <select name="barangay" id="barangay" class="form-select form-input" required>
-                                    <option value="">Select Barangay</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-footer justify-content-end">
-                        <a href="{{ route('applicants.index') }}" class="btn btn-cancel">
-                            Cancel
-                        </a>
-                        <button type="submit" class="btn btn-save shadow-sm">
-                            <i class="bi bi-check-circle-fill me-2"></i>Save Applicant
-                        </button>
-                    </div>
-
-                </div>
-            </form>
+        <div class="mx-auto mb-4 text-center text-md-start">
+            <h3 class="page-title">Add Applicant</h3>
+            <p class="text-muted mb-0">
+                Register a new applicant into the system. Ensure all required fields (<span
+                    class="text-danger">*</span>) are filled.
+            </p>
         </div>
+
+        <form action="{{ route('applicants.store') }}" method="POST">
+            @csrf
+
+            <div class="card form-card">
+
+                <div class="section-header">
+                    <i class="bi bi-person-circle"></i>
+                    Personal Information
+                </div>
+
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">First Name <span class="required-mark">*</span></label>
+                            <input type="text" name="first_name" class="form-control form-input" placeholder="e.g. John" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Middle Name</label>
+                            <input type="text" name="middle_name" class="form-control form-input" placeholder="e.g. Quinto">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Last Name <span class="required-mark">*</span></label>
+                            <input type="text" name="last_name" class="form-control form-input" placeholder="e.g. Doe" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Suffix</label>
+                            <select name="suffix" class="form-select form-input">
+                                <option value="">None</option>
+                                <option value="Jr.">Jr.</option>
+                                <option value="Sr.">Sr.</option>
+                                <option value="II">II</option>
+                                <option value="III">III</option>
+                                <option value="IV">IV</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Contact Number <span class="required-mark">*</span></label>
+                            <input type="text" name="contact_no" class="form-control form-input" placeholder="09123456789" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Address Information
+                </div>
+
+                <div class="section-body border-top">
+                    <div class="mb-4">
+                        <label class="form-label">Complete Address <span class="required-mark">*</span></label>
+                        <input type="text" name="address_line" class="form-control form-input" placeholder="House No. / Street / Phase / Block" required>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Province <span class="required-mark">*</span></label>
+                            <select name="province" id="province" class="form-select form-input" required>
+                                <option value="">Select Province</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
+                            <select name="city" id="city" class="form-select form-input" required>
+                                <option value="">Select City</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Barangay <span class="required-mark">*</span></label>
+                            <select name="barangay" id="barangay" class="form-select form-input" required>
+                                <option value="">Select Barangay</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-footer justify-content-end">
+                    <a href="{{ route('applicants.index') }}" class="btn btn-cancel">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-save shadow-sm">
+                        <i class="bi bi-check-circle-fill me-2"></i>Save Applicant
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
 @endsection
     <script>
 

@@ -35,24 +35,20 @@ Route::middleware('auth')->group(function () {
     })->name('reports.index');
 
     // ✅ MOVE THESE ABOVE RESOURCE
-    Route::get('applicants/archive', [ApplicantController::class, 'archive'])
-        ->name('applicants.archive');
-
-    Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])
-        ->name('applicants.restore');
-
-    Route::get('/applicants/{applicant}/view-file/{field}',
-        [ApplicantController::class, 'viewFile']
-    )->name('applicants.view-file');
-
-    Route::delete(
-        '/applicants/{applicant}/delete-file/{field}',
-        [ApplicantController::class, 'deleteFile']
-    )->name('applicants.delete-file');
-
-    // ✅ PUT RESOURCE LAST
-    Route::resource('applicants', ApplicantController::class);
 });
+
+Route::get('applicants/archive', [ApplicantController::class, 'archive'])
+    ->name('applicants.archive');
+
+Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])
+    ->name('applicants.restore');
+
+Route::get('/applicants/{applicant}/view-file/{field}',
+    [ApplicantController::class, 'viewFile']
+)->name('applicants.view-file');
+
+// ✅ PUT RESOURCE LAST
+Route::resource('applicants', ApplicantController::class);
 
 Route::get('/applicants/{id}/generate-referral',
     [ReferralController::class, 'generate'])
@@ -65,7 +61,3 @@ Route::get('/applicants/{id}/generate-permit',
 Route::get('/applicants/{id}/generate-clearance',
     [ClearanceController::class, 'generate'])
     ->name('applicants.generateClearance');
-
-Route::delete('/permit/{applicant}/{field}/delete',
-    [PermitController::class, 'deleteFile'])
-    ->name('permit.deleteFile');

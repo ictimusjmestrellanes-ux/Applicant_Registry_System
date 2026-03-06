@@ -85,15 +85,18 @@ class Applicant extends Model
             return false;
         }
 
+        $referral = $this->referral;
+
         // Requirement 1: Resume OR BioData
-        $hasProfile = $this->referral->resume || $this->referral->biodata;
+        $hasProfile = ! empty($referral->resume) || ! empty($referral->biodata);
 
         // Requirement 2: At least ONE clearance
         $hasClearance =
-            $this->referral->barangay_clearance ||
-            $this->referral->police_clearance ||
-            $this->referral->nbi_clearance;
+            ! empty($referral->ref_barangay_clearance) ||
+            ! empty($referral->ref_police_clearance) ||
+            ! empty($referral->ref_nbi_clearance);
 
+        // Applicant is complete only if BOTH are satisfied
         return $hasProfile && $hasClearance;
     }
 }

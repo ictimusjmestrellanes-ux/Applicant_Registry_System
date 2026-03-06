@@ -27,165 +27,191 @@
 
     @endif
     <style>
-        :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --success-color: #10b981;
-            --bg-light: #f8fafc;
-            --border-radius: 12px;
-        }
+    :root {
+        /* Primary Theme: Ocean Blue */
+        --primary-color: #0284c7; 
+        --primary-hover: #0369a1;
+        /* Success Theme: Emerald Green */
+        --success-color: #10b981;
+        --success-hover: #059669;
+        /* UI Neutrals */
+        --bg-light: #f0f4f8;
+        --border-radius: 12px;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+    }
 
-        body {
-            background-color: var(--bg-light);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            color: #1e293b;
-            line-height: 1.6;
-        }
+    body {
+        background-color: var(--bg-light);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-main);
+        line-height: 1.6;
+    }
 
-        .applicant-wrapper {
-            max-width: 1700px;
-            margin: 40px auto;
-            padding-bottom: 100px;
-        }
+    .applicant-wrapper {
+        max-width: 1700px;
+        margin: 40px auto;
+        padding-bottom: 100px;
+    }
 
-        .page-header h2 {
-            font-weight: 800;
-            color: #0f172a;
-            letter-spacing: -0.025em;
-        }
+    .page-header h2 {
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+    }
 
-        /* Main Card Container */
-        .main-card {
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            background: #ffffff;
-            overflow: hidden;
-        }
+    /* Main Card Container */
+    .main-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.1);
+        background: #ffffff;
+        overflow: hidden;
+    }
 
-        /* Requirements Section Styling */
-        .requirements-container {
-            background-color: #f1f5f9;
-            border-radius: var(--border-radius);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 2.5rem;
-        }
+    /* Requirements Section Styling */
+    .requirements-container {
+        background-color: #f8fafc;
+        border-radius: var(--border-radius);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2.5rem;
+    }
 
-        /* Modern Tabs */
+    /* Modern Tabs */
+    .nav-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        gap: 5px;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 12px 20px;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.2s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+        background-color: #ffffff;
+        border-bottom: 3px solid var(--primary-color);
+    }
+
+    .nav-tabs .nav-link:hover:not(.active) {
+        background-color: #f1f5f9;
+        color: var(--primary-hover);
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 0.625rem 0.875rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+    }
+
+    /* File Preview Box - The Blue Accent */
+    .file-status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f0f9ff;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #bae6fd;
+        margin-top: 8px;
+    }
+
+    .file-name {
+        font-size: 0.8rem;
+        color: #0369a1;
+        font-weight: 500;
+    }
+
+    /* Buttons */
+    .btn-success {
+        background-color: var(--success-color);
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: transform 0.1s ease, background-color 0.2s ease;
+    }
+
+    .btn-success:hover {
+        background-color: var(--success-hover);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    /* Section Headings */
+    .section-title {
+        position: relative;
+        padding-left: 15px;
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    /* Special text colors */
+    .text-primary { color: var(--primary-color) !important; }
+    .text-success { color: var(--success-color) !important; }
+
+    .btn-generate {
+        background-color: #0284c7;
+        border-color: #0284c7;
+        color: white;
+        transition: all 0.2s ease;
+    }
+
+    .btn-generate:hover {
+        background-color: #0369a1;
+        border-color: #0369a1;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-generate:active {
+        background-color: #0369a1;
+    }
+
+    /* Responsive Fixes */
+    @media (max-width: 768px) {
         .nav-tabs {
-            border-bottom: 2px solid #e2e8f0;
-            gap: 5px;
+            flex-direction: column;
         }
-
-        .nav-tabs .nav-link {
-            border: none;
-            color: #64748b;
-            font-weight: 600;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.2s ease;
+        .btn-generate {
+            width: 100%;
+            margin-top: 15px;
         }
-
-        .nav-tabs .nav-link.active {
-            color: var(--primary-color);
-            background-color: #ffffff;
-            border-bottom: 3px solid var(--primary-color);
-        }
-
-        .nav-tabs .nav-link:hover:not(.active) {
-            background-color: #e2e8f0;
-            color: #334155;
-        }
-
-        /* Form Styling */
-        .form-label {
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: #475569;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-control,
-        .form-select {
-            padding: 0.625rem 0.875rem;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
-
-        /* File Preview Box */
-        .file-status-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f0f9ff;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #bae6fd;
-            margin-top: 8px;
-        }
-
-        .file-name {
-            font-size: 0.8rem;
-            color: #0369a1;
-            font-weight: 500;
-        }
-
-        /* Buttons */
-        .btn-success {
-            background-color: var(--success-color);
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            border-radius: 8px;
-        }
-
-        .btn-success:hover {
-            background-color: #059669;
-        }
-
-        .btn-outline-primary {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        /* Section Headings */
-        .section-title {
-            position: relative;
-            padding-left: 15px;
-            border-left: 4px solid var(--primary-color);
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-        }
-
-        /* Responsive Fixes */
-        @media (max-width: 768px) {
-            .nav-tabs {
-                flex-direction: column;
-            }
-
-            .nav-item {
-                width: 100%;
-            }
-
-            .btn-generate {
-                width: 100%;
-                margin-top: 15px;
-            }
-        }
-    </style>
+    }
+</style>
     <div class="container applicant-wrapper">
         <div class="page-header d-md-flex justify-content-between align-items-center mb-4">
             <h2><i class="fa-solid fa-user-pen me-2 text-primary"></i>Update Applicant</h2>
@@ -208,40 +234,53 @@
                             </p>
                         </div>
                         <div class="col-md-4 text-md-end">
-                            @if($applicant->isPermitComplete())
-                                <a href="{{ route('applicants.generatePermit', $applicant->id) }}"
-                                    class="btn btn-success btn-generate shadow-sm">
-                                    <i class="fa-solid fa-file-pdf me-2"></i>Generate Permit
-                                </a>
-                            @else
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Docs
-                                </button>
-                            @endif
-                            @if($applicant->isClearanceComplete())
-                                <a href="{{ route('applicants.generateClearance', $applicant->id) }}"
-                                    class="btn btn-success btn-generate shadow-sm">
-                                    <i class="fa-solid fa-file-pdf me-2"></i>Generate Clearance
-                                </a>
-                            @else
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Docs
-                                </button>
-                            @endif
-                            @if($applicant->isReferralComplete())
-                                <a href="{{ route('applicants.generateReferral', $applicant->id) }}"
-                                    class="btn btn-success btn-generate shadow-sm">
-                                    <i class="fa-solid fa-file-pdf me-2"></i>Generate Referral
-                                </a>
-                            @else
-                                <button class="btn btn-secondary btn-sm" disabled>
-                                    <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Docs
-                                </button>
-                            @endif
+
+                            {{-- Generate Permit --}}
+                            <div class="mb-2">
+                                @if($applicant->isPermitComplete())
+                                    <a href="{{ route('applicants.generatePermit', $applicant->id) }}"
+                                    class="btn btn-generate btn-sm w-100 shadow-sm">
+                                        <i class="fa-solid fa-file-pdf me-2"></i> Generate Work Permit ID
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm w-100 opacity-75" disabled style="cursor: not-allowed;">
+                                        <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Work Permit Requirements
+                                    </button>
+                                @endif
+                            </div>
+
+                            {{-- Generate Clearance --}}
+                            <div class="mb-2">
+                                @if($applicant->isClearanceComplete())
+                                    <a href="{{ route('applicants.generateClearance', $applicant->id) }}"
+                                    class="btn btn-generate btn-sm w-100 shadow-sm">
+                                        <i class="fa-solid fa-file-pdf me-2"></i> Generate Mayor's Clearance Letter
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm w-100 opacity-75" disabled style="cursor: not-allowed;">
+                                        <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Clearance Requirements
+                                    </button>
+                                @endif
+                            </div>
+
+                            {{-- Generate Referral --}}
+                            <div>
+                                @if($applicant->isReferralComplete())
+                                    <a href="{{ route('applicants.generateReferral', $applicant->id) }}"
+                                    class="btn btn-generate btn-sm w-100 shadow-sm">
+                                        <i class="fa-solid fa-file-pdf me-2"></i> Generate Mayor's Referral Letter
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm w-100 opacity-75" disabled style="cursor: not-allowed;">
+                                        <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Referral Requirements
+                                    </button>
+                                @endif
+                            </div>
+
                         </div>
                     </div>
 
-                    <ul class="nav nav-tabs mb-4" id="mayorTabs" role="tablist">
+                    <ul class="nav nav-tabs mb-3" id="mayorTabs" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active" id="permit-tab" data-bs-toggle="tab" data-bs-target="#permit"
                                 type="button" role="tab">
@@ -294,18 +333,6 @@
                                                 class="btn btn-sm btn-outline-primary">
                                                     View
                                                 </a>
-
-                                                <form action="{{ route('permit.deleteFile', [$applicant->id, 'health_card']) }}"
-                                                    method="POST"
-                                                    style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            onclick="return confirm('Remove this file?')">
-                                                        Clear
-                                                    </button>
-                                                </form>
                                             </div>
                                         </div>
                                     @endif
@@ -330,18 +357,6 @@
                                                 class="btn btn-sm btn-outline-primary">
                                                     View
                                                 </a>
-
-                                                <form action="{{ route('permit.deleteFile', [$applicant->id, 'nbi_or_police_clearance']) }}"
-                                                    method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            onclick="return confirm('Remove this file?')">
-                                                        Clear
-                                                    </button>
-                                                </form>
                                             </div>
                                         </div>
                                     @endif
@@ -366,18 +381,6 @@
                                                 class="btn btn-sm btn-outline-primary">
                                                     View
                                                 </a>
-
-                                                <form action="{{ route('permit.deleteFile', [$applicant->id, 'cedula']) }}"
-                                                    method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            onclick="return confirm('Remove this file?')">
-                                                        Clear
-                                                    </button>
-                                                </form>
                                             </div>
                                         </div>
                                     @endif
@@ -413,23 +416,10 @@
                                                 class="btn btn-sm btn-outline-primary">
                                                     View
                                                 </a>
-
-                                                <form action="{{ route('permit.deleteFile', [$applicant->id, 'referral_letter']) }}"
-                                                    method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            onclick="return confirm('Remove this file?')">
-                                                        Clear
-                                                    </button>
-                                                </form>
                                             </div>
                                         </div>
                                     @endif
                                 </div>
-
                             </div>
                         </div>
 
@@ -509,31 +499,31 @@
                                 <div class="row g-3">
                                     <div class="col-md-4">
                                         <label class="form-label small">Barangay Clearance</label>
-                                        <input type="file" name="barangay_clearance" class="form-control">
-                                        @if($referral->barangay_clearance)
+                                        <input type="file" name="ref_barangay_clearance" class="form-control">
+                                        @if($referral->ref_barangay_clearance)
                                             <div class="file-status-box"><span
-                                                    class="file-name">{{ basename($referral->barangay_clearance) }}</span><a
-                                                    href="{{ asset('storage/' . $referral->barangay_clearance) }}"
+                                                    class="file-name">{{ basename($referral->ref_barangay_clearance) }}</span><a
+                                                    href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}"
                                                     target="_blank" class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                         @endif
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small">Police Clearance</label>
-                                        <input type="file" name="police_clearance" class="form-control">
-                                        @if($referral->police_clearance)
+                                        <input type="file" name="ref_police_clearance" class="form-control">
+                                        @if($referral->ref_police_clearance)
                                             <div class="file-status-box"><span
-                                                    class="file-name">{{ basename($referral->police_clearance) }}</span><a
-                                                    href="{{ asset('storage/' . $referral->police_clearance) }}" target="_blank"
+                                                    class="file-name">{{ basename($referral->ref_police_clearance) }}</span><a
+                                                    href="{{ asset('storage/' . $referral->ref_police_clearance) }}" target="_blank"
                                                     class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                         @endif
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small">NBI Clearance</label>
-                                        <input type="file" name="nbi_clearance" class="form-control">
-                                        @if($referral->nbi_clearance)
+                                        <input type="file" name="ref_nbi_clearance" class="form-control">
+                                        @if($referral->ref_nbi_clearance)
                                             <div class="file-status-box"><span
-                                                    class="file-name">{{ basename($referral->nbi_clearance) }}</span><a
-                                                    href="{{ asset('storage/' . $referral->nbi_clearance) }}" target="_blank"
+                                                    class="file-name">{{ basename($referral->ref_nbi_clearance) }}</span><a
+                                                    href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
                                                     class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                         @endif
                                     </div>

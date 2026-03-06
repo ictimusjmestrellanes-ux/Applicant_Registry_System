@@ -17,9 +17,9 @@ return new class extends Migration
 
             $table->string('resume')->default(false);
 
-            $table->string('barangay_clearance')->default(false);
-            $table->string('police_clearance')->default(false);
-            $table->string('nbi_clearance')->default(false);
+            $table->string('ref_barangay_clearance')->default(false);
+            $table->string('ref_police_clearance')->default(false);
+            $table->string('ref_nbi_clearance')->default(false);
 
             $table->timestamps();
         });

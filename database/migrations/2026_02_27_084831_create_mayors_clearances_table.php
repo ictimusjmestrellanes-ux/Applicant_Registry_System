@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('nbi_clearance')->default(false);
             $table->string('barangay_clearance')->default(false);
 
+
+            
             $table->timestamps();
         });
     }

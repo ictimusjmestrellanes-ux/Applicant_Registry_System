@@ -182,9 +182,9 @@ class ApplicantController extends Controller
 
         $referralFields = [
             'resume' => 'Resume',
-            'barangay_clearance' => 'Barangay_Clearance',
-            'police_clearance' => 'Police_Clearance',
-            'nbi_clearance' => 'NBI_Clearance',
+            'ref_barangay_clearance' => 'Barangay_Clearance',
+            'ref_police_clearance' => 'Police_Clearance',
+            'ref_nbi_clearance' => 'NBI_Clearance',
         ];
 
         foreach ($referralFields as $field => $label) {

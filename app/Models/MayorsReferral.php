@@ -9,9 +9,9 @@ class MayorsReferral extends Model
     protected $fillable = [
         'applicant_id',
         'resume',
-        'barangay_clearance',
-        'police_clearance',
-        'nbi_clearance'
+        'ref_barangay_clearance',
+        'ref_police_clearance',
+        'ref_nbi_clearance'
     ];
 
     public function applicant()
