@@ -113,7 +113,6 @@
 
     .form-control,
     .form-select {
-        padding: 0.625rem 0.875rem;
         border-radius: 8px;
         border: 1px solid #cbd5e1;
         background-color: #ffffff;
@@ -201,6 +200,23 @@
         background-color: #0369a1;
     }
 
+    /* Health Card */
+    .upload-group .file-label{
+    max-width:700px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:13px;
+    }
+
+    .upload-group .btn{
+        border-radius:0 6px 6px 0;
+    }
+
+    .upload-group input[type="file"]{
+        cursor:pointer;
+    }
+
     /* Responsive Fixes */
     @media (max-width: 768px) {
         .nav-tabs {
@@ -224,8 +240,6 @@
             @csrf
             @method('PUT')
 
-            <div class="card main-card p-4 p-md-5">
-
                 <div class="requirements-container p-4">
                     <div class="row align-items-center mb-4">
                         <div class="col-md-8">
@@ -233,78 +247,146 @@
                             <p class="text-muted small mb-0">Manage Mayor's Permit, Clearance, and Referral Requirements.
                             </p>
                         </div>
-                        <div class="col-md-4 text-md-end">
-
-                            {{-- Generate Permit --}}
-                            <div class="mb-2">
-                                @if($applicant->isPermitComplete())
-                                    <a href="{{ route('applicants.generatePermit', $applicant->id) }}"
-                                    class="btn btn-generate btn-sm w-100 shadow-sm">
-                                        <i class="fa-solid fa-file-pdf me-2"></i> Generate Work Permit ID
-                                    </a>
-                                @else
-                                    <button class="btn btn-secondary btn-sm w-100 opacity-75" disabled style="cursor: not-allowed;">
-                                        <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Work Permit Requirements
-                                    </button>
-                                @endif
-                            </div>
-
-                            {{-- Generate Clearance --}}
-                            <div class="mb-2">
-                                @if($applicant->isClearanceComplete())
-                                    <a href="{{ route('applicants.generateClearance', $applicant->id) }}"
-                                    class="btn btn-generate btn-sm w-100 shadow-sm">
-                                        <i class="fa-solid fa-file-pdf me-2"></i> Generate Mayor's Clearance Letter
-                                    </a>
-                                @else
-                                    <button class="btn btn-secondary btn-sm w-100 opacity-75" disabled style="cursor: not-allowed;">
-                                        <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Clearance Requirements
-                                    </button>
-                                @endif
-                            </div>
-
-                            {{-- Generate Referral --}}
-                            <div>
-                                @if($applicant->isReferralComplete())
-                                    <a href="{{ route('applicants.generateReferral', $applicant->id) }}"
-                                    class="btn btn-generate btn-sm w-100 shadow-sm">
-                                        <i class="fa-solid fa-file-pdf me-2"></i> Generate Mayor's Referral Letter
-                                    </a>
-                                @else
-                                    <button class="btn btn-secondary btn-sm w-100 opacity-75" disabled style="cursor: not-allowed;">
-                                        <i class="fa-solid fa-circle-exclamation me-1"></i> Incomplete Referral Requirements
-                                    </button>
-                                @endif
-                            </div>
-
-                        </div>
                     </div>
 
                     <ul class="nav nav-tabs mb-3" id="mayorTabs" role="tablist">
                         <li class="nav-item">
-                            <button class="nav-link active" id="permit-tab" data-bs-toggle="tab" data-bs-target="#permit"
-                                type="button" role="tab">
+                            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab"
+                                data-bs-target="#personal" type="button" role="tab">
+                                Personal Information
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-link" id="permit-tab" data-bs-toggle="tab"
+                                data-bs-target="#permit" type="button" role="tab">
                                 Permit to Work
                             </button>
                         </li>
+
                         <li class="nav-item">
-                            <button class="nav-link" id="clearance-tab" data-bs-toggle="tab" data-bs-target="#clearance"
-                                type="button" role="tab">
+                            <button class="nav-link" id="clearance-tab" data-bs-toggle="tab"
+                                data-bs-target="#clearance" type="button" role="tab">
                                 Mayor's Clearance
                             </button>
                         </li>
+
                         <li class="nav-item">
-                            <button class="nav-link" id="referral-tab" data-bs-toggle="tab" data-bs-target="#referral"
-                                type="button" role="tab">
+                            <button class="nav-link" id="referral-tab" data-bs-toggle="tab"
+                                data-bs-target="#referral" type="button" role="tab">
                                 Mayor's Referral
                             </button>
                         </li>
                     </ul>
-
                     <div class="tab-content bg-white p-4 rounded-3 border shadow-sm">
+                        
+                        <div class="tab-pane fade show active" id="personal" role="tabpanel">
 
-                        <div class="tab-pane fade show active" id="permit" role="tabpanel">
-                            <h6 class="section-title text-primary">Mayor’s Permit to Work Requirements</h6>
+                            <h6 class="section-title text-primary">Personal Information</h6>
+
+                            <div class="row g-4 mb-5">
+
+                                <div class="col-md-4">
+                                    <label class="form-label">First Name *</label>
+                                    <input type="text" name="first_name"
+                                        value="{{ $applicant->first_name }}"
+                                        class="form-control" required>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Middle Name</label>
+                                    <input type="text" name="middle_name"
+                                        value="{{ $applicant->middle_name }}"
+                                        class="form-control">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Last Name *</label>
+                                    <input type="text" name="last_name"
+                                        value="{{ $applicant->last_name }}"
+                                        class="form-control" required>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Suffix</label>
+                                    <select name="suffix" class="form-select">
+                                        <option value="">None</option>
+                                        <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.</option>
+                                        <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                                        <option value="II" {{ $applicant->suffix == 'II' ? 'selected' : '' }}>II</option>
+                                        <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III</option>
+                                        <option value="IV" {{ $applicant->suffix == 'IV' ? 'selected' : '' }}>IV</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Contact No *</label>
+                                    <input type="text"
+                                        name="contact_no"
+                                        value="{{ $applicant->contact_no }}"
+                                        class="form-control"
+                                        placeholder="09XXXXXXXXX"
+                                        required>
+                                </div>
+
+                            </div>
+
+                            <h6 class="section-title text-primary">Residential Address</h6>
+
+                            <div class="mb-4">
+                                <label class="form-label">Street Address / House No. *</label>
+                                <input type="text"
+                                    name="address_line"
+                                    value="{{ $applicant->address_line }}"
+                                    class="form-control"
+                                    required>
+                            </div>
+
+                            <div class="row g-4 mb-5">
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Province *</label>
+                                    <select name="province" id="province" class="form-select" required>
+                                        <option>Loading provinces...</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">City *</label>
+                                    <select name="city" id="city" class="form-select" required>
+                                        <option>Select City</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Barangay *</label>
+                                    <select name="barangay" id="barangay" class="form-select" required>
+                                        <option>Select Barangay</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane fade" id="permit" role="tabpanel">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                                <h6 class="section-title text-primary mb-0">Mayor’s Permit to Work Requirements</h6>
+                                @if($applicant->isPermitComplete())
+                                    <a href="{{ route('applicants.generatePermit', $applicant->id) }}"
+                                    class="btn btn-generate btn-sm shadow-sm">
+                                        <i class="fa-solid fa-file-pdf me-2"></i>
+                                        Generate Mayor's Permit to Work ID
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm opacity-75"
+                                            disabled
+                                            style="cursor:not-allowed;">
+                                        <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                        Incomplete Work Permit Requirements
+                                    </button>
+                                @endif
+                            </div>
 
                             @php 
                                 $permit = optional($applicant->permit);
@@ -315,75 +397,66 @@
 
                                 {{-- HEALTH CARD --}}
                                 <div class="col-md-6">
-                                    <label class="form-label">Health Card</label>
-                                    <input type="file" name="health_card" class="form-control">
-
-                                    @if($permit->health_card)
-                                        <div class="file-status-box d-flex justify-content-between align-items-center mt-2"
-                                            id="file-health_card">
-                                            
-                                            <span class="file-name text-truncate">
-                                                <i class="fa-solid fa-paperclip me-2"></i>
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-id-card text-primary me-1"></i>
+                                        Health Card
+                                    </label>
+                                    <div class="input-group upload-group">
+                                        <input type="file" name="health_card" class="form-control" >
+                                        @if($permit->health_card)
+                                            <span class="input-group-text file-label">
                                                 {{ basename($permit->health_card) }}
                                             </span>
-
-                                            <div>
-                                                <a href="{{ asset('storage/' . $permit->health_card) }}"
-                                                target="_blank"
-                                                class="btn btn-sm btn-outline-primary">
-                                                    View
-                                                </a>
-                                            </div>
-                                        </div>
-                                    @endif
+                                            <a href="{{ Storage::url($permit->health_card) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
-
 
                                 {{-- NBI / POLICE --}}
                                 <div class="col-md-6">
-                                    <label class="form-label">NBI or Police Clearance</label>
-                                    <input type="file" name="nbi_or_police_clearance" class="form-control">
-
-                                    @if($permit->nbi_or_police_clearance)
-                                        <div class="file-status-box d-flex justify-content-between align-items-center mt-2">
-                                            <span class="file-name text-truncate">
-                                                <i class="fa-solid fa-paperclip me-2"></i>
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-id-card text-primary me-1"></i>
+                                        NBI Clearance / Police Clearance
+                                    </label>
+                                    <div class="input-group upload-group">
+                                        <input type="file" name="nbi_or_police_clearance" class="form-control">
+                                        @if($permit->nbi_or_police_clearance)
+                                            <span class="input-group-text file-label">
                                                 {{ basename($permit->nbi_or_police_clearance) }}
                                             </span>
-
-                                            <div>
-                                                <a href="{{ asset('storage/' . $permit->nbi_or_police_clearance) }}"
-                                                target="_blank"
-                                                class="btn btn-sm btn-outline-primary">
-                                                    View
-                                                </a>
-                                            </div>
-                                        </div>
-                                    @endif
+                                            <a href="{{ Storage::url($permit->nbi_or_police_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
 
 
                                 {{-- CEDULA --}}
                                 <div class="col-md-6">
-                                    <label class="form-label">Cedula</label>
-                                    <input type="file" name="cedula" class="form-control">
-
-                                    @if($permit->cedula)
-                                        <div class="file-status-box d-flex justify-content-between align-items-center mt-2">
-                                            <span class="file-name text-truncate">
-                                                <i class="fa-solid fa-paperclip me-2"></i>
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-id-card text-primary me-1"></i>
+                                        Cedula
+                                    </label>
+                                    <div class="input-group upload-group">
+                                        <input type="file" name="cedula" class="form-control">
+                                        @if($permit->cedula)
+                                            <span class="input-group-text file-label">
                                                 {{ basename($permit->cedula) }}
                                             </span>
-
-                                            <div>
-                                                <a href="{{ asset('storage/' . $permit->cedula) }}"
-                                                target="_blank"
-                                                class="btn btn-sm btn-outline-primary">
-                                                    View
-                                                </a>
-                                            </div>
-                                        </div>
-                                    @endif
+                                            <a href="{{ Storage::url($permit->cedula) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
 
 
@@ -397,45 +470,61 @@
                                             <span class="text-danger">(Required if not from Imus)</span>
                                         @endif
                                     </label>
-
-                                    <input type="file"
-                                        name="referral_letter"
-                                        class="form-control"
-                                        {{ $isImusResident ? 'disabled' : '' }}>
-
-                                    @if($permit->referral_letter)
-                                        <div class="file-status-box d-flex justify-content-between align-items-center mt-2">
-                                            <span class="file-name text-truncate">
-                                                <i class="fa-solid fa-paperclip me-2"></i>
+                                    <div class="input-group upload-group">
+                                        <input type="file" name="referral_letter" class="form-control">
+                                        @if($permit->referral_letter)
+                                            <span class="input-group-text file-label">
                                                 {{ basename($permit->referral_letter) }}
                                             </span>
-
-                                            <div>
-                                                <a href="{{ asset('storage/' . $permit->referral_letter) }}"
-                                                target="_blank"
-                                                class="btn btn-sm btn-outline-primary">
-                                                    View
-                                                </a>
-                                            </div>
-                                        </div>
-                                    @endif
+                                            <a href="{{ Storage::url($permit->referral_letter) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="tab-pane fade" id="clearance" role="tabpanel">
-                            <h6 class="section-title text-primary">Legal Clearance Documents</h6>
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                                <h6 class="section-title text-primary mb-0">Mayor’s Clearance Requirements</h6>
+                                @if($applicant->isClearanceComplete())
+                                    <a href="{{ route('applicants.generateClearance', $applicant->id) }}"
+                                    class="btn btn-generate btn-sm shadow-sm">
+                                        <i class="fa-solid fa-file-pdf me-2"></i>
+                                        Generate Mayor's Clearance Letter
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm opacity-75"
+                                            disabled
+                                            style="cursor:not-allowed;">
+                                        <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                        Incomplete Work Clearance Requirements
+                                    </button>
+                                @endif
+                            </div>
                             @php $clearance = optional($applicant->clearance); @endphp
                             <div class="row g-4">
                                 <div class="col-md-6">
-                                    <label class="form-label">Prosecutor’s Clearance</label>
-                                    <input type="file" name="prosecutor_clearance" class="form-control">
-                                    @if($clearance->prosecutor_clearance)
-                                        <div class="file-status-box"><span
-                                                class="file-name">{{ basename($clearance->prosecutor_clearance) }}</span><a
-                                                href="{{ asset('storage/' . $clearance->prosecutor_clearance) }}"
-                                                target="_blank" class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                    @endif
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-id-card text-primary me-1"></i>
+                                        Prosecutor's Clearance
+                                    </label>
+                                    <div class="input-group upload-group">
+                                        <input type="file" name="prosecutor_clearance" class="form-control" >
+                                        @if($permit->prosecutor_clearance)
+                                            <span class="input-group-text file-label">
+                                                {{ basename($permit->prosecutor_clearance) }}
+                                            </span>
+                                            <a href="{{ Storage::url($permit->prosecutor_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Municipal Trial Court Clearance</label>
@@ -443,7 +532,7 @@
                                     @if($clearance->mtc_clearance)
                                         <div class="file-status-box"><span
                                                 class="file-name">{{ basename($clearance->mtc_clearance) }}</span><a
-                                                href="{{ asset('storage/' . $clearance->mtc_clearance) }}" target="_blank"
+                                                href="{{ Storage::url($clearance->mtc_clearance) }}" target="_blank"
                                                 class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                     @endif
                                 </div>
@@ -453,7 +542,7 @@
                                     @if($clearance->rtc_clearance)
                                         <div class="file-status-box"><span
                                                 class="file-name">{{ basename($clearance->rtc_clearance) }}</span><a
-                                                href="{{ asset('storage/' . $clearance->rtc_clearance) }}" target="_blank"
+                                                href="{{ Storage::url($clearance->rtc_clearance) }}" target="_blank"
                                                 class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                     @endif
                                 </div>
@@ -463,7 +552,7 @@
                                     @if($clearance->nbi_clearance)
                                         <div class="file-status-box"><span
                                                 class="file-name">{{ basename($clearance->nbi_clearance) }}</span><a
-                                                href="{{ asset('storage/' . $clearance->nbi_clearance) }}" target="_blank"
+                                                href="{{ Storage::url($clearance->nbi_clearance) }}" target="_blank"
                                                 class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                     @endif
                                 </div>
@@ -473,7 +562,7 @@
                                     @if($clearance->barangay_clearance)
                                         <div class="file-status-box"><span
                                                 class="file-name">{{ basename($clearance->barangay_clearance) }}</span><a
-                                                href="{{ asset('storage/' . $clearance->barangay_clearance) }}" target="_blank"
+                                                href="{{ Storage::url($clearance->barangay_clearance) }}" target="_blank"
                                                 class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                     @endif
                                 </div>
@@ -481,7 +570,23 @@
                         </div>
 
                         <div class="tab-pane fade" id="referral" role="tabpanel">
-                            <h6 class="section-title text-primary">Referral Information</h6>
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                                <h6 class="section-title text-primary mb-0">Mayor’s Referral Requirements</h6>
+                                @if($applicant->isReferralComplete())
+                                    <a href="{{ route('applicants.generateReferral', $applicant->id) }}"
+                                    class="btn btn-generate btn-sm shadow-sm">
+                                        <i class="fa-solid fa-file-pdf me-2"></i>
+                                        Generate Mayor's Referral Letter
+                                    </a>
+                                @else
+                                    <button class="btn btn-secondary btn-sm opacity-75"
+                                            disabled
+                                            style="cursor:not-allowed;">
+                                        <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                        Incomplete Referral Requirements
+                                    </button>
+                                @endif
+                            </div>
                             @php $referral = optional($applicant->referral); @endphp
                             <div class="mb-4">
                                 <label class="form-label">1. Resume or Bio-Data <span class="text-danger">*</span></label>
@@ -489,7 +594,7 @@
                                 @if($referral->resume)
                                     <div class="file-status-box"><span
                                             class="file-name">{{ basename($referral->resume) }}</span><a
-                                            href="{{ asset('storage/' . $referral->resume) }}" target="_blank"
+                                            href="{{ Storage::url($referral->resume) }}" target="_blank"
                                             class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                 @endif
                             </div>
@@ -503,7 +608,7 @@
                                         @if($referral->ref_barangay_clearance)
                                             <div class="file-status-box"><span
                                                     class="file-name">{{ basename($referral->ref_barangay_clearance) }}</span><a
-                                                    href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}"
+                                                    href="{{ Storage::url($referral->ref_barangay_clearance) }}"
                                                     target="_blank" class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                         @endif
                                     </div>
@@ -513,7 +618,7 @@
                                         @if($referral->ref_police_clearance)
                                             <div class="file-status-box"><span
                                                     class="file-name">{{ basename($referral->ref_police_clearance) }}</span><a
-                                                    href="{{ asset('storage/' . $referral->ref_police_clearance) }}" target="_blank"
+                                                    href="{{ Storage::url($referral->ref_police_clearance) }}" target="_blank"
                                                     class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                         @endif
                                     </div>
@@ -523,7 +628,7 @@
                                         @if($referral->ref_nbi_clearance)
                                             <div class="file-status-box"><span
                                                     class="file-name">{{ basename($referral->ref_nbi_clearance) }}</span><a
-                                                    href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
+                                                    href="{{ Storage::url($referral->ref_nbi_clearance) }}" target="_blank"
                                                     class="btn btn-sm btn-outline-primary py-0">View</a></div>
                                         @endif
                                     </div>
@@ -531,81 +636,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <h5 class="section-title">Personal Information</h5>
-                <div class="row g-4 mb-5">
-                    <div class="col-md-4">
-                        <label class="form-label">First Name *</label>
-                        <input type="text" name="first_name" value="{{ $applicant->first_name }}" class="form-control"
-                            required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Middle Name</label>
-                        <input type="text" name="middle_name" value="{{ $applicant->middle_name }}" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Last Name *</label>
-                        <input type="text" name="last_name" value="{{ $applicant->last_name }}" class="form-control"
-                            required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Suffix</label>
-                        <select name="suffix" class="form-select">
-                            <option value="">None</option>
-                            <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.</option>
-                            <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.</option>
-                            <option value="II" {{ $applicant->suffix == 'II' ? 'selected' : '' }}>II</option>
-                            <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III</option>
-                            <option value="IV" {{ $applicant->suffix == 'IV' ? 'selected' : '' }}>IV</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Contact No *</label>
-                        <input type="text" name="contact_no" value="{{ $applicant->contact_no }}" class="form-control"
-                            placeholder="09XXXXXXXXX" required>
-                    </div>
-                </div>
-
-                <h5 class="section-title">Residential Address</h5>
-                <div class="mb-4">
-                    <label class="form-label">Street Address / House No. *</label>
-                    <input type="text" name="address_line" value="{{ $applicant->address_line }}" class="form-control"
-                        required>
-                </div>
-
-                <div class="row g-4 mb-5">
-                    <div class="col-md-4">
-                        <label class="form-label">Province *</label>
-                        <select name="province" id="province" class="form-select" required>
-                            <option>Loading provinces...</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">City *</label>
-                        <select name="city" id="city" class="form-select" required>
-                            <option>Select City</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Barangay *</label>
-                        <select name="barangay" id="barangay" class="form-select" required>
-                            <option>Select Barangay</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="d-flex flex-wrap gap-3 pt-4 border-top">
-                    <button type="submit" class="btn btn-success shadow-sm px-5 py-2">
-                        <i class="fa-solid fa-check me-2"></i>Update Applicant Profile
-                    </button>
-                    <a href="{{ route('applicants.index') }}" class="btn btn-light border px-4 py-2">
-                        Cancel
-                    </a>
-                </div>
-            </div>
+                    <div class="d-flex flex-wrap gap-3 pt-4 border-top">
+                        <button type="submit" class="btn btn-success shadow-sm px-5 py-2">
+                            <i class="fa-solid fa-check me-2"></i>Update Applicant Profile
+                        </button>
+                        <a href="{{ route('applicants.index') }}" class="btn btn-light border px-4 py-2">Cancel</a>
+                    </div>    
+                </div>        
         </form>
-    </div>
+    </div>        
 @endsection
 <script>
     document.addEventListener("DOMContentLoaded", function () {
