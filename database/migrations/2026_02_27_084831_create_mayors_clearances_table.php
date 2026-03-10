@@ -20,7 +20,17 @@ return new class extends Migration
             $table->string('rtc_clearance')->default(false);
             $table->string('nbi_clearance')->default(false);
             $table->string('barangay_clearance')->default(false);
-
+    
+            
+            
+            $table->string('clearance_or_no');
+            $table->date('clearance_issued_on');
+            $table->string('clearance_issued_in');
+            $table->string('peso_control_no');
+            $table->string('clearance_doc_stamp_control_no');
+            $table->string('clearance_gor_control_no');
+            $table->date('date_of_payment');
+            $table->string('hired_company');
 
             
             $table->timestamps();

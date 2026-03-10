@@ -13,6 +13,16 @@ class MayorsClearance extends Model
         'rtc_clearance',
         'nbi_clearance',
         'barangay_clearance',
+
+        'clearance_or_no',
+        'clearance_issued_on',
+        'clearance_issued_in',
+        'peso_control_no',
+        'clearance_doc_stamp_control_no',
+        'clearance_gor_control_no',
+        'date_of_payment',
+        'hired_company',
+
     ];
 
     public function applicant()

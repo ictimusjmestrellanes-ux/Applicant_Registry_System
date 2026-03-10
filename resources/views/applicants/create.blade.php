@@ -177,11 +177,19 @@
                                 <option value="IV">IV</option>
                             </select>
                         </div>
-
+                        <div class="col-md-4">
+                            <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
+                            <select name="gender" class="form-select form-input" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
                         <div class="col-md-4">
                             <label class="form-label">Contact Number <span class="required-mark">*</span></label>
                             <input type="text" name="contact_no" class="form-control form-input" placeholder="09123456789" required>
                         </div>
+                        
                     </div>
                 </div>
 

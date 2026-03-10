@@ -9,7 +9,6 @@ use App\Models\MayorsReferral;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ApplicantController extends Controller
 {
@@ -24,6 +23,7 @@ class ApplicantController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'contact_no' => 'required',
+            'gender' => 'required',
             'address_line' => 'required',
             'province' => 'required',
             'city' => 'required',
@@ -45,7 +45,8 @@ class ApplicantController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where('first_name', 'like', "%$search%")
                     ->orWhere('last_name', 'like', "%$search%")
-                    ->orWhere('contact_no', 'like', "%$search%");
+                    ->orWhere('contact_no', 'like', "%$search%")
+                    ->orWhere('gender', 'like', "%$search%");
             })
             ->paginate(10);
 
@@ -75,10 +76,15 @@ class ApplicantController extends Controller
             'last_name' => $request->last_name,
             'suffix' => $request->suffix,
             'contact_no' => $request->contact_no,
+            'gender' => $request->gender,
             'address_line' => $request->address_line,
             'province' => $request->province,
             'city' => $request->city,
             'barangay' => $request->barangay,
+        ]);
+
+        $permit = MayorsPermit::firstOrNew([
+            'applicant_id' => $applicant->id,
         ]);
 
         /*
@@ -87,9 +93,7 @@ class ApplicantController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $fullName = $applicant->first_name.'_'.
-                    ($applicant->middle_name ? $applicant->middle_name.'_' : '').
-                    $applicant->last_name;
+        $fullName = $applicant->last_name;
 
         $fullName = Str::slug($fullName, '_');
 
@@ -102,6 +106,32 @@ class ApplicantController extends Controller
         $permit = MayorsPermit::firstOrCreate([
             'applicant_id' => $applicant->id,
         ]);
+
+        $permit->update([
+            'peso_id_no' => $request->peso_id_no,
+            'employers_name_or_address' => $request->employers_name_or_address,
+            'community_tax_no' => $request->community_tax_no,
+            'permit_issued_on' => $request->permit_issued_on,
+            'permit_issued_in' => $request->permit_issued_in,
+            'paid_under_official_receipt' => $request->paid_under_official_receipt,
+            'permit_date' => $request->permit_date,
+            'expires_on' => $request->expires_on,
+            'permit_doc_stamp_control_no' => $request->permit_doc_stamp_control_no,
+            'permit_gor_serial_no' => $request->permit_gor_serial_no,
+            'permit_date_of_payment' => $request->permit_date_of_payment,
+        ]);
+
+
+        // $permit->employers_name_or_address = $request->employers_name_or_address;
+        // $permit->community_tax_no = $request->community_tax_no;
+        // $permit->permit_issued_on = $request->permit_issued_on;
+        // $permit->permit_issued_in = $request->permit_issued_in;
+        // $permit->paid_under_official_receipt = $request->paid_under_official_receipt;
+        // $permit->permit_date = $request->permit_date;
+        // $permit->expires_on = $request->expires_on;
+        // $permit->permit_doc_stamp_control_no = $request->permit_doc_stamp_control_no;
+        // $permit->permit_gor_serial_no = $request->permit_gor_serial_no;
+        // $permit->permit_date_of_payment = $request->permit_date_of_payment;
 
         $permitFields = [
             'health_card' => 'Health_Card',
@@ -121,7 +151,7 @@ class ApplicantController extends Controller
                 $file = $request->file($field);
                 $extension = $file->getClientOriginalExtension();
 
-                $fileName = $label.'_'.$fullName.'.'.$extension;
+                $fileName = $label.'_'.strtoupper($fullName).'.'.$extension;
 
                 $path = $file->storeAs('permits', $fileName, 'public');
 
@@ -140,6 +170,18 @@ class ApplicantController extends Controller
         $clearance = MayorsClearance::firstOrCreate([
             'applicant_id' => $applicant->id,
         ]);
+
+        $clearance->update([
+            'clearance_or_no' => $request->clearance_or_no,
+            'clearance_issued_on' => $request->clearance_issued_on,
+            'clearance_issued_in' => $request->clearance_issued_in,
+            'peso_control_no' => $request->peso_control_no,
+            'clearance_doc_stamp_control_no' => $request->clearance_doc_stamp_control_no,
+            'clearance_gor_control_no' => $request->clearance_gor_control_no,
+            'date_of_payment' => $request->date_of_payment,
+            'hired_company' => $request->hired_company,
+        ]);
+
 
         $clearanceFields = [
             'prosecutor_clearance' => 'Prosecutor_Clearance',
@@ -160,7 +202,7 @@ class ApplicantController extends Controller
                 $file = $request->file($field);
                 $extension = $file->getClientOriginalExtension();
 
-                $fileName = $label.'_'.$fullName.'.'.$extension;
+                $fileName = $label.'_'.strtoupper($fullName).'.'.$extension;
 
                 $path = $file->storeAs('clearances', $fileName, 'public');
 
@@ -198,7 +240,7 @@ class ApplicantController extends Controller
                 $file = $request->file($field);
                 $extension = $file->getClientOriginalExtension();
 
-                $fileName = $label.'_'.$fullName.'.'.$extension;
+                $fileName = $label.'_'.strtoupper($fullName).'.'.$extension;
 
                 $path = $file->storeAs('referrals', $fileName, 'public');
 

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('suffix')->nullable();
-
             $table->string('contact_no');
+            $table->string('gender');
 
             $table->string('address_line');
             $table->string('province');

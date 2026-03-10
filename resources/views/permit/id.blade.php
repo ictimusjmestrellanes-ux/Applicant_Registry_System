@@ -1,139 +1,276 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Mayor's Permit to Work</title>
+    <meta charset="utf-8">
 
     <style>
         @page {
             size: A4;
             margin: 10mm;
-            
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
-        .container {
+        /* A4 container */
+        .print-page {
+            width: 210mm;
+            min-height: 297mm;
             display: flex;
-            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        .card {
-            height: 432px;   /* 6 inches */
-            width: 288px;  /* 4 inches */
+        /* PERMIT CARD */
+        .permit-card {
+            width: 6in;
+            height: 4in;
             border: 2px solid #000;
-            padding: 15px;
-            box-sizing: border-box;
+            display: flex;
+            margin: 10px;
         }
 
-        .header-green {
-            background: #4CAF50;
-            color: white;
+        /* LEFT SIDE */
+        .left-panel {
+            width: 50%;
+            background: #e9f4ea;
+            padding: 10px;
+        }
+
+        .header {
             text-align: center;
-            padding: 15px;
+        }
+
+        .header img {
+            width: 40px;
+        }
+
+        .title {
             font-weight: bold;
+            font-size: 16px;
+            color: #2f7f3c;
+        }
+
+        .subtitle {
+            font-size: 11px;
         }
 
         .photo-box {
-            width: 120px;
+            width: 110px;
             height: 120px;
-            border: 1px solid #000;
-            margin: 20px auto;
+            background: #ccc;
+            margin: 8px auto;
         }
 
-        .blue-box {
-            background: #1e4e79;
-            color: white;
-            padding: 8px;
-            margin-bottom: 8px;
-            font-size: 13px;
+        .name-row {
+            margin-top: 6px;
         }
 
-        .value {
+        .label {
+            background: #4caf50;
+            color: #fff;
+            padding: 3px 6px;
+            font-size: 10px;
             font-weight: bold;
-            margin-bottom: 10px;
         }
 
-        .print-btn {
-            margin-bottom: 20px;
+        .name {
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            width: 70%;
         }
 
-        @media print {
-            .print-btn {
-                display: none;
-            }
+        .signature {
+            border-bottom: 1px solid #000;
+        }
+
+        .mayor {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 6px;
+        }
+
+        /* RIGHT SIDE */
+
+        .right-panel {
+            width: 50%;
+            padding: 8px;
+            border-left: 2px solid #000;
+        }
+
+        .field {
+            margin-bottom: 5px;
+        }
+
+        .field-title {
+            background: #1c4f73;
+            color: #fff;
+            font-size: 9px;
+            padding: 2px 4px;
+            font-weight: bold;
+        }
+
+        .field-value {
+            border-bottom: 1px solid #000;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* DOCUMENTARY BOX */
+
+        .doc-box {
+            border: 2px solid red;
+            margin-top: 6px;
+            padding: 4px;
+        }
+
+        .doc-title {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .doc-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
         }
     </style>
+
 </head>
 
 <body>
 
-<button class="print-btn" onclick="window.print()">Print Permit</button>
+    <div class="print-page">
+            <div class="permit-card">
 
-<div class="container">
+                <!-- LEFT -->
+                <div class="left-panel">
 
-    <!-- FRONT -->
-    <div class="card">
+                    <div class="header">
 
-        <div class="header-green">
-            MAYOR'S PERMIT TO WORK
-        </div>
+                        <img src="{{ public_path('logo1.png') }}">
+                        <img src="{{ public_path('logo2.png') }}">
 
-        <div class="photo-box"></div>
+                        <div style="font-size:9px">
+                            Republic of the Philippines<br>
+                            Province of Cavite<br>
+                            City Government of Imus<br>
+                            Public Employment Service Office
+                        </div>
 
-        <p><strong>PESO NO.</strong> {{ now()->format('Y') }}-{{ $applicant->id }}</p>
+                        <div class="title">
+                            MAYOR'S PERMIT TO WORK
+                        </div>
 
-        <p><strong>NAME:</strong><br>
-            {{ strtoupper($applicant->name) }}
-        </p>
+                        <div class="subtitle">
+                            is hereby given to
+                        </div>
 
-        <p><strong>SIGNATURE:</strong></p>
+                    </div>
 
-        <br><br>
+                    <div class="photo-box">
+                        <img src="{{ public_path('storage/' . $applicant->photo) }}" style="width:100%;height:100%;">
+                    </div>
 
-        <p>
-            whose name, signature and photo appearing herein
-            is permitted to work within the City of Imus.
-        </p>
+                    <div style="text-align:center;font-size:9px;">
+                        PESO ID NO. 
+                    </div>
 
-        <br><br>
+                    <div class="name-row">
+                        <span class="label">NAME</span>
+                        <span class="name">{{ $applicant->full_name }}</span>
+                    </div>
 
-        <p><strong>HON. ALEX L. ADVINCULA</strong><br>
-            CITY MAYOR
-        </p>
+                    <div class="name-row">
+                        <span class="label">SIGNATURE</span>
+                        <span class="signature"></span>
+                    </div>
+
+                    <div class="mayor">
+                        <b>HON. ALEX L. ADVINCULA</b><br>
+                        CITY MAYOR
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT -->
+                <div class="right-panel">
+
+                    <div class="field">
+                        <div class="field-title">EMPLOYER'S NAME / ADDRESS</div>
+                        <div class="field-value">{{ $permit->employers_name_or_address }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">EMPLOYEE ADDRESS</div>
+                        <div class="field-value">{{ $applicant->address }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">COMMUNITY TAX NO.</div>
+                        <div class="field-value">{{ $permit->community_tax_no }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">ISSUED ON</div>
+                        <div class="field-value">{{ $permit->permit_issued_on }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">ISSUED AT</div>
+                        <div class="field-value">{{ $permit->permit_issued_in }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">PAID UNDER OFFICIAL RECEIPT</div>
+                        <div class="field-value">{{ $permit->paid_under_official_receipt }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">DATED</div>
+                        <div class="field-value">{{ $permit->permit_date }}</div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-title">THIS PERMIT EXPIRES ON</div>
+                        <div class="field-value">{{ $permit->expires_on }}</div>
+                    </div>
+
+                    <div class="doc-box">
+
+                        <div class="doc-title">
+                            DOCUMENTARY STAMP TAX PAID
+                        </div>
+
+                        <div style="text-align:center;font-weight:bold;">
+                            {{ $permit->permit_doc_stamp_control_no }}
+                        </div>
+
+                        <div class="doc-row">
+                            <div>GOR SERIAL</div>
+                            <div>{{ $permit->permit_gor_serial_no }}</div>
+                        </div>
+
+                        <div class="doc-row">
+                            <div>DATE OF PAYMENT</div>
+                            <div>{{ $permit->permit_date_of_payment }}</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
     </div>
-
-    <!-- BACK -->
-    <div class="card">
-
-        <div class="blue-box">EMPLOYER'S NAME / ADDRESS</div>
-        <div class="value">TO BE FILLED</div>
-
-        <div class="blue-box">COMMUNITY TAX NO.</div>
-        <div class="value">123456789</div>
-
-        <div class="blue-box">ISSUED ON</div>
-        <div class="value">{{ now()->format('m/d/Y') }}</div>
-
-        <div class="blue-box">ISSUED AT</div>
-        <div class="value">CITY OF IMUS</div>
-
-        <div class="blue-box">PERMIT EXPIRES ON</div>
-        <div class="value">
-            {{ now()->addYear()->format('F d, Y') }}
-        </div>
-
-        <br><br>
-
-        <div style="border:2px solid red; padding:10px;">
-            DOCUMENTARY STAMP TAX PAID
-        </div>
-
-    </div>
-
-</div>
 
 </body>
+
 </html>

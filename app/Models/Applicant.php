@@ -15,6 +15,7 @@ class Applicant extends Model
         'last_name',
         'suffix',
         'contact_no',
+        'gender',
         'address_line',
         'province',
         'city',

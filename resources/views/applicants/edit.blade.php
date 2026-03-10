@@ -10,16 +10,41 @@
             document.addEventListener('DOMContentLoaded', function () {
 
                 Swal.fire({
-                    title: 'Applicant Created!',
-                    text: 'Do you want to continue editing requirements?',
+                    title: 'Applicant Successfully Created',
+                    html: `
+                        <div style="font-size:14px;">
+                            <p class="mb-2">The applicant profile has been saved successfully.</p>
+                            <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                        </div>
+                    `,
                     icon: 'success',
+                    background: '#ffffff',
+                    color: '#333',
+                    width: 420,
                     showCancelButton: true,
-                    confirmButtonText: 'Yes, Continue',
-                    cancelButtonText: 'No, Go Back'
+
+                    confirmButtonText: '<i class="fa-solid fa-pen-to-square me-2"></i> Continue Editing',
+                    cancelButtonText: '<i class="fa-solid fa-arrow-left me-2"></i> Back to List',
+
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+
+                    buttonsStyling: true,
+                    reverseButtons: true,
+
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                    }
+
                 }).then((result) => {
+
                     if (!result.isConfirmed) {
                         window.location.href = "{{ route('applicants.index') }}";
                     }
+
                 });
 
             });
@@ -228,7 +253,7 @@
         }
     }
 </style>
-    <div class="container applicant-wrapper">
+<div class="container applicant-wrapper">
         <div class="page-header d-md-flex justify-content-between align-items-center mb-4">
             <h2><i class="fa-solid fa-user-pen me-2 text-primary"></i>Update Applicant</h2>
             <a href="{{ route('applicants.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -318,28 +343,26 @@
                                         <option value="IV" {{ $applicant->suffix == 'IV' ? 'selected' : '' }}>IV</option>
                                     </select>
                                 </div>
-
+                                <div class="col-md-4">
+                                    <label class="form-label">Sex/Gender</label>
+                                    <select name="gender" class="form-select">
+                                        <option value="">None</option>
+                                        <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male</option>
+                                        <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>Female</option>
+                                    </select>
+                                </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Contact No *</label>
-                                    <input type="text"
-                                        name="contact_no"
-                                        value="{{ $applicant->contact_no }}"
-                                        class="form-control"
-                                        placeholder="09XXXXXXXXX"
-                                        required>
+                                    <input type="text" name="contact_no" value="{{ $applicant->contact_no }}" class="form-control" placeholder="09XXXXXXXXX" required>
                                 </div>
-
                             </div>
 
+                            
                             <h6 class="section-title text-primary">Residential Address</h6>
 
                             <div class="mb-4">
                                 <label class="form-label">Street Address / House No. *</label>
-                                <input type="text"
-                                    name="address_line"
-                                    value="{{ $applicant->address_line }}"
-                                    class="form-control"
-                                    required>
+                                <input type="text" name="address_line" value="{{ $applicant->address_line }}" class="form-control" required>
                             </div>
 
                             <div class="row g-4 mb-5">
@@ -399,12 +422,12 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">
                                         <i class="fa-solid fa-id-card text-primary me-1"></i>
-                                        Health Card
+                                        1. Health Card
                                     </label>
                                     <div class="input-group upload-group">
                                         <input type="file" name="health_card" class="form-control" >
                                         @if($permit->health_card)
-                                            <span class="input-group-text file-label">
+                                            <span class="input-group-text file-name">
                                                 {{ basename($permit->health_card) }}
                                             </span>
                                             <a href="{{ Storage::url($permit->health_card) }}"
@@ -420,12 +443,12 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">
                                         <i class="fa-solid fa-id-card text-primary me-1"></i>
-                                        NBI Clearance / Police Clearance
+                                        2. NBI Clearance / Police Clearance
                                     </label>
                                     <div class="input-group upload-group">
                                         <input type="file" name="nbi_or_police_clearance" class="form-control">
                                         @if($permit->nbi_or_police_clearance)
-                                            <span class="input-group-text file-label">
+                                            <span class="input-group-text file-name">
                                                 {{ basename($permit->nbi_or_police_clearance) }}
                                             </span>
                                             <a href="{{ Storage::url($permit->nbi_or_police_clearance) }}"
@@ -442,12 +465,12 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">
                                         <i class="fa-solid fa-id-card text-primary me-1"></i>
-                                        Cedula
+                                        3. Cedula
                                     </label>
                                     <div class="input-group upload-group">
                                         <input type="file" name="cedula" class="form-control">
                                         @if($permit->cedula)
-                                            <span class="input-group-text file-label">
+                                            <span class="input-group-text file-name">
                                                 {{ basename($permit->cedula) }}
                                             </span>
                                             <a href="{{ Storage::url($permit->cedula) }}"
@@ -463,7 +486,7 @@
                                 {{-- REFERRAL LETTER --}}
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Referral Letter
+                                        4. Referral Letter
                                         @if($isImusResident)
                                             <span class="text-success">(Not Required - Imus Resident)</span>
                                         @else
@@ -471,9 +494,9 @@
                                         @endif
                                     </label>
                                     <div class="input-group upload-group">
-                                        <input type="file" name="referral_letter" class="form-control">
+                                        <input type="file" name="referral_letter" class="form-control" {{ $isImusResident ? 'disabled' : '' }}>
                                         @if($permit->referral_letter)
-                                            <span class="input-group-text file-label">
+                                            <span class="input-group-text file-name">
                                                 {{ basename($permit->referral_letter) }}
                                             </span>
                                             <a href="{{ Storage::url($permit->referral_letter) }}"
@@ -483,6 +506,110 @@
                                             </a>
                                         @endif
                                     </div>
+                                </div>
+                                <h6 class="section-title text-primary mb-0">Mayor’s Permit to Work ID Details</h6>
+                                {{-- ================= PERMIT DETAILS ================= --}}
+                                <div class="row g-3 mt-3">
+
+                                    {{-- Peso ID No --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Peso ID No.</label>
+                                        <input type="text"
+                                            name="peso_id_no"
+                                            class="form-control"
+                                            value="{{$permit->peso_id_no}}">
+                                    </div>
+
+                                    {{-- Employer's Name / Address --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Employer's Name / Address</label>
+                                        <input type="text"
+                                            name="employers_name_or_address"
+                                            class="form-control"
+                                            value="{{$permit->employers_name_or_address}}">
+                                    </div>
+
+                                    {{-- Community Tax No --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Community Tax No.</label>
+                                        <input type="text"
+                                            name="community_tax_no"
+                                            class="form-control"
+                                            value="{{$permit->community_tax_no}}">
+                                    </div>
+
+                                    {{-- Issued On --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Permit Issued On</label>
+                                        <input type="date"
+                                            name="permit_issued_on"
+                                            class="form-control"
+                                            value="{{$permit->permit_issued_on}}">
+                                    </div>
+
+                                    {{-- Issued In --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Permit Issued In</label>
+                                        <input type="text"
+                                            name="permit_issued_in"
+                                            class="form-control"
+                                            value="{{ old('permit_issued_in', $permit->permit_issued_in) }}">
+                                    </div>
+
+                                    {{-- Official Receipt --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Paid Under Official Receipt No.</label>
+                                        <input type="text"
+                                            name="paid_under_official_receipt"
+                                            class="form-control"
+                                            value="{{ old('paid_under_official_receipt', $permit->paid_under_official_receipt) }}">
+                                    </div>
+
+                                    {{-- Permit Date --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Permit Date</label>
+                                        <input type="date"
+                                            name="permit_date"
+                                            class="form-control"
+                                            value="{{ old('permit_date', $permit->permit_date) }}">
+                                    </div>
+
+                                    {{-- Expiration --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Expires On</label>
+                                        <input type="date"
+                                            name="expires_on"
+                                            class="form-control"
+                                            value="{{ old('expires_on', $permit->expires_on) }}">
+                                    </div>
+
+                                    {{-- Documentary Stamp --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Documentary Stamp Control No.</label>
+                                        <input type="text"
+                                            name="permit_doc_stamp_control_no"
+                                            class="form-control"
+                                            value="{{ old('permit_doc_stamp_control_no', $permit->permit_doc_stamp_control_no) }}">
+                                    </div>
+
+                                    {{-- GOR Serial No --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">GOR Serial No.</label>
+                                        <input type="text"
+                                            name="permit_gor_serial_no"
+                                            class="form-control"
+                                            value="{{ old('permit_gor_serial_no', $permit->permit_gor_serial_no) }}">
+                                    </div>
+
+                                    {{-- Date of Payment --}}
+                                    <div class="col-md-3">
+                                        <label class="form-label">Date of Payment</label>
+                                        <input type="date"
+                                            name="permit_date_of_payment"
+                                            class="form-control"
+                                            value="{{ old('permit_date_of_payment', $permit->permit_date_of_payment) }}">
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -509,16 +636,16 @@
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">
-                                        <i class="fa-solid fa-id-card text-primary me-1"></i>
-                                        Prosecutor's Clearance
+                                        <i class="fa-solid fa-scale-balanced text-primary me-1"></i>
+                                        1. Prosecutor’s Clearance
                                     </label>
-                                    <div class="input-group upload-group">
-                                        <input type="file" name="prosecutor_clearance" class="form-control" >
-                                        @if($permit->prosecutor_clearance)
-                                            <span class="input-group-text file-label">
-                                                {{ basename($permit->prosecutor_clearance) }}
+                                    <div class="input-group ">
+                                        <input type="file" name="prosecutor_clearance" class="form-control">
+                                        @if($clearance->prosecutor_clearance)
+                                            <span class="input-group-text file-name">
+                                                {{ basename($clearance->prosecutor_clearance) }}
                                             </span>
-                                            <a href="{{ Storage::url($permit->prosecutor_clearance) }}"
+                                            <a href="{{ Storage::url($clearance->prosecutor_clearance) }}"
                                             target="_blank"
                                             class="btn btn-outline-primary">
                                                 View
@@ -527,44 +654,153 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Municipal Trial Court Clearance</label>
-                                    <input type="file" name="mtc_clearance" class="form-control">
-                                    @if($clearance->mtc_clearance)
-                                        <div class="file-status-box"><span
-                                                class="file-name">{{ basename($clearance->mtc_clearance) }}</span><a
-                                                href="{{ Storage::url($clearance->mtc_clearance) }}" target="_blank"
-                                                class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                    @endif
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-scale-balanced text-primary me-1"></i>
+                                        2. Municipal Trial Court Clearance
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="file" name="mtc_clearance" class="form-control">
+                                        @if($clearance->mtc_clearance)
+                                            <span class="input-group-text file-name">
+                                                {{ basename($clearance->mtc_clearance) }}
+                                            </span>
+                                            <a href="{{ Storage::url($clearance->mtc_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Regional Trial Court Clearance</label>
-                                    <input type="file" name="rtc_clearance" class="form-control">
-                                    @if($clearance->rtc_clearance)
-                                        <div class="file-status-box"><span
-                                                class="file-name">{{ basename($clearance->rtc_clearance) }}</span><a
-                                                href="{{ Storage::url($clearance->rtc_clearance) }}" target="_blank"
-                                                class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                    @endif
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-scale-balanced text-primary me-1"></i>
+                                        3. Regional Trial Court Clearance
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="file" name="rtc_clearance" class="form-control">
+                                        @if($clearance->rtc_clearance)
+                                            <span class="input-group-text file-name">
+                                                {{ basename($clearance->rtc_clearance) }}
+                                            </span>
+                                            <a href="{{ Storage::url($clearance->rtc_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">National Bureau of Investigation (NBI) Clearance</label>
-                                    <input type="file" name="nbi_clearance" class="form-control">
-                                    @if($clearance->nbi_clearance)
-                                        <div class="file-status-box"><span
-                                                class="file-name">{{ basename($clearance->nbi_clearance) }}</span><a
-                                                href="{{ Storage::url($clearance->nbi_clearance) }}" target="_blank"
-                                                class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                    @endif
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-scale-balanced text-primary me-1"></i>
+                                        4. National Bureau of Investigation (NBI) Clearance
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="file" name="nbi_clearance" class="form-control">
+                                        @if($clearance->nbi_clearance)
+                                            <span class="input-group-text file-name">
+                                                {{ basename($clearance->nbi_clearance) }}
+                                            </span>
+                                            <a href="{{ Storage::url($clearance->nbi_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Barangay Clearance</label>
-                                    <input type="file" name="barangay_clearance" class="form-control">
-                                    @if($clearance->barangay_clearance)
-                                        <div class="file-status-box"><span
-                                                class="file-name">{{ basename($clearance->barangay_clearance) }}</span><a
-                                                href="{{ Storage::url($clearance->barangay_clearance) }}" target="_blank"
-                                                class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                    @endif
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa-solid fa-scale-balanced text-primary me-1"></i>
+                                        5. Barangay Clearance
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="file" name="barangay_clearance" class="form-control">
+                                        @if($clearance->barangay_clearance)
+                                            <span class="input-group-text file-name">
+                                                {{ basename($clearance->barangay_clearance) }}
+                                            </span>
+                                            <a href="{{ Storage::url($clearance->barangay_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary">
+                                                View
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <h6 class="section-title text-primary mb-0 mt-4">Mayor’s Clearance Letter Details</h6>
+                            <div class="row g-3 mt-3">
+                                {{-- Hired Company --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">Hired Company</label>
+                                    <input type="text"
+                                        name="hired_company"
+                                        class="form-control"
+                                        value="{{$clearance->hired_company}}">
+                                </div>
+
+                                {{-- Official Receipt No --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">O.R. No.</label>
+                                    <input type="text"
+                                        name="clearance_or_no"
+                                        class="form-control"
+                                        value="{{$clearance->clearance_or_no}}">
+                                </div>
+
+                                {{-- Issued On --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">Issued On</label>
+                                    <input type="date"
+                                        name="clearance_issued_on"
+                                        class="form-control"
+                                        value="{{$clearance->clearance_issued_on}}">
+                                </div>
+
+                                {{-- Issued In --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">Issued In</label>
+                                    <input type="text"
+                                        name="clearance_issued_in"
+                                        class="form-control"
+                                        value="{{$clearance->clearance_issued_in}}">
+                                </div>
+
+                                {{-- PESO Control No --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">PESO Control No.</label>
+                                    <input type="text"
+                                        name="peso_control_no"
+                                        class="form-control"
+                                        value="{{$clearance->peso_control_no}}">
+                                </div>
+
+                                {{-- Documentary Stamp Control No --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">Documentary Stamp Control No.</label>
+                                    <input type="text"
+                                        name="clearance_doc_stamp_control_no"
+                                        class="form-control"
+                                        value="{{$clearance->clearance_doc_stamp_control_no}}">
+                                </div>
+
+                                {{-- GOR Control No --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">GOR Control No.</label>
+                                    <input type="text"
+                                        name="clearance_gor_control_no"
+                                        class="form-control"
+                                        value="{{$clearance->clearance_gor_control_no}}">
+                                </div>
+
+                                {{-- Date of Payment --}}
+                                <div class="col-md-3">
+                                    <label class="form-label">Date of Payment</label>
+                                    <input type="date" name="date_of_payment" 
+                                        class="form-control"
+                                        value="{{$clearance->date_of_payment}}">
                                 </div>
                             </div>
                         </div>
@@ -589,48 +825,86 @@
                             </div>
                             @php $referral = optional($applicant->referral); @endphp
                             <div class="mb-4">
-                                <label class="form-label">1. Resume or Bio-Data <span class="text-danger">*</span></label>
-                                <input type="file" name="resume" class="form-control">
-                                @if($referral->resume)
-                                    <div class="file-status-box"><span
-                                            class="file-name">{{ basename($referral->resume) }}</span><a
-                                            href="{{ Storage::url($referral->resume) }}" target="_blank"
-                                            class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                @endif
+                                <label class="form-label fw-semibold">
+                                    <i class="fa-solid fa-file-user text-primary me-1"></i>1. Resume or Bio-Data<span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="file" name="resume" class="form-control">
+                                    @if($referral->resume)
+                                        <span class="input-group-text file-name">
+                                            {{ basename($referral->resume) }}
+                                        </span>
+                                        <a href="{{ Storage::url($referral->resume) }}"
+                                        target="_blank"
+                                        class="btn btn-outline-primary">
+                                            View
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
                             <div class="p-3 bg-light rounded-3 border">
                                 <label class="form-label fw-bold d-block mb-3">2. Choose at least one (Alin man sa mga
                                     sumusunod):</label>
                                 <div class="row g-3">
+                                    <!-- Barangay Clearance -->
                                     <div class="col-md-4">
-                                        <label class="form-label small">Barangay Clearance</label>
-                                        <input type="file" name="ref_barangay_clearance" class="form-control">
-                                        @if($referral->ref_barangay_clearance)
-                                            <div class="file-status-box"><span
-                                                    class="file-name">{{ basename($referral->ref_barangay_clearance) }}</span><a
-                                                    href="{{ Storage::url($referral->ref_barangay_clearance) }}"
-                                                    target="_blank" class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                        @endif
+                                        <label class="form-label small fw-semibold">
+                                            <i class="fa-solid fa-building-columns text-primary me-1"></i>
+                                            Barangay Clearance
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="file" name="ref_barangay_clearance" class="form-control">
+                                            @if($referral->ref_barangay_clearance)
+                                                <span class="input-group-text file-name">
+                                                    {{ basename($referral->ref_barangay_clearance) }}
+                                                </span>
+                                                <a href="{{ Storage::url($referral->ref_barangay_clearance) }}"
+                                                target="_blank"
+                                                class="btn btn-outline-primary">
+                                                View
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
+
+                                    <!-- Police Clearance -->
                                     <div class="col-md-4">
-                                        <label class="form-label small">Police Clearance</label>
-                                        <input type="file" name="ref_police_clearance" class="form-control">
-                                        @if($referral->ref_police_clearance)
-                                            <div class="file-status-box"><span
-                                                    class="file-name">{{ basename($referral->ref_police_clearance) }}</span><a
-                                                    href="{{ Storage::url($referral->ref_police_clearance) }}" target="_blank"
-                                                    class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                        @endif
+                                        <label class="form-label small fw-semibold">
+                                            <i class="fa-solid fa-shield-halved text-primary me-1"></i>
+                                            Police Clearance
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="file" name="ref_police_clearance" class="form-control">
+                                            @if($referral->ref_police_clearance)
+                                                <span class="input-group-text file-name">
+                                                    {{ basename($referral->ref_police_clearance) }}
+                                                </span>
+                                                <a href="{{ Storage::url($referral->ref_police_clearance) }}"
+                                                target="_blank" class="btn btn-outline-primary">
+                                                View
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
+
+                                    <!-- NBI Clearance -->
                                     <div class="col-md-4">
-                                        <label class="form-label small">NBI Clearance</label>
-                                        <input type="file" name="ref_nbi_clearance" class="form-control">
-                                        @if($referral->ref_nbi_clearance)
-                                            <div class="file-status-box"><span
-                                                    class="file-name">{{ basename($referral->ref_nbi_clearance) }}</span><a
-                                                    href="{{ Storage::url($referral->ref_nbi_clearance) }}" target="_blank"
-                                                    class="btn btn-sm btn-outline-primary py-0">View</a></div>
-                                        @endif
+                                        <label class="form-label small fw-semibold">
+                                            <i class="fa-solid fa-id-card text-primary me-1"></i>
+                                            NBI Clearance
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="file" name="ref_nbi_clearance" class="form-control">
+                                            @if($referral->ref_nbi_clearance)
+                                                <span class="input-group-text file-name">
+                                                    {{ basename($referral->ref_nbi_clearance) }}
+                                                </span>
+                                                <a href="{{ Storage::url($referral->ref_nbi_clearance) }}"
+                                                target="_blank" class="btn btn-outline-primary">
+                                                View
+                                                </a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -643,8 +917,8 @@
                         <a href="{{ route('applicants.index') }}" class="btn btn-light border px-4 py-2">Cancel</a>
                     </div>    
                 </div>        
-        </form>
-    </div>        
+    </form>
+</div>        
 @endsection
 <script>
     document.addEventListener("DOMContentLoaded", function () {
