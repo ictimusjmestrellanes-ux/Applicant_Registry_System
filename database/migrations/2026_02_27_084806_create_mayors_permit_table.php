@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('community_tax_no');
             $table->date('permit_issued_on');
             $table->string('permit_issued_in');
-            $table->string('paid_under_official_receipt');
             $table->date('permit_date');
             $table->date('expires_on');
             $table->string('permit_doc_stamp_control_no');

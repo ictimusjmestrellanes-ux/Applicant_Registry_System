@@ -36,12 +36,14 @@ class DashboardController extends Controller
                         'label' => 'List of Applicants',
                         'route' => 'applicants.index',
                     ],
-                    [
-                        'label' => 'Archived Applicants',
-                        'route' => 'applicants.archive',
-                    ],
 
                 ],
+
+            ],
+            [
+                'label' => 'Archived Applicants',
+                'icon' => 'bi bi-archive',
+                'route' => 'applicants.archive',
             ],
 
             [

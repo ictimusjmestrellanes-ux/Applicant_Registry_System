@@ -20,14 +20,24 @@ class ApplicantController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+
+        // Applicant Personal Information
+            'or_no' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
             'contact_no' => 'required',
             'gender' => 'required',
+            'civil_status' => 'required',
+            'pwd'=> 'required',
+            'four_ps'=> 'required',
             'address_line' => 'required',
             'province' => 'required',
             'city' => 'required',
             'barangay' => 'required',
+            'educational_attainment'=> 'required',
+            'position_hired'=> 'required',
+            'first_time_job_seeker'=> 'required',
+            'is_paid'=> 'required',
         ]);
 
         $applicant = Applicant::create($request->all());
@@ -71,16 +81,26 @@ class ApplicantController extends Controller
         */
 
         $applicant->update([
+            'or_no'=> $request->or_no,
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'suffix' => $request->suffix,
+            'age' => $request->age,
             'contact_no' => $request->contact_no,
             'gender' => $request->gender,
+            'civil_status' => $request->civil_status,
+            'pwd' => $request->pwd,
+            'four_ps' => $request->four_ps,
             'address_line' => $request->address_line,
             'province' => $request->province,
             'city' => $request->city,
             'barangay' => $request->barangay,
+            'educational_attainment' => $request->educational_attainment,
+            'hiring_company' => $request->hiring_company,
+            'position_hired' => $request->position_hired,
+            'first_time_job_seeker' => $request->first_time_job_seeker,
+            'is_paid' => $request->is_paid,
         ]);
 
         $permit = MayorsPermit::firstOrNew([
@@ -113,7 +133,6 @@ class ApplicantController extends Controller
             'community_tax_no' => $request->community_tax_no,
             'permit_issued_on' => $request->permit_issued_on,
             'permit_issued_in' => $request->permit_issued_in,
-            'paid_under_official_receipt' => $request->paid_under_official_receipt,
             'permit_date' => $request->permit_date,
             'expires_on' => $request->expires_on,
             'permit_doc_stamp_control_no' => $request->permit_doc_stamp_control_no,

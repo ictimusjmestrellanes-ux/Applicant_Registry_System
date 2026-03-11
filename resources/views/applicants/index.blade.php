@@ -183,6 +183,7 @@
                             <tr class="align-middle">
                                 <th>ID</th>
                                 <th>Applicant Name</th>
+                                <th>Gender</th>
                                 <th>Contact</th>
                                 <th style="min-width: 200px;">Address</th>
                                 <th class="text-center">Mayor's Permit</th>
@@ -203,8 +204,13 @@
                                             </div>
                                         </td>
                                         <td>
+                                            <div class="fw-bold text-dark text-center   ">
+                                                {{ $applicant->gender }}
+                                            </div>
+                                        </td>
+                                        <td>
                                             <span class="badge bg-light text-dark border"><i
-                                                    class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
+                                            class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
                                         </td>
                                         <td class="text-muted small">
                                             {{ $applicant->address_line }}, {{ $applicant->barangay }}, {{ $applicant->city }}

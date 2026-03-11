@@ -10,16 +10,26 @@ class Applicant extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'or_no',
         'first_name',
         'middle_name',
         'last_name',
         'suffix',
+        'age',
         'contact_no',
         'gender',
+        'civil_status',
+        'pwd',
+        'four_ps',
         'address_line',
         'province',
         'city',
         'barangay',
+        'educational_attainment',
+        'hiring_company',
+        'position_hired',
+        'first_time_job_seeker',
+        'is_paid',
     ];
 
     public function permit()
