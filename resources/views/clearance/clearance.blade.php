@@ -175,8 +175,8 @@
         </p>
 
         <p>
-            This certification is issued upon the request of <span class="highlight-name">Mr./Ms. {{ $applicant->last_name ?? 'SANTANDER' }}</span> in support
-            of his/her application with the <span class="highlight-name">{{ $applicant->purpose ?? 'ARMED FORCES OF THE PHILIPPINES' }}</span>. 
+            This certification is issued upon the request of <span class="highlight-name">Mr./Ms. {{ $applicant->last_name}}</span> in support
+            of his/her application with the <span class="highlight-name">{{ $applicant->hired_company}}</span>. 
         </p>
 
         <p>

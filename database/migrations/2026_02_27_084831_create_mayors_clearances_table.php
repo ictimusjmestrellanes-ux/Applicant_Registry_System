@@ -11,9 +11,7 @@ return new class extends Migration
         Schema::create('mayors_clearances', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('applicant_id')
-                ->constrained()
-                ->cascadeOnDelete();
+            $table->foreignId('applicant_id')->constrained()->cascadeOnDelete();
 
             $table->string('prosecutor_clearance')->default(false);
             $table->string('mtc_clearance')->default(false);
@@ -23,14 +21,13 @@ return new class extends Migration
     
             
             
-            $table->string('clearance_or_no');
-            $table->date('clearance_issued_on');
-            $table->string('clearance_issued_in');
-            $table->string('peso_control_no');
-            $table->string('clearance_doc_stamp_control_no');
-            $table->string('clearance_gor_control_no');
-            $table->date('date_of_payment');
-            $table->string('hired_company');
+            $table->string('clearance_or_no')->nullable();
+            $table->date('clearance_issued_on')->nullable();
+            $table->string('clearance_issued_in')->nullable();
+            $table->string('clearance_peso_control_no')->nullable();
+            $table->string('clearance_doc_stamp_control_no')->nullable();
+            $table->date('clearance_date_of_payment')->nullable();
+            $table->string('clearance_hired_company')->nullable();
 
             
             $table->timestamps();

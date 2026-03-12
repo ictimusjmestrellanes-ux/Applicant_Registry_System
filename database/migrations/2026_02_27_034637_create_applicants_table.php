@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('applicants', function (Blueprint $table) {
+            
             $table->id();
-            $table->foreignId('applicant_id')->constrained()->cascadeOnDelete();
-
+            
             $table->string('or_no')->nullable();
             $table->string('first_name');
             $table->string('middle_name')->nullable();
@@ -46,8 +46,6 @@ return new class extends Migration
             $table->string('position_hired')->nullable();
 
             $table->boolean('first_time_job_seeker')->default(false);
-
-            $table->boolean('is_paid')->default(false);
 
             $table->timestamps();
         });

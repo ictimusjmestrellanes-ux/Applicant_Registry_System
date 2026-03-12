@@ -29,7 +29,6 @@ class Applicant extends Model
         'hiring_company',
         'position_hired',
         'first_time_job_seeker',
-        'is_paid',
     ];
 
     public function permit()

@@ -49,15 +49,9 @@ Route::get('/applicants/{applicant}/view-file/{field}',
 
 // ✅ PUT RESOURCE LAST
 Route::resource('applicants', ApplicantController::class);
-
-Route::get('/applicants/{id}/generate-referral',
-    [ReferralController::class, 'generate'])
-    ->name('applicants.generateReferral');
-
-Route::get('/applicants/{id}/generate-permit',
-    [PermitController::class, 'generate'])
-    ->name('applicants.generatePermit');
-
-Route::get('/applicants/{id}/generate-clearance',
-    [ClearanceController::class, 'generate'])
-    ->name('applicants.generateClearance');
+Route::put('/permits/{id}', [PermitController::class,'update'])
+    ->name('permits.update');
+Route::put('/clearances/{id}', [ClearanceController::class,'update'])
+    ->name('clearances.update');
+Route::put('/referrals/{id}', [ReferralController::class,'update'])
+    ->name('referrals.update');
