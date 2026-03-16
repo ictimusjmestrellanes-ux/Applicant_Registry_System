@@ -2,21 +2,561 @@
 
 @section('content')
 
-
     <style>
+        /* ===================================
+    GLOBAL LAYOUT
+    =================================== */
+
+        body {
+            background: #f3f6fb;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            color: #2d3748;
+        }
+
+        /* ===================================
+    PAGE HEADER
+    =================================== */
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .container-fluid {
+            max-width: 1600px;
+        }
+
+        /* ===================================
+    ADD APPLICANT BUTTON
+    =================================== */
+
+        .btn-save {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all .25s ease;
+        }
+
+        .btn-save:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+        }
+
+        /* ===================================
+    FILTER PANEL
+    =================================== */
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* ===================================
+    SEARCH FIELD
+    =================================== */
+
+        .input-group {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .input-group-text {
+            background: #f1f5f9;
+            border: none;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 14px;
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, .15);
+        }
+
+        /* ===================================
+    TABLE CARD
+    =================================== */
+
+        .table-card {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* ===================================
+    TABLE
+    =================================== */
+
+        .table {
+            font-size: 14px;
+        }
+
+        .table thead {
+            background: #f8fafc;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+            padding: 14px;
+        }
+
+        .table tbody td {
+            padding: 14px;
+            vertical-align: middle;
+        }
+
+        /* ===================================
+    ROW HOVER
+    =================================== */
+
+        .table-hover tbody tr {
+            transition: all .2s ease;
+        }
+
+        .table-hover tbody tr:hover {
+            background: #f9fbff;
+        }
+
+        /* ===================================
+    CONTACT BADGE
+    =================================== */
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        /* ===================================
+    PROGRESS BAR
+    =================================== */
+
+        .progress {
+            height: 6px;
+            border-radius: 10px;
+            background: #e2e8f0;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+        }
+
+        /* ===================================
+    ACTION BUTTONS
+    =================================== */
+
+        .btn-outline-primary {
+            border-radius: 6px;
+        }
+
+        .btn-outline-primary:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            border-radius: 6px;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* ===================================
+    ALERT
+    =================================== */
+
+        .alert-success {
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        /* ===================================
+    EMPTY STATE
+    =================================== */
+
+        tbody td i {
+            opacity: .6;
+        }
+
+        /* ===================================
+    PAGINATION
+    =================================== */
+
+        .pagination {
+            gap: 6px;
+        }
+
+        .page-link {
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .page-item.active .page-link {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
+        /* ===================================
+    RESPONSIVE
+    =================================== */
+
+        @media(max-width:992px) {
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .table {
+                font-size: 13px;
+            }
+
+        }
+
+        @media(max-width:768px) {
+
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .btn-save {
+                width: 100%;
+            }
+
+        }
+    </style>
+    {{-- <style>
+        /* ===============================
+        GLOBAL PAGE STYLE
+        ================================ */
+
+        body {
+            background: linear-gradient(135deg, #eef2f8, #e8eef6);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ===============================
+        PAGE TITLE
+        ================================ */
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .container-fluid {
+            font-size: 14px;
+            max-width: 1900px;
+        }
+
+
+        /* ===============================
+        SAVE BUTTON
+        ================================ */
+
+        .btn-save {
+            background: linear-gradient(135deg, #4a7dff, #6aa8ff);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 10px;
+            box-shadow: 0 8px 18px rgba(74, 125, 255, 0.35);
+            transition: all .3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(74, 125, 255, 0.45);
+        }
+
+        /* ===============================
+        FILTER CARD
+        ================================ */
+
+        .card {
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===============================
+        FORM LABEL
+        ================================ */
+
+        .form-label {
+            font-size: 12px;
+            letter-spacing: .5px;
+        }
+
+        /* ===============================
+        SEARCH INPUT
+        ================================ */
+
+        .input-group {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .input-group-text {
+            background: #f3f6fb;
+        }
+
+        .form-control,
+        .form-select {
+            background: #f9fbff;
+            border-radius: 10px;
+            border: 1px solid #dce3ef;
+            font-size: 14px;
+            padding: 9px 12px;
+            transition: all .25s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #5fa8ff;
+            box-shadow: 0 0 0 3px rgba(95, 168, 255, 0.15);
+            background: white;
+        }
+
+        /* ===============================
+        TABLE CARD
+        ================================ */
+
+        .table-card {
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        /* ===============================
+        TABLE STYLE
+        ================================ */
+
+        .table {
+            font-size: 14px;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #f7f9fd, #eef2f7);
+        }
+
+        .table thead th {
+            font-weight: 600;
+            font-size: 13px;
+            color: #4a5875;
+            border: none;
+            padding: 14px;
+        }
+
+        .table tbody td {
+            padding: 14px;
+            vertical-align: middle;
+            border-top: 1px solid #eef2f7;
+        }
+
+        /* ===============================
+        ROW HOVER EFFECT
+        ================================ */
+
+        .table-hover tbody tr {
+            transition: all .25s ease;
+        }
+
+        .table-hover tbody tr:hover {
+            background: #f7faff;
+            transform: scale(1.005);
+        }
+
+        /* ===============================
+        CONTACT BADGE
+        ================================ */
+
+        .badge {
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        /* ===============================
+        PROGRESS BAR
+        ================================ */
+
+        .progress {
+            border-radius: 20px;
+            background: #edf1f7;
+        }
+
+        .progress-bar {
+            border-radius: 20px;
+            transition: width .6s ease;
+        }
+
+        /* ===============================
+        ACTION BUTTONS
+        ================================ */
+
+        .btn-outline-primary,
+        .btn-outline-danger {
+            border-radius: 8px;
+            transition: all .25s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: #4a7dff;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-danger:hover {
+            background: #e74c3c;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ===============================
+        SUCCESS ALERT
+        ================================ */
+
+        .alert-success {
+            background: linear-gradient(135deg, #eafaf1, #e2f7eb);
+            color: #2c7a4b;
+            border-radius: 10px;
+        }
+
+        /* ===============================
+        EMPTY STATE
+        ================================ */
+
+        tbody td i {
+            opacity: .6;
+        }
+
+        /* ===============================
+        PAGINATION
+        ================================ */
+
+        .pagination {
+            gap: 5px;
+        }
+
+        .page-link {
+            border-radius: 8px;
+            border: none;
+            color: #4a5875;
+        }
+
+        .page-item.active .page-link {
+            background: #4a7dff;
+            color: white;
+        }
+
+        /* ===============================
+        RESPONSIVE
+        ================================ */
+
+        @media (max-width:992px) {
+
+            .table {
+                font-size: 13px;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+        }
+
+        @media (max-width:768px) {
+
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .btn-save {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+        /* ===============================
+        SUBTLE CARD ANIMATION
+        ================================ */
+
+        .card {
+            animation: fadeUp .35s ease;
+        }
+
+        @keyframes fadeUp {
+
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+    </style> --}}
+    {{-- <style>
         :root {
-        /* Primary Theme: Ocean Blue */
-        --primary-color: #0284c7; 
-        --primary-hover: #0369a1;
-        /* Success Theme: Emerald Green */
-        --success-color: #10b981;
-        --success-hover: #059669;
-        /* UI Neutrals */
-        --bg-light: #f0f4f8;
-        --border-radius: 12px;
-        --text-main: #1e293b;
-        --text-muted: #64748b;
-    }
+            /* Primary Theme: Ocean Blue */
+            --primary-color: #0284c7;
+            --primary-hover: #0369a1;
+            /* Success Theme: Emerald Green */
+            --success-color: #10b981;
+            --success-hover: #059669;
+            /* UI Neutrals */
+            --bg-light: #f0f4f8;
+            --border-radius: 12px;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
 
         body {
             background-color: var(--bg-light);
@@ -106,8 +646,7 @@
             color: var(--primary-color);
             border-color: var(--primary-color);
         }
-    </style>
-    </head>
+    </style> --}}
 
     <body>
 
@@ -210,7 +749,7 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-light text-dark border"><i
-                                            class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
+                                                    class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
                                         </td>
                                         <td class="text-muted small">
                                             {{ $applicant->address_line }}, {{ $applicant->barangay }}, {{ $applicant->city }}
@@ -248,7 +787,7 @@
 
                                             <div class="progress mb-1" style="height: 6px;">
                                                 <div class="progress-bar 
-                                                    {{ $pPerc == 100 ? 'bg-success' : ($pPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                                                    {{ $pPerc == 100 ? 'bg-success' : ($pPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
                                                     style="width: {{ $pPerc }}%;">
                                                 </div>
                                             </div>

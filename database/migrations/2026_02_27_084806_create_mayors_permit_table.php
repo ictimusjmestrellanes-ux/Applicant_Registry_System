@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('cedula')->default(0);
             $table->string('referral_letter')->default(0);
 
+            $table->string('permit_or_no')->nullable();
             $table->string('peso_id_no')->nullable();
             $table->string('employers_name_or_address')->nullable();
             $table->string('community_tax_no')->nullable();

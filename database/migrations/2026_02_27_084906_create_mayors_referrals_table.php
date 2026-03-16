@@ -21,6 +21,20 @@ return new class extends Migration
             $table->string('ref_police_clearance')->default(false);
             $table->string('ref_nbi_clearance')->default(false);
 
+            //other cities
+            $table->string('ref_or_no')->nullable();
+            $table->string('ref_mayor_recipient_firstname');
+            $table->string('ref_mayor_recipient_middlename')->nullable();
+            $table->string('ref_mayor_recipient_lastname');
+            $table->string('ref_city_gov')->nullable();
+            $table->string('ref_place')->nullable();
+            $table->string('ref_hired_company')->nullable();
+
+            //peso public service
+            $table->string('ref_peso_or_no')->nullable();
+            $table->string('ref_recipient')->nullable();
+            $table->string('ref_place')->nullable();
+
             $table->timestamps();
         });
     }

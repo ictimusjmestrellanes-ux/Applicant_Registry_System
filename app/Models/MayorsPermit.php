@@ -15,6 +15,7 @@ class MayorsPermit extends Model
         'cedula',
         'referral_letter',
 
+        'permit_or_no',
         'peso_id_no',
         'community_tax_no',
 
@@ -27,7 +28,6 @@ class MayorsPermit extends Model
         'permit_doc_stamp_control_no',
         'permit_date_of_payment',
 
-        'is_paid'
     ];
 
     /*

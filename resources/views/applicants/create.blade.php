@@ -2,6 +2,268 @@
 
 @section('content')
     <style>
+        /* ===============================
+    GLOBAL PAGE STYLE
+    ================================ */
+
+        body {
+            background: linear-gradient(135deg, #eef2f7, #e6edf5);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+
+        /* ===============================
+    PAGE TITLE AREA
+    ================================ */
+
+        .page-title {
+            font-weight: 700;
+            font-size: 26px;
+            color: #2c3e50;
+        }
+
+        .container-fluid p {
+            font-size: 14px;
+            max-width: 1600px;
+        }
+
+
+        /* ===============================
+    MAIN FORM CARD
+    ================================ */
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            transition: all .35s ease;
+        }
+
+        .form-card:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+
+        /* ===============================
+    SECTION HEADER
+    ================================ */
+
+        .section-header {
+            font-weight: 700;
+            font-size: 16px;
+            padding: 18px 25px;
+            border-bottom: 1px solid #edf1f7;
+            color: #34495e;
+            background: linear-gradient(135deg, #f8faff, #eef3fb);
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header i {
+            font-size: 20px;
+            color: #4a7dff;
+        }
+
+
+        /* ===============================
+    SECTION BODY
+    ================================ */
+
+        .section-body {
+            padding: 25px;
+        }
+
+
+        /* ===============================
+    FORM LABEL
+    ================================ */
+
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #44526f;
+        }
+
+
+        /* ===============================
+    INPUT FIELDS
+    ================================ */
+
+        .form-input,
+        .form-control,
+        .form-select {
+
+            border-radius: 10px;
+            border: 1px solid #dce3ef;
+            padding: 10px 12px;
+            font-size: 14px;
+            background: #f9fbff;
+            transition: all .25s ease;
+        }
+
+        .form-input:focus,
+        .form-control:focus,
+        .form-select:focus {
+
+            border-color: #5fa8ff;
+            background: white;
+
+            box-shadow:
+                0 0 0 3px rgba(95, 168, 255, 0.15);
+        }
+
+
+        /* ===============================
+    REQUIRED MARK
+    ================================ */
+
+        .required-mark {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+
+        /* ===============================
+    BUTTON AREA
+    ================================ */
+
+        .form-footer {
+            display: flex;
+            gap: 12px;
+            padding: 20px 25px;
+            border-top: 1px solid #edf1f7;
+        }
+
+
+        /* ===============================
+    SAVE BUTTON
+    ================================ */
+
+        .btn-save {
+
+            background: linear-gradient(135deg, #4a7dff, #6aa8ff);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px;
+
+            box-shadow: 0 8px 18px rgba(74, 125, 255, 0.35);
+
+            transition: all .3s ease;
+        }
+
+        .btn-save:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 15px 35px rgba(74, 125, 255, 0.45);
+        }
+
+
+        /* ===============================
+    CANCEL BUTTON
+    ================================ */
+
+        .btn-cancel {
+
+            background: #f4f6fb;
+            color: #5b6b8b;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-weight: 600;
+
+            border: 1px solid #dce3ef;
+
+            transition: all .25s ease;
+        }
+
+        .btn-cancel:hover {
+
+            background: #e9efff;
+            color: #2c3e50;
+        }
+
+
+        /* ===============================
+    FORM GRID RESPONSIVE
+    ================================ */
+
+        @media(max-width:1200px) {
+
+            .col-md-2 {
+                flex: 0 0 33%;
+                max-width: 33%;
+            }
+
+        }
+
+        @media(max-width:768px) {
+
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-6 {
+
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .section-body {
+                padding: 20px;
+            }
+
+            .form-footer {
+                flex-direction: column;
+            }
+
+        }
+
+
+        /* ===============================
+    SMOOTH INPUT HOVER EFFECT
+    ================================ */
+
+        .form-control:hover,
+        .form-select:hover {
+
+            border-color: #b8c8ea;
+        }
+
+
+        /* ===============================
+    SUBTLE ANIMATION
+    ================================ */
+
+        .form-card {
+
+            animation: fadeUp .4s ease;
+        }
+
+        @keyframes fadeUp {
+
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+    </style>
+    {{-- <style>
         :root {
             /* Primary Theme: Ocean Blue */
             --primary-color: #0284c7;
@@ -128,7 +390,7 @@
             /* Standard Red for required marks */
             margin-left: 2px;
         }
-    </style>
+    </style> --}}
 
     <div class="container-fluid py-5">
 
@@ -152,11 +414,6 @@
 
                 <div class="section-body">
                     <div class="row g-3">
-                        <div class="col-md-2">
-                            <label class="form-label">O.R No. <span class="required-mark">*</span></label>
-                            <input type="text" name="or_no" class="form-control form-input"
-                                placeholder="Official Receipt Number" required>
-                        </div>
                         <div class="col-md-2">
                             <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
                             <select name="first_time_job_seeker" class="form-select form-input" required>
@@ -262,18 +519,18 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Educational Attainment <span class="required-mark">*</span></label>
-                            <input type="text" name="educational_attainment" class="form-control form-input" placeholder="e.g. Bachelor's Degree"
-                                required>
+                            <input type="text" name="educational_attainment" class="form-control form-input"
+                                placeholder="e.g. Bachelor's Degree" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
-                            <input type="text" name="hiring_company" class="form-control form-input" placeholder="e.g. Tech Corp"
-                                required>
+                            <input type="text" name="hiring_company" class="form-control form-input"
+                                placeholder="e.g. Tech Corp" required>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Position Hired <span class="required-mark">*</span></label>
-                            <input type="text" name="position_hired" class="form-control form-input" placeholder="e.g. Software Engineer"
-                                required>
+                            <input type="text" name="position_hired" class="form-control form-input"
+                                placeholder="e.g. Software Engineer" required>
                         </div>
                     </div>
                 </div>

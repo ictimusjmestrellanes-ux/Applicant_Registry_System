@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MayorsClearance;
 use Illuminate\Http\Request;
 use App\Models\Applicant;
 use App\Models\Clearance;
@@ -21,7 +22,7 @@ class ClearanceController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $clearance = Clearance::firstOrNew([
+        $clearance = MayorsClearance::firstOrNew([
             'applicant_id' => $applicant->id
         ]);
 

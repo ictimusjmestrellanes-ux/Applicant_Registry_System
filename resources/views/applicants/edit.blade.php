@@ -12,11 +12,11 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-                                                                                                                <div style="font-size:14px;">
-                                                                                                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                </div>
-                                                                                                            `,
+                                                                                                                                                        <div style="font-size:14px;">
+                                                                                                                                                            <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                                                                            <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                                                                        </div>
+                                                                                                                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -53,9 +53,276 @@
     @endif
 
     <style>
+        /* ================================
+                    GLOBAL STYLES
+                    ================================ */
+
+        body {
+            background: linear-gradient(135deg, #eef2f7, #e8edf5);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* ================================
+                    MAIN WRAPPER
+                    ================================ */
+
+        .applicant-wrapper {
+            max-width: 1500px;
+        }
+
+        /* ================================
+                    PAGE HEADER
+                    ================================ */
+
+        .page-header {
+            background: linear-gradient(135deg, #ffffff, #f6f9ff);
+            padding: 20px 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e6ecf5;
+        }
+
+        .page-header h2 {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        /* ================================
+                    MAIN CARD CONTAINER
+                    ================================ */
+
+        .requirements-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* ================================
+                    SECTION TITLES
+                    ================================ */
+
+        .section-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #3b4a6b;
+            letter-spacing: .3px;
+            margin-bottom: 15px;
+        }
+
+        /* ================================
+                    NAV TABS
+                    ================================ */
+
+        .nav-tabs {
+            border: none;
+            gap: 10px;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: #f4f6fb;
+            color: #5b6b8b;
+            font-weight: 600;
+            transition: all .3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: #e9efff;
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #4a7dff, #5fa8ff);
+            color: white;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ================================
+                    TAB CONTENT
+                    ================================ */
+
+        .tab-content {
+            border-radius: 14px;
+            background: white;
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* ================================
+                    FORM CARD
+                    ================================ */
+
+        .form-card {
+            padding: 10px 5px;
+        }
+
+        /* ================================
+                    FORM LABEL
+                    ================================ */
+
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #44526f;
+        }
+
+        /* ================================
+                    INPUTS
+                    ================================ */
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 1px solid #dce3ef;
+            padding: 10px 12px;
+            font-size: 14px;
+            transition: all .25s ease;
+            background: #f9fbff;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #5fa8ff;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 150, 255, 0.15);
+        }
+
+        /* ================================
+                    FILE INPUTS
+                    ================================ */
+
+        input[type=file] {
+            background: #f5f8ff;
+            border: 1px dashed #c9d5f2;
+        }
+
+        /* ================================
+                    BUTTONS
+                    ================================ */
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all .3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a7dff, #6aa8ff);
+            border: none;
+            box-shadow: 0 6px 15px rgba(74, 125, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(74, 125, 255, 0.35);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.35);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.45);
+        }
+
+        .btn-outline-secondary {
+            border-radius: 10px;
+        }
+
+        /* ================================
+                    FORM GRID RESPONSIVE
+                    ================================ */
+
+        @media(max-width:1200px) {
+
+            .col-md-2 {
+                flex: 0 0 33%;
+                max-width: 33%;
+            }
+
+        }
+
+        @media(max-width:768px) {
+
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-5,
+            .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+        }
+
+        /* ================================
+                    3D CARD EFFECT
+                    ================================ */
+
+        .requirements-container:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 18px 50px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transition: .4s;
+        }
+
+        /* ================================
+                    REQUIRED MARK
+                    ================================ */
+
+        .required-mark {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* ================================
+                    ANIMATIONS
+                    ================================ */
+
+        .tab-pane {
+            animation: fadeSlide .35s ease;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ================================
+                    SCROLL SMOOTH
+                    ================================ */
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+    {{-- <style>
         /* ===============================
-        GLOBAL
-        ================================ */
+                            GLOBAL
+                            ================================ */
 
         :root {
             /* Primary Theme: Ocean Blue */
@@ -85,8 +352,8 @@
         }
 
         /* ===============================
-        HEADER
-        ================================ */
+                            HEADER
+                            ================================ */
 
         .page-header {
             background: white;
@@ -96,8 +363,8 @@
         }
 
         /* ===============================
-        MAIN CARD
-        ================================ */
+                            MAIN CARD
+                            ================================ */
 
         .requirements-container {
             background: linear-gradient(145deg, #ffffff, #f8fafc);
@@ -106,8 +373,8 @@
         }
 
         /* ===============================
-        FORM CARD
-        ================================ */
+                            FORM CARD
+                            ================================ */
 
         .form-card {
             background: white;
@@ -118,8 +385,8 @@
         }
 
         /* ===============================
-        SECTION TITLE
-        ================================ */
+                            SECTION TITLE
+                            ================================ */
 
         .section-title {
             font-weight: 700;
@@ -130,8 +397,8 @@
         }
 
         /* ===============================
-        FLOATING LABEL
-        ================================ */
+                            FLOATING LABEL
+                            ================================ */
 
         .form-floating>.form-control,
         .form-floating>.form-select {
@@ -146,8 +413,8 @@
         }
 
         /* ===============================
-        TABS
-        ================================ */
+                            TABS
+                            ================================ */
 
         .nav-tabs {
             border: none;
@@ -170,8 +437,8 @@
         }
 
         /* ===============================
-        FILE UPLOAD
-        ================================ */
+                            FILE UPLOAD
+                            ================================ */
 
         .file-preview {
             margin-top: 6px;
@@ -180,8 +447,8 @@
         }
 
         /* ===============================
-        PROFILE AVATAR
-        ================================ */
+                            PROFILE AVATAR
+                            ================================ */
 
         .avatar-box {
             width: 120px;
@@ -198,8 +465,8 @@
         }
 
         /* ===============================
-        BUTTON
-        ================================ */
+                            BUTTON
+                            ================================ */
 
         .btn-primary {
             background: #2563eb;
@@ -220,14 +487,14 @@
         }
 
         /* ===============================
-        PROGRESS BAR
-        ================================ */
+                            PROGRESS BAR
+                            ================================ */
 
         .progress {
             height: 8px;
             border-radius: 10px;
         }
-    </style>
+    </style> --}}
     {{-- Personal Information --}}
     {{-- <style>
         :root {
@@ -972,13 +1239,6 @@
 
                             <div class="row g-4">
 
-                                {{-- OR NUMBER --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">O.R No. <span class="required-mark">*</span></label>
-                                    <input type="text" name="or_no" value="{{ $applicant->or_no }}" class="form-control"
-                                        required>
-                                </div>
-
                                 {{-- FIRST TIME JOB SEEKER --}}
                                 <div class="col-md-2">
                                     <label class="form-label">First Time Job Seeker?</label>
@@ -1026,14 +1286,15 @@
 
                                 {{-- AGE --}}
                                 <div class="col-md-2">
-                                    <label class="form-label">Age</label>
-                                    <input type="number" name="age" value="{{ $applicant->age }}" class="form-control">
+                                    <label class="form-label">Age <span class="required-mark">*</span></label>
+                                    <input type="number" name="age" value="{{ $applicant->age }}" class="form-control"
+                                        required>
                                 </div>
 
                                 {{-- GENDER --}}
                                 <div class="col-md-2">
-                                    <label class="form-label">Gender</label>
-                                    <select name="gender" class="form-select">
+                                    <label class="form-label">Gender <span class="required-mark">*</span></label>
+                                    <select name="gender" class="form-select" required>
                                         <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male
                                         </option>
                                         <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>Female
@@ -1043,8 +1304,8 @@
 
                                 {{-- CIVIL STATUS --}}
                                 <div class="col-md-2">
-                                    <label class="form-label">Civil Status</label>
-                                    <select name="civil_status" class="form-select">
+                                    <label class="form-label">Civil Status<span class="required-mark">*</span></label>
+                                    <select name="civil_status" class="form-select" required>
                                         <option value="Single" {{ $applicant->civil_status == 'Single' ? 'selected' : '' }}>
                                             Single</option>
                                         <option value="Married" {{ $applicant->civil_status == 'Married' ? 'selected' : '' }}>
@@ -1056,8 +1317,8 @@
 
                                 {{-- PWD --}}
                                 <div class="col-md-1">
-                                    <label class="form-label">PWD</label>
-                                    <select name="pwd" class="form-select">
+                                    <label class="form-label">PWD<span class="required-mark">*</span></label>
+                                    <select name="pwd" class="form-select" required>
                                         <option value="0" {{ $applicant->pwd == 0 ? 'selected' : '' }}>No</option>
                                         <option value="1" {{ $applicant->pwd == 1 ? 'selected' : '' }}>Yes</option>
                                     </select>
@@ -1065,8 +1326,8 @@
 
                                 {{-- 4PS --}}
                                 <div class="col-md-1">
-                                    <label class="form-label">4Ps</label>
-                                    <select name="four_ps" class="form-select">
+                                    <label class="form-label">4Ps<span class="required-mark">*</span></label>
+                                    <select name="four_ps" class="form-select" required>
                                         <option value="0" {{ $applicant->four_ps == 0 ? 'selected' : '' }}>No</option>
                                         <option value="1" {{ $applicant->four_ps == 1 ? 'selected' : '' }}>Yes</option>
                                     </select>
@@ -1074,55 +1335,56 @@
 
                                 {{-- CONTACT --}}
                                 <div class="col-md-3">
-                                    <label class="form-label">Contact No</label>
+                                    <label class="form-label">Contact No<span class="required-mark">*</span></label>
                                     <input type="text" name="contact_no" value="{{ $applicant->contact_no }}"
-                                        class="form-control">
+                                        class="form-control" required>
                                 </div>
 
                                 {{-- ADDRESS --}}
                                 <div class="col-md-5">
-                                    <label class="form-label">Complete Address</label>
+                                    <label class="form-label">Complete Address<span class="required-mark">*</span></label>
                                     <input type="text" name="address_line" value="{{ $applicant->address_line }}"
-                                        class="form-control">
+                                        class="form-control" required>
                                 </div>
 
                                 {{-- PROVINCE --}}
                                 <div class="col-md-2">
-                                    <label class="form-label">Province</label>
-                                    <select name="province" id="province" class="form-select"></select>
+                                    <label class="form-label">Province<span class="required-mark">*</span></label>
+                                    <select name="province" id="province" class="form-select" required></select>
                                 </div>
 
                                 {{-- CITY --}}
                                 <div class="col-md-2">
-                                    <label class="form-label">City</label>
-                                    <select name="city" id="city" class="form-select"></select>
+                                    <label class="form-label">City<span class="required-mark">*</span></label>
+                                    <select name="city" id="city" class="form-select" required></select>
                                 </div>
 
                                 {{-- BARANGAY --}}
                                 <div class="col-md-2">
-                                    <label class="form-label">Barangay</label>
-                                    <select name="barangay" id="barangay" class="form-select"></select>
+                                    <label class="form-label">Barangay<span class="required-mark">*</span></label>
+                                    <select name="barangay" id="barangay" class="form-select" required></select>
                                 </div>
 
                                 {{-- EDUCATION --}}
                                 <div class="col-md-4">
-                                    <label class="form-label">Educational Attainment</label>
+                                    <label class="form-label">Educational Attainment<span
+                                            class="required-mark">*</span></label>
                                     <input type="text" name="educational_attainment"
-                                        value="{{ $applicant->educational_attainment }}" class="form-control">
+                                        value="{{ $applicant->educational_attainment }}" class="form-control" required>
                                 </div>
 
                                 {{-- COMPANY --}}
                                 <div class="col-md-4">
-                                    <label class="form-label">Hiring Company</label>
+                                    <label class="form-label">Hiring Company<span class="required-mark">*</span></label>
                                     <input type="text" name="hiring_company" value="{{ $applicant->hiring_company }}"
-                                        class="form-control">
+                                        class="form-control" required>
                                 </div>
 
                                 {{-- POSITION --}}
                                 <div class="col-md-4">
-                                    <label class="form-label">Position Hired</label>
+                                    <label class="form-label">Position Hired<span class="required-mark">*</span></label>
                                     <input type="text" name="position_hired" value="{{ $applicant->position_hired }}"
-                                        class="form-control">
+                                        class="form-control" required>
                                 </div>
 
                             </div>
@@ -1167,23 +1429,23 @@
                         <div class="row g-4">
 
                             <div class="col-md-6">
-                                <label class="form-label">Health Card</label>
-                                <input type="file" name="health_card" class="form-control">
+                                <label class="form-label">Health Card<span class="required-mark">*</span></label>
+                                <input type="file" name="health_card" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">NBI / Police Clearance</label>
-                                <input type="file" name="nbi_or_police_clearance" class="form-control">
+                                <label class="form-label">NBI / Police Clearance<span class="required-mark">*</span></label>
+                                <input type="file" name="nbi_or_police_clearance" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Cedula</label>
-                                <input type="file" name="cedula" class="form-control">
+                                <label class="form-label">Cedula<span class="required-mark">*</span></label>
+                                <input type="file" name="cedula" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Referral Letter</label>
-                                <input type="file" name="referral_letter" class="form-control" {{ $isImusResident ? 'disabled' : '' }}>
+                                <label class="form-label">Referral Letter<span class="required-mark">*</span></label>
+                                <input type="file" name="referral_letter" class="form-control" {{ $isImusResident ? 'disabled' : '' }} required>
                             </div>
 
                         </div>
@@ -1192,57 +1454,68 @@
 
                         <div class="row g-3 mt-3">
 
+                            {{-- OR NUMBER --}}
+                            <div class="col-md-2">
+                                <label class="form-label">O.R No. <span class="required-mark">*</span></label>
+                                <input type="text" name="peso_or_no" value="{{ $applicant->peso_or_no }}"
+                                    class="form-control" required>
+                            </div>
+
                             {{-- Peso ID No --}}
                             <div class="col-md-3">
-                                <label class="form-label">Peso ID No.</label>
-                                <input type="text" name="peso_id_no" class="form-control" value="{{$permit->peso_id_no}}">
+                                <label class="form-label">Peso ID No.<span class="required-mark">*</span></label>
+                                <input type="text" name="peso_id_no" class="form-control" value="{{$permit->peso_id_no}}"
+                                    required>
                             </div>
                             {{-- Community Tax No --}}
                             <div class="col-md-3">
-                                <label class="form-label">Community Tax No.</label>
+                                <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
                                 <input type="text" name="community_tax_no" class="form-control"
-                                    value="{{$permit->community_tax_no}}">
+                                    value="{{$permit->community_tax_no}}" required>
                             </div>
 
                             {{-- Issued On --}}
                             <div class="col-md-3">
-                                <label class="form-label">Permit Issued On</label>
+                                <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="permit_issued_on" class="form-control"
-                                    value="{{$permit->permit_issued_on}}">
+                                    value="{{$permit->permit_issued_on}}" required>
                             </div>
 
                             {{-- Issued In --}}
                             <div class="col-md-3">
-                                <label class="form-label">Permit Issued At</label>
+                                <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
                                 <input type="text" name="permit_issued_in" class="form-control"
-                                    value="{{$permit->permit_issued_in}}">
+                                    value="{{$permit->permit_issued_in}}" required>
                             </div>
                             {{-- Permit Date --}}
                             <div class="col-md-3">
-                                <label class="form-label">Permit Date</label>
-                                <input type="date" name="permit_date" class="form-control" value="{{$permit->permit_date}}">
+                                <label class="form-label">Permit Date<span class="required-mark">*</span></label>
+                                <input type="date" name="permit_date" class="form-control" value="{{$permit->permit_date}}"
+                                    required>
                             </div>
 
                             {{-- Expiration --}}
                             <div class="col-md-3">
-                                <label class="form-label">Expires On</label>
-                                <input type="date" name="expires_on" class="form-control" value="{{$permit->expires_on}}">
+                                <label class="form-label">Expires On<span class="required-mark">*</span></label>
+                                <input type="date" name="expires_on" class="form-control" value="{{$permit->expires_on}}"
+                                    required>
                             </div>
 
                             {{-- Documentary Stamp --}}
                             <div class="col-md-3">
-                                <label class="form-label">Documentary Stamp Control No.</label>
+                                <label class="form-label">Documentary Stamp Control No.<span
+                                        class="required-mark">*</span></label>
                                 <input type="text" name="permit_doc_stamp_control_no" class="form-control"
-                                    value="{{$permit->permit_doc_stamp_control_no}}">
+                                    value="{{$permit->permit_doc_stamp_control_no}}" required>
                             </div>
                             {{-- Date of Payment --}}
                             <div class="col-md-3">
-                                <label class="form-label">Date of Payment</label>
+                                <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                 <input type="date" name="permit_date_of_payment" class="form-control"
                                     value="{{$permit->permit_date_of_payment}}">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Payment Status <span class="required-mark">*</span></label>
+                                <label class="form-label">Payment Status<span class="required-mark">*</span></label>
                                 <select name="is_paid" class="form-select form-input" required>
                                     <option value="0" {{ $permit->is_paid == 0 ? 'selected' : '' }}>Not Paid</option>
                                     <option value="1" {{ $permit->is_paid == 1 ? 'selected' : '' }}>Paid</option>
@@ -1279,28 +1552,30 @@
                         <div class="row g-4">
 
                             <div class="col-md-6">
-                                <label class="form-label">Prosecutor Clearance</label>
-                                <input type="file" name="prosecutor_clearance" class="form-control">
+                                <label class="form-label">Prosecutor Clearance<span class="required-mark">*</span></label>
+                                <input type="file" name="prosecutor_clearance" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Municipal Trial Court Clearance</label>
-                                <input type="file" name="mtc_clearance" class="form-control">
+                                <label class="form-label">Municipal Trial Court Clearance<span
+                                        class="required-mark">*</span></label>
+                                <input type="file" name="mtc_clearance" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Regional Trial Court Clearance</label>
-                                <input type="file" name="rtc_clearance" class="form-control">
+                                <label class="form-label">Regional Trial Court Clearance<span
+                                        class="required-mark">*</span></label>
+                                <input type="file" name="rtc_clearance" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">NBI Clearance</label>
-                                <input type="file" name="nbi_clearance" class="form-control">
+                                <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
+                                <input type="file" name="nbi_clearance" class="form-control" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Barangay Clearance</label>
-                                <input type="file" name="barangay_clearance" class="form-control">
+                                <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
+                                <input type="file" name="barangay_clearance" class="form-control" required>
                             </div>
 
                         </div>
@@ -1308,45 +1583,46 @@
                         <div class="row g-3 mt-3">
                             {{-- Hired Company --}}
                             <div class="col-md-3">
-                                <label class="form-label">Hired Company</label>
+                                <label class="form-label">Hired Company<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_hired_company" class="form-control"
-                                    value="{{$clearance->clearance_hired_company}}">
+                                    value="{{$clearance->clearance_hired_company}}" required>
                             </div>
                             {{-- Official Receipt No --}}
                             <div class="col-md-3">
-                                <label class="form-label">O.R. No.</label>
+                                <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_or_no" class="form-control"
-                                    value="{{$clearance->clearance_or_no}}">
+                                    value="{{$clearance->clearance_or_no}}" required>
                             </div>
                             {{-- Issued On --}}
                             <div class="col-md-3">
-                                <label class="form-label">Issued On</label>
+                                <label class="form-label">Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="clearance_issued_on" class="form-control"
-                                    value="{{$clearance->clearance_issued_on}}">
+                                    value="{{$clearance->clearance_issued_on}}" required>
                             </div>
                             {{-- Issued In --}}
                             <div class="col-md-3">
-                                <label class="form-label">Issued In</label>
+                                <label class="form-label">Issued In<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_issued_in" class="form-control"
-                                    value="{{$clearance->clearance_issued_in}}">
+                                    value="{{$clearance->clearance_issued_in}}" required>
                             </div>
                             {{-- PESO Control No --}}
                             <div class="col-md-3">
-                                <label class="form-label">PESO Control No.</label>
+                                <label class="form-label">PESO Control No.<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_peso_control_no" class="form-control"
-                                    value="{{$clearance->clearance_peso_control_no}}">
+                                    value="{{$clearance->clearance_peso_control_no}}" required>
                             </div>
                             {{-- Documentary Stamp Control No --}}
                             <div class="col-md-3">
-                                <label class="form-label">Documentary Stamp Control No.</label>
+                                <label class="form-label">Documentary Stamp Control No.<span
+                                        class="required-mark">*</span></label>
                                 <input type="text" name="clearance_doc_stamp_control_no" class="form-control"
-                                    value="{{$clearance->clearance_doc_stamp_control_no}}">
+                                    value="{{$clearance->clearance_doc_stamp_control_no}}" required>
                             </div>
                             {{-- Date of Payment --}}
                             <div class="col-md-3">
-                                <label class="form-label">Date of Payment</label>
+                                <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                 <input type="date" name="date_of_payment" class="form-control"
-                                    value="{{$clearance->date_of_payment}}">
+                                    value="{{$clearance->date_of_payment}}" required>
                             </div>
                         </div>
 
@@ -1399,6 +1675,107 @@
 
                         </div>
 
+                        <!-- INNER TABS -->
+                        <div class="mt-4">
+                            <h6 class="section-title text-primary">Mayor's Referral Requirements</h6>
+
+                            <ul class="nav nav-tabs" id="referralTabs" role="tablist">
+
+
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="peso-office-tab" data-bs-toggle="tab"
+                                        data-bs-target="#peso-office" type="button" role="tab">
+                                        PESO Office
+                                    </button>
+                                </li>
+
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="other-city-tab" data-bs-toggle="tab"
+                                        data-bs-target="#other-city" type="button" role="tab">
+                                        Referral for Other City Government
+                                    </button>
+                                </li>
+
+                            </ul>
+
+
+                            <div class="tab-content border border-top-0 p-4">
+
+                                <!-- TAB 1 -->
+                                <div class="tab-pane fade show active" id="peso-office" role="tabpanel">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">O.R No.</label>
+                                            <input type="text" name="ref_or_no" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Mayor's First Name</label>
+                                            <input type="text" name="ref_mayor_recipient_firstname" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Mayor's Middle Name</label>
+                                            <input type="text" name="ref_mayor_recipient_middlename" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Mayor's Last Name</label>
+                                            <input type="text" name="ref_mayor_recipient_lastname" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">City Government</label>
+                                            <select name="ref_city_gov" id="cityGovernment" class="form-select">
+                                                <option value="">Select City Government</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label"> City Address</label>
+                                            <input type="text" name="ref_place" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">Hired Company</label>
+                                            <input type="text" name="ref_hired_company" class="form-control">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- TAB 2 -->
+
+                                <div class="tab-pane fade" id="other-city" role="tabpanel">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">O.R No.</label>
+                                            <input type="text" name="ref_peso_or_no" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">Recipient Name</label>
+                                            <input type="text" name="ref_recipient" class="form-control">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">Company Address</label>
+                                            <input type="text" name="ref_place" class="form-control">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                         <div class="pt-4 border-top mt-4">
                             <button type="submit" class="btn btn-primary px-5">
                                 Save Referral
@@ -1413,6 +1790,69 @@
         </div>
     </div>
 @endsection
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const cityDropdown = document.getElementById("cityGovernment");
+
+        const luzonRegions = [
+            "04"
+        ];
+
+        fetch("https://psgc.gitlab.io/api/cities-municipalities/")
+            .then(response => response.json())
+            .then(data => {
+
+                data.forEach(city => {
+
+                    const regionCode = city.regionCode?.substring(0, 2);
+
+                    if (luzonRegions.includes(regionCode)) {
+
+                        const option = document.createElement("option");
+
+                        option.value = "City Government of " + city.name;
+                        option.text = "City Government of " + city.name;
+
+                        cityDropdown.appendChild(option);
+
+                    }
+
+                });
+
+            })
+            .catch(error => console.error("Error loading cities:", error));
+
+    });
+
+</script>
+{{--
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const cityDropdown = document.getElementById("cityGovernment");
+
+        fetch("https://psgc.gitlab.io/api/cities-municipalities/")
+            .then(response => response.json())
+            .then(data => {
+
+                data.forEach(city => {
+
+                    const option = document.createElement("option");
+
+                    option.value = "City Government of " + city.name;
+                    option.text = "City Government of " + city.name;
+
+                    cityDropdown.appendChild(option);
+
+                });
+
+            })
+            .catch(error => console.error("Error loading cities:", error));
+
+    });
+</script> --}}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 

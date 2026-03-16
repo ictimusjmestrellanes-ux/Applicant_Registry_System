@@ -106,7 +106,7 @@ class PermitController extends Controller
         | SAVE FORM DATA
         |--------------------------------------------------------------------------
         */
-
+        $permit->permit_or_no = $request->permit_or_no;
         $permit->peso_id_no = $request->peso_id_no;
         $permit->community_tax_no = $request->community_tax_no;
 
@@ -118,8 +118,6 @@ class PermitController extends Controller
 
         $permit->permit_doc_stamp_control_no = $request->permit_doc_stamp_control_no;
         $permit->permit_date_of_payment = $request->permit_date_of_payment;
-
-        $permit->is_paid = $request->is_paid;
 
         $permit->save();
 

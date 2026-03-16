@@ -17,7 +17,6 @@ class ApplicantController extends Controller
         $request->validate([
 
             // Applicant Personal Information
-            'or_no' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
             'contact_no' => 'required',
@@ -75,7 +74,6 @@ class ApplicantController extends Controller
         */
 
         $applicant->update([
-            'or_no' => $request->or_no,
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,

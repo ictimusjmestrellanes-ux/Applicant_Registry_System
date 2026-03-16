@@ -10,7 +10,7 @@ class Applicant extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'or_no',
+        
         'first_name',
         'middle_name',
         'last_name',
