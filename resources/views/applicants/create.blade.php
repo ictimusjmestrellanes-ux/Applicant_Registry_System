@@ -417,8 +417,8 @@
                         <div class="col-md-2">
                             <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
                             <select name="first_time_job_seeker" class="form-select form-input" required>
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -475,16 +475,16 @@
                         <div class="col-md-2">
                             <label class="form-label">PWD <span class="required-mark">*</span></label>
                             <select name="pwd" class="form-select form-input" required>
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
                             </select>
                         </div>
                         <!-- 4Ps -->
                         <div class="col-md-2">
                             <label class="form-label">4Ps Beneficiary <span class="required-mark">*</span></label>
                             <select name="four_ps" class="form-select form-input" required>
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
                             </select>
                         </div>
                         <div class="col-md-2">

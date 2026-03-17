@@ -20,7 +20,6 @@ class MayorsPermit extends Model
         'community_tax_no',
 
         'permit_issued_on',
-        'permit_issued_in',
 
         'permit_date',
         'expires_on',

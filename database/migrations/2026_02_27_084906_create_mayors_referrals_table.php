@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('ref_mayor_recipient_middlename')->nullable();
             $table->string('ref_mayor_recipient_lastname');
             $table->string('ref_city_gov')->nullable();
-            $table->string('ref_place')->nullable();
+            $table->string('ref_company_address')->nullable();
             $table->string('ref_hired_company')->nullable();
 
             //peso public service

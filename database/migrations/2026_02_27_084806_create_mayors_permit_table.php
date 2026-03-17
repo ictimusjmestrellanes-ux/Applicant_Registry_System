@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('community_tax_no')->nullable();
 
             $table->date('permit_issued_on')->nullable();
-            $table->string('permit_issued_in')->nullable();
 
             $table->date('permit_date')->nullable();
             $table->date('expires_on')->nullable();
@@ -33,9 +32,6 @@ return new class extends Migration
             $table->string('permit_gor_serial_no')->nullable();
 
             $table->date('permit_date_of_payment')->nullable();
-            
-            $table->boolean('is_paid')->default(false);
-
             $table->timestamps();
         });
     }

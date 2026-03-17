@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MayorsClearance;
 use Illuminate\Http\Request;
 use App\Models\Applicant;
-use App\Models\Clearance;
+use App\Models\Clearance;  
 use Illuminate\Support\Str;
 
 class ClearanceController extends Controller
@@ -117,6 +117,17 @@ class ClearanceController extends Controller
             );
         }
 
+        $clearance->clearance_or_no = $request->clearance_or_no;
+        $clearance->clearance_issued_on = $request->clearance_issued_on;
+        $clearance->clearance_issued_in = $request->clearance_issued_in;
+
+        $clearance->clearance_peso_control_no = $request->clearance_peso_control_no;
+        $clearance->clearance_doc_stamp_control_no = $request->clearance_doc_stamp_control_no;
+        $clearance->clearance_date_of_payment = $request->clearance_date_of_payment;
+
+        $clearance->clearance_hired_company = $request->clearance_hired_company;
+        
+
         /*
         |--------------------------------------------------------------------------
         | SAVE CLEARANCE
@@ -124,6 +135,24 @@ class ClearanceController extends Controller
         */
 
         $clearance->save();
+
+        if (empty($clearance->clearance_peso_control_no)) {
+
+            $year = date('Y');
+
+            $latest = MayorsClearance::whereYear('created_at', $year)
+                ->whereNotNull('clearance_peso_control_no')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $nextNumber = $latest
+                ? ((int) substr($latest->clearance_peso_control_no, -4)) + 1
+                : 1;
+
+            $clearance->clearance_peso_control_no =$year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+            $clearance->save(); // SAVE AGAIN with generated ID
+        }
 
         return redirect()
             ->route('applicants.edit', $applicant->id)

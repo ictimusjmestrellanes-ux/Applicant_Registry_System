@@ -31,8 +31,8 @@ return new class extends Migration
                 'Widowed',
             ])->nullable();
 
-            $table->boolean('pwd')->default(false);
-            $table->boolean('four_ps')->default(false);
+            $table->string('pwd')->nullable();
+            $table->string('four_ps')->nullable();
 
             $table->string('address_line');
             $table->string('province');
@@ -44,7 +44,7 @@ return new class extends Migration
             $table->string('hiring_company')->nullable();
             $table->string('position_hired')->nullable();
 
-            $table->boolean('first_time_job_seeker')->default(false);
+            $table->string('first_time_job_seeker')->nullable();
 
             $table->timestamps();
         });

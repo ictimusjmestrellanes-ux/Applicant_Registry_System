@@ -720,15 +720,17 @@
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr class="align-middle">
-                                <th>ID</th>
-                                <th>Applicant Name</th>
-                                <th>Gender</th>
-                                <th>Contact</th>
-                                <th style="min-width: 200px;">Address</th>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">Applicant Name</th>
+                                <th class="text-center">Gender</th>
+                                <th class="text-center">PWD</th>
+                                <th class="text-center">4Ps</th>
+                                <th class="text-center">Contact</th>
+                                <th class="text-center"  style="min-width: 200px;">Address</th>
                                 <th class="text-center">Mayor's Permit</th>
                                 <th class="text-center">Mayor's Clearance</th>
                                 <th class="text-center">Mayor's Referral</th>
-                                <th>Date Created</th>
+                                <th class="text-center">Date Created</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -748,6 +750,16 @@
                                             </div>
                                         </td>
                                         <td>
+                                            <div class="fw-bold text-dark text-center">
+                                                {{ $applicant->pwd }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark text-center   ">
+                                                {{ $applicant->four_ps }}
+                                            </div>
+                                        </td>
+                                        <td>
                                             <span class="badge bg-light text-dark border"><i
                                                     class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
                                         </td>
@@ -756,7 +768,7 @@
                                         </td>
 
                                         {{-- Mayor's Permit Column --}}
-                                        <td>
+                                        <td class="text-center">
                                             @php
                                                 $permit = optional($applicant->permit);
 
@@ -835,7 +847,7 @@
                                                 </small></div>
                                         </td>
 
-                                        <td class="text-muted small">
+                                        <td class="text-muted small text-center">
                                             {{ $applicant->created_at->format('M d, Y') }}
                                         </td>
 
