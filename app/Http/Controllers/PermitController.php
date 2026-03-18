@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Models\MayorsPermit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PermitController extends Controller
 {
     public function update(Request $request, $id)
     {
-
         $applicant = Applicant::findOrFail($id);
 
         /*
@@ -19,7 +19,6 @@ class PermitController extends Controller
         | CREATE OR UPDATE PERMIT
         |--------------------------------------------------------------------------
         */
-
         $permit = MayorsPermit::firstOrNew([
             'applicant_id' => $applicant->id,
         ]);
@@ -29,9 +28,7 @@ class PermitController extends Controller
         | PREPARE FILE NAME
         |--------------------------------------------------------------------------
         */
-
-        $fullName = $applicant->last_name;
-        $fullName = Str::lower(Str::slug($fullName, '_'));
+        $fullName = Str::lower(Str::slug($applicant->last_name, '_'));
 
         /*
         |--------------------------------------------------------------------------
@@ -39,12 +36,19 @@ class PermitController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        // =========================
+        // HEALTH CARD
+        // =========================
         if ($request->hasFile('health_card')) {
+
+            if ($permit->health_card) {
+                Storage::disk('public')->delete($permit->health_card);
+            }
 
             $file = $request->file('health_card');
             $extension = $file->getClientOriginalExtension();
 
-            $fileName = 'Health_Card_'.$fullName.'_'.$extension.'.';
+            $fileName = 'health_card_'.$fullName.'.'.$extension;
 
             $permit->health_card = $file->storeAs(
                 'permits/health_cards',
@@ -53,26 +57,76 @@ class PermitController extends Controller
             );
         }
 
-        if ($request->hasFile('nbi_or_police_clearance')) {
+        // =========================
+        // NBI / POLICE (DROPDOWN LOGIC)
+        // =========================
+        if ($request->clearance_type === 'nbi') {
 
-            $file = $request->file('nbi_or_police_clearance');
-            $extension = $file->getClientOriginalExtension();
+            // delete police if exists
+            if ($permit->police_clearance) {
+                Storage::disk('public')->delete($permit->police_clearance);
+                $permit->police_clearance = null;
+            }
 
-            $fileName = 'NBI_or_Police_Clearance_'.$fullName.'_'.$extension.'.';
+            if ($request->hasFile('nbi_clearance')) {
 
-            $permit->nbi_or_police_clearance = $file->storeAs(
-                'permits/nbi_clearance',
-                $fileName,
-                'public'
-            );
+                if ($permit->nbi_clearance) {
+                    Storage::disk('public')->delete($permit->nbi_clearance);
+                }
+
+                $file = $request->file('nbi_clearance');
+                $extension = $file->getClientOriginalExtension();
+
+                $fileName = 'nbi_clearance_'.$fullName.'.'.$extension;
+
+                $permit->nbi_clearance = $file->storeAs(
+                    'permits/nbi_clearance',
+                    $fileName,
+                    'public'
+                );
+            }
         }
 
+        if ($request->clearance_type === 'police') {
+
+            // delete nbi if exists
+            if ($permit->nbi_clearance) {
+                Storage::disk('public')->delete($permit->nbi_clearance);
+                $permit->nbi_clearance = null;
+            }
+
+            if ($request->hasFile('police_clearance')) {
+
+                if ($permit->police_clearance) {
+                    Storage::disk('public')->delete($permit->police_clearance);
+                }
+
+                $file = $request->file('police_clearance');
+                $extension = $file->getClientOriginalExtension();
+
+                $fileName = 'police_clearance_'.$fullName.'.'.$extension;
+
+                $permit->police_clearance = $file->storeAs(
+                    'permits/police_clearance',
+                    $fileName,
+                    'public'
+                );
+            }
+        }
+
+        // =========================
+        // CEDULA
+        // =========================
         if ($request->hasFile('cedula')) {
+
+            if ($permit->cedula) {
+                Storage::disk('public')->delete($permit->cedula);
+            }
 
             $file = $request->file('cedula');
             $extension = $file->getClientOriginalExtension();
 
-            $fileName = 'Cedula_'.$fullName.'_'.$extension.'.';
+            $fileName = 'cedula_'.$fullName.'.'.$extension;
 
             $permit->cedula = $file->storeAs(
                 'permits/cedula',
@@ -81,12 +135,19 @@ class PermitController extends Controller
             );
         }
 
+        // =========================
+        // REFERRAL LETTER
+        // =========================
         if ($request->hasFile('referral_letter')) {
+
+            if ($permit->referral_letter) {
+                Storage::disk('public')->delete($permit->referral_letter);
+            }
 
             $file = $request->file('referral_letter');
             $extension = $file->getClientOriginalExtension();
 
-            $fileName = 'Referral_Letter_'.$fullName.'_'.$extension.'.';
+            $fileName = 'referral_letter_'.$fullName.'.'.$extension;
 
             $permit->referral_letter = $file->storeAs(
                 'permits/referral_letters',
@@ -100,7 +161,6 @@ class PermitController extends Controller
         | SAVE FORM DATA
         |--------------------------------------------------------------------------
         */
-        // Save FIRST (so it gets ID)
         $permit->fill([
             'permit_or_no' => $request->permit_or_no,
             'community_tax_no' => $request->community_tax_no,
@@ -109,14 +169,15 @@ class PermitController extends Controller
             'expires_on' => $request->expires_on,
             'permit_doc_stamp_control_no' => $request->permit_doc_stamp_control_no,
             'permit_date_of_payment' => $request->permit_date_of_payment,
+            'clearance_type' => $request->clearance_type,
         ]);
 
         $permit->save();
 
         /*
-        |---------------------------------------------------
-        | AUTO GENERATE PESO ID (AFTER SAVE)
-        |---------------------------------------------------
+        |--------------------------------------------------------------------------
+        | AUTO GENERATE PESO ID
+        |--------------------------------------------------------------------------
         */
         if (empty($permit->peso_id_no)) {
 
@@ -128,16 +189,19 @@ class PermitController extends Controller
                 ->first();
 
             $nextNumber = $latest
-                ? ((int) substr($latest->peso_id_no, -4)) + 1
+                ? ((int) substr($latest->peso_id_no, -7)) + 1
                 : 1;
 
-            $permit->peso_id_no =$year.'-'.str_pad($nextNumber, 7, '0', STR_PAD_LEFT);
+            $permit->peso_id_no = $year.'-'.str_pad($nextNumber, 7, '0', STR_PAD_LEFT);
 
-            $permit->save(); // SAVE AGAIN with generated ID
+            $permit->save();
         }
+
+        
 
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('success', 'Permit updated successfully.');
     }
+    
 }

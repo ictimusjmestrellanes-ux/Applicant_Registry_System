@@ -14,9 +14,12 @@ return new class extends Migration
             $table->foreignId('applicant_id')->constrained()->cascadeOnDelete();
 
             $table->string('health_card')->default(0);
-            $table->string('nbi_or_police_clearance')->default(0);
+            $table->string('nbi_clearance')->default(0);
+            $table->string('police_clearance')->default(0);
             $table->string('cedula')->default(0);
             $table->string('referral_letter')->default(0);
+
+            $table->string('clearance_type')->nullable();
 
             $table->string('permit_or_no')->nullable();
             $table->string('peso_id_no')->nullable();

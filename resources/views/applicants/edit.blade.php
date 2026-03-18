@@ -1443,46 +1443,168 @@
 
                         <div class="row g-4">
 
-                            {{-- Health Card --}}
-                            <div class="col-md-6">
-                                <label class="form-label">Health Card<span class="required-mark">*</span></label>
-                                <input type="file" name="health_card" class="form-control" >
-                            </div>
+                            <div class="row g-4">
 
-                            {{-- Cedula --}}
-                            <div class="col-md-6">
-                                <label class="form-label">Cedula<span class="required-mark">*</span></label>
-                                <input type="file" name="Cedula" class="form-control" >
+                                {{-- Health Card --}}
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Health Card<span class="required-mark">*</span>
+                                    </label>
+
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <input type="file"
+                                            name="health_card"
+                                            class="form-control"
+                                            onchange="showFileName(this, 'health_card_name')">
+
+                                        {{-- FILE NAME --}}
+                                        <small id="health_card_name" class="text-muted">
+                                            {{ !empty($permit->health_card) ? basename($permit->health_card) : 'No file selected' }}
+                                        </small>
+
+                                        {{-- VIEW BUTTON --}}
+                                        @if(!empty($permit->health_card))
+                                            <a href="{{ asset('storage/'.$permit->health_card) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary btn-sm">
+                                            View
+                                            </a>
+                                        @endif
+
+                                    </div>
+                                </div>
+
+
+                                {{-- Cedula --}}
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        Cedula<span class="required-mark">*</span>
+                                    </label>
+
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <input type="file"
+                                            name="cedula"
+                                            class="form-control"
+                                            onchange="showFileName(this, 'cedula_name')">
+
+                                        {{-- FILE NAME --}}
+                                        <small id="cedula_name" class="text-muted">
+                                            {{ !empty($permit->cedula) ? basename($permit->cedula) : 'No file selected' }}
+                                        </small>
+
+                                        {{-- VIEW BUTTON --}}
+                                        @if(!empty($permit->cedula))
+                                            <a href="{{ asset('storage/'.$permit->cedula) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary btn-sm">
+                                            View
+                                            </a>
+                                        @endif
+
+                                    </div>
+                                </div>
+
                             </div>
 
                             {{-- NBI / Police Clearance --}}
                             <div class="col-md-6">
-                                <label class="form-label">NBI or Police Clearance<span class="required-mark">*</span></label>
+                                <label class="form-label">
+                                    NBI or Police Clearance<span class="required-mark">*</span>
+                                </label>
 
                                 <!-- DROPDOWN -->
-                                <select id="clearance_type" class="form-select mb-2">
+                                <select name="clearance_type" id="clearance_type" class="form-select mb-2">
                                     <option value="">Select Clearance Type</option>
-                                    <option value="nbi">NBI Clearance</option>
-                                    <option value="police">Police Clearance</option>
+                                    <option value="nbi" {{ $permit->clearance_type == 'nbi' ? 'selected' : '' }}>
+                                        NBI Clearance
+                                    </option>
+                                    <option value="police" {{ $permit->clearance_type == 'police' ? 'selected' : '' }}>
+                                        Police Clearance
+                                    </option>
                                 </select>
 
                                 <!-- NBI INPUT -->
-                                <div id="nbi_input" style="display:none;">
-                                    <input type="file" name="nbi_clearance" class="form-control">
+                                <div id="nbi_section">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="file" name="nbi_clearance" class="form-control" onchange="showFileName(this, 'nbi_name')">
+
+                                        {{-- FILE NAME --}}
+                                        <small id="nbi_name" class="text-muted">
+                                            {{ !empty($permit->nbi_clearance) ? basename($permit->nbi_clearance) : 'No file selected' }}
+                                        </small>
+
+                                        {{-- VIEW BUTTON --}}
+                                        @if(!empty($permit->nbi_clearance))
+                                            <a href="{{ asset('storage/'.$permit->nbi_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary btn-sm">
+                                            View
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <!-- POLICE INPUT -->
-                                <div id="police_input" style="display:none;">
-                                    <input type="file" name="police_clearance" class="form-control">
-                                </div>
+                                <div id="police_section">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="file" name="police_clearance" class="form-control" onchange="showFileName(this, 'police_name')">
 
+                                        {{-- FILE NAME --}}
+                                        <small id="police_name" class="text-muted">
+                                            {{ !empty($permit->police_clearance) ? basename($permit->police_clearance) : 'No file selected' }}
+                                        </small>
+
+                                        {{-- VIEW BUTTON --}}
+                                        @if(!empty($permit->police_clearance))
+                                            <a href="{{ asset('storage/'.$permit->police_clearance) }}"
+                                            target="_blank"
+                                            class="btn btn-outline-primary btn-sm">
+                                            View
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
-                            {{-- Referral Letter --}}
-
                             <div class="col-md-6">
-                                <label class="form-label">Referral Letter<span class="required-mark">*</span></label>
-                                <input type="file" name="referral_letter" class="form-control" {{ $isImusResident ? 'disabled' : '' }}>
+                                <label class="form-label">
+                                    Referral Letter
+                                    @if(!$isImusResident)
+                                        <span class="required-mark">*</span>
+                                    @endif
+                                </label>
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <input type="file"
+                                    name="referral_letter"
+                                    class="form-control"
+                                    onchange="showFileName(this, 'referral_name')"
+
+                                    {{ (!$isImusResident && empty($permit->referral_letter)) ? 'required' : '' }}
+                                    {{ $isImusResident ? 'disabled' : '' }}>
+                                    {{-- FILE NAME --}}
+                                    <small id="referral_name" class="text-muted">
+                                        {{ !empty($permit->referral_letter) ? basename($permit->referral_letter) : 'No file selected' }}
+                                    </small>
+
+                                    {{-- VIEW BUTTON --}}
+                                    @if(!empty($permit->referral_letter))
+                                        <a href="{{ asset('storage/'.$permit->referral_letter) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        View
+                                        </a>
+                                    @endif
+
+                                </div>
+
+                                {{-- INFO MESSAGE --}}
+                                @if($isImusResident)
+                                    <small class="text-success d-block mt-1">
+                                        Not required for City of Imus residents
+                                    </small>
+                                @endif
                             </div>
                         </div>
 
@@ -1549,8 +1671,14 @@
                             <button type="submit" class="btn btn-primary px-5">
                                 Save Permit
                             </button>
-                        </div>
 
+                            <form action="{{ route('permits.generateId', $applicant->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-success px-5">
+                                    Generate ID
+                                </button>
+                            </form>
+                        </div>
                     </form>
 
                 </div>
@@ -2108,26 +2236,29 @@ document.addEventListener("DOMContentLoaded", function () {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const dropdown = document.getElementById("clearance_type");
-    const nbiInput = document.getElementById("nbi_input");
-    const policeInput = document.getElementById("police_input");
+    const type = document.getElementById('clearance_type');
+    const nbi = document.getElementById('nbi_section');
+    const police = document.getElementById('police_section');
 
-    dropdown.addEventListener("change", function () {
-
-        // Hide both first
-        nbiInput.style.display = "none";
-        policeInput.style.display = "none";
-
-        // Show selected
-        if (this.value === "nbi") {
-            nbiInput.style.display = "block";
+    function toggleClearance() {
+        if (type.value === 'nbi') {
+            nbi.style.display = 'block';
+            police.style.display = 'none';
+        } 
+        else if (type.value === 'police') {
+            nbi.style.display = 'none';
+            police.style.display = 'block';
+        } 
+        else {
+            nbi.style.display = 'none';
+            police.style.display = 'none';
         }
+    }
 
-        if (this.value === "police") {
-            policeInput.style.display = "block";
-        }
+    // run on load (IMPORTANT for edit page)
+    toggleClearance();
 
-    });
-
+    // run on change
+    type.addEventListener('change', toggleClearance);
 });
 </script>

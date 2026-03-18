@@ -96,7 +96,7 @@
 <style>
     :root {
         /* Theme: Deep Navy & Emerald */
-        --sidebar-bg: #0f172a;
+        --sidebar-bg: #1e59a7;
         /* Deep Navy */
         --sidebar-accent: #10b981;
         /* Emerald Green */
@@ -106,7 +106,6 @@
 
     .sidebar {
         background-color: var(--sidebar-bg);
-        background-image: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
         width: 280px;
         height: 100vh;

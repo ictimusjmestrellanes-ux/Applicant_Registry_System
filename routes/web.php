@@ -55,3 +55,6 @@ Route::put('/clearances/{id}', [ClearanceController::class,'update'])
     ->name('clearances.update');
 Route::put('/referrals/{id}', [ReferralController::class,'update'])
     ->name('referrals.update');
+
+    Route::post('/permits/{id}/generate-id', [PermitController::class, 'generateId'])
+    ->name('permits.generateId');

@@ -11,9 +11,12 @@ class MayorsPermit extends Model
         'applicant_id',
 
         'health_card',
-        'nbi_or_police_clearance',
+        'nbi_clearance',
+        'police_clearance',
         'cedula',
         'referral_letter',
+
+        'clearance_type',
 
         'permit_or_no',
         'peso_id_no',
