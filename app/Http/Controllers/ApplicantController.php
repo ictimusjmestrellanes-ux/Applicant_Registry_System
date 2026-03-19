@@ -58,7 +58,7 @@ class ApplicantController extends Controller
 
     public function edit($id)
     {
-        $applicant = Applicant::findOrFail($id);
+        $applicant = Applicant::with(['activityLogs.causer'])->findOrFail($id);
 
         return view('applicants.edit', compact('applicant'));
     }
