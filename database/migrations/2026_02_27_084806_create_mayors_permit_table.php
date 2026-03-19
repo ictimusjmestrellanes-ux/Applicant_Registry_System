@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('applicant_id')->constrained()->cascadeOnDelete();
 
             $table->string('health_card')->default(0);
-            $table->string('nbi_clearance')->default(0);
-            $table->string('police_clearance')->default(0);
+            $table->string('permit_nbi_clearance')->nullable();
+            $table->string('permit_police_clearance')->nullable();
             $table->string('cedula')->default(0);
             $table->string('referral_letter')->default(0);
 
@@ -23,7 +23,6 @@ return new class extends Migration
 
             $table->string('permit_or_no')->nullable();
             $table->string('peso_id_no')->nullable();
-            $table->string('employers_name_or_address')->nullable();
             $table->string('community_tax_no')->nullable();
 
             $table->date('permit_issued_on')->nullable();
@@ -32,7 +31,6 @@ return new class extends Migration
             $table->date('expires_on')->nullable();
 
             $table->string('permit_doc_stamp_control_no')->nullable();
-            $table->string('permit_gor_serial_no')->nullable();
 
             $table->date('permit_date_of_payment')->nullable();
             $table->timestamps();

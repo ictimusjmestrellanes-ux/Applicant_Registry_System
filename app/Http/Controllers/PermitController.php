@@ -63,24 +63,24 @@ class PermitController extends Controller
         if ($request->clearance_type === 'nbi') {
 
             // delete police if exists
-            if ($permit->police_clearance) {
-                Storage::disk('public')->delete($permit->police_clearance);
-                $permit->police_clearance = null;
+            if ($permit->permit_police_clearance) {
+                Storage::disk('public')->delete($permit->permit_police_clearance);
+                $permit->permit_police_clearance = null;
             }
 
-            if ($request->hasFile('nbi_clearance')) {
+            if ($request->hasFile('permit_nbi_clearance')) {
 
-                if ($permit->nbi_clearance) {
-                    Storage::disk('public')->delete($permit->nbi_clearance);
+                if ($permit->permit_nbi_clearance) {
+                    Storage::disk('public')->delete($permit->permit_nbi_clearance);
                 }
 
-                $file = $request->file('nbi_clearance');
+                $file = $request->file('permit_nbi_clearance');
                 $extension = $file->getClientOriginalExtension();
 
                 $fileName = 'nbi_clearance_'.$fullName.'.'.$extension;
 
-                $permit->nbi_clearance = $file->storeAs(
-                    'permits/nbi_clearance',
+                $permit->permit_nbi_clearance = $file->storeAs(
+                    'permits/permit_nbi_clearance',
                     $fileName,
                     'public'
                 );
@@ -90,15 +90,15 @@ class PermitController extends Controller
         if ($request->clearance_type === 'police') {
 
             // delete nbi if exists
-            if ($permit->nbi_clearance) {
-                Storage::disk('public')->delete($permit->nbi_clearance);
-                $permit->nbi_clearance = null;
+            if ($permit->permit_nbi_clearance) {
+                Storage::disk('public')->delete($permit->permit_nbi_clearance);
+                $permit->permit_nbi_clearance = null;
             }
 
             if ($request->hasFile('police_clearance')) {
 
-                if ($permit->police_clearance) {
-                    Storage::disk('public')->delete($permit->police_clearance);
+                if ($permit->permit_police_clearance) {
+                    Storage::disk('public')->delete($permit->permit_police_clearance);
                 }
 
                 $file = $request->file('police_clearance');
@@ -106,8 +106,8 @@ class PermitController extends Controller
 
                 $fileName = 'police_clearance_'.$fullName.'.'.$extension;
 
-                $permit->police_clearance = $file->storeAs(
-                    'permits/police_clearance',
+                $permit->permit_police_clearance = $file->storeAs(
+                    'permits/permit_police_clearance',
                     $fileName,
                     'public'
                 );
@@ -197,11 +197,19 @@ class PermitController extends Controller
             $permit->save();
         }
 
-        
-
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('success', 'Permit updated successfully.');
     }
-    
+
+    public function printId($id)
+    {
+        $applicant = Applicant::with('permit')->findOrFail($id);
+
+        if (! $applicant->permit || ! $applicant->permit->isComplete()) {
+            return redirect()->back()->with('error', 'Permit is not complete.');
+        }
+
+        return view('permit.id', compact('applicant'));
+    }
 }

@@ -11,8 +11,8 @@ class MayorsPermit extends Model
         'applicant_id',
 
         'health_card',
-        'nbi_clearance',
-        'police_clearance',
+        'permit_nbi_clearance',
+        'permit_police_clearance',
         'cedula',
         'referral_letter',
 
@@ -41,5 +41,31 @@ class MayorsPermit extends Model
     public function applicant()
     {
         return $this->belongsTo(Applicant::class);
+    }
+
+    public function isComplete()
+    {
+        return
+            // REQUIREMENTS
+            ! empty($this->health_card) &&
+            ! empty($this->cedula) &&
+            (
+                ! empty($this->permit_nbi_clearance) ||
+                ! empty($this->permit_police_clearance)
+            ) &&
+            (
+                // Referral only required if NOT Imus
+                stripos(optional($this->applicant)->city, 'City of Imus') !== false
+                || ! empty($this->referral_letter)
+            ) &&
+
+            // DETAILS
+            ! empty($this->permit_or_no) &&
+            ! empty($this->peso_id_no) &&
+            ! empty($this->community_tax_no) &&
+            ! empty($this->permit_issued_on) &&
+            ! empty($this->permit_date) &&
+            ! empty($this->expires_on) &&
+            ! empty($this->permit_doc_stamp_control_no);
     }
 }

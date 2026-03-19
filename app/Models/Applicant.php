@@ -46,6 +46,11 @@ class Applicant extends Model
         return $this->hasOne(MayorsReferral::class);
     }
 
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class)->latest();
+    }
+
     public function isPermitComplete()
     {
         if (! $this->permit) {

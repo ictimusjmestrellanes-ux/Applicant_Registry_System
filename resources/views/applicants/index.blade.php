@@ -4,8 +4,8 @@
 
     <style>
         /* ===================================
-    GLOBAL LAYOUT
-    =================================== */
+        GLOBAL LAYOUT
+        =================================== */
 
         body {
             background: #f3f6fb;
@@ -14,8 +14,8 @@
         }
 
         /* ===================================
-    PAGE HEADER
-    =================================== */
+        PAGE HEADER
+        =================================== */
 
         .page-title {
             font-size: 28px;
@@ -28,8 +28,8 @@
         }
 
         /* ===================================
-    ADD APPLICANT BUTTON
-    =================================== */
+        ADD APPLICANT BUTTON
+        =================================== */
 
         .btn-save {
             background: #2563eb;
@@ -48,8 +48,8 @@
         }
 
         /* ===================================
-    FILTER PANEL
-    =================================== */
+        FILTER PANEL
+        =================================== */
 
         .card {
             background: #ffffff;
@@ -63,8 +63,8 @@
         }
 
         /* ===================================
-    SEARCH FIELD
-    =================================== */
+        SEARCH FIELD
+        =================================== */
 
         .input-group {
             border-radius: 8px;
@@ -93,8 +93,8 @@
         }
 
         /* ===================================
-    TABLE CARD
-    =================================== */
+        TABLE CARD
+        =================================== */
 
         .table-card {
             border-radius: 12px;
@@ -102,8 +102,8 @@
         }
 
         /* ===================================
-    TABLE
-    =================================== */
+        TABLE
+        =================================== */
 
         .table {
             font-size: 14px;
@@ -127,8 +127,8 @@
         }
 
         /* ===================================
-    ROW HOVER
-    =================================== */
+        ROW HOVER
+        =================================== */
 
         .table-hover tbody tr {
             transition: all .2s ease;
@@ -139,8 +139,8 @@
         }
 
         /* ===================================
-    CONTACT BADGE
-    =================================== */
+        CONTACT BADGE
+        =================================== */
 
         .badge {
             padding: 6px 10px;
@@ -149,8 +149,8 @@
         }
 
         /* ===================================
-    PROGRESS BAR
-    =================================== */
+        PROGRESS BAR
+        =================================== */
 
         .progress {
             height: 6px;
@@ -163,8 +163,8 @@
         }
 
         /* ===================================
-    ACTION BUTTONS
-    =================================== */
+        ACTION BUTTONS
+        =================================== */
 
         .btn-outline-primary {
             border-radius: 6px;
@@ -185,8 +185,8 @@
         }
 
         /* ===================================
-    ALERT
-    =================================== */
+        ALERT
+        =================================== */
 
         .alert-success {
             border-radius: 10px;
@@ -194,16 +194,16 @@
         }
 
         /* ===================================
-    EMPTY STATE
-    =================================== */
+        EMPTY STATE
+        =================================== */
 
         tbody td i {
             opacity: .6;
         }
 
         /* ===================================
-    PAGINATION
-    =================================== */
+        PAGINATION
+        =================================== */
 
         .pagination {
             gap: 6px;
@@ -221,8 +221,8 @@
         }
 
         /* ===================================
-    RESPONSIVE
-    =================================== */
+        RESPONSIVE
+        =================================== */
 
         @media(max-width:992px) {
 
@@ -257,8 +257,8 @@
     </style>
     {{-- <style>
         /* ===============================
-        GLOBAL PAGE STYLE
-        ================================ */
+            GLOBAL PAGE STYLE
+            ================================ */
 
         body {
             background: linear-gradient(135deg, #eef2f8, #e8eef6);
@@ -266,8 +266,8 @@
         }
 
         /* ===============================
-        PAGE TITLE
-        ================================ */
+            PAGE TITLE
+            ================================ */
 
         .page-title {
             font-size: 26px;
@@ -282,8 +282,8 @@
 
 
         /* ===============================
-        SAVE BUTTON
-        ================================ */
+            SAVE BUTTON
+            ================================ */
 
         .btn-save {
             background: linear-gradient(135deg, #4a7dff, #6aa8ff);
@@ -302,8 +302,8 @@
         }
 
         /* ===============================
-        FILTER CARD
-        ================================ */
+            FILTER CARD
+            ================================ */
 
         .card {
             border-radius: 16px;
@@ -316,8 +316,8 @@
         }
 
         /* ===============================
-        FORM LABEL
-        ================================ */
+            FORM LABEL
+            ================================ */
 
         .form-label {
             font-size: 12px;
@@ -325,8 +325,8 @@
         }
 
         /* ===============================
-        SEARCH INPUT
-        ================================ */
+            SEARCH INPUT
+            ================================ */
 
         .input-group {
             border-radius: 10px;
@@ -355,8 +355,8 @@
         }
 
         /* ===============================
-        TABLE CARD
-        ================================ */
+            TABLE CARD
+            ================================ */
 
         .table-card {
             border-radius: 18px;
@@ -364,8 +364,8 @@
         }
 
         /* ===============================
-        TABLE STYLE
-        ================================ */
+            TABLE STYLE
+            ================================ */
 
         .table {
             font-size: 14px;
@@ -390,8 +390,8 @@
         }
 
         /* ===============================
-        ROW HOVER EFFECT
-        ================================ */
+            ROW HOVER EFFECT
+            ================================ */
 
         .table-hover tbody tr {
             transition: all .25s ease;
@@ -403,8 +403,8 @@
         }
 
         /* ===============================
-        CONTACT BADGE
-        ================================ */
+            CONTACT BADGE
+            ================================ */
 
         .badge {
             font-weight: 500;
@@ -413,8 +413,8 @@
         }
 
         /* ===============================
-        PROGRESS BAR
-        ================================ */
+            PROGRESS BAR
+            ================================ */
 
         .progress {
             border-radius: 20px;
@@ -427,8 +427,8 @@
         }
 
         /* ===============================
-        ACTION BUTTONS
-        ================================ */
+            ACTION BUTTONS
+            ================================ */
 
         .btn-outline-primary,
         .btn-outline-danger {
@@ -449,8 +449,8 @@
         }
 
         /* ===============================
-        SUCCESS ALERT
-        ================================ */
+            SUCCESS ALERT
+            ================================ */
 
         .alert-success {
             background: linear-gradient(135deg, #eafaf1, #e2f7eb);
@@ -459,16 +459,16 @@
         }
 
         /* ===============================
-        EMPTY STATE
-        ================================ */
+            EMPTY STATE
+            ================================ */
 
         tbody td i {
             opacity: .6;
         }
 
         /* ===============================
-        PAGINATION
-        ================================ */
+            PAGINATION
+            ================================ */
 
         .pagination {
             gap: 5px;
@@ -486,8 +486,8 @@
         }
 
         /* ===============================
-        RESPONSIVE
-        ================================ */
+            RESPONSIVE
+            ================================ */
 
         @media (max-width:992px) {
 
@@ -522,8 +522,8 @@
         }
 
         /* ===============================
-        SUBTLE CARD ANIMATION
-        ================================ */
+            SUBTLE CARD ANIMATION
+            ================================ */
 
         .card {
             animation: fadeUp .35s ease;
@@ -726,7 +726,7 @@
                                 <th class="text-center">PWD</th>
                                 <th class="text-center">4Ps</th>
                                 <th class="text-center">Contact</th>
-                                <th class="text-center"  style="min-width: 200px;">Address</th>
+                                <th class="text-center" style="min-width: 200px;">Address</th>
                                 <th class="text-center">Mayor's Permit</th>
                                 <th class="text-center">Mayor's Clearance</th>
                                 <th class="text-center">Mayor's Referral</th>
@@ -736,140 +736,140 @@
                         </thead>
                         <tbody>
                             @forelse($applicants as $applicant)
-                                <tr>
-                                    <h5>
-                                        <td class="text-muted fw-medium">#{{ $applicant->id }}</td>
-                                        <td>
-                                            <div class="fw-bold text-dark">
-                                                {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="fw-bold text-dark text-center   ">
-                                                {{ $applicant->gender }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="fw-bold text-dark text-center">
-                                                {{ $applicant->pwd }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="fw-bold text-dark text-center   ">
-                                                {{ $applicant->four_ps }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-light text-dark border"><i
-                                                    class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
-                                        </td>
-                                        <td class="text-muted small">
-                                            {{ $applicant->address_line }}, {{ $applicant->barangay }}, {{ $applicant->city }}
-                                        </td>
+                                            <tr>
+                                                <h5>
+                                                    <td class="text-muted fw-medium">#{{ $applicant->id }}</td>
+                                                    <td>
+                                                        <div class="fw-bold text-dark">
+                                                            {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-bold text-dark text-center   ">
+                                                            {{ $applicant->gender }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-bold text-dark text-center">
+                                                            {{ $applicant->pwd }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-bold text-dark text-center   ">
+                                                            {{ $applicant->four_ps }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-light text-dark border"><i
+                                                                class="bi bi-telephone me-1"></i>{{ $applicant->contact_no }}</span>
+                                                    </td>
+                                                    <td class="text-muted small">
+                                                        {{ $applicant->address_line }}, {{ $applicant->barangay }}, {{ $applicant->city }}
+                                                    </td>
 
-                                        {{-- Mayor's Permit Column --}}
-                                        <td class="text-center">
-                                            @php
-                                                $permit = optional($applicant->permit);
+                                                    {{-- Mayor's Permit Column --}}
+                                                    <td class="text-center">
+                                                        @php
+                                                            $permit = optional($applicant->permit);
 
-                                                // Detect if resident of City of Imus
-                                                $isImusResident = stripos($applicant->city, 'City of Imus') !== false;
+                                                            // Detect Imus resident safely
+                                                            $isImusResident = $applicant->city && stripos($applicant->city, 'City of Imus') !== false;
 
-                                                if ($isImusResident) {
-                                                    // 3 requirements for Imus residents
-                                                    $pReqs = [
-                                                        $permit->health_card,
-                                                        $permit->nbi_or_police_clearance,
-                                                        $permit->cedula,
-                                                    ];
-                                                } else {
-                                                    // 4 requirements for non-Imus residents
-                                                    $pReqs = [
-                                                        $permit->health_card,
-                                                        $permit->nbi_or_police_clearance,
-                                                        $permit->cedula,
-                                                        $permit->referral_letter,
-                                                    ];
-                                                }
+                                                            // CLEARANCE LOGIC (NEW)
+                                                            $hasClearance =
+                                                                ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
+                                                                ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
 
-                                                $pTotal = count($pReqs);
-                                                $pUploaded = collect($pReqs)->filter()->count();
-                                                $pPerc = $pTotal > 0 ? ($pUploaded / $pTotal) * 100 : 0;
-                                            @endphp
+                                                            // REQUIREMENTS LIST (UPDATED)
+                                                            $pReqs = [
+                                                                !empty($permit->health_card),
+                                                                !empty($permit->cedula),
+                                                                $hasClearance,
+                                                            ];
 
-                                            <div class="progress mb-1" style="height: 6px;">
-                                                <div class="progress-bar 
-                                                                    {{ $pPerc == 100 ? 'bg-success' : ($pPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                                    style="width: {{ $pPerc }}%;">
-                                                </div>
-                                            </div>
+                                                            // Add referral ONLY if NOT Imus
+                                                            if (!$isImusResident) {
+                                                                $pReqs[] = !empty($permit->referral_letter);
+                                                            }
 
-                                            <div class="text-center" style="font-size: 0.7rem;">
-                                                <small class="text-muted">
-                                                    {{ $pUploaded }} / {{ $pTotal }} Submitted
-                                                </small>
-                                            </div>
-                                        </td>
+                                                            $pTotal = count($pReqs);
+                                                            $pUploaded = collect($pReqs)->filter()->count();
+                                                            $pPerc = $pTotal > 0 ? ($pUploaded / $pTotal) * 100 : 0;
+                                                        @endphp
 
-                                        {{-- Mayor's Clearance Column --}}
-                                        <td>
-                                            @php
-                                                $clearance = optional($applicant->clearance);
-                                                $cReqs = [$clearance->prosecutor_clearance, $clearance->mtc_clearance, $clearance->rtc_clearance, $clearance->nbi_clearance, $clearance->barangay_clearance];
-                                                $cUploaded = collect($cReqs)->filter()->count();
-                                                $cTotal = count($cReqs);
-                                                $cPerc = $cTotal > 0 ? ($cUploaded / $cTotal) * 100 : 0;
-                                            @endphp
-                                            <div class="progress mb-1" style="height: 6px;">
-                                                <div class="progress-bar {{ $cPerc == 100 ? 'bg-success' : ($cPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                                    style="width: {{ $cPerc }}%;"></div>
-                                            </div>
-                                            <div class="text-center" style="font-size: 0.7rem;"><small class="text-muted">
-                                                    {{ $cUploaded }} / {{ $cTotal }} Submitted
-                                                </small></div>
-                                        </td>
+                                                        <div class="progress mb-1" style="height: 6px;">
+                                                            <div class="progress-bar 
+                                {{ $pPerc == 100 ? 'bg-success' : ($pPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                                                style="width: {{ $pPerc }}%;">
+                                                            </div>
+                                                        </div>
 
-                                        {{-- Mayor's Referral Column --}}
-                                        <td>
-                                            @php
-                                                $referral = optional($applicant->referral);
-                                                $hasResume = !empty($referral->resume);
-                                                $hasOneClearance = collect([$referral->ref_barangay_clearance, $referral->ref_police_clearance, $referral->ref_nbi_clearance])->filter()->count() > 0;
-                                                $rUploaded = ($hasResume ? 1 : 0) + ($hasOneClearance ? 1 : 0);
-                                                $rPerc = ($rUploaded / 2) * 100;
-                                            @endphp
-                                            <div class="progress mb-1" style="height: 6px;">
-                                                <div class="progress-bar {{ $rPerc == 100 ? 'bg-success' : ($rPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                                    style="width: {{ $rPerc }}%;"></div>
-                                            </div>
-                                            <div class="text-center" style="font-size: 0.7rem;"><small class="text-muted">
-                                                    {{ $rUploaded }} / 2 Submitted
-                                                </small></div>
-                                        </td>
+                                                        <div class="text-center" style="font-size: 0.75rem;">
+                                                            <small class="text-muted">
+                                                                {{ $pUploaded }} / {{ $pTotal }} Submitted
+                                                            </small>
+                                                        </div>
+                                                    </td>
 
-                                        <td class="text-muted small text-center">
-                                            {{ $applicant->created_at->format('M d, Y') }}
-                                        </td>
+                                                    {{-- Mayor's Clearance Column --}}
+                                                    <td>
+                                                        @php
+                                                            $clearance = optional($applicant->clearance);
+                                                            $cReqs = [$clearance->prosecutor_clearance, $clearance->mtc_clearance, $clearance->rtc_clearance, $clearance->nbi_clearance, $clearance->barangay_clearance];
+                                                            $cUploaded = collect($cReqs)->filter()->count();
+                                                            $cTotal = count($cReqs);
+                                                            $cPerc = $cTotal > 0 ? ($cUploaded / $cTotal) * 100 : 0;
+                                                        @endphp
+                                                        <div class="progress mb-1" style="height: 6px;">
+                                                            <div class="progress-bar {{ $cPerc == 100 ? 'bg-success' : ($cPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                                                style="width: {{ $cPerc }}%;"></div>
+                                                        </div>
+                                                        <div class="text-center" style="font-size: 0.7rem;"><small class="text-muted">
+                                                                {{ $cUploaded }} / {{ $cTotal }} Submitted
+                                                            </small></div>
+                                                    </td>
 
-                                        <td class="text-center">
-                                            <div class="d-flex justify-content-center gap-2">
-                                                <a href="{{ route('applicants.edit', $applicant->id) }}"
-                                                    class="btn btn-sm btn-outline-primary" title="Edit">
-                                                    <i class="bi bi-eye-fill"></i>
-                                                </a>
+                                                    {{-- Mayor's Referral Column --}}
+                                                    <td>
+                                                        @php
+                                                            $referral = optional($applicant->referral);
+                                                            $hasResume = !empty($referral->resume);
+                                                            $hasOneClearance = collect([$referral->ref_barangay_clearance, $referral->ref_police_clearance, $referral->ref_nbi_clearance])->filter()->count() > 0;
+                                                            $rUploaded = ($hasResume ? 1 : 0) + ($hasOneClearance ? 1 : 0);
+                                                            $rPerc = ($rUploaded / 2) * 100;
+                                                        @endphp
+                                                        <div class="progress mb-1" style="height: 6px;">
+                                                            <div class="progress-bar {{ $rPerc == 100 ? 'bg-success' : ($rPerc > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                                                style="width: {{ $rPerc }}%;"></div>
+                                                        </div>
+                                                        <div class="text-center" style="font-size: 0.7rem;"><small class="text-muted">
+                                                                {{ $rUploaded }} / 2 Submitted
+                                                            </small></div>
+                                                    </td>
 
-                                                <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
-                                                    onsubmit="return confirm('Are you sure you want to archive this applicant?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive">
-                                                        <i class="bi bi-archive"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </h5>
-                                </tr>
+                                                    <td class="text-muted small text-center">
+                                                        {{ $applicant->created_at->format('M d, Y') }}
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        <div class="d-flex justify-content-center gap-2">
+                                                            <a href="{{ route('applicants.edit', $applicant->id) }}"
+                                                                class="btn btn-sm btn-outline-primary" title="Edit">
+                                                                <i class="bi bi-eye-fill"></i>
+                                                            </a>
+
+                                                            <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to archive this applicant?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive">
+                                                                    <i class="bi bi-archive"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </h5>
+                                            </tr>
                             @empty
                                 <tr>
                                     <td colspan="9" class="text-center p-5">

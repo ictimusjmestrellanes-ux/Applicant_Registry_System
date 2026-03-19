@@ -49,12 +49,15 @@ Route::get('/applicants/{applicant}/view-file/{field}',
 
 // ✅ PUT RESOURCE LAST
 Route::resource('applicants', ApplicantController::class);
-Route::put('/permits/{id}', [PermitController::class,'update'])
+Route::put('/permits/{id}', [PermitController::class, 'update'])
     ->name('permits.update');
-Route::put('/clearances/{id}', [ClearanceController::class,'update'])
+Route::put('/clearances/{id}', [ClearanceController::class, 'update'])
     ->name('clearances.update');
-Route::put('/referrals/{id}', [ReferralController::class,'update'])
+Route::put('/referrals/{id}', [ReferralController::class, 'update'])
     ->name('referrals.update');
 
-    Route::post('/permits/{id}/generate-id', [PermitController::class, 'generateId'])
-    ->name('permits.generateId');
+Route::get('/applicants/{id}/permit-id', [PermitController::class, 'printId'])
+    ->name('permits.printId');
+
+Route::get('/applicants/{id}/print-clearance', [ClearanceController::class, 'printLetter'])
+    ->name('clearances.printLetter');

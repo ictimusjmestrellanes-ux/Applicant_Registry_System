@@ -93,14 +93,12 @@
             float: right;
             width: 350px;
             text-align: center;
-            margin-top: 40px;
         }
 
         .signature-name {
             font-weight: bold;
             font-size: 12pt;
             text-transform: uppercase;
-            margin-top: 50px;
             border-bottom: 1px solid #000;
             display: inline-block;
             min-width: 250px;
@@ -109,6 +107,8 @@
         .signature-title {
             display: block;
             font-size: 11pt;
+            
+            margin-bottom: 50px;
         }
 
         .authority-text {
@@ -142,6 +142,10 @@
     </style>
 </head>
 <body>
+
+    @php
+        $clearance = optional($applicant->clearance);
+    @endphp
 
 <div class="container">
     {{-- Header Section [cite: 5, 6] --}}
@@ -186,12 +190,12 @@
     </div>
 
     {{-- Bottom Section Wrapper --}}
-    <div style="margin-top: 50px;">
+    <div style="margin-top: 10px;">
         {{-- Metadata Table [cite: 20] --}}
         <table class="info-table">
             <tr>
                 <td width="40%">O.R No.:</td>
-                <td><strong>{{ $applicant->or_no ?? '3122309' }}</strong></td>
+                <td><strong>{{ $clearance->clearance_or_no ?? '3122309' }}</strong></td>
             </tr>
             <tr>
                 <td>Issued on:</td>
@@ -203,7 +207,7 @@
             </tr>
             <tr>
                 <td>PESO Control No.:</td>
-                <td>{{ date('Y') }}-{{ $applicant->control_no ?? '0011' }} </td>
+                <td>{{ $clearance->clearance_peso_control_no ?? '0000' }} </td>
             </tr>
         </table>
 
