@@ -110,14 +110,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        $(document).ready(function () {
-            // Function to toggle sidebar
-            function toggleSidebar() {
-                $('.sidebar').toggleClass('active');
-                $('#sidebar-overlay').toggleClass('active');
-            }
+        function toggleSidebar() {
+            $('.sidebar').toggleClass('active');
+            $('#sidebar-overlay').toggleClass('active');
+        }
 
-            // You'll need a button in your Navbar with id="sidebarToggle"
+        $(document).ready(function () {
             $('#sidebarToggle, #sidebar-overlay').on('click', function () {
                 toggleSidebar();
             });

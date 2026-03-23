@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Models\MayorsPermit;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -22,6 +23,8 @@ class PermitController extends Controller
         $permit = MayorsPermit::firstOrNew([
             'applicant_id' => $applicant->id,
         ]);
+        $wasRecentlyCreated = ! $permit->exists;
+        $before = $permit->exists ? $permit->only($permit->getFillable()) : [];
 
         /*
         |--------------------------------------------------------------------------
@@ -95,13 +98,13 @@ class PermitController extends Controller
                 $permit->permit_nbi_clearance = null;
             }
 
-            if ($request->hasFile('police_clearance')) {
+            if ($request->hasFile('permit_police_clearance')) {
 
                 if ($permit->permit_police_clearance) {
                     Storage::disk('public')->delete($permit->permit_police_clearance);
                 }
 
-                $file = $request->file('police_clearance');
+                $file = $request->file('permit_police_clearance');
                 $extension = $file->getClientOriginalExtension();
 
                 $fileName = 'police_clearance_'.$fullName.'.'.$extension;
@@ -197,6 +200,20 @@ class PermitController extends Controller
             $permit->save();
         }
 
+        $after = $permit->fresh()->only($permit->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        if (! empty($changes)) {
+            ActivityLogger::log(
+                'permit',
+                $wasRecentlyCreated ? 'created' : 'updated',
+                $wasRecentlyCreated ? 'Added mayor\'s permit details for the applicant.' : 'Updated mayor\'s permit details.',
+                $applicant,
+                $changes,
+                $request->user()
+            );
+        }
+
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('success', 'Permit updated successfully.');
@@ -209,6 +226,15 @@ class PermitController extends Controller
         if (! $applicant->permit || ! $applicant->permit->isComplete()) {
             return redirect()->back()->with('error', 'Permit is not complete.');
         }
+
+        ActivityLogger::log(
+            'permit',
+            'generated',
+            'Generated the mayor\'s permit to work document.',
+            $applicant,
+            null,
+            request()->user()
+        );
 
         return view('permit.id', compact('applicant'));
     }

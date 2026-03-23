@@ -1,190 +1,379 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white dashboard-navbar py-2">
-    <div class="container-fluid px-md-4">
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<nav class="navbar dashboard-navbar">
+    @php
+        $navProfileImageUrl = auth()->user()?->profileImageUrl();
+    @endphp
 
-        <div class="ms-auto" id="navbarNav">
-            <ul class="navbar-nav align-items-center">
+    <div class="container-fluid px-md-4 px-3">
+        <div class="d-flex align-items-center gap-3 flex-grow-1">
+            <button id="sidebarToggle" class="nav-toggle-btn d-lg-none" type="button" aria-label="Toggle sidebar">
+                <i class="bi bi-list"></i>
+            </button>
 
-                <li class="nav-item me-2">
-                    <a class="nav-link nav-icon-btn" href="#">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-badge"></span>
-                    </a>
-                </li>
+            <div class="nav-heading-wrap">
+                <div class="nav-page-title">@yield('title', 'Dashboard')</div>
+            </div>
+        </div>
 
-                <div class="vr mx-3 d-none d-md-block opacity-10" style="height: 30px;"></div>
+        <div class="d-flex align-items-center gap-2 gap-md-3">
+            <div class="nav-utility d-none d-md-flex">
+                <div class="utility-icon">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <div>
+                    <div class="utility-label">Today</div>
+                    <div class="utility-value">{{ now()->format('M d, Y') }}</div>
+                </div>
+            </div>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle user-menu-link d-flex align-items-center" href="#"
-                        id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-action-btn" href="{{ route('activity-logs.index') }}" title="Activity Logs">
+                <i class="bi bi-journal-text"></i>
+            </a>
 
-                        <div class="avatar-circle me-md-2">
+            <a class="nav-action-btn" href="#" title="Notifications">
+                <i class="bi bi-bell"></i>
+                <span class="notification-dot"></span>
+            </a>
+
+            <div class="dropdown">
+                <a
+                    class="user-menu-link d-flex align-items-center"
+                    href="#"
+                    id="userDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                >
+                    @if($navProfileImageUrl)
+                        <img src="{{ $navProfileImageUrl }}" alt="{{ auth()->user()->name }}" class="avatar-image me-2">
+                    @else
+                        <div class="avatar-circle me-2">
                             {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                         </div>
-                        <div class="d-none d-md-block">
-                            <span class="d-block fw-bold text-navy small line-height-1">
-                                {{ auth()->user()->name ?? 'User' }}
-                            </span>
-                            <small class="text-muted fw-medium" style="font-size: 0.7rem;">Administrator</small>
-                        </div>
-                    </a>
+                    @endif
+                    <div class="d-none d-md-block">
+                        <span class="d-block user-name">
+                            {{ auth()->user()->name ?? 'User' }}
+                        </span>
+                        <small class="user-role">{{ ucfirst(auth()->user()->role ?? 'user') }}</small>
+                    </div>
+                    <i class="bi bi-chevron-down ms-2 dropdown-arrow d-none d-md-inline-flex"></i>
+                </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow-premium border-0 mt-3 animate slideIn"
-                        aria-labelledby="userDropdown">
-                        <li class="px-3 py-3 bg-light-green rounded-top">
-                            <div class="d-flex flex-column">
-                                <small class="text-emerald text-uppercase fw-800"
-                                    style="font-size: 0.6rem; letter-spacing: 0.05em;">Authorized Account</small>
-                                <span class="fw-bold text-navy">{{ auth()->user()->name ?? 'User' }}</span>
-                                <small class="text-muted truncate">{{ auth()->user()->email ?? 'admin@system.com' }}</small>
-                            </div>
-                        </li>
+                <ul class="dropdown-menu dropdown-menu-end navbar-dropdown border-0 mt-3" aria-labelledby="userDropdown">
 
-                        <li><hr class="dropdown-divider my-0"></li>
+                    <li>
+                        <a class="dropdown-item navbar-item py-2 mt-2" href="{{ route('profile.edit') }}">
+                            <i class="bi bi-person-circle me-2"></i>
+                            My Profile
+                        </a>
+                    </li>
 
-                        <li>
-                            <a class="dropdown-item py-2 mt-2" href="#">
-                                <i class="bi bi-person me-2 text-emerald"></i>
-                                My Profile
-                            </a>
-                        </li>
+                    <li>
+                        <a class="dropdown-item navbar-item py-2" href="{{ route('activity-logs.index') }}">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Activity Logs
+                        </a>
+                    </li>
 
-                        <li>
-                            <a class="dropdown-item py-2" href="#">
-                                <i class="bi bi-gear me-2 text-emerald"></i>
-                                Settings
-                            </a>
-                        </li>
+                    <li>
+                        <a class="dropdown-item navbar-item py-2" href="#">
+                            <i class="bi bi-gear me-2"></i>
+                            Settings
+                        </a>
+                    </li>
 
-                        <li><hr class="dropdown-divider"></li>
+                    <li><hr class="dropdown-divider"></li>
 
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger py-2 mb-1">
-                                    <i class="bi bi-box-arrow-right me-2"></i>
-                                    Logout Account
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item navbar-item logout-item py-2 mb-1">
+                                <i class="bi bi-box-arrow-right me-2"></i>
+                                Logout Account
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>
 
 <style>
     :root {
-        --nav-navy: #0f172a;
-        --nav-emerald: #10b981;
+        --nav-ink: #10243d;
+        --nav-muted: #64748b;
+        --nav-line: #dbe5ef;
+        --nav-accent: #10b981;
+        --nav-accent-strong: #059669;
+        --nav-primary: #123c73;
     }
 
     .dashboard-navbar {
+        position: sticky;
+        top: 0;
         z-index: 1030;
-        background: #ffffff !important;
-        border-bottom: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        padding: 16px 0;
+        background:
+            linear-gradient(180deg, rgba(241, 247, 253, 0.96) 0%, rgba(255, 255, 255, 0.94) 100%);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(219, 229, 239, 0.8);
+        box-shadow: 0 8px 30px rgba(15, 34, 58, 0.06);
     }
 
-    .text-navy { color: var(--nav-navy); }
-    .text-emerald { color: var(--nav-emerald); }
-    .fw-800 { font-weight: 800; }
-    .line-height-1 { line-height: 1.2; }
-
-    /* Nav Icons */
-    .nav-icon-btn {
-        color: #64748b !important;
-        padding: 8px !important;
-        border-radius: 8px;
-        transition: all 0.2s;
-        position: relative;
+    .nav-toggle-btn {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--nav-line);
+        border-radius: 14px;
+        background: #ffffff;
+        color: var(--nav-primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 8px 18px rgba(15, 34, 58, 0.06);
     }
 
-    .nav-icon-btn:hover {
-        background-color: #f1f5f9;
-        color: var(--nav-emerald) !important;
+    .nav-heading-wrap {
+        min-width: 0;
     }
 
-    .notification-badge {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 8px;
-        height: 8px;
-        background-color: #ef4444;
-        border: 2px solid #fff;
-        border-radius: 50%;
+    .nav-kicker {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--nav-accent-strong);
     }
 
-    /* Avatar Circle */
-    .avatar-circle {
+    .nav-page-title {
+        color: var(--nav-ink);
+        font-size: 1.2rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .nav-utility {
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 16px;
+        border: 1px solid var(--nav-line);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .utility-icon {
         width: 38px;
         height: 38px;
-        background: linear-gradient(135deg, var(--nav-emerald), #059669);
-        color: white;
-        border-radius: 10px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.9rem;
+        background: linear-gradient(135deg, rgba(18, 60, 115, 0.12), rgba(16, 185, 129, 0.14));
+        color: var(--nav-primary);
+        font-size: 1rem;
+    }
+
+    .utility-label {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--nav-muted);
+    }
+
+    .utility-value {
+        font-size: 0.85rem;
         font-weight: 700;
-        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+        color: var(--nav-ink);
+    }
+
+    .nav-action-btn {
+        width: 42px;
+        height: 42px;
+        position: relative;
+        border-radius: 14px;
+        border: 1px solid var(--nav-line);
+        background: rgba(255, 255, 255, 0.92);
+        color: #4f6278;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 18px rgba(15, 34, 58, 0.05);
+    }
+
+    .nav-action-btn:hover {
+        color: var(--nav-accent-strong);
+        border-color: #bfe8d9;
+        background: #f3fdf8;
+        transform: translateY(-1px);
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: 9px;
+        right: 9px;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #ef4444;
+        box-shadow: 0 0 0 3px #ffffff;
     }
 
     .user-menu-link {
         text-decoration: none;
-        padding: 4px 8px !important;
-        border-radius: 12px;
-        transition: background 0.2s;
+        padding: 6px 8px 6px 6px;
+        border-radius: 18px;
+        border: 1px solid var(--nav-line);
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 10px 20px rgba(15, 34, 58, 0.05);
+        transition: all 0.2s ease;
     }
 
     .user-menu-link:hover {
-        background-color: #f8fafc;
+        background: #ffffff;
+        border-color: #c8d8e8;
     }
 
-    /* Premium Dropdown */
-    .shadow-premium {
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, var(--nav-accent), var(--nav-accent-strong));
+        color: white;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        font-weight: 800;
+        box-shadow: 0 10px 18px rgba(16, 185, 129, 0.22);
     }
 
-    .bg-light-green {
-        background-color: #f0fdf4;
+    .avatar-image {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        object-fit: cover;
+        box-shadow: 0 10px 18px rgba(15, 34, 58, 0.12);
     }
 
-    .dropdown-menu {
-        border-radius: 12px;
-        min-width: 240px;
+    .user-name {
+        color: var(--nav-ink);
+        font-size: 0.84rem;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    .user-role {
+        color: var(--nav-muted);
+        font-size: 0.71rem;
+        font-weight: 600;
+    }
+
+    .dropdown-arrow {
+        color: #7a8da4;
+        font-size: 0.78rem;
+    }
+
+    .navbar-dropdown {
+        min-width: 270px;
         padding: 0;
         overflow: hidden;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 26px 40px rgba(15, 34, 58, 0.14);
     }
 
-    .dropdown-item {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #475569;
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
+    .dropdown-header-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 18px 16px;
+        background:
+            radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 28%),
+            linear-gradient(135deg, #f7fbff 0%, #eef7ff 100%);
     }
 
-    .dropdown-item i {
-        font-size: 1.1rem;
+    .dropdown-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #123c73, #1f5fa0);
+        color: #fff;
+        font-weight: 800;
+        box-shadow: 0 10px 18px rgba(18, 60, 115, 0.2);
     }
 
-    .dropdown-item:hover {
-        background-color: #f1f5f9;
-        color: var(--nav-emerald);
-        padding-left: 1.5rem;
+    .dropdown-kicker {
+        color: var(--nav-accent-strong);
+        font-size: 0.64rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
     }
 
-    /* Animation */
-    @keyframes slideIn {
-        0% { transform: translateY(10px); opacity: 0; }
-        100% { transform: translateY(0); opacity: 1; }
+    .dropdown-name {
+        color: var(--nav-ink);
+        font-weight: 800;
+        line-height: 1.2;
     }
 
-    .slideIn { animation: slideIn 0.25s ease-out; }
+    .dropdown-email {
+        color: var(--nav-muted);
+        font-size: 0.75rem;
+        word-break: break-word;
+    }
+
+    .navbar-item {
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #465a72;
+        transition: all 0.18s ease;
+    }
+
+    .navbar-item i {
+        color: var(--nav-accent-strong);
+    }
+
+    .navbar-item:hover {
+        background: #f3f8fd;
+        color: var(--nav-primary);
+        padding-left: 1.35rem;
+    }
+
+    .logout-item {
+        color: #dc2626;
+    }
+
+    .logout-item i {
+        color: #dc2626;
+    }
+
+    .logout-item:hover {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    @media (max-width: 767.98px) {
+        .dashboard-navbar {
+            padding: 12px 0;
+        }
+
+        .nav-page-title {
+            font-size: 1rem;
+        }
+
+        .user-menu-link {
+            padding-right: 6px;
+        }
+    }
 </style>

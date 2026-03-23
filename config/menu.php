@@ -14,8 +14,8 @@ return [
         'route' => 'users.index',
         'children' => [
             ['label' => 'All Users', 'route' => 'users.index'],
-            ['label' => 'Add User', 'route' => 'users.create'],
         ],
+        'admin_only' => true,
     ],
 
     [
@@ -25,7 +25,14 @@ return [
         'children' => [
             ['label' => 'Add Applicant', 'route' => 'applicants.create'],
             ['label' => 'List of Applicants', 'route' => 'applicants.index'],
+            ['label' => 'Archived Applicants', 'route' => 'applicants.archive'],
         ],
+    ],
+
+    [
+        'label' => 'Activity Logs',
+        'icon' => 'bi bi-journal-text',
+        'route' => 'activity-logs.index',
     ],
 
     [

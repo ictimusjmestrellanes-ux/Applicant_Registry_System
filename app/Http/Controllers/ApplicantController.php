@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applicant;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 
 class ApplicantController extends Controller
@@ -35,6 +36,15 @@ class ApplicantController extends Controller
 
         $applicant = Applicant::create($request->all());
 
+        ActivityLogger::log(
+            'applicant',
+            'created',
+            'Created a new applicant record.',
+            $applicant,
+            ActivityLogger::diff([], $applicant->only($applicant->getFillable())),
+            $request->user()
+        );
+
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('created_success', true);
@@ -58,7 +68,7 @@ class ApplicantController extends Controller
 
     public function edit($id)
     {
-        $applicant = Applicant::with(['activityLogs.causer'])->findOrFail($id);
+        $applicant = Applicant::with(['permit', 'clearance', 'referral', 'activityLogs.causer'])->findOrFail($id);
 
         return view('applicants.edit', compact('applicant'));
     }
@@ -66,6 +76,7 @@ class ApplicantController extends Controller
     public function update(Request $request, $id)
     {
         $applicant = Applicant::findOrFail($id);
+        $before = $applicant->only($applicant->getFillable());
 
         /*
         |--------------------------------------------------------------------------
@@ -94,6 +105,19 @@ class ApplicantController extends Controller
             'first_time_job_seeker' => $request->first_time_job_seeker,
         ]);
 
+        $changes = ActivityLogger::diff($before, $applicant->fresh()->only($applicant->getFillable()));
+
+        if (! empty($changes)) {
+            ActivityLogger::log(
+                'applicant',
+                'updated',
+                'Updated applicant information.',
+                $applicant,
+                $changes,
+                $request->user()
+            );
+        }
+
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('success', 'Applicant updated successfully.');
@@ -102,24 +126,77 @@ class ApplicantController extends Controller
     public function destroy($id)
     {
         $applicant = Applicant::findOrFail($id);
+        $applicantName = trim($applicant->first_name.' '.$applicant->last_name);
 
         $applicant->delete(); // Moves to Archive
+
+        ActivityLogger::log(
+            'applicant',
+            'archived',
+            'Archived applicant record.',
+            $applicant,
+            [
+                'status' => [
+                    'before' => 'Active',
+                    'after' => 'Archived',
+                ],
+                'applicant_name' => [
+                    'before' => $applicantName,
+                    'after' => $applicantName,
+                ],
+            ],
+            request()->user()
+        );
 
         return redirect()->route('applicants.archive')
             ->with('success', 'Applicant Archived');
     }
 
-    public function archive()
+    public function archive(Request $request)
     {
-        $applicants = Applicant::onlyTrashed()->paginate(10);
+        $search = trim((string) $request->search);
 
-        return view('applicants.archive', compact('applicants'));
+        $applicants = Applicant::onlyTrashed()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('middle_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('contact_no', 'like', "%{$search}%")
+                        ->orWhere('barangay', 'like', "%{$search}%")
+                        ->orWhere('city', 'like', "%{$search}%");
+                });
+            })
+            ->latest('deleted_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('applicants.archive', compact('applicants', 'search'));
     }
 
     public function restore($id)
     {
         $applicant = Applicant::withTrashed()->findOrFail($id);
+        $applicantName = trim($applicant->first_name.' '.$applicant->last_name);
         $applicant->restore();
+
+        ActivityLogger::log(
+            'applicant',
+            'restored',
+            'Restored applicant record from archive.',
+            $applicant,
+            [
+                'status' => [
+                    'before' => 'Archived',
+                    'after' => 'Active',
+                ],
+                'applicant_name' => [
+                    'before' => $applicantName,
+                    'after' => $applicantName,
+                ],
+            ],
+            request()->user()
+        );
 
         return redirect()->route('applicants.index')
             ->with('success', 'Applicant restored successfully.');

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Update Applicant')
+
 @section('content')
 
     @if(session('created_success'))
@@ -12,11 +14,11 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-                                                                                                                                                                                                <div style="font-size:14px;">
-                                                                                                                                                                                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                                                                                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                                                                                                </div>
-                                                                                                                                                                                            `,
+                                                                                                                                                                                                                        <div style="font-size:14px;">
+                                                                                                                                                                                                                            <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                                                                                                                                            <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -52,49 +54,611 @@
 
     @endif
 
+    @php
+        $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
+
+        $permit = optional($applicant->permit);
+        $isImusResident = $applicant->city && stripos($applicant->city, 'City of Imus') !== false;
+        $hasPermitClearance =
+            ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
+            ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
+        $permitRequirements = [
+            !empty($permit->health_card),
+            !empty($permit->cedula),
+            $hasPermitClearance,
+        ];
+
+        if (!$isImusResident) {
+            $permitRequirements[] = !empty($permit->referral_letter);
+        }
+
+        $permitTotal = count($permitRequirements);
+        $permitUploaded = collect($permitRequirements)->filter()->count();
+        $permitPercent = $permitTotal > 0 ? round(($permitUploaded / $permitTotal) * 100) : 0;
+
+        $clearance = optional($applicant->clearance);
+        $clearanceRequirements = [
+            $clearance->prosecutor_clearance,
+            $clearance->mtc_clearance,
+            $clearance->rtc_clearance,
+            $clearance->nbi_clearance,
+            $clearance->barangay_clearance,
+        ];
+        $clearanceUploaded = collect($clearanceRequirements)->filter()->count();
+        $clearanceTotal = count($clearanceRequirements);
+        $clearancePercent = $clearanceTotal > 0 ? round(($clearanceUploaded / $clearanceTotal) * 100) : 0;
+
+        $referral = optional($applicant->referral);
+        $hasResume = !empty($referral->resume);
+        $hasReferralClearance = collect([
+            $referral->ref_barangay_clearance,
+            $referral->ref_police_clearance,
+            $referral->ref_nbi_clearance,
+        ])->filter()->count() > 0;
+        $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
+        $referralPercent = round(($referralUploaded / 2) * 100);
+    @endphp
+
     <style>
-        /* Document Grid Styling */
-        .document-upload-card {
+        :root {
+            --edit-ink: #10243d;
+            --edit-slate: #5f7088;
+            --edit-line: #d9e4ef;
+            --edit-soft: #f5f8fc;
+            --edit-panel: rgba(255, 255, 255, 0.84);
+            --edit-primary: #1d4ed8;
+            --edit-primary-soft: #dbeafe;
+            --edit-success: #059669;
+            --edit-success-soft: #d1fae5;
+            --edit-warm: #f59e0b;
+            --edit-warm-soft: #fef3c7;
+            --edit-deep: #0f172a;
+            --edit-glow: rgba(37, 99, 235, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 24%),
+                radial-gradient(circle at top right, rgba(16, 185, 129, 0.12), transparent 22%),
+                radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 18%),
+                linear-gradient(180deg, #edf3f9 0%, #e6eef7 100%);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .applicant-wrapper {
+            max-width: 1800px;
+        }
+
+        .page-header {
+            padding: 32px 32px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background:
+                radial-gradient(circle at top right, rgba(96, 165, 250, 0.2), transparent 24%),
+                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.14), transparent 28%),
+                linear-gradient(135deg, #0f172a 0%, #172554 52%, #1e3a8a 100%);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+        }
+
+        .page-header::after {
+            content: "";
+            position: absolute;
+            right: -80px;
+            top: -70px;
+            width: 250px;
+            height: 250px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .page-header::before {
+            content: "";
+            position: absolute;
+            left: 48%;
+            top: -120px;
+            width: 260px;
+            height: 260px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .page-title-wrap {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #bfdbfe;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .page-header h2 {
+            margin-bottom: 8px;
+            color: #f8fafc;
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            max-width: 720px;
+            color: rgba(226, 232, 240, 0.84);
+            margin: 0;
+        }
+
+        .page-header-actions {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .page-header-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.6rem 0.95rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #e0f2fe;
+            font-size: 0.82rem;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-back-list {
+            border-radius: 16px;
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-back-list:hover {
+            background: rgba(255, 255, 255, 0.16);
+            color: #ffffff;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin: 20px 0 22px;
+        }
+
+        .summary-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            padding: 20px 20px 18px;
+            border-radius: 24px;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 251, 255, 0.92));
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 24px 42px rgba(15, 23, 42, 0.12);
+            border-color: #c9ddf5;
+        }
+
+        .summary-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .summary-icon-blue {
+            background: rgba(59, 130, 246, 0.12);
+            color: #2563eb;
+        }
+
+        .summary-icon-emerald {
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+        }
+
+        .summary-icon-amber {
+            background: rgba(245, 158, 11, 0.16);
+            color: #b45309;
+        }
+
+        .summary-icon-slate {
+            background: rgba(71, 85, 105, 0.12);
+            color: #334155;
+        }
+
+        .summary-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--edit-slate);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            color: var(--edit-ink);
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .summary-subtext {
+            display: block;
+            margin-top: 6px;
+            color: #708198;
+            font-size: 0.82rem;
+        }
+
+        .requirements-container {
+            padding: 24px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 251, 255, 0.82));
+            backdrop-filter: blur(14px);
+            box-shadow: 0 28px 70px rgba(15, 34, 58, 0.1);
+        }
+
+        .content-intro {
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 2px 4px 0;
+        }
+
+        .content-intro p {
+            margin: 0;
+            color: var(--edit-slate);
+        }
+
+        .workspace-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.6rem 0.9rem;
+            border-radius: 999px;
+            background: #eef6ff;
+            color: #1d4ed8;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border: 1px solid #dbeafe;
+        }
+
+        .workflow-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.85rem;
+        }
+
+        .workflow-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.78rem;
+            border-radius: 999px;
+            background: #f8fbff;
+            color: #475569;
+            border: 1px solid #dbe7f3;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .nav-tab-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+
+        .record-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .record-meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.42rem 0.75rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #3f556f;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .tab-shell {
+            padding: 12px;
+            border-radius: 26px;
+            background: linear-gradient(180deg, #f8fbff, #f1f7fd);
+            border: 1px solid #dbe7f3;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+        }
+
+        .nav-tabs {
+            border: none;
+            gap: 10px;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            padding: 14px 20px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.66);
+            color: #5b6d86;
+            font-weight: 700;
+            transition: all .25s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-tabs .nav-link:hover {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 1.25rem;
+            border-color: #d8e4f2;
+            color: var(--edit-ink);
+            transform: translateY(-1px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #0f172a, #1d4ed8);
+            color: #fff;
+            box-shadow: 0 14px 28px rgba(29, 78, 216, 0.24);
+        }
+
+        .tab-pane {
+            animation: fadeSlide .35s ease;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tab-content {
+            margin-top: 16px;
+            padding: 28px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, #ffffff, #fbfdff);
+            border: 1px solid #e4edf7;
+            box-shadow: 0 22px 46px rgba(15, 34, 58, 0.08);
+        }
+
+        .form-card {
+            padding: 4px 2px 0;
+        }
+
+        .profile-action-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+            margin-top: 1.75rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid #e4edf7;
+        }
+
+        .section-title {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            color: var(--edit-ink);
+            font-size: 0.96rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+        }
+
+        .section-title-c {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            color:  black;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+        .section-title-c::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08);
+        }
+
+        .section-title::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08);
+        }
+
+        .form-label {
+            margin-bottom: 7px;
+            color: #44526f;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 48px;
+            border-radius: 16px;
+            border: 1px solid var(--edit-line);
+            padding: 11px 14px;
+            font-size: 14px;
+            background: #f8fbff;
+            transition: all .25s ease;
+        }
+
+        .form-control:hover,
+        .form-select:hover {
+            border-color: #bfd0e6;
+            background: #ffffff;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #7aa2ff;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+
+        input[type=file] {
+            background: #f5f9ff;
+            border: 1px dashed #c8d7eb;
+        }
+
+        .document-upload-card {
             height: 100%;
-            transition: all 0.2s ease;
+            padding: 20px;
+            border-radius: 22px;
+            border: 1px solid #dce7f3;
+            background:
+                linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
+            box-shadow: 0 14px 26px rgba(15, 34, 58, 0.05);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .document-upload-card-resume{
+            padding: 20px;
+            border-radius: 22px;
+            border: 1px solid #dce7f3;
+            background:
+                linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
+            box-shadow: 0 14px 26px rgba(15, 34, 58, 0.05);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
 
         .document-upload-card:hover {
-            border-color: #2563eb;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            border-color: #b8d0fb;
+            box-shadow: 0 16px 32px rgba(15, 34, 58, 0.08);
         }
 
-        /* File Name Display refined */
+        .upload-disabled {
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            opacity: 0.82;
+            cursor: not-allowed;
+        }
+
         .file-name-text {
-            font-size: 0.8rem;
-            color: #64748b;
             display: block;
             margin-top: 8px;
+            color: #64748b;
+            font-size: 0.8rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
         }
 
-        /* Specialized label for required marks */
         .required-mark {
             color: #ef4444;
             margin-left: 3px;
-            font-weight: bold;
+            font-weight: 800;
+        }
+
+        .btn {
+            border-radius: 14px;
+            font-weight: 700;
+            transition: all .25s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0f172a, #1d4ed8);
+            border: none;
+            box-shadow: 0 12px 26px rgba(29, 78, 216, 0.24);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 32px rgba(29, 78, 216, 0.28);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #10b981);
+            border: none;
+            box-shadow: 0 10px 22px rgba(5, 150, 105, 0.22);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(5, 150, 105, 0.28);
+        }
+
+        .btn-outline-secondary {
+            border-radius: 14px;
+            border-color: #cfdae7;
+            color: #45566f;
+            background: #fff;
+        }
+
+        .btn-light.border {
+            border-radius: 14px;
+            border-color: #d9e4ef !important;
+            background: #fff;
         }
 
         .activity-log-card {
-            background: linear-gradient(180deg, #fbfdff, #f3f7fc);
-            border: 1px solid #dbe7f3;
-            border-radius: 14px;
-            padding: 1rem 1.25rem;
+            margin-top: 20px;
+            padding: 20px 22px;
+            border-radius: 24px;
+            border: 1px solid #dfe9f3;
+            background: linear-gradient(180deg, #fbfdff, #f3f8fd);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
         }
 
-        .activity-log-item + .activity-log-item {
+        .activity-log-item {
+            border-radius: 16px;
+            padding: 0.2rem 0;
+        }
+
+        .activity-log-item+.activity-log-item {
             border-top: 1px solid #e6edf5;
             margin-top: 1rem;
             padding-top: 1rem;
@@ -106,264 +670,16 @@
         }
 
         .activity-log-badge {
-            background: #e0ecff;
-            color: #2952a3;
-            border-radius: 999px;
             display: inline-flex;
             align-items: center;
-            padding: 0.2rem 0.7rem;
-            font-size: 0.78rem;
-            font-weight: 600;
+            padding: 0.24rem 0.78rem;
             margin: 0.2rem 0.35rem 0 0;
-        }
-
-        /* Disabled State Styling */
-        .upload-disabled {
-            background-color: #f8fafc;
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        /* ================================
-                                        GLOBAL STYLES
-                                        ================================ */
-
-        body {
-            background: linear-gradient(135deg, #eef2f7, #e8edf5);
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* ================================
-                                        MAIN WRAPPER
-                                        ================================ */
-
-        .applicant-wrapper {
-            max-width: 1700px;
-        }
-
-        /* ================================
-                                        PAGE HEADER
-                                        ================================ */
-
-        .page-header {
-            background: linear-gradient(135deg, #ffffff, #f6f9ff);
-            padding: 20px 25px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e6ecf5;
-        }
-
-        .page-header h2 {
+            border-radius: 999px;
+            background: #e0ecff;
+            color: #2952a3;
+            font-size: 0.78rem;
             font-weight: 700;
-            color: #2c3e50;
         }
-
-        /* ================================
-                                        MAIN CARD CONTAINER
-                                        ================================ */
-
-        .requirements-container {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        /* ================================
-                                        SECTION TITLES
-                                        ================================ */
-
-        .section-title {
-            font-weight: 700;
-            font-size: 15px;
-            color: #3b4a6b;
-            letter-spacing: .3px;
-            margin-bottom: 15px;
-        }
-
-        /* ================================
-                                        NAV TABS
-                                        ================================ */
-
-        .nav-tabs {
-            border: none;
-            gap: 10px;
-        }
-
-        .nav-tabs .nav-link {
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            background: #f4f6fb;
-            color: #5b6b8b;
-            font-weight: 600;
-            transition: all .3s ease;
-        }
-
-        .nav-tabs .nav-link:hover {
-            background: #e9efff;
-            transform: translateY(-2px);
-        }
-
-        .nav-tabs .nav-link.active {
-            background: linear-gradient(135deg, #4a7dff, #5fa8ff);
-            color: white;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-        }
-
-        /* ================================
-                                        TAB CONTENT
-                                        ================================ */
-
-        .tab-content {
-            border-radius: 14px;
-            background: white;
-            box-shadow:
-                0 15px 40px rgba(0, 0, 0, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        }
-
-        /* ================================
-                                        FORM CARD
-                                        ================================ */
-
-        .form-card {
-            padding: 10px 5px;
-        }
-
-        /* ================================
-                                        FORM LABEL
-                                        ================================ */
-
-        .form-label {
-            font-weight: 600;
-            font-size: 13px;
-            color: #44526f;
-        }
-
-        /* ================================
-                                        INPUTS
-                                        ================================ */
-
-        .form-control,
-        .form-select {
-            border-radius: 10px;
-            border: 1px solid #dce3ef;
-            padding: 10px 12px;
-            font-size: 14px;
-            transition: all .25s ease;
-            background: #f9fbff;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #5fa8ff;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(90, 150, 255, 0.15);
-        }
-
-        /* ================================
-                                        FILE INPUTS
-                                        ================================ */
-
-        input[type=file] {
-            background: #f5f8ff;
-            border: 1px dashed #c9d5f2;
-        }
-
-        /* ================================
-                                        BUTTONS
-                                        ================================ */
-
-        .btn {
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all .3s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4a7dff, #6aa8ff);
-            border: none;
-            box-shadow: 0 6px 15px rgba(74, 125, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(74, 125, 255, 0.35);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            border: none;
-            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.35);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.45);
-        }
-
-        .btn-outline-secondary {
-            border-radius: 10px;
-        }
-
-        /* ================================
-                                        FORM GRID RESPONSIVE
-                                        ================================ */
-
-        @media(max-width:1200px) {
-
-            .col-md-2 {
-                flex: 0 0 33%;
-                max-width: 33%;
-            }
-
-        }
-
-        @media(max-width:768px) {
-
-            .col-md-2,
-            .col-md-3,
-            .col-md-4,
-            .col-md-5,
-            .col-md-6 {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-
-            .page-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-        }
-
-        /* ================================
-                                        3D CARD EFFECT
-                                        ================================ */
-
-        .requirements-container:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 18px 50px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6);
-            transition: .4s;
-        }
-
-        /* ================================
-                                        REQUIRED MARK
-                                        ================================ */
-
-        .required-mark {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        /* ================================
-                                        ANIMATIONS
-                                        ================================ */
 
         .tab-pane {
             animation: fadeSlide .35s ease;
@@ -381,104 +697,115 @@
             }
         }
 
-        /* ================================
-                                        SCROLL SMOOTH
-                                        ================================ */
-
         html {
             scroll-behavior: smooth;
+        }
+
+        @media (max-width: 1200px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .col-md-2 {
+                flex: 0 0 33%;
+                max-width: 33%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-5,
+            .col-md-6,
+            .col-md-1 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .page-header {
+                padding: 22px 20px;
+            }
+
+            .page-header h2 {
+                font-size: 1.55rem;
+            }
+
+            .content-intro {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header-actions {
+                margin-top: 1rem;
+            }
+
+            .tab-content {
+                padding: 18px;
+            }
+
+            .profile-action-bar>* {
+                width: 100%;
+            }
         }
     </style>
 
     <div class="container applicant-wrapper">
-        <div class="page-header d-md-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fa-solid fa-user-pen me-2 text-primary"></i>Update Applicant</h2>
-            <a href="{{ route('applicants.index') }}" class="btn btn-sm btn-outline-secondary">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to List
-            </a>
-        </div>
-
-        <div class="requirements-container p-4">
-
-            <div class="row align-items-center mb-4">
-                <div class="col-md-8">
+        <div class="requirements-container">
+            <div class="content-intro">
+                <div>
                     <h5 class="fw-bold mb-1">Document Compliance</h5>
-                    <p class="text-muted small mb-0">Manage Mayor's Permit, Clearance, and Referral Requirements.</p>
+                    <p class="small">Manage permit, clearance, and referral requirements with a cleaner workflow.</p>
                 </div>
             </div>
 
-            @if(session('success'))
-                <div class="alert alert-success border-0 shadow-sm mb-4" role="alert">
-                    {{ session('success') }}
-                </div>
-            @endif
+            <div class="tab-shell">
+                <ul class="nav nav-tabs mb-0" id="mayorTabs">
 
-            @if($applicant->activityLogs->isNotEmpty())
-                <div class="activity-log-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                        <div>
-                            <h6 class="fw-bold text-primary mb-1">Recent Activity Log</h6>
-                            <p class="text-muted small mb-0">Latest changes made to this applicant's documents.</p>
-                        </div>
-                        <span class="badge text-bg-light border">{{ $applicant->activityLogs->count() }} record(s)</span>
-                    </div>
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#personal">
+                            <span class="nav-tab-label">
+                                <i class="bi bi-person-lines-fill"></i>
+                                Personal Information
+                            </span>
+                        </button>
+                    </li>
 
-                    @foreach($applicant->activityLogs->take(10) as $log)
-                        <div class="activity-log-item">
-                            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
-                                <div>
-                                    <div class="fw-semibold text-dark">{{ $log->description }}</div>
-                                    <div class="activity-log-meta mt-1">
-                                        {{ $log->created_at->format('F d, Y h:i A') }}
-                                        by {{ $log->causer->name ?? 'System' }}
-                                    </div>
-                                </div>
-                                <span class="badge {{ $log->action === 'created' ? 'text-bg-success' : 'text-bg-primary' }}">
-                                    {{ strtoupper($log->action) }}
-                                </span>
-                            </div>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#permit">
+                            <span class="nav-tab-label">
+                                <i class="bi bi-patch-check-fill"></i>
+                                Mayor's Permit to Work
+                            </span>
+                        </button>
+                    </li>
 
-                            @if(!empty($log->changes))
-                                <div class="mt-2">
-                                    @foreach($log->changes as $change)
-                                        <span class="activity-log-badge">{{ $change['label'] }}</span>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#clearance">
+                            <span class="nav-tab-label">
+                                <i class="bi bi-shield-fill-check"></i>
+                                Mayor's Clearance
+                            </span>
+                        </button>
+                    </li>
 
-            <ul class="nav nav-tabs mb-3" id="mayorTabs">
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#referral">
+                            <span class="nav-tab-label">
+                                <i class="bi bi-send-fill"></i>
+                                Mayor's Referral
+                            </span>
+                        </button>
+                    </li>
 
-                <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#personal">
-                        Personal Information
-                    </button>
-                </li>
+                </ul>
+            </div>
 
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#permit">
-                        Mayor's Permit to Work
-                    </button>
-                </li>
-
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#clearance">
-                        Mayor's Clearance
-                    </button>
-                </li>
-
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#referral">
-                        Mayor's Referral
-                    </button>
-                </li>
-
-            </ul>
-
-            <div class="tab-content bg-white p-4 rounded-3 border shadow-sm">
+            <div class="tab-content">
 
                 <!-- ===================================================== -->
                 <!-- PERSONAL INFORMATION -->
@@ -648,7 +975,7 @@
                             </div>
 
 
-                            <div class="d-flex gap-3 pt-4 mt-4 border-top">
+                            <div class="profile-action-bar">
 
                                 <button type="submit" class="btn btn-success px-5 py-2">
                                     <i class="fa-solid fa-check me-2"></i>
@@ -660,9 +987,7 @@
                                 </a>
 
                             </div>
-
                         </form>
-
                     </div>
                 </div>
 
@@ -671,7 +996,8 @@
                 <!-- ===================================================== -->
 
                 <div class="tab-pane fade" id="permit">
-                    <form action="{{ route('permits.update', $applicant->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('permits.update', $applicant->id) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         @php
@@ -683,14 +1009,16 @@
                             $isImusResident = stripos($applicant->city, 'City of Imus') !== false;
                         @endphp
 
-                        <h6 class="section-title mb-4">Mayor’s Permit to Work Requirements</h6>
+                        <h6 class="section-title text-primary">Mayor’s Permit to Work Requirements</h6>
 
                         <div class="row g-3">
                             {{-- 1. NBI / Police Clearance --}}
                             <div class="col-md-3">
                                 <div class="document-upload-card">
-                                    <label class="form-label">Clearance Type <span class="required-mark">*</span></label>
-                                    <select name="clearance_type" id="clearance_type" class="form-select form-select-sm mb-3">
+                                    <label class="form-label">Clearance Type (NBI or Police)<span
+                                            class="required-mark">*</span></label>
+                                    <select name="clearance_type" id="clearance_type"
+                                        class="form-select form-select-sm mb-3">
                                         <option value="">Select Type</option>
                                         <option value="nbi" {{ old('clearance_type', $permit->clearance_type ?? '') == 'nbi' ? 'selected' : '' }}>
                                             NBI Clearance
@@ -700,37 +1028,53 @@
                                         </option>
                                     </select>
 
-                                    <div class="gap-2"  id="nbi_section" style="display:none">
-                                        <input type="file" id="nbi_input" name="permit_nbi_clearance" style="display:none" onchange="showFileName(this, 'nbi_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('nbi_input').click()">
+                                    <div class="gap-2" id="nbi_section" style="display:none">
+                                        <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
+                                        <input type="file" id="nbi_input" name="permit_nbi_clearance" class="d-none"
+                                            onchange="showFileName(this, 'nbi_name')">
+
+                                        <!-- USE LABEL INSTEAD OF BUTTON -->
+                                        <label for="nbi_input" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-upload me-1"></i> Upload File
-                                        </button>
-                                        
+                                        </label>
+
                                         <small id="nbi_name" class="file-name-text">
                                             {{ !empty($permit->permit_nbi_clearance) ? basename($permit->permit_nbi_clearance) : 'No file selected' }}
                                         </small>
 
                                         @if(!empty($permit->permit_nbi_clearance))
-                                            <a href="{{ asset('storage/'.$permit->permit_nbi_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $permit->permit_nbi_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
                                     </div>
-                                    <div class="gap-2"  id="police_section" style="display:none">
-                                        <input type="file" id="police_input" name="permit_police_clearance" style="display:none" onchange="showFileName(this, 'police_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('police_input').click()">
+
+
+                                    <div class="gap-2" id="police_section" style="display:none">
+
+                                        <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
+                                        <input type="file" id="police_input" name="permit_police_clearance" class="d-none"
+                                            onchange="showFileName(this, 'police_name')">
+
+                                        <!-- USE LABEL INSTEAD OF BUTTON -->
+                                        <label for="police_input" class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-upload me-1"></i> Upload File
-                                        </button>
-                                        
+                                        </label>
+
+                                        <!-- FILE NAME -->
                                         <small id="police_name" class="file-name-text">
                                             {{ !empty($permit->permit_police_clearance) ? basename($permit->permit_police_clearance) : 'No file selected' }}
                                         </small>
 
+                                        <!-- VIEW FILE -->
                                         @if(!empty($permit->permit_police_clearance))
-                                            <a href="{{ asset('storage/'.$permit->permit_police_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $permit->permit_police_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
+
                                     </div>
                                 </div>
                             </div>
@@ -740,15 +1084,18 @@
                                 <div class="document-upload-card">
                                     <label class="form-label">Health Card <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="health_card_input" name="health_card" style="display:none" onchange="showFileName(this, 'health_card_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('health_card_input').click()">
+                                        <input type="file" id="health_card_input" name="health_card" style="display:none"
+                                            onchange="showFileName(this, 'health_card_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('health_card_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="health_card_name" class="file-name-text">
                                             {{ !empty($permit->health_card) ? basename($permit->health_card) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->health_card))
-                                            <a href="{{ asset('storage/'.$permit->health_card) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $permit->health_card) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -761,15 +1108,18 @@
                                 <div class="document-upload-card">
                                     <label class="form-label">Cedula <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="cedula_input" name="cedula" style="display:none" onchange="showFileName(this, 'cedula_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('cedula_input').click()">
+                                        <input type="file" id="cedula_input" name="cedula" style="display:none"
+                                            onchange="showFileName(this, 'cedula_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('cedula_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="cedula_name" class="file-name-text">
                                             {{ !empty($permit->cedula) ? basename($permit->cedula) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->cedula))
-                                            <a href="{{ asset('storage/'.$permit->cedula) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $permit->cedula) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -781,17 +1131,15 @@
                             <div class="col-md-3">
                                 <div class="document-upload-card {{ $isImusResident ? 'upload-disabled' : '' }}">
                                     <label class="form-label">
-                                        Referral Letter 
+                                        Referral Letter
                                         @if(!$isImusResident)<span class="required-mark">*</span>@endif
                                     </label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="referral_input" name="referral_letter" style="display:none" 
-                                            onchange="showFileName(this, 'referral_name')"
-                                            {{ $isImusResident ? 'disabled' : '' }}>
-                                        
-                                        <button type="button" class="btn btn-outline-primary btn-sm" 
-                                                onclick="document.getElementById('referral_input').click()"
-                                                {{ $isImusResident ? 'disabled' : '' }}>
+                                        <input type="file" id="referral_input" name="referral_letter" style="display:none"
+                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }}>
+
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('referral_input').click()" {{ $isImusResident ? 'disabled' : '' }}>
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
 
@@ -823,7 +1171,8 @@
 
                             {{-- Peso ID No --}}
                             <div class="col-md-2">
-                                <label class="form-label">Peso ID No. (Auto Generate)<span class="required-mark">*</span></label>
+                                <label class="form-label">Peso ID No. (Auto Generate)<span
+                                        class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $permit->peso_id_no ?? '' }}" readonly>
                             </div>
@@ -843,15 +1192,15 @@
                             {{-- Permit Date --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Date<span class="required-mark">*</span></label>
-                                <input type="date" id="permit_date" name="permit_date" class="form-control" value="{{$permit->permit_date}}"
-                                    required>
+                                <input type="date" id="permit_date" name="permit_date" class="form-control"
+                                    value="{{$permit->permit_date}}" required>
                             </div>
 
                             {{-- Expiration --}}
                             <div class="col-md-2">
                                 <label class="form-label">Expires On<span class="required-mark">*</span></label>
-                                <input type="date" id="expires_on" name="expires_on" class="form-control" value="{{$permit->expires_on}}"
-                                    readonly>
+                                <input type="date" id="expires_on" name="expires_on" class="form-control"
+                                    value="{{$permit->expires_on}}" readonly>
                             </div>
 
                             {{-- Documentary Stamp --}}
@@ -869,32 +1218,43 @@
                             </div>
                         </div>
 
-                        <div class="pt-3 border-top mt-4 d-flex gap-2">
-
-                            <button type="submit" class="btn btn-primary px-4">
-                                Save Permit
-                            </button>
-
-                            <div class="pt-3">
-
-                                @if($permit && $permit->isComplete())
-                                    <a href="{{ route('permits.printId', $applicant->id) }}"
-                                    target="_blank"
-                                    class="btn btn-success px-4">
-                                        <i class="fa-solid fa-id-card me-2"></i>
-                                        Print Permit ID
-                                    </a>
-                                @else
-                                    <button class="btn btn-secondary px-4" disabled>
-                                        <i class="fa-solid fa-circle-exclamation me-1"></i>
-                                        Complete all requirements to print ID
+                        <div class="d-flex align-items-center gap-2 mt-4">
+                            {{-- Action: Save/Update --}}
+                            @if(auth()->user()->hasPermission('update_permit'))
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                    <i class="fa-solid fa-floppy-disk me-2"></i>Save Permit
+                                </button>
+                            @else
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="No permission to update">
+                                    <button type="button" class="btn btn-outline-secondary px-4" disabled>
+                                        Save Permit
                                     </button>
-                                @endif
+                                </span>
+                            @endif
 
-                            </div>
+                            {{-- Action: Print/Generate --}}
+                            @if(auth()->user()->hasPermission('generate_permit') && $permit && $permit->isComplete())
+                                <a href="{{ route('permits.printId', $applicant->id) }}" target="_blank"
+                                    class="btn btn-success px-4 shadow-sm">
+                                    <i class="fa-solid fa-id-card me-2"></i>Print Permit ID
+                                </a>
+                            @else
+                                @php
+                                    // Logic para sa error message
+                                    $reason = !auth()->user()->hasPermission('generate_permit')
+                                        ? 'No permission to generate ID'
+                                        : 'Complete all requirements first';
+                                @endphp
+
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="{{ $reason }}">
+                                    <button class="btn btn-outline-secondary px-4" disabled>
+                                        <i class="fa-solid fa-id-card me-2 text-muted"></i>Print Permit ID
+                                    </button>
+                                </span>
+                            @endif
                         </div>
                     </form>
-
                 </div>
 
                 <!-- ===================================================== -->
@@ -902,7 +1262,6 @@
                 <!-- ===================================================== -->
 
                 <div class="tab-pane fade" id="clearance">
-
                     <form action="{{ route('clearances.update', $applicant->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
@@ -916,17 +1275,21 @@
 
                             <div class="col-md-2">
                                 <div class="document-upload-card">
-                                    <label class="form-label">Prosecutor Clearance<span class="required-mark">*</span></label>
+                                    <label class="form-label">Prosecutor Clearance<span
+                                            class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="prosecutor_input" name="prosecutor_clearance" style="display:none" onchange="showFileName(this, 'prosecutor_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('prosecutor_input').click()">
+                                        <input type="file" id="prosecutor_input" name="prosecutor_clearance"
+                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('prosecutor_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="prosecutor_name" class="file-name-text">
                                             {{ !empty($clearance->prosecutor_clearance) ? basename($clearance->prosecutor_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->prosecutor_clearance))
-                                            <a href="{{ asset('storage/'.$clearance->prosecutor_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $clearance->prosecutor_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -934,19 +1297,23 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="col-mb-2">
                                 <div class="document-upload-card">
-                                    <label class="form-label">Municipal Trial Court Clearance<span class="required-mark">*</span></label>
+                                    <label class="form-label">Municipal Trial Court Clearance<span
+                                            class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="mtc_input" name="mtc_clearance" style="display:none" onchange="showFileName(this, 'mtc_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('mtc_input').click()">
+                                        <input type="file" id="mtc_input" name="mtc_clearance" style="display:none"
+                                            onchange="showFileName(this, 'mtc_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('mtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="mtc_name" class="file-name-text">
                                             {{ !empty($clearance->mtc_clearance) ? basename($clearance->mtc_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->mtc_clearance))
-                                            <a href="{{ asset('storage/'.$clearance->mtc_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $clearance->mtc_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -956,17 +1323,21 @@
 
                             <div class="col-md-2">
                                 <div class="document-upload-card">
-                                    <label class="form-label">Regional Trial Court Clearance<span class="required-mark">*</span></label>
+                                    <label class="form-label">Regional Trial Court Clearance<span
+                                            class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="rtc_input" name="rtc_clearance" style="display:none" onchange="showFileName(this, 'rtc_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('rtc_input').click()">
+                                        <input type="file" id="rtc_input" name="rtc_clearance" style="display:none"
+                                            onchange="showFileName(this, 'rtc_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('rtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="rtc_name" class="file-name-text">
                                             {{ !empty($clearance->rtc_clearance) ? basename($clearance->rtc_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->rtc_clearance))
-                                            <a href="{{ asset('storage/'.$clearance->rtc_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $clearance->rtc_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -978,15 +1349,18 @@
                                 <div class="document-upload-card">
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="c_nbi_input" name="nbi_clearance" style="display:none" onchange="showFileName(this, 'c_nbi_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('c_nbi_input').click()">
+                                        <input type="file" id="c_nbi_input" name="nbi_clearance" style="display:none"
+                                            onchange="showFileName(this, 'c_nbi_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('c_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="c_nbi_name" class="file-name-text">
                                             {{ !empty($clearance->nbi_clearance) ? basename($clearance->nbi_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->nbi_clearance))
-                                            <a href="{{ asset('storage/'.$clearance->nbi_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $clearance->nbi_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -998,15 +1372,18 @@
                                 <div class="document-upload-card">
                                     <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
-                                        <input type="file" id="brgy_input" name="barangay_clearance" style="display:none" onchange="showFileName(this, 'brgy_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('brgy_input').click()">
+                                        <input type="file" id="brgy_input" name="barangay_clearance" style="display:none"
+                                            onchange="showFileName(this, 'brgy_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="brgy_name" class="file-name-text">
                                             {{ !empty($clearance->barangay_clearance) ? basename($clearance->barangay_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->barangay_clearance))
-                                            <a href="{{ asset('storage/'.$clearance->barangay_clearance) }}" target="_blank" class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ asset('storage/' . $clearance->barangay_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -1027,7 +1404,8 @@
                             {{-- PESO Control No --}}
                             <div class="col-md-2">
                                 <label class="form-label">PESO Control No.<span class="required-mark">*</span></label>
-                                <input type="text" name="peso_id_no" class="form-control" value="{{ $clearance->clearance_peso_control_no }}" readonly>
+                                <input type="text" name="peso_id_no" class="form-control"
+                                    value="{{ $clearance->clearance_peso_control_no }}" readonly>
                             </div>
                             {{-- Hired Company --}}
                             <div class="col-md-2">
@@ -1064,27 +1442,39 @@
                             </div>
                         </div>
 
-                        <div class="pt-4 border-top mt-4">
-                            <button type="submit" class="btn btn-primary px-5">
-                                Save Clearance
-                            </button>
-
-                            <div class="mt-3">
-
-                                @if($clearance && $clearance->isComplete())
-                                    <a href="{{ route('clearances.printLetter', $applicant->id) }}"
-                                    target="_blank"
-                                    class="btn btn-success">
-                                        <i class="fa-solid fa-print me-1"></i>
-                                        Print Clearance Letter
-                                    </a>
-                                @else
-                                    <button class="btn btn-secondary" disabled>
-                                        Complete requirements to print letter
+                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
+                            {{-- Update/Save Section --}}
+                            @if(auth()->user()->hasPermission('update_clearance'))
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                    <i class="fa-solid fa-check-circle me-2"></i>Save Clearance
+                                </button>
+                            @else
+                                <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
+                                    <button type="button" class="btn btn-outline-secondary px-4" disabled>
+                                        Save Clearance
                                     </button>
-                                @endif
+                                </span>
+                            @endif
 
-                            </div>
+                            {{-- Print Section --}}
+                            @if(auth()->user()->hasPermission('generate_clearance') && $clearance && $clearance->isComplete())
+                                <a href="{{ route('clearances.printLetter', $applicant->id) }}" target="_blank"
+                                    class="btn btn-success px-4 shadow-sm">
+                                    <i class="fa-solid fa-print me-2"></i>Print Clearance Letter
+                                </a>
+                            @else
+                                @php
+                                    $reason = !auth()->user()->hasPermission('generate_clearance')
+                                        ? 'No permission to generate letter'
+                                        : 'Requirements incomplete';
+                                @endphp
+
+                                <span class="d-inline-block" data-bs-toggle="tooltip" title="{{ $reason }}">
+                                    <button class="btn btn-outline-secondary px-4" disabled>
+                                        <i class="fa-solid fa-print me-2 text-muted"></i>Print Clearance Letter
+                                    </button>
+                                </span>
+                            @endif
                         </div>
 
                     </form>
@@ -1106,200 +1496,313 @@
 
                         <h6 class="section-title text-primary">Mayor's Referral Requirements</h6>
 
-                        <div class="mb-4">
-                            <label class="form-label">Resume / Bio-data</label>
-                            <input type="file" name="resume" class="form-control">
+                        <div class="mb-3">
+                            <div class="document-upload-card-resume">
+                                <label class="form-label">Resume / Bio-data<span class="required-mark">*</span></label>
+                                <div class="d-grid gap-2">
+                                    <input type="file" id="resume_input" name="resume" style="display:none"
+                                        onchange="showFileName(this, 'resume_name')">
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        onclick="document.getElementById('resume_input').click()">
+                                        <i class="fas fa-upload me-1"></i> Upload File
+                                    </button>
+                                    <small id="resume_name" class="file-name-text">
+                                        {{ !empty($referral->resume) ? basename($referral->resume) : 'No file selected' }}
+                                    </small>
+                                    @if(!empty($referral->resume))
+                                        <a href="{{ asset('storage/' . $referral->resume) }}" target="_blank"
+                                            class="btn btn-light btn-sm text-primary border">
+                                            <i class="fas fa-eye me-1"></i> View Current
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="row g-3">
+
+                        <h4 class="section-title-c text-primary">Choose at least one of the following:</h6>
+                        <div class="d-flex justify-content-center overflow-auto pb-2">
 
                             <div class="col-md-4">
-                                <label class="form-label">Barangay Clearance</label>
-                                <input type="file" name="ref_barangay_clearance" class="form-control">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" id="ref_brgy_input" name="ref_barangay_clearance"
+                                            style="display:none" onchange="showFileName(this, 'ref_brgy_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('ref_brgy_input').click()">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </button>
+                                        <small id="ref_brgy_name" class="file-name-text">
+                                            {{ !empty($referral->ref_barangay_clearance) ? basename($referral->ref_barangay_clearance) : 'No file selected' }}
+                                        </small>
+                                        @if(!empty($referral->ref_barangay_clearance))
+                                            <a href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
+                                                <i class="fas fa-eye me-1"></i> View Current
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">Police Clearance</label>
-                                <input type="file" name="ref_police_clearance" class="form-control">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Police Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" id="ref_police_input" name="ref_police_clearance"
+                                            style="display:none" onchange="showFileName(this, 'ref_police_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('ref_police_input').click()">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </button>
+                                        <small id="ref_police_name" class="file-name-text">
+                                            {{ !empty($referral->ref_police_clearance) ? basename($referral->ref_police_clearance) : 'No file selected' }}
+                                        </small>
+                                        @if(!empty($referral->ref_police_clearance))
+                                            <a href="{{ asset('storage/' . $referral->ref_police_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
+                                                <i class="fas fa-eye me-1"></i> View Current
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label">NBI Clearance</label>
-                                <input type="file" name="ref_nbi_clearance" class="form-control">
+                                <div class="document-upload-card">
+                                    <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" id="ref_nbi_input" name="ref_nbi_clearance"
+                                            style="display:none" onchange="showFileName(this, 'ref_nbi_name')">
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="document.getElementById('ref_nbi_input').click()">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </button>
+                                        <small id="ref_nbi_name" class="file-name-text">
+                                            {{ !empty($referral->ref_nbi_clearance) ? basename($referral->ref_nbi_clearance) : 'No file selected' }}
+                                        </small>
+                                        @if(!empty($referral->ref_nbi_clearance))
+                                            <a href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
+                                                <i class="fas fa-eye me-1"></i> View Current
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
 
-                        <!-- INNER TABS -->
                         <div class="mt-4">
-                            <h6 class="section-title text-primary">Mayor's Referral Requirements</h6>
+                            <h6 class="section-title text-primary">Mayor's Referral Letter Details</h6>
+                            @php
+                                $selectedReferralType = old(
+                                    'referral_type',
+                                    $referral->referral_type ?? \App\Models\MayorsReferral::TYPE_PESO_OFFICE
+                                );
+                            @endphp
 
-                            <ul class="nav nav-tabs" id="referralTabs" role="tablist">
-
-
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="peso-office-tab" data-bs-toggle="tab"
-                                        data-bs-target="#peso-office" type="button" role="tab">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Referral Letter Type</label>
+                                <select name="referral_type" id="referralTypeSelect" class="form-select">
+                                    <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
+                                        {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
                                         PESO Office
-                                    </button>
-                                </li>
-
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="other-city-tab" data-bs-toggle="tab"
-                                        data-bs-target="#other-city" type="button" role="tab">
+                                    </option>
+                                    <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
+                                        {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
                                         Referral for Other City Government
-                                    </button>
-                                </li>
+                                    </option>
+                                </select>
+                            </div>
 
-                            </ul>
-
-
-                            <div class="tab-content border border-top-0 p-4">
-
-                                <!-- TAB 1 -->
-                                <div class="tab-pane fade show active" id="peso-office" role="tabpanel">
-
+                            <div class="border p-4 rounded-4 bg-white">
+                                <div id="pesoOfficeFields"
+                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
                                     <div class="row g-3">
-
                                         <div class="col-md-2">
                                             <label class="form-label">O.R No.</label>
-                                            <input type="text" name="ref_or_no" class="form-control">
+                                            <input type="text" name="ref_or_no" class="form-control"
+                                                value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label">Mayor's First Name</label>
-                                            <input type="text" name="ref_mayor_recipient_firstname" class="form-control">
+                                            <input type="text" name="ref_mayor_recipient_firstname" class="form-control"
+                                                value="{{ old('ref_mayor_recipient_firstname', $referral->ref_mayor_recipient_firstname ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label">Mayor's Middle Name</label>
-                                            <input type="text" name="ref_mayor_recipient_middlename" class="form-control">
+                                            <input type="text" name="ref_mayor_recipient_middlename" class="form-control"
+                                                value="{{ old('ref_mayor_recipient_middlename', $referral->ref_mayor_recipient_middlename ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label">Mayor's Last Name</label>
-                                            <input type="text" name="ref_mayor_recipient_lastname" class="form-control">
+                                            <input type="text" name="ref_mayor_recipient_lastname" class="form-control"
+                                                value="{{ old('ref_mayor_recipient_lastname', $referral->ref_mayor_recipient_lastname ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
                                             <label class="form-label">City Government</label>
                                             <select name="ref_city_gov" id="cityGovernment" class="form-select">
-                                                <option value="">Select City Government</option>
+                                                <option value="{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}"
+                                                    selected>
+                                                    {{ old('ref_city_gov', $referral->ref_city_gov ?? 'Select City Government') }}
+                                                </option>
                                             </select>
                                         </div>
 
                                         <div class="col-md-3">
                                             <label class="form-label"> City Address</label>
-                                            <input type="text" name="ref_place" class="form-control">
+                                            <input type="text" name="ref_place" class="form-control"
+                                                value="{{ old('ref_place', $referral->ref_place ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
                                             <label class="form-label">Hired Company</label>
-                                            <input type="text" name="ref_hired_company" class="form-control">
+                                            <input type="text" name="ref_hired_company" class="form-control"
+                                                value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
                                         </div>
-
                                     </div>
-
                                 </div>
 
-                                <!-- TAB 2 -->
-
-                                <div class="tab-pane fade" id="other-city" role="tabpanel">
-
+                                <div id="otherCityFields"
+                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
                                     <div class="row g-3">
-
                                         <div class="col-md-3">
                                             <label class="form-label">O.R No.</label>
-                                            <input type="text" name="ref_peso_or_no" class="form-control">
+                                            <input type="text" name="ref_peso_or_no" class="form-control"
+                                                value="{{ old('ref_peso_or_no', $referral->ref_peso_or_no ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
                                             <label class="form-label">Recipient Name</label>
-                                            <input type="text" name="ref_recipient" class="form-control">
+                                            <input type="text" name="ref_recipient" class="form-control"
+                                                value="{{ old('ref_recipient', $referral->ref_recipient ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
                                             <label class="form-label">Company Address</label>
-                                            <input type="text" name="ref_place" class="form-control">
+                                            <input type="text" name="ref_company_address" class="form-control"
+                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
                                         </div>
-
                                     </div>
-
                                 </div>
-
                             </div>
 
                         </div>
 
                         <div class="pt-4 border-top mt-4">
-                            <button type="submit" class="btn btn-primary px-5">
-                                Save Referral
-                            </button>
+                            @if(auth()->user()->hasPermission('update_referral'))
+                                <button type="submit" class="btn btn-primary px-5">
+                                    Save Referral
+                                </button>
+                            @else
+                                <button type="button" class="btn btn-secondary px-5" disabled>
+                                    No permission to update referral
+                                </button>
+                            @endif
+
+                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->isComplete())
+                                <a href="{{ route('referrals.printLetter', $applicant->id) }}"
+                                    class="btn btn-outline-primary px-4 ms-2" target="_blank">
+                                    Print Referral Letter
+                                </a>
+                            @elseif(!auth()->user()->hasPermission('generate_referral'))
+                                <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
+                                    No permission to generate referral letter
+                                </button>
+                            @endif
                         </div>
 
                     </form>
 
                 </div>
 
+
+
             </div>
         </div>
-    </div>
 @endsection
-{{-- City Government--}}
-<script>
+    {{-- City Government--}}
+    <script>
 
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
+            const referralTypeSelect = document.getElementById("referralTypeSelect");
+            const pesoOfficeFields = document.getElementById("pesoOfficeFields");
+            const otherCityFields = document.getElementById("otherCityFields");
 
-        const cityDropdown = document.getElementById("cityGovernment");
+            if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
+                const toggleReferralFields = () => {
+                    const selectedType = referralTypeSelect.value;
 
-        const allowedRegions = [
-            "130000000", // NCR
-            "040000000"  // Region 4A (CALABARZON)
-        ];
+                    pesoOfficeFields.classList.toggle(
+                        "d-none",
+                        selectedType !== "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
+                    );
+                    otherCityFields.classList.toggle(
+                        "d-none",
+                        selectedType !== "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
+                    );
+                };
 
-        fetch("https://psgc.gitlab.io/api/cities-municipalities/")
-            .then(response => response.json())
-            .then(data => {
+                toggleReferralFields();
+                referralTypeSelect.addEventListener("change", toggleReferralFields);
+            }
 
-                data.forEach(city => {
+            const cityDropdown = document.getElementById("cityGovernment");
 
-                    if (allowedRegions.includes(city.regionCode)) {
+            const allowedRegions = [
+                "130000000", // NCR
+                "040000000"  // Region 4A (CALABARZON)
+            ];
 
-                        const option = document.createElement("option");
+            fetch("https://psgc.gitlab.io/api/cities-municipalities/")
+                .then(response => response.json())
+                .then(data => {
 
-                        option.value = "City Government of " + city.name;
-                        option.text = "City Government of " + city.name;
+                    data.forEach(city => {
 
-                        cityDropdown.appendChild(option);
+                        if (allowedRegions.includes(city.regionCode)) {
 
-                    }
+                            const option = document.createElement("option");
 
-                });
+                            option.value = "City Government of " + city.name;
+                            option.text = "City Government of " + city.name;
 
-            })
-            .catch(error => console.error("Error loading cities:", error));
+                            cityDropdown.appendChild(option);
 
-    });
+                        }
 
-</script>
-{{-- Upload file name --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
+                    });
 
-        document.querySelectorAll(".file-input").forEach(input => {
-            input.addEventListener("change", function () {
+                })
+                .catch(error => console.error("Error loading cities:", error));
 
-                const previewId = this.dataset.preview;
-                const previewContainer = document.getElementById(previewId);
+        });
 
-                if (!previewContainer) return;
+    </script>
+    {{-- Upload file name --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-                if (this.files && this.files[0]) {
+            document.querySelectorAll(".file-input").forEach(input => {
+                input.addEventListener("change", function () {
 
-                    const file = this.files[0];
-                    const fileURL = URL.createObjectURL(file);
+                    const previewId = this.dataset.preview;
+                    const previewContainer = document.getElementById(previewId);
 
-                    previewContainer.innerHTML = `
+                    if (!previewContainer) return;
+
+                    if (this.files && this.files[0]) {
+
+                        const file = this.files[0];
+                        const fileURL = URL.createObjectURL(file);
+
+                        previewContainer.innerHTML = `
                     <a href="${fileURL}" 
                        target="_blank"
                        class="badge bg-success text-white border px-3 py-2">
@@ -1307,273 +1810,273 @@
                         ${file.name}
                     </a>
                 `;
-                }
+                    }
+                });
+
             });
 
         });
+    </script>
+    {{-- City Address --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-    });
-</script>
-{{-- City Address --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const provinceSelect = document.getElementById('province');
-        const citySelect = document.getElementById('city');
-        const barangaySelect = document.getElementById('barangay');
+            const provinceSelect = document.getElementById('province');
+            const citySelect = document.getElementById('city');
+            const barangaySelect = document.getElementById('barangay');
 
 
-        // SAVED VALUES
-        let savedProvince = "{{ $applicant->province }}";
-        let savedCity = "{{ $applicant->city }}";
-        let savedBarangay = "{{ $applicant->barangay }}";
+            // SAVED VALUES
+            let savedProvince = "{{ $applicant->province }}";
+            let savedCity = "{{ $applicant->city }}";
+            let savedBarangay = "{{ $applicant->barangay }}";
 
 
 
-        // ---------- LOAD PROVINCES ----------
-        function loadProvinces() {
+            // ---------- LOAD PROVINCES ----------
+            function loadProvinces() {
 
-            provinceSelect.innerHTML = '<option>Loading provinces...</option>';
+                provinceSelect.innerHTML = '<option>Loading provinces...</option>';
 
-            fetch('https://psgc.gitlab.io/api/provinces/')
-                .then(response => response.json())
-                .then(data => {
+                fetch('https://psgc.gitlab.io/api/provinces/')
+                    .then(response => response.json())
+                    .then(data => {
 
-                    provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                        provinceSelect.innerHTML = '<option value="">Select Province</option>';
 
-                    data.sort((a, b) => a.name.localeCompare(b.name));
+                        data.sort((a, b) => a.name.localeCompare(b.name));
 
-                    data.forEach(province => {
+                        data.forEach(province => {
 
-                        let option = document.createElement('option');
+                            let option = document.createElement('option');
 
-                        option.value = province.name;
-                        option.textContent = province.name;
-                        option.dataset.code = province.code;
+                            option.value = province.name;
+                            option.textContent = province.name;
+                            option.dataset.code = province.code;
 
-                        if (province.name === savedProvince) {
-                            option.selected = true;
-                            loadCities(province.code);
-                        }
+                            if (province.name === savedProvince) {
+                                option.selected = true;
+                                loadCities(province.code);
+                            }
 
-                        provinceSelect.appendChild(option);
+                            provinceSelect.appendChild(option);
 
-                    });
-
-                });
-
-        }
-
-
-
-        // ---------- LOAD CITIES ----------
-        function loadCities(provinceCode) {
-
-            citySelect.innerHTML = '<option>Loading cities...</option>';
-
-            fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
-                .then(response => response.json())
-                .then(data => {
-
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-
-                    data.sort((a, b) => a.name.localeCompare(b.name));
-
-                    data.forEach(city => {
-
-                        let option = document.createElement('option');
-
-                        option.value = city.name;
-                        option.textContent = city.name;
-                        option.dataset.code = city.code;
-
-                        if (city.name === savedCity) {
-                            option.selected = true;
-                            loadBarangays(city.code);
-                        }
-
-                        citySelect.appendChild(option);
+                        });
 
                     });
 
-                });
-
-        }
+            }
 
 
 
-        // ---------- LOAD BARANGAYS ----------
-        function loadBarangays(cityCode) {
+            // ---------- LOAD CITIES ----------
+            function loadCities(provinceCode) {
 
-            barangaySelect.innerHTML = '<option>Loading barangays...</option>';
+                citySelect.innerHTML = '<option>Loading cities...</option>';
 
-            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
-                .then(response => response.json())
-                .then(data => {
+                fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
+                    .then(response => response.json())
+                    .then(data => {
 
-                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                        citySelect.innerHTML = '<option value="">Select City</option>';
 
-                    data.sort((a, b) => a.name.localeCompare(b.name));
+                        data.sort((a, b) => a.name.localeCompare(b.name));
 
-                    data.forEach(barangay => {
+                        data.forEach(city => {
 
-                        let option = document.createElement('option');
+                            let option = document.createElement('option');
 
-                        option.value = barangay.name;
-                        option.textContent = barangay.name;
+                            option.value = city.name;
+                            option.textContent = city.name;
+                            option.dataset.code = city.code;
 
-                        if (barangay.name === savedBarangay) {
-                            option.selected = true;
-                        }
+                            if (city.name === savedCity) {
+                                option.selected = true;
+                                loadBarangays(city.code);
+                            }
 
-                        barangaySelect.appendChild(option);
+                            citySelect.appendChild(option);
+
+                        });
 
                     });
 
-                });
-
-        }
+            }
 
 
 
-        // ---------- EVENTS ----------
-        provinceSelect.addEventListener('change', function () {
+            // ---------- LOAD BARANGAYS ----------
+            function loadBarangays(cityCode) {
 
-            let code = this.options[this.selectedIndex].dataset.code;
+                barangaySelect.innerHTML = '<option>Loading barangays...</option>';
 
-            if (code) {
+                fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+                    .then(response => response.json())
+                    .then(data => {
 
-                loadCities(code);
+                        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
-            } else {
+                        data.sort((a, b) => a.name.localeCompare(b.name));
 
-                citySelect.innerHTML = '<option>Select City</option>';
-                barangaySelect.innerHTML = '<option>Select Barangay</option>';
+                        data.forEach(barangay => {
+
+                            let option = document.createElement('option');
+
+                            option.value = barangay.name;
+                            option.textContent = barangay.name;
+
+                            if (barangay.name === savedBarangay) {
+                                option.selected = true;
+                            }
+
+                            barangaySelect.appendChild(option);
+
+                        });
+
+                    });
 
             }
 
-        });
 
 
-        citySelect.addEventListener('change', function () {
+            // ---------- EVENTS ----------
+            provinceSelect.addEventListener('change', function () {
 
-            let code = this.options[this.selectedIndex].dataset.code;
+                let code = this.options[this.selectedIndex].dataset.code;
 
-            if (code) {
+                if (code) {
 
-                loadBarangays(code);
+                    loadCities(code);
 
-            } else {
-
-                barangaySelect.innerHTML = '<option>Select Barangay</option>';
-
-            }
-
-        });
-
-
-
-        // ---------- INIT ----------
-        loadProvinces();
-
-    });
-
-</script>
-{{-- Archived File--}}
-<script>
-    function clearFile(applicantId, field) {
-
-        if (!confirm("Remove this file?")) return;
-
-        fetch(`/permit/${applicantId}/${field}/delete`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                "Accept": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Server error");
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("file-" + field).remove();
                 } else {
-                    alert("Error removing file.");
+
+                    citySelect.innerHTML = '<option>Select City</option>';
+                    barangaySelect.innerHTML = '<option>Select Barangay</option>';
+
+                }
+
+            });
+
+
+            citySelect.addEventListener('change', function () {
+
+                let code = this.options[this.selectedIndex].dataset.code;
+
+                if (code) {
+
+                    loadBarangays(code);
+
+                } else {
+
+                    barangaySelect.innerHTML = '<option>Select Barangay</option>';
+
+                }
+
+            });
+
+
+
+            // ---------- INIT ----------
+            loadProvinces();
+
+        });
+
+    </script>
+    {{-- Archived File--}}
+    <script>
+        function clearFile(applicantId, field) {
+
+            if (!confirm("Remove this file?")) return;
+
+            fetch(`/permit/${applicantId}/${field}/delete`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
                 }
             })
-            .catch(error => {
-                console.error(error);
-                alert("Error removing file.");
-            });
-    }
-</script>
-{{-- Expires On --}}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const permitDate = document.getElementById("permit_date");
-    const expiresOn = document.getElementById("expires_on");
-
-    permitDate.addEventListener("change", function () {
-
-        if (!this.value) return;
-
-        let date = new Date(this.value);
-
-        // Add 6 months
-        date.setMonth(date.getMonth() + 6);
-
-        // Fix date format (YYYY-MM-DD)
-        let formatted = date.toISOString().split('T')[0];
-
-        expiresOn.value = formatted;
-
-    });
-
-});
-</script>
-{{-- nbi or police --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const dropdown = document.getElementById("clearance_type");
-        const nbi = document.getElementById("nbi_section");
-        const police = document.getElementById("police_section");
-
-        function toggleFields() {
-            const value = dropdown.value;
-
-            if (value === "nbi") {
-                nbi.style.display = "grid";
-                police.style.display = "none";
-            } 
-            else if (value === "police") {
-                nbi.style.display = "none";
-                police.style.display = "grid";
-            } 
-            else {
-                nbi.style.display = "none";
-                police.style.display = "none";
-            }
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Server error");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("file-" + field).remove();
+                    } else {
+                        alert("Error removing file.");
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Error removing file.");
+                });
         }
+    </script>
+    {{-- Expires On --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-        // Run on page load (edit mode support)
-        toggleFields();
+            const permitDate = document.getElementById("permit_date");
+            const expiresOn = document.getElementById("expires_on");
 
-        // Run when changed
-        dropdown.addEventListener("change", toggleFields);
+            permitDate.addEventListener("change", function () {
 
-    });
-</script>
+                if (!this.value) return;
 
-<script>
-    function showFileName(input, displayId) {
-        const fileName = input.files.length ? input.files[0].name : '';
-        document.getElementById(displayId).textContent = fileName;
-    }
-</script>
+                let date = new Date(this.value);
+
+                // Add 6 months
+                date.setMonth(date.getMonth() + 6);
+
+                // Fix date format (YYYY-MM-DD)
+                let formatted = date.toISOString().split('T')[0];
+
+                expiresOn.value = formatted;
+
+            });
+
+        });
+    </script>
+    {{-- nbi or police --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const dropdown = document.getElementById("clearance_type");
+            const nbi = document.getElementById("nbi_section");
+            const police = document.getElementById("police_section");
+
+            function toggleFields() {
+                const value = dropdown.value;
+
+                if (value === "nbi") {
+                    nbi.style.display = "grid";
+                    police.style.display = "none";
+                }
+                else if (value === "police") {
+                    nbi.style.display = "none";
+                    police.style.display = "grid";
+                }
+                else {
+                    nbi.style.display = "none";
+                    police.style.display = "none";
+                }
+            }
+
+            // Run on page load (edit mode support)
+            toggleFields();
+
+            // Run when changed
+            dropdown.addEventListener("change", toggleFields);
+
+        });
+    </script>
+
+    <script>
+        function showFileName(input, displayId) {
+            const fileName = input.files.length ? input.files[0].name : '';
+            document.getElementById(displayId).textContent = fileName;
+        }
+    </script>

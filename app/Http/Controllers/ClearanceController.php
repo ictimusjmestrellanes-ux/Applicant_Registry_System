@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
 use App\Models\Applicant;
 use App\Models\MayorsClearance;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -23,12 +23,8 @@ class ClearanceController extends Controller
         $clearance = MayorsClearance::firstOrNew([
             'applicant_id' => $applicant->id,
         ]);
-
-        $trackedFields = $this->trackedFields();
         $wasRecentlyCreated = ! $clearance->exists;
-        $originalValues = $clearance->exists
-            ? $clearance->only(array_keys($trackedFields))
-            : [];
+        $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
 
         /*
         |--------------------------------------------------------------------------
@@ -137,8 +133,6 @@ class ClearanceController extends Controller
 
         $clearance->save();
 
-        $changes = $this->buildChanges($clearance, $originalValues, $trackedFields);
-
         if (empty($clearance->clearance_peso_control_no)) {
             $year = date('Y');
 
@@ -154,27 +148,20 @@ class ClearanceController extends Controller
             $clearance->clearance_peso_control_no = $year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
             $clearance->save(); // SAVE AGAIN with generated ID
-
-            $changes[] = [
-                'field' => 'clearance_peso_control_no',
-                'label' => $trackedFields['clearance_peso_control_no'],
-                'old' => $this->formatLogValue($originalValues['clearance_peso_control_no'] ?? null),
-                'new' => $this->formatLogValue($clearance->clearance_peso_control_no),
-            ];
         }
 
-        if ($changes !== []) {
-            $action = $wasRecentlyCreated ? 'created' : 'updated';
-            $changedLabels = collect($changes)->pluck('label')->unique()->values()->all();
+        $after = $clearance->fresh()->only($clearance->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
 
-            ActivityLog::create([
-                'applicant_id' => $applicant->id,
-                'causer_id' => $request->user()?->id,
-                'module' => 'mayors_clearance',
-                'action' => $action,
-                'description' => $this->buildDescription($action, $changedLabels),
-                'changes' => $changes,
-            ]);
+        if (! empty($changes)) {
+            ActivityLogger::log(
+                'clearance',
+                $wasRecentlyCreated ? 'created' : 'updated',
+                $wasRecentlyCreated ? 'Added mayor\'s clearance details for the applicant.' : 'Updated mayor\'s clearance details.',
+                $applicant,
+                $changes,
+                $request->user()
+            );
         }
 
         return redirect()
@@ -190,73 +177,15 @@ class ClearanceController extends Controller
             return back()->with('error', 'Clearance is not complete.');
         }
 
+        ActivityLogger::log(
+            'clearance',
+            'generated',
+            'Generated the mayor\'s clearance letter.',
+            $applicant,
+            null,
+            request()->user()
+        );
+
         return view('clearance.clearance', compact('applicant'));
-    }
-
-    private function trackedFields(): array
-    {
-        return [
-            'prosecutor_clearance' => 'Prosecutor Clearance',
-            'mtc_clearance' => 'Municipal Trial Court Clearance',
-            'rtc_clearance' => 'Regional Trial Court Clearance',
-            'nbi_clearance' => 'NBI Clearance',
-            'barangay_clearance' => 'Barangay Clearance',
-            'clearance_or_no' => 'O.R. No.',
-            'clearance_issued_on' => 'Issued On',
-            'clearance_issued_in' => 'Issued In',
-            'clearance_peso_control_no' => 'PESO Control No.',
-            'clearance_doc_stamp_control_no' => 'Documentary Stamp Control No.',
-            'clearance_date_of_payment' => 'Date of Payment',
-            'clearance_hired_company' => 'Hired Company',
-        ];
-    }
-
-    private function buildChanges(MayorsClearance $clearance, array $originalValues, array $trackedFields): array
-    {
-        $changes = [];
-
-        foreach ($trackedFields as $field => $label) {
-            $oldValue = $originalValues[$field] ?? null;
-            $newValue = $clearance->{$field};
-
-            if ($oldValue == $newValue) {
-                continue;
-            }
-
-            $changes[] = [
-                'field' => $field,
-                'label' => $label,
-                'old' => $this->formatLogValue($oldValue),
-                'new' => $this->formatLogValue($newValue),
-            ];
-        }
-
-        return $changes;
-    }
-
-    private function buildDescription(string $action, array $changedLabels): string
-    {
-        $prefix = $action === 'created'
-            ? 'Created mayor\'s clearance record'
-            : 'Updated mayor\'s clearance';
-
-        if ($changedLabels === []) {
-            return $prefix.'.';
-        }
-
-        return $prefix.' for '.implode(', ', $changedLabels).'.';
-    }
-
-    private function formatLogValue(mixed $value): string
-    {
-        if (blank($value)) {
-            return 'Empty';
-        }
-
-        if (is_string($value) && str_contains($value, '/')) {
-            return basename($value);
-        }
-
-        return (string) $value;
     }
 }

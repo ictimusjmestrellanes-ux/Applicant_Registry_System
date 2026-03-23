@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ActivityLogger;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,21 @@ class AuthController extends Controller
             'auth_provider' => 'local',
         ])) {
             $request->session()->regenerate();
+
+            ActivityLogger::log(
+                'auth',
+                'login',
+                'User logged in using email and password.',
+                null,
+                [
+                    'provider' => [
+                        'before' => null,
+                        'after' => 'local',
+                    ],
+                ],
+                Auth::user()
+            );
+
             return redirect()->intended('dashboard');
         }
 
@@ -133,6 +149,8 @@ class AuthController extends Controller
                 'name' => $azureUser->getName() ?: Str::before($email, '@'),
                 'email' => $email,
                 'password' => Hash::make(Str::random(40)),
+                'role' => User::ROLE_USER,
+                'permissions' => [],
                 'auth_provider' => 'azure',
                 'email_verified_at' => now(),
             ]);
@@ -141,6 +159,20 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
+        ActivityLogger::log(
+            'auth',
+            'login',
+            'User logged in using Microsoft Azure.',
+            null,
+            [
+                'provider' => [
+                    'before' => null,
+                    'after' => 'azure',
+                ],
+            ],
+            $user
+        );
+
         return redirect()->intended('dashboard');
     }
 
@@ -148,6 +180,17 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $user = $request->user();
+
+        if ($user) {
+            ActivityLogger::log(
+                'auth',
+                'logout',
+                'User logged out of the system.',
+                null,
+                null,
+                $user
+            );
+        }
 
         Auth::logout();
         $request->session()->invalidate();
