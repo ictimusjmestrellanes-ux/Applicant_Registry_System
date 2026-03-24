@@ -1618,41 +1618,32 @@
                             </div>
 
                             <div class="border p-4 rounded-4 bg-white">
-                                <div id="pesoOfficeFields"
+                                <div id="pesoOfficeFields" data-referral-group="peso"
                                     class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
                                     <div class="row g-3">
-                                        <div class="col-md-2">
-                                            <label class="form-label">O.R No.</label>
-                                            <input type="text" name="ref_or_no" class="form-control"
-                                                value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">Mayor's First Name</label>
-                                            <input type="text" name="ref_mayor_recipient_firstname" class="form-control"
-                                                value="{{ old('ref_mayor_recipient_firstname', $referral->ref_mayor_recipient_firstname ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">Mayor's Middle Name</label>
-                                            <input type="text" name="ref_mayor_recipient_middlename" class="form-control"
-                                                value="{{ old('ref_mayor_recipient_middlename', $referral->ref_mayor_recipient_middlename ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">Mayor's Last Name</label>
-                                            <input type="text" name="ref_mayor_recipient_lastname" class="form-control"
-                                                value="{{ old('ref_mayor_recipient_lastname', $referral->ref_mayor_recipient_lastname ?? '') }}">
-                                        </div>
-
                                         <div class="col-md-3">
-                                            <label class="form-label">City Government</label>
-                                            <select name="ref_city_gov" id="cityGovernment" class="form-select">
-                                                <option value="{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}"
-                                                    selected>
-                                                    {{ old('ref_city_gov', $referral->ref_city_gov ?? 'Select City Government') }}
-                                                </option>
-                                            </select>
+                                            <label class="form-label">Peso OCRL (Auto Generate)</label>
+                                            <input type="text" name="ref_imus_ocrl" class="form-control"
+                                                value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}" readonly
+                                                placeholder="Will generate after save when complete">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">O.R CR</label>
+                                            <input type="text" name="ref_imus_or" class="form-control"
+                                                value="{{ old('ref_imus_or', $referral->ref_imus_or ?? '') }}">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Employer Name</label>
+                                            <input type="text" name="ref_employer_name" class="form-control"
+                                                value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Employer Position</label>
+                                            <input type="text" name="ref_employer_position" class="form-control"
+                                                value="{{ old('ref_employer_position', $referral->ref_employer_position ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
@@ -1669,9 +1660,15 @@
                                     </div>
                                 </div>
 
-                                <div id="otherCityFields"
+                                <div id="otherCityFields" data-referral-group="other-city"
                                     class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
                                     <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Peso Imus OCRL (Auto Generate)</label>
+                                            <input type="text" name="ref_ocrl" class="form-control"
+                                                value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}" readonly
+                                                placeholder="Will generate after save when complete">
+                                        </div>
                                         <div class="col-md-3">
                                             <label class="form-label">O.R No.</label>
                                             <input type="text" name="ref_peso_or_no" class="form-control"
@@ -1689,13 +1686,22 @@
                                             <input type="text" name="ref_company_address" class="form-control"
                                                 value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
                                         </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">City Government</label>
+                                            <select name="ref_city_gov" id="cityGovernment" class="form-select">
+                                                <option value="{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}"
+                                                    selected>
+                                                    {{ old('ref_city_gov', $referral->ref_city_gov ?? 'Select City Government') }}
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
 
-                        <div class="pt-4 border-top mt-4">
+                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
                             @if(auth()->user()->hasPermission('update_referral'))
                                 <button type="submit" class="btn btn-primary px-5">
                                     Save Referral
@@ -1706,7 +1712,7 @@
                                 </button>
                             @endif
 
-                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->isComplete())
+                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
                                 <a href="{{ route('referrals.printLetter', $applicant->id) }}"
                                     class="btn btn-outline-primary px-4 ms-2" target="_blank">
                                     Print Referral Letter
@@ -1734,23 +1740,41 @@
             const referralTypeSelect = document.getElementById("referralTypeSelect");
             const pesoOfficeFields = document.getElementById("pesoOfficeFields");
             const otherCityFields = document.getElementById("otherCityFields");
+            const referralForm = referralTypeSelect ? referralTypeSelect.closest("form") : null;
 
             if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
+                const setGroupDisabledState = (container, shouldDisable) => {
+                    container.querySelectorAll("input, select, textarea").forEach(field => {
+                        field.disabled = shouldDisable;
+                    });
+                };
+
                 const toggleReferralFields = () => {
                     const selectedType = referralTypeSelect.value;
+                    const isPesoOffice =
+                        selectedType === "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}";
+                    const isOtherCity =
+                        selectedType === "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}";
 
                     pesoOfficeFields.classList.toggle(
                         "d-none",
-                        selectedType !== "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
+                        !isPesoOffice
                     );
                     otherCityFields.classList.toggle(
                         "d-none",
-                        selectedType !== "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
+                        !isOtherCity
                     );
+
+                    setGroupDisabledState(pesoOfficeFields, !isPesoOffice);
+                    setGroupDisabledState(otherCityFields, !isOtherCity);
                 };
 
                 toggleReferralFields();
                 referralTypeSelect.addEventListener("change", toggleReferralFields);
+
+                if (referralForm) {
+                    referralForm.addEventListener("submit", toggleReferralFields);
+                }
             }
 
             const cityDropdown = document.getElementById("cityGovernment");

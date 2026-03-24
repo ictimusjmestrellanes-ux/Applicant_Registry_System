@@ -15,7 +15,6 @@ class ReferralController extends Controller
     {
         $applicant = Applicant::findOrFail($id);
         $referralType = $request->input('referral_type');
-
         $referral = MayorsReferral::firstOrNew([
             'applicant_id' => $applicant->id,
         ]);
@@ -48,25 +47,28 @@ class ReferralController extends Controller
 
         $referralData = [
             'referral_type' => $referralType,
+
+            'ref_imus_ocrl' => null,
+            'ref_employer_name' => null,
+            'ref_position' => null,
             'ref_or_no' => null,
-            'ref_mayor_recipient_firstname' => null,
-            'ref_mayor_recipient_middlename' => null,
-            'ref_mayor_recipient_lastname' => null,
-            'ref_city_gov' => null,
             'ref_company_address' => null,
             'ref_hired_company' => null,
+
+
             'ref_peso_or_no' => null,
             'ref_recipient' => null,
             'ref_place' => null,
+            'ref_ocrl' => null,
+            'ref_city_gov' => null,
         ];
 
         if ($referralType === MayorsReferral::TYPE_PESO_OFFICE) {
             $referralData = array_merge($referralData, [
+                'ref_imus_ocrl' => $request->ref_imus_ocrl,
+                'ref_employer_name' => $request->ref_employer_name,
+                'ref_position' => $request->ref_position,
                 'ref_or_no' => $request->ref_or_no,
-                'ref_mayor_recipient_firstname' => $request->ref_mayor_recipient_firstname ?? '',
-                'ref_mayor_recipient_middlename' => $request->ref_mayor_recipient_middlename,
-                'ref_mayor_recipient_lastname' => $request->ref_mayor_recipient_lastname ?? '',
-                'ref_city_gov' => $request->ref_city_gov,
                 'ref_place' => $request->ref_place,
                 'ref_hired_company' => $request->ref_hired_company,
             ]);
@@ -75,12 +77,21 @@ class ReferralController extends Controller
                 'ref_peso_or_no' => $request->ref_peso_or_no,
                 'ref_recipient' => $request->ref_recipient,
                 'ref_company_address' => $request->ref_company_address,
+                'ref_city_gov' => $request->ref_city_gov,
             ]);
         }
 
         $referral->fill($referralData);
-
         $referral->save();
+
+        if (
+            $referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT &&
+            empty($referral->ref_ocrl) &&
+            $referral->canPrint()
+        ) {
+            $referral->ref_ocrl = MayorsReferral::generateNextOcrl();
+            $referral->save();
+        }
 
         $after = $referral->fresh()->only($referral->getFillable());
         $changes = ActivityLogger::diff($before, $after);
@@ -105,8 +116,17 @@ class ReferralController extends Controller
     {
         $applicant = Applicant::with('referral')->findOrFail($id);
 
-        if (! $applicant->referral || ! $applicant->referral->isComplete()) {
+        if (! $applicant->referral || ! $applicant->referral->canPrint()) {
             return back()->with('error', 'Referral is not complete.');
+        }
+
+        if (
+            $applicant->referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT &&
+            empty($applicant->referral->ref_ocrl)
+        ) {
+            $applicant->referral->ref_ocrl = MayorsReferral::generateNextOcrl();
+            $applicant->referral->save();
+            $applicant->load('referral');
         }
 
         ActivityLogger::log(
@@ -118,6 +138,10 @@ class ReferralController extends Controller
             request()->user()
         );
 
-        return view('referral.letter', compact('applicant'));
+        $view = $applicant->referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT
+            ? 'referral.other-city-municipality'
+            : 'referral.letter';
+
+        return view($view, compact('applicant'));
     }
 }
