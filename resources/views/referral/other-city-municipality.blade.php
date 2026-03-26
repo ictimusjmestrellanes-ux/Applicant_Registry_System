@@ -145,7 +145,6 @@
         .ref-no {
             margin-bottom: 1mm;
             font-style: italic;
-            font-style: ;
         }
 
         .date-line {
@@ -172,6 +171,10 @@
         .body p {
             margin: 0 0 5mm;
             text-align: justify;
+        }
+        
+        .greet {
+            font-style: italic;
         }
 
         .closing {
@@ -280,7 +283,7 @@
                 <p class="salutation"><strong>Dear Mayor {{ ucwords(strtolower($salutationName)) }}:</strong></p>
 
                 <div class="body">
-                    <p>Warmest greetings of Public Service!</p>
+                    <p class="greet">Warmest greetings of Public Service!</p>
 
                     <p>
                         On behalf of the City Mayor of Imus, <strong>HON. ALEX "AA" L. ADVINCULA</strong>, I am writing to formally

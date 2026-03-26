@@ -49,7 +49,7 @@ class ReferralController extends Controller
             'referral_type' => $referralType,
 
             'ref_imus_ocrl' => null,
-            'ref_employer_name' => null,
+            'ref_employer' => null,
             'ref_position' => null,
             'ref_or_no' => null,
             'ref_company_address' => null,
@@ -66,7 +66,7 @@ class ReferralController extends Controller
         if ($referralType === MayorsReferral::TYPE_PESO_OFFICE) {
             $referralData = array_merge($referralData, [
                 'ref_imus_ocrl' => $request->ref_imus_ocrl,
-                'ref_employer_name' => $request->ref_employer_name,
+                'ref_employer' => $request->ref_employer,
                 'ref_position' => $request->ref_position,
                 'ref_or_no' => $request->ref_or_no,
                 'ref_place' => $request->ref_place,
@@ -75,6 +75,7 @@ class ReferralController extends Controller
         } elseif ($referralType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT) {
             $referralData = array_merge($referralData, [
                 'ref_peso_or_no' => $request->ref_peso_or_no,
+                'ref_ocrl' => $request->ref_ocrl,
                 'ref_recipient' => $request->ref_recipient,
                 'ref_company_address' => $request->ref_company_address,
                 'ref_city_gov' => $request->ref_city_gov,
@@ -83,6 +84,15 @@ class ReferralController extends Controller
 
         $referral->fill($referralData);
         $referral->save();
+
+        if (
+            $referral->referral_type === MayorsReferral::TYPE_PESO_OFFICE &&
+            empty($referral->ref_imus_ocrl) &&
+            $referral->canPrint()
+        ) {
+            $referral->ref_imus_ocrl = MayorsReferral::generateNextImusOcrl();
+            $referral->save();
+        }
 
         if (
             $referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT &&
@@ -118,6 +128,15 @@ class ReferralController extends Controller
 
         if (! $applicant->referral || ! $applicant->referral->canPrint()) {
             return back()->with('error', 'Referral is not complete.');
+        }
+
+        if (
+            $applicant->referral->referral_type === MayorsReferral::TYPE_PESO_OFFICE &&
+            empty($applicant->referral->ref_imus_ocrl)
+        ) {
+            $applicant->referral->ref_imus_ocrl = MayorsReferral::generateNextImusOcrl();
+            $applicant->referral->save();
+            $applicant->load('referral');
         }
 
         if (

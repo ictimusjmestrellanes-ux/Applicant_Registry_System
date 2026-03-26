@@ -29,8 +29,8 @@
             padding: 0;
             background: #eef2f7;
             color: var(--text);
-            font-family: "Times New Roman", Times, serif;
-            font-size: 14.5px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13.5px;
             line-height: 1.5;
         }
 
@@ -63,6 +63,7 @@
             background-size: cover;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
+            justify-content: center;
         }
 
         .page::before {
@@ -79,7 +80,7 @@
         }
 
         .letter {
-            margin-top: 60mm;
+            margin-top: 50mm;
         }
 
         .letter-title,
@@ -93,13 +94,15 @@
         }
 
         .letter-title {
-            margin-bottom: 7mm;
+            margin-bottom: 5mm;
             font-weight: 700;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .ref-no {
-            margin-bottom: 4mm;
+            margin-bottom: 1mm;
+            font-style: italic;
         }
 
         .date-line {
@@ -117,17 +120,21 @@
         }
 
         .salutation {
-            margin-top: 7mm;
+            margin-top: 6mm;
             margin-bottom: 6mm;
         }
 
         .body p {
-            margin: 0 0 5mm;
+            margin: 0 0 3mm;
             text-align: justify;
         }
 
+        .greet {
+            font-style: italic;
+        }
+
         .closing {
-            margin-top: 2mm;
+            margin-top: 7mm;
             margin-bottom: 12mm;
         }
 
@@ -139,6 +146,30 @@
             display: inline-block;
             font-weight: 700;
             text-transform: uppercase;
+        }
+
+        .signature-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 5px;
+            width: 100%;
+        }
+
+        .signature-role {
+            display: inline-block;
+        }
+
+        .signature-seal-note {
+            font-size: 11px;
+            font-style: italic;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .copy{
+            font-size: 11px;
+            font-style: italic;
         }
 
         @media print {
@@ -176,21 +207,17 @@
             $applicant->province,
         ])->filter()->implode(' ')));
 
-        $recipientName = strtoupper(trim(collect([
-            $referral->ref_mayor_recipient_firstname,
-            $referral->ref_mayor_recipient_middlename,
-            $referral->ref_mayor_recipient_lastname,
-        ])->filter()->implode(' ')) ?: 'MR. JOHN TEO ONG');
-
-        $recipientTitle = 'President';
-        $companyName = strtoupper($referral->ref_hired_company ?: 'ANNIES’ CANDY MANUFACTURING');
-        $recipientAddress = $referral->ref_place ?: 'City of Imus, Cavite';
+        $recipientName = strtoupper($referral->ref_employer);
+        $recipientTitle = $referral->ref_position;
+        $companyName = strtoupper($referral->ref_hired_company);
+        $recipientAddress = $referral->ref_place;
         $letterDate = now()->format('F d, Y');
-        $referralNumber = $referral->ref_or_no ?: 'PESO-OCRL2026-098';
-        $residentName = strtoupper($applicantName ?: 'AARON GABRIEL D. MIRANDA');
-        $residentAddress = $applicantAddress ?: '271 ANABU I-B CITY OF IMUS CAVITE';
-        $surname = strtoupper($applicant->last_name ?: 'MIRANDA');
-        $salutationName = trim(collect(explode(' ', preg_replace('/\s+/', ' ', $recipientName)))->last() ?: 'ONG');
+        $letterYear = now()->format('Y');
+        $referralNumber = $referral->ref_imus_ocrl;
+        $residentName = strtoupper($applicantName);
+        $residentAddress = $applicantAddress;
+        $surname = strtoupper($applicant->last_name);
+        $salutationName = trim(collect(explode(' ', preg_replace('/\s+/', ' ', $recipientName)))->last());
     @endphp
 
     <div class="no-print">
@@ -198,11 +225,11 @@
     </div>
 
     <div class="page">
-        <div class="content">
+        <div class="content">`
             <div class="letter">
-                <p class="letter-title">Referral Letter</p>
+                <p class="letter-title" style="font-size: 20px">Referral Letter</p>
 
-                <p class="ref-no">{{ $referralNumber }}</p>
+                <p class="ref-no">PESO-OCRL{{ $referralNumber }}</p>
 
                 <p class="date-line">{{ $letterDate }}</p>
 
@@ -214,15 +241,15 @@
                 <p class="salutation">Dear Mr. {{ ucwords(strtolower($salutationName)) }},</p>
 
                 <div class="body">
-                    <p>Warmest greetings of Public Service!</p>
+                    <p class="greet">Warmest greetings of Public Service!</p>
 
                     <p>
                         In line with the jobs/employment assistance to the people of Cavite, may I personally refer to
-                        you, Mr./Ms. {{ $residentName }} of {{ $residentAddress }}, for employment.
+                        you, Mr./Ms. <strong>{{ $residentName }}</strong> of <strong>{{ $residentAddress }}</strong>, for employment.
                     </p>
 
                     <p>
-                        Mr./Ms. {{ $surname }} is a person of good moral character, diligent and well-qualified for the
+                        Mr./Ms. <strong>{{ $surname }}</strong> is a person of good moral character, diligent and well-qualified for the
                         position he/she is applying for. He/She will make an exemplary employee at your company once
                         given the opportunity for employment.
                     </p>
@@ -241,7 +268,14 @@
 
                 <p class="signature">
                     <span class="name">CECILE C. FOZ</span><br>
-                    City Government Department Head I
+                    <span class="signature-row">
+                        <span class="signature-role">City Government Department Head I</span>
+                        <span class="signature-seal-note">Not Valid Without Official Dry Seal</span>
+                    </span>
+                    <br>
+                    <span class="copy">/PESOfile{{ $letterYear }}</span><br>
+                    <span class="copy">/au.cg.</span><br>
+                    <span class="copy">/1st copy</span><br>
                 </p>
             </div>
         </div>

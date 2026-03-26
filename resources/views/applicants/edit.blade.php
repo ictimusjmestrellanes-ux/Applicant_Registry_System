@@ -1608,7 +1608,7 @@
                                 <select name="referral_type" id="referralTypeSelect" class="form-select">
                                     <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
                                         {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
-                                        PESO Office
+                                        Referral for PESO Imus
                                     </option>
                                     <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
                                         {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
@@ -1623,27 +1623,30 @@
                                     <div class="row g-3">
                                         <div class="col-md-3">
                                             <label class="form-label">Peso OCRL (Auto Generate)</label>
+                                            @php
+                                                $nextImusOcrl = $referral->ref_imus_ocrl
+                                                    ?? \App\Models\MayorsReferral::generateNextImusOcrl();
+                                            @endphp
                                             <input type="text" name="ref_imus_ocrl" class="form-control"
-                                                value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}" readonly
-                                                placeholder="Will generate after save when complete">
+                                                value="{{ old('ref_imus_ocrl', $nextImusOcrl) }}" readonly>
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label">O.R CR</label>
-                                            <input type="text" name="ref_imus_or" class="form-control"
-                                                value="{{ old('ref_imus_or', $referral->ref_imus_or ?? '') }}">
+                                            <input type="text" name="ref_or_no" class="form-control"
+                                                value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label">Employer Name</label>
-                                            <input type="text" name="ref_employer_name" class="form-control"
-                                                value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
+                                            <input type="text" name="ref_employer" class="form-control"
+                                                value="{{ old('ref_employer', $referral->ref_employer ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label">Employer Position</label>
-                                            <input type="text" name="ref_employer_position" class="form-control"
-                                                value="{{ old('ref_employer_position', $referral->ref_employer_position ?? '') }}">
+                                            <input type="text" name="ref_position" class="form-control"
+                                                value="{{ old('ref_position', $referral->ref_position ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">

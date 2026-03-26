@@ -21,7 +21,7 @@ class MayorsReferral extends Model
         'ref_nbi_clearance',
 
         'ref_imus_ocrl',
-        'ref_employer_name',
+        'ref_employer',
         'ref_position',
         'ref_or_no',
         'ref_company_address',
@@ -34,31 +34,41 @@ class MayorsReferral extends Model
         'ref_city_gov',
     ];
 
-    public static function generateNextOcrl(?int $year = null): string
+    public static function generateNextSequence(string $column, ?int $year = null): string
     {
         $year ??= (int) Carbon::now()->format('Y');
         $prefix = $year.'-';
 
         $latestForYear = static::query()
-            ->where('ref_ocrl', 'like', $prefix.'%')
-            ->orderByDesc('ref_ocrl')
-            ->value('ref_ocrl');
+            ->where($column, 'like', $prefix.'%')
+            ->orderByDesc($column)
+            ->value($column);
 
-        $nextNumber = 1;
+        $nextNumber = 0;
 
-        if ($latestForYear && preg_match('/^\d{4}-(\d{3})$/', $latestForYear, $matches)) {
+        if ($latestForYear && preg_match('/^\d{4}-(\d{6})$/', $latestForYear, $matches)) {
             $nextNumber = ((int) $matches[1]) + 1;
         }
 
-        return sprintf('%d-%03d', $year, $nextNumber);
+        return sprintf('%d-%06d', $year, $nextNumber);
+    }
+
+    public static function generateNextOcrl(?int $year = null): string
+    {
+        return static::generateNextSequence('ref_ocrl', $year);
+    }
+
+    public static function generateNextImusOcrl(?int $year = null): string
+    {
+        return static::generateNextSequence('ref_imus_ocrl', $year);
     }
 
     public function hasRequiredDetails(): bool
     {
         if ($this->referral_type === self::TYPE_PESO_OFFICE) {
             return ! empty($this->ref_or_no)
-                && ! empty($this->ref_mayor_recipient_firstname)
-                && ! empty($this->ref_mayor_recipient_lastname)
+                && ! empty($this->ref_employer)
+                && ! empty($this->ref_position)
                 && ! empty($this->ref_place)
                 && ! empty($this->ref_hired_company);
         }
