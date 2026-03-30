@@ -60,6 +60,8 @@ Route::put('/clearances/{id}', [ClearanceController::class, 'update'])->middlewa
     ->name('clearances.update');
 Route::put('/referrals/{id}', [ReferralController::class, 'update'])->middleware(['auth', 'permission:update_referral'])
     ->name('referrals.update');
+Route::get('/api/referrals/recipients', [ReferralController::class, 'searchRecipients'])->middleware('auth')
+    ->name('referrals.recipients.search');
 
 Route::get('/applicants/{id}/permit-id', [PermitController::class, 'printId'])->middleware(['auth', 'permission:generate_permit'])
     ->name('permits.printId');

@@ -168,6 +168,7 @@ class PermitController extends Controller
             'permit_or_no' => $request->permit_or_no,
             'community_tax_no' => $request->community_tax_no,
             'permit_issued_on' => $request->permit_issued_on,
+            'permit_issued_at' => $request->permit_issued_at,
             'permit_date' => $request->permit_date,
             'expires_on' => $request->expires_on,
             'permit_doc_stamp_control_no' => $request->permit_doc_stamp_control_no,

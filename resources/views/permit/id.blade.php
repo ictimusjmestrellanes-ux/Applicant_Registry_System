@@ -1,500 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>Mayor's Permit ID</title>
-
     <style>
         @page {
             size: A4;
-            margin: 10mm;
+            margin: 12mm;
         }
 
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #11253d;
+            padding: 0;
             background: #ffffff;
+            font-family: Calibri, 'Candara', 'Segoe UI', 'Optima', 'Arial', sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        :root {
+            --page-width: 210mm;
+            --page-height: 297mm;
+            --text: #111111;
+            --green: #0a9c39;
+            --blue: #173b8f;
+            --soft-gray: rgba(17, 17, 17, 0.08);
         }
 
         .print-page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 12mm 8mm;
-        }
-
-        .cards-wrap {
+            width: var(--page-width);
+            min-height: var(--page-height);
+            margin: 0 auto;
             display: flex;
-            gap: 14mm;
-            justify-content: center;
+            flex-direction: column;
             align-items: flex-start;
-            flex-wrap: wrap;
+            justify-content: flex-start;
         }
 
-        .permit-id {
-            width: 86mm;
-            height: 54mm;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1.6px solid #163b67;
-            background: #ffffff;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        .id-sheet {
             position: relative;
-        }
-
-        .permit-id.front {
-            background:
-                radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 26%),
-                linear-gradient(180deg, #ffffff 0%, #f2f8ff 100%);
-        }
-
-        .permit-id.back {
-            background:
-                linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-        }
-
-        .top-band {
-            background: linear-gradient(135deg, #0f3e73, #1f5fa0);
-            color: #ffffff;
-            padding: 7px 9px 8px;
-        }
-
-        .top-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .gov-copy {
-            flex: 1;
-            line-height: 1.18;
-        }
-
-        .gov-copy .tiny {
-            font-size: 6.4px;
-            opacity: 0.95;
-        }
-
-        .gov-copy .title {
-            margin-top: 3px;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-        }
-
-        .logo-stack {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .logo-box {
-            width: 18px;
-            height: 18px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 1px solid rgba(255, 255, 255, 0.26);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 6in;
+            height: 4in;
+            margin: 28px auto 0;
+            background-image: url('{{ asset('images/permit_ID1.png') }}');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% 100%;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
         }
 
-        .logo-box img {
-            width: 100%;
-            height: 100%;
+        .id-sheet::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.10) 38%, rgba(255, 255, 255, 0.18) 100%);
+            pointer-events: none;
+        }
+
+        .field {
+            position: absolute;
+            color: #000000;
+            font-weight: 700;
+            text-transform: uppercase;
+            line-height: 1.15;
+            word-break: break-word;
+        }
+
+        .photo {
+            position: absolute;
+            left: 17.3%;
+            top: 23.8%;
+            width: 16.7%;
+            height: 24.2%;
             object-fit: cover;
         }
 
-        .front-body {
-            padding: 8px 9px 9px;
-        }
-
-        .front-main {
-            display: grid;
-            grid-template-columns: 24mm 1fr;
-            gap: 8px;
-            align-items: start;
-        }
-
-        .photo-box {
-            width: 24mm;
-            height: 28mm;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #e7eef7;
-            border: 1px solid #b9cbe0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6a7f95;
-            font-size: 7px;
+        .peso-id {
+            left: 20.2%;
+            top: 49.9%;
+            width: 25.8%;
+            font-size: 7pt;
             text-align: center;
         }
 
-        .photo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .front-name {
+            left: 12.5%;
+            top: 57.1%;
+            width: 33.5%;
+            font-size: 9pt;
+            text-align: center;
+            
         }
 
-        .permit-chip {
-            display: inline-block;
-            padding: 3px 7px;
+        .employer {
+            left: 53.6%;
+            top: 16.5%;
+            width: 42%;
+            font-size: 9pt;
+        }
+
+        .address {
+            left: 53.6%;
+            top: 31%;
+            width: 42%;
+            font-size: 8pt;
+        }
+
+        .community-tax {
+            left: 77%;
+            top: 37.2%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .issued-on {
+            left: 77%;
+            top: 42.8%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .issued-at {
+            left: 77%;
+            top: 48.5%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .official-receipt {
+            left: 77%;
+            top: 54.3%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .dated {
+            left: 77%;
+            top: 59.9%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .expires {
+            left: 77%;
+            top: 65.6%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .stamp-control {
+            left: 60.3%;
+            top: 79.5%;
+            width: 29.5%;
+            font-size: 8pt;
+            color: #b12222;
+            text-align: center;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .stamp-gor {
+            left: 56.2%;
+            top: 86.5%;
+            width: 14.6%;
+            font-size: 6.1pt;
+            color: #b12222;
+            text-align: center;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .stamp-payment {
+            left: 79.4%;
+            top: 86.5%;
+            width: 15%;
+            font-size: 6.1pt;
+            color: #b12222;
+            text-align: center;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .no-print {
+            width: var(--page-width);
+            margin: 18px auto;
+            text-align: right;
+        }
+
+        .no-print button {
+            border: 0;
             border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-size: 6.6px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin-bottom: 4px;
+            padding: 10px 18px;
+            background: var(--blue);
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
         }
 
-        .name-block {
-            margin-bottom: 5px;
-        }
+        @media print {
+            body {
+                background: #fff;
+            }
 
-        .name-label,
-        .mini-label {
-            font-size: 6.1px;
-            color: #5b728c;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            font-weight: 700;
-        }
+            .id-sheet {
+                box-shadow: none;
+            }
 
-        .name-value {
-            margin-top: 2px;
-            font-size: 11.4px;
-            font-weight: 700;
-            line-height: 1.18;
-            color: #11253d;
-            text-transform: uppercase;
-        }
+            .print-page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+            }
 
-        .front-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px 7px;
-            margin-top: 4px;
-        }
-
-        .meta-box {
-            padding: 4px 5px;
-            border-radius: 8px;
-            background: #f4f8fc;
-            border: 1px solid #d9e5f1;
-            min-height: 28px;
-        }
-
-        .meta-value {
-            margin-top: 2px;
-            font-size: 7.3px;
-            font-weight: 700;
-            line-height: 1.2;
-            color: #18324f;
-            text-transform: uppercase;
-        }
-
-        .signature-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 7px;
-            align-items: end;
-        }
-
-        .signature-box {
-            font-size: 6.1px;
-            color: #51677f;
-        }
-
-        .signature-line {
-            height: 13px;
-            border-bottom: 1px solid #7e93aa;
-            margin-bottom: 2px;
-        }
-
-        .mayor-box {
-            text-align: center;
-        }
-
-        .mayor-name {
-            font-size: 7px;
-            font-weight: 700;
-            color: #0f3e73;
-            text-transform: uppercase;
-        }
-
-        .mayor-role {
-            font-size: 5.9px;
-            color: #5d6e82;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .back-body {
-            padding: 8px 9px 9px;
-        }
-
-        .back-title {
-            margin-bottom: 7px;
-            font-size: 8.8px;
-            font-weight: 700;
-            color: #0f3e73;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 5px;
-        }
-
-        .detail-row {
-            padding-bottom: 4px;
-            border-bottom: 1px solid #dce6f0;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .detail-value {
-            margin-top: 2px;
-            font-size: 7.4px;
-            font-weight: 700;
-            color: #1c3149;
-            line-height: 1.25;
-            text-transform: uppercase;
-        }
-
-        .stamp-box {
-            margin-top: 7px;
-            padding: 6px 7px;
-            border: 1.5px solid #cf2e2e;
-            border-radius: 10px;
-            background: #fff7f7;
-        }
-
-        .stamp-title {
-            font-size: 6.3px;
-            font-weight: 700;
-            color: #c21f1f;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            text-align: center;
-            margin-bottom: 3px;
-        }
-
-        .stamp-number {
-            text-align: center;
-            font-size: 9.5px;
-            font-weight: 700;
-            color: #9f1515;
-            margin-bottom: 4px;
-        }
-
-        .stamp-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
-
-        .stamp-meta .detail-value {
-            font-size: 6.5px;
+            .no-print {
+                display: none;
+            }
         }
     </style>
 </head>
-
 <body>
     @php
         $permit = optional($applicant->permit);
-        $fullName = trim(collect([
+        $fullName = strtoupper(trim(collect([
             $applicant->first_name,
             $applicant->middle_name,
             $applicant->last_name,
             $applicant->suffix,
-        ])->filter()->implode(' '));
-        $address = trim(collect([
-            $applicant->address_line,
+        ])->filter()->implode(' ')));
+        $address = strtoupper(trim(collect([
             $applicant->barangay,
             $applicant->city,
             $applicant->province,
-        ])->filter()->implode(', '));
-        $logo1 = public_path('logo1.png');
-        $logo2 = public_path('logo2.png');
-        $photoPath = !empty($applicant->photo) ? public_path('storage/' . $applicant->photo) : null;
+        ])->filter()->implode(', ')));
+        $employer = strtoupper($applicant->hiring_company ?: $applicant->hired_company ?: 'N/A');
+        $photoPath = ! empty($applicant->photo) ? public_path('storage/'.$applicant->photo) : null;
+        $issuedOn = $permit->permit_issued_on ? strtoupper(\Carbon\Carbon::parse($permit->permit_issued_on)->format('F j, Y')) : 'N/A';
+        $issuedAt = strtoupper($permit->permit_issued_at ?? 'N/A');
+        $permitDate = $permit->permit_date ? strtoupper(\Carbon\Carbon::parse($permit->permit_date)->format('F j, Y')) : 'N/A';
+        $expiresOn = $permit->expires_on ? strtoupper(\Carbon\Carbon::parse($permit->expires_on)->format('F j, Y')) : 'N/A';
+        $paymentDate = $permit->permit_date_of_payment ? strtoupper(\Carbon\Carbon::parse($permit->permit_date_of_payment)->format('F j, Y')) : 'N/A';
     @endphp
+    <div class="no-print">
+        <button onclick="window.print()">Print Permit ID</button>
+    </div>
 
     <div class="print-page">
-        <div class="cards-wrap">
-            <div class="permit-id front">
-                <div class="top-band">
-                    <div class="top-row">
-                        <div class="gov-copy">
-                            <div class="tiny">
-                                Republic of the Philippines<br>
-                                Province of Cavite<br>
-                                City Government of Imus
-                            </div>
-                            <div class="title">MAYOR'S PERMIT TO WORK</div>
-                        </div>
+        <div class="id-sheet">
+            @if($photoPath && file_exists($photoPath))
+                <img src="{{ $photoPath }}" alt="Applicant Photo" class="photo">
+            @endif
 
-                        <div class="logo-stack">
-                            <div class="logo-box">
-                                @if(file_exists($logo1))
-                                    <img src="{{ $logo1 }}" alt="Logo 1">
-                                @endif
-                            </div>
-                            <div class="logo-box">
-                                @if(file_exists($logo2))
-                                    <img src="{{ $logo2 }}" alt="Logo 2">
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="field peso-id">PESOIMUS-OP{{ strtoupper($permit->peso_id_no ?? 'N/A') }}</div>
+            <div class="field front-name">{{ $fullName }}</div>
 
-                <div class="front-body">
-                    <div class="front-main">
-                        <div class="photo-box">
-                            @if($photoPath && file_exists($photoPath))
-                                <img src="{{ $photoPath }}" alt="Applicant Photo">
-                            @else
-                                2x2 PHOTO
-                            @endif
-                        </div>
+            <div class="field employer">{{ $employer }}</div>
+            <div class="field address">{{ $address }}</div>
+            <div class="field community-tax">{{ strtoupper($permit->community_tax_no ?? 'N/A') }}</div>
+            <div class="field issued-on">{{ $issuedOn }}</div>
+            <div class="field issued-at">{{ $issuedAt }}</div>
+            <div class="field official-receipt">{{ strtoupper($permit->permit_or_no ?? 'N/A') }}</div>
+            <div class="field dated">{{ $permitDate }}</div>
+            <div class="field expires">{{ $expiresOn }}</div>
 
-                        <div>
-                            <div class="permit-chip">PESO ID NO. {{ $permit->peso_id_no ?? 'N/A' }}</div>
-
-                            <div class="name-block">
-                                <div class="name-label">Permit Holder</div>
-                                <div class="name-value">{{ strtoupper($fullName ?: 'N/A') }}</div>
-                            </div>
-
-                            <div class="front-meta">
-                                <div class="meta-box">
-                                    <div class="mini-label">Position</div>
-                                    <div class="meta-value">{{ $applicant->position_hired ?? 'N/A' }}</div>
-                                </div>
-                                <div class="meta-box">
-                                    <div class="mini-label">Status</div>
-                                    <div class="meta-value">Authorized Worker</div>
-                                </div>
-                                <div class="meta-box">
-                                    <div class="mini-label">Valid Until</div>
-                                    <div class="meta-value">
-                                        {{ $permit->expires_on ? \Carbon\Carbon::parse($permit->expires_on)->format('M d, Y') : 'N/A' }}
-                                    </div>
-                                </div>
-                                <div class="meta-box">
-                                    <div class="mini-label">Issued On</div>
-                                    <div class="meta-value">
-                                        {{ $permit->permit_issued_on ? \Carbon\Carbon::parse($permit->permit_issued_on)->format('M d, Y') : 'N/A' }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="signature-row">
-                        <div class="signature-box">
-                            <div class="signature-line"></div>
-                            Signature of Permit Holder
-                        </div>
-
-                        <div class="mayor-box">
-                            <div class="mayor-name">HON. ALEX L. ADVINCULA</div>
-                            <div class="mayor-role">City Mayor</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="permit-id back">
-                <div class="top-band">
-                    <div class="top-row">
-                        <div class="gov-copy">
-                            <div class="tiny">Public Employment Service Office</div>
-                            <div class="title">PERMIT DETAILS</div>
-                        </div>
-
-                        <div class="logo-stack">
-                            <div class="logo-box">
-                                @if(file_exists($logo1))
-                                    <img src="{{ $logo1 }}" alt="Logo 1">
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="back-body">
-                    <div class="back-title">Official Information</div>
-
-                    <div class="detail-grid">
-                        <div class="detail-row">
-                            <div class="mini-label">Employer / Hiring Company</div>
-                            <div class="detail-value">{{ $applicant->hiring_company ?? 'N/A' }}</div>
-                        </div>
-
-                        <div class="detail-row">
-                            <div class="mini-label">Employee Address</div>
-                            <div class="detail-value">{{ strtoupper($address ?: 'N/A') }}</div>
-                        </div>
-
-                        <div class="detail-row">
-                            <div class="mini-label">Community Tax No.</div>
-                            <div class="detail-value">{{ $permit->community_tax_no ?? 'N/A' }}</div>
-                        </div>
-
-                        <div class="detail-row">
-                            <div class="mini-label">Issued At</div>
-                            <div class="detail-value">{{ $permit->permit_issued_in ?? 'IMUS, CAVITE' }}</div>
-                        </div>
-
-                        <div class="detail-row">
-                            <div class="mini-label">O.R. No. / Permit Date</div>
-                            <div class="detail-value">
-                                {{ $permit->permit_or_no ?? 'N/A' }}
-                                /
-                                {{ $permit->permit_date ? \Carbon\Carbon::parse($permit->permit_date)->format('M d, Y') : 'N/A' }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stamp-box">
-                        <div class="stamp-title">Documentary Stamp Tax Paid</div>
-                        <div class="stamp-number">{{ $permit->permit_doc_stamp_control_no ?? 'N/A' }}</div>
-
-                        <div class="stamp-meta">
-                            <div>
-                                <div class="mini-label">GOR Serial No.</div>
-                                <div class="detail-value">{{ $permit->permit_or_no ?? 'N/A' }}</div>
-                            </div>
-                            <div>
-                                <div class="mini-label">Date of Payment</div>
-                                <div class="detail-value">
-                                    {{ $permit->permit_date_of_payment ? \Carbon\Carbon::parse($permit->permit_date_of_payment)->format('M d, Y') : 'N/A' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="field stamp-control">CGI-{{ strtoupper($permit->permit_doc_stamp_control_no ?? 'N/A') }}</div>
+            <div class="field stamp-gor">{{ strtoupper($permit->permit_or_no ?? 'N/A') }}</div>
+            <div class="field stamp-payment">{{ $paymentDate }}</div>
         </div>
     </div>
-</body>
 
+    
+</body>
 </html>

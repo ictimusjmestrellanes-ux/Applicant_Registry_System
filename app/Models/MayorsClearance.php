@@ -16,7 +16,6 @@ class MayorsClearance extends Model
 
         'clearance_or_no',
         'clearance_issued_on',
-        'clearance_issued_in',
         'clearance_peso_control_no',
         'clearance_doc_stamp_control_no',
         'clearance_date_of_payment',
@@ -41,7 +40,6 @@ class MayorsClearance extends Model
 
             ! empty($this->clearance_or_no) &&
             ! empty($this->clearance_issued_on) &&
-            ! empty($this->clearance_issued_in) &&
             ! empty($this->clearance_peso_control_no) &&
             ! empty($this->clearance_doc_stamp_control_no) &&
             ! empty($this->clearance_date_of_payment) &&

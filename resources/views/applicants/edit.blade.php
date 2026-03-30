@@ -117,11 +117,7 @@
         }
 
         body {
-            background:
-                radial-gradient(circle at top left, rgba(59, 130, 246, 0.14), transparent 24%),
-                radial-gradient(circle at top right, rgba(16, 185, 129, 0.12), transparent 22%),
-                radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 18%),
-                linear-gradient(180deg, #edf3f9 0%, #e6eef7 100%);
+            background: #ffffff;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -132,12 +128,9 @@
         .page-header {
             padding: 32px 32px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background:
-                radial-gradient(circle at top right, rgba(96, 165, 250, 0.2), transparent 24%),
-                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.14), transparent 28%),
-                linear-gradient(135deg, #0f172a 0%, #172554 52%, #1e3a8a 100%);
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+            border: 1px solid #e5edf5;
+            background: #ffffff;
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
         }
 
         .page-header::after {
@@ -148,7 +141,7 @@
             width: 250px;
             height: 250px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(59, 130, 246, 0.04);
         }
 
         .page-header::before {
@@ -159,7 +152,7 @@
             width: 260px;
             height: 260px;
             border-radius: 999px;
-            background: rgba(16, 185, 129, 0.08);
+            background: rgba(16, 185, 129, 0.04);
         }
 
         .page-title-wrap {
@@ -174,18 +167,18 @@
             margin-bottom: 12px;
             padding: 8px 13px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.12);
-            color: #bfdbfe;
+            background: #ffffff;
+            color: #4b5f7a;
             font-size: 0.78rem;
             font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid #dce6f0;
         }
 
         .page-header h2 {
             margin-bottom: 8px;
-            color: #f8fafc;
+            color: #10243d;
             font-size: clamp(2rem, 3vw, 2.8rem);
             font-weight: 800;
             letter-spacing: -0.02em;
@@ -193,7 +186,7 @@
 
         .page-subtitle {
             max-width: 720px;
-            color: rgba(226, 232, 240, 0.84);
+            color: #5f7088;
             margin: 0;
         }
 
@@ -212,9 +205,9 @@
             gap: 0.45rem;
             padding: 0.6rem 0.95rem;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            color: #e0f2fe;
+            background: #ffffff;
+            border: 1px solid #dce6f0;
+            color: #4b5f7a;
             font-size: 0.82rem;
             font-weight: 700;
             backdrop-filter: blur(10px);
@@ -224,15 +217,15 @@
             border-radius: 16px;
             padding: 0.8rem 1rem;
             font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            background: rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
+            border: 1px solid #dce6f0;
+            background: #ffffff;
+            color: #10243d;
             backdrop-filter: blur(10px);
         }
 
         .btn-back-list:hover {
-            background: rgba(255, 255, 255, 0.16);
-            color: #ffffff;
+            background: #f8fbff;
+            color: #10243d;
         }
 
         .summary-grid {
@@ -249,7 +242,7 @@
             padding: 20px 20px 18px;
             border-radius: 24px;
             border: 1px solid rgba(226, 232, 240, 0.9);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 251, 255, 0.92));
+            background: #ffffff;
             box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
             transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
@@ -318,9 +311,8 @@
         .requirements-container {
             padding: 24px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.78);
-            background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 251, 255, 0.82));
+            border: 1px solid #e5edf5;
+            background: #ffffff;
             backdrop-filter: blur(14px);
             box-shadow: 0 28px 70px rgba(15, 34, 58, 0.1);
         }
@@ -344,11 +336,11 @@
             gap: 0.45rem;
             padding: 0.6rem 0.9rem;
             border-radius: 999px;
-            background: #eef6ff;
-            color: #1d4ed8;
+            background: #ffffff;
+            color: #4b5f7a;
             font-size: 0.8rem;
             font-weight: 800;
-            border: 1px solid #dbeafe;
+            border: 1px solid #dce6f0;
         }
 
         .workflow-pills {
@@ -364,9 +356,9 @@
             gap: 0.45rem;
             padding: 0.5rem 0.78rem;
             border-radius: 999px;
-            background: #f8fbff;
+            background: #ffffff;
             color: #475569;
-            border: 1px solid #dbe7f3;
+            border: 1px solid #dce6f0;
             font-size: 0.78rem;
             font-weight: 700;
         }
@@ -390,8 +382,8 @@
             gap: 0.4rem;
             padding: 0.42rem 0.75rem;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #ffffff;
+            border: 1px solid #dce6f0;
             color: #3f556f;
             font-size: 0.78rem;
             font-weight: 700;
@@ -400,8 +392,8 @@
         .tab-shell {
             padding: 12px;
             border-radius: 26px;
-            background: linear-gradient(180deg, #f8fbff, #f1f7fd);
-            border: 1px solid #dbe7f3;
+            background: #ffffff;
+            border: 1px solid #e5edf5;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
         }
 
@@ -416,7 +408,7 @@
             border: none;
             padding: 14px 20px;
             border-radius: 18px;
-            background: rgba(255, 255, 255, 0.66);
+            background: #ffffff;
             color: #5b6d86;
             font-weight: 700;
             transition: all .25s ease;
@@ -431,9 +423,10 @@
         }
 
         .nav-tabs .nav-link.active {
-            background: linear-gradient(135deg, #0f172a, #1d4ed8);
-            color: #fff;
-            box-shadow: 0 14px 28px rgba(29, 78, 216, 0.24);
+            background: #ffffff;
+            color: #10243d;
+            border: 1px solid #cfdbe8;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
         }
 
         .tab-pane {
@@ -456,7 +449,7 @@
             margin-top: 16px;
             padding: 28px;
             border-radius: 28px;
-            background: linear-gradient(180deg, #ffffff, #fbfdff);
+            background: #ffffff;
             border: 1px solid #e4edf7;
             box-shadow: 0 22px 46px rgba(15, 34, 58, 0.08);
         }
@@ -548,6 +541,46 @@
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
         }
 
+        .select2-container .select2-selection--single {
+            min-height: 48px;
+            border-radius: 16px;
+            border: 1px solid var(--edit-line);
+            background: #f8fbff;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #212529;
+            line-height: 46px;
+            padding-left: 0;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px;
+            right: 12px;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--open .select2-selection--single {
+            border-color: #7aa2ff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            background: #fff;
+        }
+
+        .select2-dropdown {
+            border: 1px solid #d7e3f0;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .select2-search--dropdown .select2-search__field {
+            border: 1px solid #d7e3f0;
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+
         input[type=file] {
             background: #f5f9ff;
             border: 1px dashed #c8d7eb;
@@ -558,8 +591,7 @@
             padding: 20px;
             border-radius: 22px;
             border: 1px solid #dce7f3;
-            background:
-                linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
+            background: #ffffff;
             box-shadow: 0 14px 26px rgba(15, 34, 58, 0.05);
             transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
@@ -568,8 +600,7 @@
             padding: 20px;
             border-radius: 22px;
             border: 1px solid #dce7f3;
-            background:
-                linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
+            background: #ffffff;
             box-shadow: 0 14px 26px rgba(15, 34, 58, 0.05);
             transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
@@ -609,39 +640,39 @@
             transition: all .25s ease;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #0f172a, #1d4ed8);
-            border: none;
-            box-shadow: 0 12px 26px rgba(29, 78, 216, 0.24);
+        .btn-primary,
+        .btn-success,
+        .btn-secondary,
+        .btn-outline-primary,
+        .btn-outline-secondary,
+        .btn-light.border,
+        .btn-back-list {
+            background: #ffffff !important;
+            border: 1px solid #d8e3ee !important;
+            color: #10243d !important;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover,
+        .btn-success:hover,
+        .btn-secondary:hover,
+        .btn-outline-primary:hover,
+        .btn-outline-secondary:hover,
+        .btn-light.border:hover,
+        .btn-back-list:hover {
+            background: #d1d5db !important;
+            border-color: #9ca3af !important;
+            color: #10243d !important;
             transform: translateY(-1px);
-            box-shadow: 0 18px 32px rgba(29, 78, 216, 0.28);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, #059669, #10b981);
-            border: none;
-            box-shadow: 0 10px 22px rgba(5, 150, 105, 0.22);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(5, 150, 105, 0.28);
-        }
-
-        .btn-outline-secondary {
-            border-radius: 14px;
-            border-color: #cfdae7;
-            color: #45566f;
-            background: #fff;
-        }
-
-        .btn-light.border {
-            border-radius: 14px;
-            border-color: #d9e4ef !important;
-            background: #fff;
+        .btn:disabled,
+        .btn.disabled {
+            background: #f4f7fa !important;
+            border-color: #d8e3ee !important;
+            color: #7b8796 !important;
+            box-shadow: none;
         }
 
         .activity-log-card {
@@ -1189,6 +1220,17 @@
                                 <input type="date" name="permit_issued_on" class="form-control"
                                     value="{{$permit->permit_issued_on}}" required>
                             </div>
+
+                            {{-- Permit Issued At --}}
+                            <div class="col-md-2">
+                                <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
+                                <select name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
+                                    <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
+                                        {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
+                                    </option>
+                                </select>
+                            </div>
+
                             {{-- Permit Date --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Date<span class="required-mark">*</span></label>
@@ -1249,7 +1291,7 @@
 
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="{{ $reason }}">
                                     <button class="btn btn-outline-secondary px-4" disabled>
-                                        <i class="fa-solid fa-id-card me-2 text-muted"></i>Print Permit ID
+                                        <i class="fa-solid fa-id-card me-2 text-muted"></i>View Permit to Work ID
                                     </button>
                                 </span>
                             @endif
@@ -1403,8 +1445,8 @@
                             </div>
                             {{-- PESO Control No --}}
                             <div class="col-md-2">
-                                <label class="form-label">PESO Control No.<span class="required-mark">*</span></label>
-                                <input type="text" name="peso_id_no" class="form-control"
+                                <label class="form-label">Peso Control No. (Auto Generate)<span class="required-mark">*</span></label>
+                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $clearance->clearance_peso_control_no }}" readonly>
                             </div>
                             {{-- Hired Company --}}
@@ -1419,12 +1461,6 @@
                                 <label class="form-label">Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="clearance_issued_on" class="form-control"
                                     value="{{$clearance->clearance_issued_on}}" required>
-                            </div>
-                            {{-- Issued In --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Issued In<span class="required-mark">*</span></label>
-                                <input type="text" name="clearance_issued_in" class="form-control"
-                                    value="{{$clearance->clearance_issued_in}}" required>
                             </div>
 
                             {{-- Documentary Stamp Control No --}}
@@ -1608,11 +1644,11 @@
                                 <select name="referral_type" id="referralTypeSelect" class="form-select">
                                     <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
                                         {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
-                                        Referral for PESO Imus
+                                        Referral Within Imus
                                     </option>
                                     <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
                                         {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
-                                        Referral for Other City Government
+                                        Referral Outside Imus (Other City Government)
                                     </option>
                                 </select>
                             </div>
@@ -1622,41 +1658,44 @@
                                     class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
                                     <div class="row g-3">
                                         <div class="col-md-3">
-                                            <label class="form-label">Peso OCRL (Auto Generate)</label>
+                                            <label class="form-label">Peso OCRL (Auto Generate)<span class="required-mark">*</span></label>
                                             @php
                                                 $nextImusOcrl = $referral->ref_imus_ocrl
                                                     ?? \App\Models\MayorsReferral::generateNextImusOcrl();
                                             @endphp
-                                            <input type="text" name="ref_imus_ocrl" class="form-control"
+                                            <input type="text" name="ref_imus_ocrl" class="form-control" style="text-align: center"
                                                 value="{{ old('ref_imus_ocrl', $nextImusOcrl) }}" readonly>
                                         </div>
 
                                         <div class="col-md-2">
-                                            <label class="form-label">O.R CR</label>
+                                            <label class="form-label">O.R CR<span class="required-mark">*</span></label>
                                             <input type="text" name="ref_or_no" class="form-control"
                                                 value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
-                                            <label class="form-label">Employer Name</label>
+                                            <label class="form-label">Employer Name<span class="required-mark">*</span></label>
                                             <input type="text" name="ref_employer" class="form-control"
                                                 value="{{ old('ref_employer', $referral->ref_employer ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
-                                            <label class="form-label">Employer Position</label>
+                                            <label class="form-label">Employer Position<span class="required-mark">*</span></label>
                                             <input type="text" name="ref_position" class="form-control"
                                                 value="{{ old('ref_position', $referral->ref_position ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label"> City Address</label>
-                                            <input type="text" name="ref_place" class="form-control"
+                                            <label class="form-label"> City Address<span class="required-mark">*</span></label>
+                                            <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
+                                                list="refPlaceList" autocomplete="off"
+                                                placeholder="Type to search city address"
                                                 value="{{ old('ref_place', $referral->ref_place ?? '') }}">
+                                            <datalist id="refPlaceList"></datalist>
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label">Hired Company</label>
+                                            <label class="form-label">Hired Company<span class="required-mark">*</span></label>
                                             <input type="text" name="ref_hired_company" class="form-control"
                                                 value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
                                         </div>
@@ -1667,36 +1706,44 @@
                                     class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
                                     <div class="row g-3">
                                         <div class="col-md-3">
-                                            <label class="form-label">Peso Imus OCRL (Auto Generate)</label>
-                                            <input type="text" name="ref_ocrl" class="form-control"
+                                            <label class="form-label">Peso Imus OCRL (Auto Generate)<span class="required-mark">*</span></label>
+                                            <input type="text" name="ref_ocrl" class="form-control" style="text-align: center"
                                                 value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}" readonly
                                                 placeholder="Will generate after save when complete">
                                         </div>
                                         <div class="col-md-3">
-                                            <label class="form-label">O.R No.</label>
+                                            <label class="form-label">O.R No.<span class="required-mark">*</span></label>
                                             <input type="text" name="ref_peso_or_no" class="form-control"
                                                 value="{{ old('ref_peso_or_no', $referral->ref_peso_or_no ?? '') }}">
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label">Recipient Name</label>
-                                            <input type="text" name="ref_recipient" class="form-control"
-                                                value="{{ old('ref_recipient', $referral->ref_recipient ?? '') }}">
+                                            <label class="form-label">Mayor's Name<span class="required-mark">*</span></label>
+                                            <select name="ref_recipient" id="refRecipientSelect" class="form-select">
+                                                <option value=""></option>
+                                                <option value="{{ old('ref_recipient', $referral->ref_recipient ?? '') }}" selected>
+                                                    {{ old('ref_recipient', $referral->ref_recipient ?? 'Search or type mayor\'s name') }}
+                                                </option>
+                                            </select>
                                         </div>
 
                                         <div class="col-md-3">
-                                            <label class="form-label">Company Address</label>
-                                            <input type="text" name="ref_company_address" class="form-control"
-                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">City Government</label>
+                                            <label class="form-label">City Government<span class="required-mark">*</span></label>
                                             <select name="ref_city_gov" id="cityGovernment" class="form-select">
                                                 <option value="{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}"
                                                     selected>
                                                     {{ old('ref_city_gov', $referral->ref_city_gov ?? 'Select City Government') }}
                                                 </option>
                                             </select>
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <label class="form-label">City Address<span class="required-mark">*</span></label>
+                                            <input type="text" name="ref_company_address" id="refCompanyAddressInput" class="form-control"
+                                                list="refCompanyAddressList" autocomplete="off"
+                                                placeholder="Type to search city address"
+                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
+                                            <datalist id="refCompanyAddressList"></datalist>
                                         </div>
                                     </div>
                                 </div>
@@ -1735,6 +1782,7 @@
 
             </div>
         </div>
+    </div>
 @endsection
     {{-- City Government--}}
     <script>
@@ -1781,30 +1829,134 @@
             }
 
             const cityDropdown = document.getElementById("cityGovernment");
+            const permitIssuedAtDropdown = document.getElementById("permitIssuedAtSelect");
+            const refRecipientDropdown = document.getElementById("refRecipientSelect");
+            const refPlaceInput = document.getElementById("refPlaceInput");
+            const refPlaceList = document.getElementById("refPlaceList");
+            const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
+            const refCompanyAddressList = document.getElementById("refCompanyAddressList");
+            const selectedPermitIssuedAt = `{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}`;
+            const selectedCityGovernment = `{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}`;
+            const selectedRefRecipient = `{{ old('ref_recipient', $referral->ref_recipient ?? '') }}`;
+            const selectedRefPlace = `{{ old('ref_place', $referral->ref_place ?? '') }}`;
+            const selectedRefCompanyAddress = `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
 
             const allowedRegions = [
                 "130000000", // NCR
                 "040000000"  // Region 4A (CALABARZON)
             ];
 
+            const appendOptionIfMissing = (select, value, label) => {
+                if (!select || !value) {
+                    return;
+                }
+
+                const hasExisting = Array.from(select.options).some(option => option.value === value);
+
+                if (!hasExisting) {
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.text = label;
+                    option.selected = true;
+                    select.appendChild(option);
+                }
+            };
+
+            appendOptionIfMissing(cityDropdown, selectedCityGovernment, selectedCityGovernment);
+            appendOptionIfMissing(permitIssuedAtDropdown, selectedPermitIssuedAt, selectedPermitIssuedAt);
+            appendOptionIfMissing(refRecipientDropdown, selectedRefRecipient, selectedRefRecipient);
+
+            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                if (permitIssuedAtDropdown) {
+                    window.jQuery(permitIssuedAtDropdown).select2({
+                        placeholder: "Select City Government",
+                        allowClear: true,
+                        width: "100%",
+                        dropdownAutoWidth: true,
+                        minimumResultsForSearch: 0
+                    });
+                }
+
+                if (cityDropdown) {
+                    window.jQuery(cityDropdown).select2({
+                        placeholder: "Select City Government",
+                        allowClear: true,
+                        width: "100%",
+                        dropdownAutoWidth: true,
+                        minimumResultsForSearch: 0
+                    });
+                }
+            }
+
             fetch("https://psgc.gitlab.io/api/cities-municipalities/")
                 .then(response => response.json())
                 .then(data => {
+                    const sortedCities = data
+                        .filter(city => allowedRegions.includes(city.regionCode))
+                        .sort((a, b) => a.name.localeCompare(b.name));
 
-                    data.forEach(city => {
+                    sortedCities.forEach(city => {
+                        const cityGovernmentValue = city.name;
+                        const cityAddressValue = city.name;
 
-                        if (allowedRegions.includes(city.regionCode)) {
-
+                        if (permitIssuedAtDropdown && !Array.from(permitIssuedAtDropdown.options).some(option => option.value === cityGovernmentValue)) {
                             const option = document.createElement("option");
+                            option.value = cityGovernmentValue;
+                            option.text = cityGovernmentValue;
 
-                            option.value = "City Government of " + city.name;
-                            option.text = "City Government of " + city.name;
+                            if (cityGovernmentValue === selectedPermitIssuedAt) {
+                                option.selected = true;
+                            }
 
-                            cityDropdown.appendChild(option);
-
+                            permitIssuedAtDropdown.appendChild(option);
                         }
 
+                        if (cityDropdown && !Array.from(cityDropdown.options).some(option => option.value === cityGovernmentValue)) {
+                            const option = document.createElement("option");
+                            option.value = cityGovernmentValue;
+                            option.text = cityGovernmentValue;
+
+                            if (cityGovernmentValue === selectedCityGovernment) {
+                                option.selected = true;
+                            }
+
+                            cityDropdown.appendChild(option);
+                        }
+
+                        if (refPlaceList && !Array.from(refPlaceList.options).some(option => option.value === cityAddressValue)) {
+                            const option = document.createElement("option");
+                            option.value = cityAddressValue;
+                            refPlaceList.appendChild(option);
+                        }
+
+                        if (refCompanyAddressList && !Array.from(refCompanyAddressList.options).some(option => option.value === cityAddressValue)) {
+                            const option = document.createElement("option");
+                            option.value = cityAddressValue;
+                            refCompanyAddressList.appendChild(option);
+                        }
                     });
+
+                    if (refPlaceInput && selectedRefPlace) {
+                        refPlaceInput.value = selectedRefPlace;
+                    }
+
+                    if (refCompanyAddressInput && selectedRefCompanyAddress) {
+                        refCompanyAddressInput.value = selectedRefCompanyAddress;
+                    }
+
+                    if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                        if (permitIssuedAtDropdown) {
+                            window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
+                        }
+
+                        if (cityDropdown) {
+                            window.jQuery(cityDropdown).trigger("change.select2");
+                        }
+
+                        if (refRecipientDropdown) {
+                            window.jQuery(refRecipientDropdown).trigger("change.select2");
+                        }
+                    }
 
                 })
                 .catch(error => console.error("Error loading cities:", error));

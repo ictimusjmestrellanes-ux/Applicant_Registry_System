@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Models\MayorsReferral;
 use App\Support\ActivityLogger;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -120,6 +123,13 @@ class ReferralController extends Controller
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('success', 'Referral updated successfully.');
+    }
+
+    private function searchPhilippineMayors(string $search, string $cityGovernment): Collection
+    {
+        // TODO: Implement API call or database lookup for Philippine mayors
+        // For now, returning an empty collection
+        return collect();
     }
 
     public function printLetter($id)

@@ -23,6 +23,7 @@ class MayorsPermit extends Model
         'community_tax_no',
 
         'permit_issued_on',
+        'permit_issued_at',
 
         'permit_date',
         'expires_on',
@@ -64,6 +65,7 @@ class MayorsPermit extends Model
             ! empty($this->peso_id_no) &&
             ! empty($this->community_tax_no) &&
             ! empty($this->permit_issued_on) &&
+            ! empty($this->permit_issued_at) &&
             ! empty($this->permit_date) &&
             ! empty($this->expires_on) &&
             ! empty($this->permit_doc_stamp_control_no);

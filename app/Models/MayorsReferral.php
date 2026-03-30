@@ -44,7 +44,7 @@ class MayorsReferral extends Model
             ->orderByDesc($column)
             ->value($column);
 
-        $nextNumber = 0;
+        $nextNumber = 1;
 
         if ($latestForYear && preg_match('/^\d{4}-(\d{6})$/', $latestForYear, $matches)) {
             $nextNumber = ((int) $matches[1]) + 1;

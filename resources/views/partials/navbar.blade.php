@@ -102,11 +102,11 @@
 <style>
     :root {
         --nav-ink: #10243d;
-        --nav-muted: #64748b;
+        --nav-muted: #334155;
         --nav-line: #dbe5ef;
         --nav-accent: #10b981;
         --nav-accent-strong: #059669;
-        --nav-primary: #123c73;
+        --nav-primary: #10243d;
     }
 
     .dashboard-navbar {
@@ -148,6 +148,7 @@
     }
 
     .nav-page-title {
+        font-family: Arial, Helvetica, sans-serif;
         color: var(--nav-ink);
         font-size: 1.2rem;
         font-weight: 800;
@@ -196,7 +197,7 @@
         border-radius: 14px;
         border: 1px solid var(--nav-line);
         background: rgba(255, 255, 255, 0.92);
-        color: #4f6278;
+        color: #23364d;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -275,7 +276,7 @@
     }
 
     .dropdown-arrow {
-        color: #7a8da4;
+        color: #334155;
         font-size: 0.78rem;
     }
 
@@ -336,7 +337,7 @@
         padding-right: 1.2rem;
         font-size: 0.9rem;
         font-weight: 600;
-        color: #465a72;
+        color: #1f3147;
         transition: all 0.18s ease;
     }
 

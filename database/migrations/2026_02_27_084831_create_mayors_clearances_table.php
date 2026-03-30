@@ -23,7 +23,6 @@ return new class extends Migration
             
             $table->string('clearance_or_no')->nullable();
             $table->date('clearance_issued_on')->nullable();
-            $table->string('clearance_issued_in')->nullable();
             $table->string('clearance_peso_control_no')->nullable();
             $table->string('clearance_doc_stamp_control_no')->nullable();
             $table->date('clearance_date_of_payment')->nullable();
