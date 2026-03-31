@@ -21,7 +21,7 @@ class MayorsReferral extends Model
         'ref_nbi_clearance',
 
         'ref_imus_ocrl',
-        'ref_employer',
+        'ref_employer_name',
         'ref_position',
         'ref_or_no',
         'ref_company_address',
@@ -67,7 +67,7 @@ class MayorsReferral extends Model
     {
         if ($this->referral_type === self::TYPE_PESO_OFFICE) {
             return ! empty($this->ref_or_no)
-                && ! empty($this->ref_employer)
+                && ! empty($this->ref_employer_name)
                 && ! empty($this->ref_position)
                 && ! empty($this->ref_place)
                 && ! empty($this->ref_hired_company);

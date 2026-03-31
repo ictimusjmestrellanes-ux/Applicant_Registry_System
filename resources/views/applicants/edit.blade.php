@@ -1675,8 +1675,8 @@
 
                                         <div class="col-md-2">
                                             <label class="form-label">Employer Name<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_employer" class="form-control"
-                                                value="{{ old('ref_employer', $referral->ref_employer ?? '') }}">
+                                            <input type="text" name="ref_employer_name" class="form-control"
+                                                value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">

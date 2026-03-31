@@ -24,7 +24,7 @@ return new class extends Migration
             //other cities
             $table->string('ref_imus_ocrl')->nullable();
             $table->string('ref_or_no')->nullable();
-            $table->string('ref_employer')->nullable();
+            $table->string('ref_employer_name')->nullable();
             $table->string('ref_position')->nullable();
             $table->string('ref_hired_company')->nullable();
             $table->string('ref_company_address')->nullable();

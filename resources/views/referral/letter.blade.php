@@ -207,7 +207,7 @@
             $applicant->province,
         ])->filter()->implode(' ')));
 
-        $recipientName = strtoupper($referral->ref_employer);
+        $recipientName = strtoupper($referral->ref_employer_name);
         $recipientTitle = $referral->ref_position;
         $companyName = strtoupper($referral->ref_hired_company);
         $recipientAddress = $referral->ref_place;

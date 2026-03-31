@@ -52,7 +52,7 @@ class ReferralController extends Controller
             'referral_type' => $referralType,
 
             'ref_imus_ocrl' => null,
-            'ref_employer' => null,
+            'ref_employer_name_name' => null,
             'ref_position' => null,
             'ref_or_no' => null,
             'ref_company_address' => null,
@@ -69,7 +69,7 @@ class ReferralController extends Controller
         if ($referralType === MayorsReferral::TYPE_PESO_OFFICE) {
             $referralData = array_merge($referralData, [
                 'ref_imus_ocrl' => $request->ref_imus_ocrl,
-                'ref_employer' => $request->ref_employer,
+                'ref_employer_name' => $request->ref_employer_name,
                 'ref_position' => $request->ref_position,
                 'ref_or_no' => $request->ref_or_no,
                 'ref_place' => $request->ref_place,
