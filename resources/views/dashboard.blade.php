@@ -8,7 +8,7 @@
             <div class="row g-4 align-items-center">
                 <div class="col-lg-8">
                     <span class="eyebrow">Applicant Registry Overview</span>
-                    <h2 class="hero-title mb-2">Welcome back, {{ Auth::user()->name }}.</h2>
+                    <h2 class="hero-title mb-2">Welcome back, {{ Auth::user()->name }}</h2>
                     <p class="hero-copy mb-0">
                         Track applicant progress, monitor document completion, and jump straight into the tasks that need
                         attention today.

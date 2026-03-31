@@ -238,7 +238,7 @@
                 <p class="recipient">{{ $companyName }}</p>
                 <p class="recipient">{{ $recipientAddress }}</p>
 
-                <p class="salutation">Dear Mr. {{ ucwords(strtolower($salutationName)) }},</p>
+                <p class="salutation">Dear Mr./Ms. {{ ucwords(strtolower($salutationName)) }},</p>
 
                 <div class="body">
                     <p class="greet">Warmest greetings of Public Service!</p>
