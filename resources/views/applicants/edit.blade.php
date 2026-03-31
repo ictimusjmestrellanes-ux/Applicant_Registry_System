@@ -1224,7 +1224,7 @@
                             {{-- Permit Issued At --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
-                                <select name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
+                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
                                     <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
                                         {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
                                     </option>
