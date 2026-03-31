@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('community_tax_no')->nullable();
 
             $table->date('permit_issued_on')->nullable();
+            $table->date('permit_issued_at')->nullable();
 
             $table->date('permit_date')->nullable();
             $table->date('expires_on')->nullable();
