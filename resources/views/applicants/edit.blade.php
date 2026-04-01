@@ -14,11 +14,12 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-                                                                                                                                                                                                                                <div style="font-size:14px;">
-                                                                                                                                                                                                                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                                                                                                                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            `,
+
+                                    <div style="font-size:14px;">
+                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                    </div>
+                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -883,8 +884,9 @@
                             <section class="form-section">
                                 <h6 class="section-title">Personal Information</h6>
                                 <div class="row g-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
+                                    <div class="col-md-2">
+                                        <label class="form-label">First Time Jobseeker <span
+                                                class="required-mark">*</span></label>
                                         <select name="first_time_job_seeker" class="form-select" required>
                                             <option value="No" {{ $applicant->first_time_job_seeker == 'No' ? 'selected' : '' }}>No</option>
                                             <option value="Yes" {{ $applicant->first_time_job_seeker == 'Yes' ? 'selected' : '' }}>Yes</option>
@@ -892,40 +894,49 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                        <input type="text" name="first_name" class="form-control" value="{{ $applicant->first_name }}" placeholder="e.g. John" required>
+                                        <input type="text" name="first_name" class="form-control"
+                                            value="{{ $applicant->first_name }}" placeholder="e.g. John" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Middle Name</label>
-                                        <input type="text" name="middle_name" class="form-control" value="{{ $applicant->middle_name }}" placeholder="Optional">
+                                        <input type="text" name="middle_name" class="form-control"
+                                            value="{{ $applicant->middle_name }}" placeholder="Optional">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                        <input type="text" name="last_name" class="form-control" value="{{ $applicant->last_name }}" placeholder="e.g. Doe" required>
+                                        <input type="text" name="last_name" class="form-control"
+                                            value="{{ $applicant->last_name }}" placeholder="e.g. Doe" required>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-1">
                                         <label class="form-label">Suffix</label>
                                         <select name="suffix" class="form-select">
                                             <option value="">None</option>
-                                            <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.</option>
-                                            <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                                            <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.
+                                            </option>
+                                            <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.
+                                            </option>
                                             <option value="II" {{ $applicant->suffix == 'II' ? 'selected' : '' }}>II</option>
-                                            <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III</option>
+                                            <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III
+                                            </option>
                                             <option value="IV" {{ $applicant->suffix == 'IV' ? 'selected' : '' }}>IV</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label">Age <span class="required-mark">*</span></label>
-                                        <input type="number" name="age" class="form-control" value="{{ $applicant->age }}" placeholder="e.g. 25" required>
+                                        <input type="number" name="age" class="form-control" value="{{ $applicant->age }}"
+                                            placeholder="e.g. 25" required>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
                                         <select name="gender" class="form-select" required>
                                             <option value="">Select Gender</option>
-                                            <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male</option>
-                                            <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>Female</option>
+                                            <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male
+                                            </option>
+                                            <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>
+                                                Female</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label">Civil Status <span class="required-mark">*</span></label>
                                         <select name="civil_status" class="form-select" required>
                                             <option value="">Select Status</option>
@@ -934,18 +945,19 @@
                                             <option value="Widowed" {{ $applicant->civil_status == 'Widowed' ? 'selected' : '' }}>Widowed</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">PWD <span class="required-mark">*</span></label>
+                                    <div class="col-md-1">
+                                        <label class="form-label">PWD?<span class="required-mark">*</span></label>
                                         <select name="pwd" class="form-select" required>
                                             <option value="No" {{ $applicant->pwd == 'No' ? 'selected' : '' }}>No</option>
                                             <option value="Yes" {{ $applicant->pwd == 'Yes' ? 'selected' : '' }}>Yes</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">4Ps Beneficiary <span class="required-mark">*</span></label>
+                                    <div class="col-md-1">
+                                        <label class="form-label">4Ps?<span class="required-mark">*</span></label>
                                         <select name="four_ps" class="form-select" required>
                                             <option value="No" {{ $applicant->four_ps == 'No' ? 'selected' : '' }}>No</option>
-                                            <option value="Yes" {{ $applicant->four_ps == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                            <option value="Yes" {{ $applicant->four_ps == 'Yes' ? 'selected' : '' }}>Yes
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -955,14 +967,18 @@
                                 <h6 class="section-title">Contact & Location</h6>
                                 <div class="row g-4">
                                     <div class="col-md-4">
-                                        <label class="form-label">Contact Number <span class="required-mark">*</span></label>
-                                        <input type="tel" name="contact_no" class="form-control" value="{{ $applicant->contact_no }}"
-                                            placeholder="09123456789" pattern="[0-9]{11}" maxlength="11"
-                                            inputmode="numeric" required>
+                                        <label class="form-label">Contact Number <span
+                                                class="required-mark">*</span></label>
+                                        <input type="tel" name="contact_no" class="form-control"
+                                            value="{{ $applicant->contact_no }}" placeholder="09123456789"
+                                            pattern="[0-9]{11}" maxlength="11" inputmode="numeric" required>
                                     </div>
                                     <div class="col-md-8">
-                                        <label class="form-label">Complete Address <span class="required-mark">*</span></label>
-                                        <input type="text" name="address_line" class="form-control" value="{{ $applicant->address_line }}" placeholder="House No. / Street / Phase / Block" required>
+                                        <label class="form-label">Complete Address <span
+                                                class="required-mark">*</span></label>
+                                        <input type="text" name="address_line" class="form-control"
+                                            value="{{ $applicant->address_line }}"
+                                            placeholder="House No. / Street / Phase / Block" required>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Province <span class="required-mark">*</span></label>
@@ -971,7 +987,8 @@
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
+                                        <label class="form-label">City / Municipality <span
+                                                class="required-mark">*</span></label>
                                         <select name="city" id="city" class="form-select" required>
                                             <option value="">Select City</option>
                                         </select>
@@ -989,12 +1006,13 @@
                                 <h6 class="section-title">Education & Hiring</h6>
                                 <div class="row g-4">
                                     <div class="col-md-4">
-                                        <label class="form-label">Educational Attainment <span class="required-mark">*</span></label>
-                                        <select name="educational_attainment" id="educationalAttainmentSelect" class="form-select" required>
+                                        <label class="form-label">Educational Attainment <span
+                                                class="required-mark">*</span></label>
+                                        <select name="educational_attainment" id="educationalAttainmentSelect"
+                                            class="form-select" required>
                                             <option value="">Select educational attainment</option>
                                             @foreach(config('educational_attainments', []) as $attainment)
-                                                <option value="{{ $attainment }}"
-                                                    {{ $applicant->educational_attainment === $attainment ? 'selected' : '' }}>
+                                                <option value="{{ $attainment }}" {{ $applicant->educational_attainment === $attainment ? 'selected' : '' }}>
                                                     {{ $attainment }}
                                                 </option>
                                             @endforeach
@@ -1006,12 +1024,17 @@
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
-                                        <input type="text" name="hiring_company" class="form-control" value="{{ $applicant->hiring_company }}" placeholder="e.g. Tech Corp" required>
+                                        <label class="form-label">Hiring Company <span
+                                                class="required-mark">*</span></label>
+                                        <input type="text" name="hiring_company" class="form-control"
+                                            value="{{ $applicant->hiring_company }}" placeholder="e.g. Tech Corp" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Position Hired <span class="required-mark">*</span></label>
-                                        <input type="text" name="position_hired" class="form-control" value="{{ $applicant->position_hired }}" placeholder="e.g. Software Engineer" required>
+                                        <label class="form-label">Position Hired <span
+                                                class="required-mark">*</span></label>
+                                        <input type="text" name="position_hired" class="form-control"
+                                            value="{{ $applicant->position_hired }}" placeholder="e.g. Software Engineer"
+                                            required>
                                     </div>
                                 </div>
                             </section>
@@ -1211,6 +1234,14 @@
 
                         <div class="row g-3 mt-3">
 
+                            {{-- Peso ID No --}}
+                            <div class="col-md-2">
+                                <label class="form-label">Peso ID No. (Auto Generate)<span
+                                        class="required-mark">*</span></label>
+                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
+                                    value="{{ $permit->peso_id_no ?? '' }}" placeholder="Will generate after save when complete" readonly>
+                            </div>
+
                             {{-- OR NUMBER --}}
                             <div class="col-md-2">
                                 <label class="form-label">O.R No. <span class="required-mark">*</span></label>
@@ -1218,13 +1249,6 @@
                                     class="form-control" required>
                             </div>
 
-                            {{-- Peso ID No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Peso ID No. (Auto Generate)<span
-                                        class="required-mark">*</span></label>
-                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
-                                    value="{{ $permit->peso_id_no ?? '' }}" readonly>
-                            </div>
                             {{-- Community Tax No --}}
                             <div class="col-md-2">
                                 <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
@@ -1456,19 +1480,21 @@
 
                         <h6 class="section-title text-primary mb-0 mt-4">Mayor’s Clearance Letter Details</h6>
                         <div class="row g-3 mt-3">
+                            {{-- PESO Control No --}}
+                            <div class="col-md-2">
+                                <label class="form-label">Peso Control No. (Auto Generate)<span
+                                        class="required-mark">*</span></label>
+                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
+                                    value="{{ $clearance->clearance_peso_control_no }}" placeholder="Will generate after save when complete" readonly>
+                            </div>
+
                             {{-- Official Receipt No --}}
                             <div class="col-md-2">
                                 <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_or_no" class="form-control"
                                     value="{{$clearance->clearance_or_no}}" required>
                             </div>
-                            {{-- PESO Control No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Peso Control No. (Auto Generate)<span
-                                        class="required-mark">*</span></label>
-                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
-                                    value="{{ $clearance->clearance_peso_control_no }}" readonly>
-                            </div>
+                            
                             {{-- Hired Company --}}
                             <div class="col-md-2">
                                 <label class="form-label">Hired Company<span class="required-mark">*</span></label>
@@ -1772,7 +1798,7 @@
                                                 <input type="text" name="ref_company_address" id="refCompanyAddressInput"
                                                     class="form-control" list="refCompanyAddressList" autocomplete="off"
                                                     value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -1919,47 +1945,47 @@
             }
         };
 
-            const formatCityGovernmentLabel = cityName => {
-                if (!cityName) {
-                    return "";
-                }
+        const formatCityGovernmentLabel = cityName => {
+            if (!cityName) {
+                return "";
+            }
 
             const normalizedCityName = cityName
                 .replace(/^City Government of\s+/i, "")
                 .replace(/^City of\s+/i, "");
 
-                return `City Government of ${normalizedCityName}`;
-            };
+            return `City Government of ${normalizedCityName}`;
+        };
 
-            const normalizeCityGovernmentValue = cityName => {
-                if (!cityName) {
-                    return "";
+        const normalizeCityGovernmentValue = cityName => {
+            if (!cityName) {
+                return "";
+            }
+
+            return cityName
+                .replace(/^City Government of\s+/i, "")
+                .replace(/^City of\s+/i, "")
+                .trim()
+                .toLowerCase();
+        };
+
+        const ensurePsgcCityData = (() => {
+            let cityDataPromise = null;
+
+            return () => {
+                if (!cityDataPromise) {
+                    cityDataPromise = fetch("https://psgc.gitlab.io/api/cities-municipalities/")
+                        .then(response => response.json())
+                        .then(data => data.sort((a, b) => a.name.localeCompare(b.name)))
+                        .catch(error => {
+                            console.error("Error loading cities:", error);
+                            return [];
+                        });
                 }
 
-                return cityName
-                    .replace(/^City Government of\s+/i, "")
-                    .replace(/^City of\s+/i, "")
-                    .trim()
-                    .toLowerCase();
+                return cityDataPromise;
             };
-
-            const ensurePsgcCityData = (() => {
-                let cityDataPromise = null;
-
-                return () => {
-                    if (!cityDataPromise) {
-                        cityDataPromise = fetch("https://psgc.gitlab.io/api/cities-municipalities/")
-                            .then(response => response.json())
-                            .then(data => data.sort((a, b) => a.name.localeCompare(b.name)))
-                            .catch(error => {
-                                console.error("Error loading cities:", error);
-                                return [];
-                            });
-                    }
-
-                    return cityDataPromise;
-                };
-            })();
+        })();
 
         const setRecipientDetails = (cityGovernment, companyAddress) => {
             if (cityDropdown && cityGovernment) {
@@ -1991,10 +2017,10 @@
             companyAddress: selectedRefCompanyAddress
         });
 
-            const syncRecipientDetailsFromSelectedOption = () => {
-                if (!refRecipientDropdown) {
-                    return;
-                }
+        const syncRecipientDetailsFromSelectedOption = () => {
+            if (!refRecipientDropdown) {
+                return;
+            }
 
             const selectedRecipientOption = refRecipientDropdown.options[refRecipientDropdown.selectedIndex];
 
@@ -2004,51 +2030,51 @@
 
             setRecipientDetails(
                 selectedRecipientOption.dataset.cityGovernment || "",
-                    selectedRecipientOption.dataset.companyAddress || ""
-                );
-            };
+                selectedRecipientOption.dataset.companyAddress || ""
+            );
+        };
 
-            const syncRecipientFromCityGovernment = () => {
-                if (!cityDropdown || !refRecipientDropdown) {
-                    return;
-                }
+        const syncRecipientFromCityGovernment = () => {
+            if (!cityDropdown || !refRecipientDropdown) {
+                return;
+            }
 
-                const normalizedSelectedCity = normalizeCityGovernmentValue(cityDropdown.value);
+            const normalizedSelectedCity = normalizeCityGovernmentValue(cityDropdown.value);
 
-                if (!normalizedSelectedCity) {
-                    refRecipientDropdown.value = "";
-
-                    if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
-                        window.jQuery(refRecipientDropdown).val(null).trigger("change");
-                    }
-
-                    if (refCompanyAddressInput) {
-                        refCompanyAddressInput.value = "";
-                    }
-
-                    return;
-                }
-
-                const matchingMayorOption = Array.from(refRecipientDropdown.options).find(option =>
-                    normalizeCityGovernmentValue(option.dataset.cityGovernment || "") === normalizedSelectedCity
-                );
-
-                if (!matchingMayorOption) {
-                    return;
-                }
-
-                matchingMayorOption.selected = true;
-                refRecipientDropdown.value = matchingMayorOption.value;
+            if (!normalizedSelectedCity) {
+                refRecipientDropdown.value = "";
 
                 if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
-                    window.jQuery(refRecipientDropdown).trigger("change.select2");
+                    window.jQuery(refRecipientDropdown).val(null).trigger("change");
                 }
 
-                setRecipientDetails(
-                    matchingMayorOption.dataset.cityGovernment || "",
-                    matchingMayorOption.dataset.companyAddress || ""
-                );
-            };
+                if (refCompanyAddressInput) {
+                    refCompanyAddressInput.value = "";
+                }
+
+                return;
+            }
+
+            const matchingMayorOption = Array.from(refRecipientDropdown.options).find(option =>
+                normalizeCityGovernmentValue(option.dataset.cityGovernment || "") === normalizedSelectedCity
+            );
+
+            if (!matchingMayorOption) {
+                return;
+            }
+
+            matchingMayorOption.selected = true;
+            refRecipientDropdown.value = matchingMayorOption.value;
+
+            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                window.jQuery(refRecipientDropdown).trigger("change.select2");
+            }
+
+            setRecipientDetails(
+                matchingMayorOption.dataset.cityGovernment || "",
+                matchingMayorOption.dataset.companyAddress || ""
+            );
+        };
 
         if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
             if (permitIssuedAtDropdown) {
@@ -2133,109 +2159,109 @@
             }
         }
 
-            if (refRecipientDropdown) {
-                refRecipientDropdown.addEventListener("change", syncRecipientDetailsFromSelectedOption);
-            }
+        if (refRecipientDropdown) {
+            refRecipientDropdown.addEventListener("change", syncRecipientDetailsFromSelectedOption);
+        }
 
-            if (cityDropdown) {
-                cityDropdown.addEventListener("change", syncRecipientFromCityGovernment);
-            }
+        if (cityDropdown) {
+            cityDropdown.addEventListener("change", syncRecipientFromCityGovernment);
+        }
 
-            const configuredCityGovernments = [...new Set(
-                configuredMayors
-                    .map(mayor => mayor.city_government)
-                    .filter(Boolean)
-            )].sort((a, b) => a.localeCompare(b));
+        const configuredCityGovernments = [...new Set(
+            configuredMayors
+                .map(mayor => mayor.city_government)
+                .filter(Boolean)
+        )].sort((a, b) => a.localeCompare(b));
 
-            const configuredCompanyAddresses = [...new Set(
-                configuredMayors
-                    .map(mayor => mayor.company_address)
-                    .filter(Boolean)
-            )].sort((a, b) => a.localeCompare(b));
+        const configuredCompanyAddresses = [...new Set(
+            configuredMayors
+                .map(mayor => mayor.company_address)
+                .filter(Boolean)
+        )].sort((a, b) => a.localeCompare(b));
 
-            configuredCityGovernments.forEach(cityGovernmentValue => {
-                if (cityDropdown && !Array.from(cityDropdown.options).some(option => option.value === cityGovernmentValue)) {
-                    const option = document.createElement("option");
-                    option.value = cityGovernmentValue;
-                    option.text = cityGovernmentValue;
+        configuredCityGovernments.forEach(cityGovernmentValue => {
+            if (cityDropdown && !Array.from(cityDropdown.options).some(option => option.value === cityGovernmentValue)) {
+                const option = document.createElement("option");
+                option.value = cityGovernmentValue;
+                option.text = cityGovernmentValue;
 
-                    if (cityGovernmentValue === selectedCityGovernment) {
-                        option.selected = true;
-                    }
-
-                    cityDropdown.appendChild(option);
+                if (cityGovernmentValue === selectedCityGovernment) {
+                    option.selected = true;
                 }
-            });
 
-            configuredCompanyAddresses.forEach(companyAddressValue => {
-                if (refCompanyAddressList && !Array.from(refCompanyAddressList.options).some(option => option.value === companyAddressValue)) {
-                    const option = document.createElement("option");
-                    option.value = companyAddressValue;
-                    refCompanyAddressList.appendChild(option);
-                }
-            });
-
-            if (refCompanyAddressInput && selectedRefCompanyAddress) {
-                refCompanyAddressInput.value = selectedRefCompanyAddress;
+                cityDropdown.appendChild(option);
             }
+        });
 
-            syncRecipientDetailsFromSelectedOption();
+        configuredCompanyAddresses.forEach(companyAddressValue => {
+            if (refCompanyAddressList && !Array.from(refCompanyAddressList.options).some(option => option.value === companyAddressValue)) {
+                const option = document.createElement("option");
+                option.value = companyAddressValue;
+                refCompanyAddressList.appendChild(option);
+            }
+        });
 
-            const populatePsgcCityData = () => {
-                ensurePsgcCityData().then(cities => {
-                    cities.forEach(city => {
-                        const cityValue = city.name;
+        if (refCompanyAddressInput && selectedRefCompanyAddress) {
+            refCompanyAddressInput.value = selectedRefCompanyAddress;
+        }
 
-                        if (permitIssuedAtDropdown && !Array.from(permitIssuedAtDropdown.options).some(option => option.value === cityValue)) {
-                            const option = document.createElement("option");
-                            option.value = cityValue;
-                            option.text = cityValue;
+        syncRecipientDetailsFromSelectedOption();
 
-                            if (cityValue === selectedPermitIssuedAt) {
-                                option.selected = true;
-                            }
+        const populatePsgcCityData = () => {
+            ensurePsgcCityData().then(cities => {
+                cities.forEach(city => {
+                    const cityValue = city.name;
 
-                            permitIssuedAtDropdown.appendChild(option);
+                    if (permitIssuedAtDropdown && !Array.from(permitIssuedAtDropdown.options).some(option => option.value === cityValue)) {
+                        const option = document.createElement("option");
+                        option.value = cityValue;
+                        option.text = cityValue;
+
+                        if (cityValue === selectedPermitIssuedAt) {
+                            option.selected = true;
                         }
 
-                        if (refPlaceList && !Array.from(refPlaceList.options).some(option => option.value === cityValue)) {
-                            const option = document.createElement("option");
-                            option.value = cityValue;
-                            refPlaceList.appendChild(option);
-                        }
-                    });
-
-                    if (refPlaceInput && selectedRefPlace) {
-                        refPlaceInput.value = selectedRefPlace;
+                        permitIssuedAtDropdown.appendChild(option);
                     }
 
-                    if (window.jQuery && typeof window.jQuery.fn.select2 === "function" && permitIssuedAtDropdown) {
-                        window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
+                    if (refPlaceList && !Array.from(refPlaceList.options).some(option => option.value === cityValue)) {
+                        const option = document.createElement("option");
+                        option.value = cityValue;
+                        refPlaceList.appendChild(option);
                     }
                 });
-            };
 
-            if (permitIssuedAtDropdown) {
-                permitIssuedAtDropdown.addEventListener("focus", populatePsgcCityData, { once: true });
-            }
-
-            if (refPlaceInput) {
-                refPlaceInput.addEventListener("focus", populatePsgcCityData, { once: true });
-            }
-
-            if (selectedPermitIssuedAt || selectedRefPlace) {
-                populatePsgcCityData();
-            }
-
-            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
-                if (cityDropdown) {
-                    window.jQuery(cityDropdown).trigger("change.select2");
+                if (refPlaceInput && selectedRefPlace) {
+                    refPlaceInput.value = selectedRefPlace;
                 }
 
-                if (refRecipientDropdown) {
-                    window.jQuery(refRecipientDropdown).trigger("change.select2");
+                if (window.jQuery && typeof window.jQuery.fn.select2 === "function" && permitIssuedAtDropdown) {
+                    window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
                 }
+            });
+        };
+
+        if (permitIssuedAtDropdown) {
+            permitIssuedAtDropdown.addEventListener("focus", populatePsgcCityData, { once: true });
+        }
+
+        if (refPlaceInput) {
+            refPlaceInput.addEventListener("focus", populatePsgcCityData, { once: true });
+        }
+
+        if (selectedPermitIssuedAt || selectedRefPlace) {
+            populatePsgcCityData();
+        }
+
+        if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+            if (cityDropdown) {
+                window.jQuery(cityDropdown).trigger("change.select2");
             }
+
+            if (refRecipientDropdown) {
+                window.jQuery(refRecipientDropdown).trigger("change.select2");
+            }
+        }
 
     });
 

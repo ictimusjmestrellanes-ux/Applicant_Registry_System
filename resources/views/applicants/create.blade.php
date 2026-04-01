@@ -435,7 +435,7 @@
                         <section class="form-section">
                             <h6 class="section-title">Personal Information</h6>
                             <div class="row g-4">
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">First Time Jobseeker <span
                                             class="required-mark">*</span></label>
                                     <select name="first_time_job_seeker" class="form-select" required>
@@ -459,10 +459,10 @@
                                     <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}"
                                         placeholder="e.g. Doe" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-1">
                                     <label class="form-label">Suffix</label>
                                     <select name="suffix" class="form-select">
-                                        <option value="">None</option>
+                                        <option value="">Optional</option>
                                         <option value="Jr." {{ old('suffix') === 'Jr.' ? 'selected' : '' }}>Jr.</option>
                                         <option value="Sr." {{ old('suffix') === 'Sr.' ? 'selected' : '' }}>Sr.</option>
                                         <option value="II" {{ old('suffix') === 'II' ? 'selected' : '' }}>II</option>
@@ -470,12 +470,12 @@
                                         <option value="IV" {{ old('suffix') === 'IV' ? 'selected' : '' }}>IV</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Age <span class="required-mark">*</span></label>
                                     <input type="number" name="age" class="form-control" value="{{ old('age') }}"
                                         placeholder="e.g. 25" required>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
                                     <select name="gender" class="form-select" required>
                                         <option value="">Select Gender</option>
@@ -484,7 +484,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label class="form-label">Civil Status <span class="required-mark">*</span></label>
                                     <select name="civil_status" class="form-select" required>
                                         <option value="">Select Status</option>
@@ -496,15 +496,15 @@
                                             Widowed</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">PWD <span class="required-mark">*</span></label>
+                                <div class="col-md-1" style="text-align: center">
+                                    <label class="form-label">PWD?<span class="required-mark">*</span></label>
                                     <select name="pwd" class="form-select" required>
                                         <option value="No" {{ old('pwd', 'No') === 'No' ? 'selected' : '' }}>No</option>
                                         <option value="Yes" {{ old('pwd') === 'Yes' ? 'selected' : '' }}>Yes</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">4Ps Beneficiary <span class="required-mark">*</span></label>
+                                <div class="col-md-1" style="text-align: center">
+                                    <label class="form-label">4Ps?<span class="required-mark">*</span></label>
                                     <select name="four_ps" class="form-select" required>
                                         <option value="No" {{ old('four_ps', 'No') === 'No' ? 'selected' : '' }}>No</option>
                                         <option value="Yes" {{ old('four_ps') === 'Yes' ? 'selected' : '' }}>Yes</option>
