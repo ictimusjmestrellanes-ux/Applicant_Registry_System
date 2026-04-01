@@ -6,6 +6,7 @@ use App\Models\Applicant;
 use App\Models\MayorsClearance;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ClearanceController extends Controller
@@ -42,11 +43,19 @@ class ClearanceController extends Controller
 
         // PROSECUTOR CLEARANCE
         if ($request->hasFile('prosecutor_clearance')) {
-
             $file = $request->file('prosecutor_clearance');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'clearances/prosecutor/'.$fileName;
 
-            $fileName = 'PROSECUTOR_CLEARANCE_'.$fullName.'.'.$extension;
+            if ($clearance->prosecutor_clearance) {
+                Storage::disk('public')->delete($clearance->prosecutor_clearance);
+            }
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $clearance->prosecutor_clearance = $file->storeAs(
                 'clearances/prosecutor',
@@ -57,11 +66,19 @@ class ClearanceController extends Controller
 
         // MUNICIPAL TRIAL COURT
         if ($request->hasFile('mtc_clearance')) {
-
             $file = $request->file('mtc_clearance');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'clearances/mtc/'.$fileName;
 
-            $fileName = 'MTC_CLEARANCE_'.$fullName.'.'.$extension;
+            if ($clearance->mtc_clearance) {
+                Storage::disk('public')->delete($clearance->mtc_clearance);
+            }
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $clearance->mtc_clearance = $file->storeAs(
                 'clearances/mtc',
@@ -72,11 +89,19 @@ class ClearanceController extends Controller
 
         // REGIONAL TRIAL COURT
         if ($request->hasFile('rtc_clearance')) {
-
             $file = $request->file('rtc_clearance');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'clearances/rtc/'.$fileName;
 
-            $fileName = 'RTC_CLEARANCE_'.$fullName.'.'.$extension;
+            if ($clearance->rtc_clearance) {
+                Storage::disk('public')->delete($clearance->rtc_clearance);
+            }
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $clearance->rtc_clearance = $file->storeAs(
                 'clearances/rtc',
@@ -87,11 +112,19 @@ class ClearanceController extends Controller
 
         // NBI CLEARANCE
         if ($request->hasFile('nbi_clearance')) {
-
             $file = $request->file('nbi_clearance');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'clearances/nbi/'.$fileName;
 
-            $fileName = 'NBI_CLEARANCE_'.$fullName.'.'.$extension;
+            if ($clearance->nbi_clearance) {
+                Storage::disk('public')->delete($clearance->nbi_clearance);
+            }
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $clearance->nbi_clearance = $file->storeAs(
                 'clearances/nbi',
@@ -102,11 +135,19 @@ class ClearanceController extends Controller
 
         // BARANGAY CLEARANCE
         if ($request->hasFile('barangay_clearance')) {
-
             $file = $request->file('barangay_clearance');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'clearances/barangay/'.$fileName;
 
-            $fileName = 'BARANGAY_CLEARANCE_'.$fullName.'.'.$extension;
+            if ($clearance->barangay_clearance) {
+                Storage::disk('public')->delete($clearance->barangay_clearance);
+            }
+
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $clearance->barangay_clearance = $file->storeAs(
                 'clearances/barangay',

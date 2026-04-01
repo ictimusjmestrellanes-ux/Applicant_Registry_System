@@ -105,7 +105,7 @@
                 @endif
 
                 <!-- Traditional Login -->
-                <form method="POST" action="{{ route('login') }}">
+                {{-- <form method="POST" action="{{ route('login') }}">
                     @csrf
 
                     <div class="mb-3">
@@ -122,10 +122,10 @@
                     <button type="submit" class="btn btn-primary w-100 mb-3">
                         Login
                     </button>
-                </form>
+                </form> --}}
 
                 <!-- Divider -->
-                <div class="divider my-4">OR</div>
+                {{-- <div class="divider my-4">OR</div> --}}
 
                 <!-- Microsoft Login -->
                 <a href="{{ route('login.azure.redirect') }}"

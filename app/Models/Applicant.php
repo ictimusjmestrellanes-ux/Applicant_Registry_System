@@ -58,6 +58,13 @@ class Applicant extends Model
         }
 
         $permit = $this->permit;
+        $hasPermitClearance =
+            ($permit->clearance_type === 'nbi' && ! empty($permit->permit_nbi_clearance)) ||
+            ($permit->clearance_type === 'police' && ! empty($permit->permit_police_clearance)) ||
+            (
+                empty($permit->clearance_type) &&
+                (! empty($permit->permit_nbi_clearance) || ! empty($permit->permit_police_clearance))
+            );
 
         // Detect if resident of City of Imus
         $isImusResident = stripos($this->city, 'City of Imus') !== false;
@@ -65,7 +72,7 @@ class Applicant extends Model
         // Always required
         if (
             empty($permit->health_card) ||
-            empty($permit->nbi_or_police_clearance) ||
+            ! $hasPermitClearance ||
             empty($permit->cedula)
         ) {
             return false;

@@ -83,7 +83,7 @@
         }
 
         .peso-id {
-            left: 20.2%;
+            left: 17.2%;
             top: 49.9%;
             width: 25.8%;
             font-size: 7pt;
@@ -254,7 +254,7 @@
                 <img src="{{ $photoPath }}" alt="Applicant Photo" class="photo">
             @endif
 
-            <div class="field peso-id">PESOIMUS-OP{{ strtoupper($permit->peso_id_no ?? 'N/A') }}</div>
+            <div class="field peso-id">OP{{ strtoupper($permit->peso_id_no ?? 'N/A') }}</div>
             <div class="field front-name">{{ $fullName }}</div>
 
             <div class="field employer">{{ $employer }}</div>

@@ -37,8 +37,8 @@
                     </div>
                     <div>
                         <div class="metric-label">Permit Completion</div>
-                        <div class="metric-value">{{ $completion['permit']['percent'] }}%</div>
-                        <div class="metric-note">{{ $completion['permit']['count'] }} applicants complete</div>
+                        <div class="metric-value">{{ data_get($completion, 'permit.percent', 0) }}%</div>
+                        <div class="metric-note">{{ data_get($completion, 'permit.count', 0) }} applicants complete</div>
                     </div>
                 </div>
             </div>

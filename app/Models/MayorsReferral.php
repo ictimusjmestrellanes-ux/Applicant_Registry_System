@@ -46,11 +46,11 @@ class MayorsReferral extends Model
 
         $nextNumber = 1;
 
-        if ($latestForYear && preg_match('/^\d{4}-(\d{6})$/', $latestForYear, $matches)) {
+        if ($latestForYear && preg_match('/^\d{4}-(\d{5})$/', $latestForYear, $matches)) {
             $nextNumber = ((int) $matches[1]) + 1;
         }
 
-        return sprintf('%d-%06d', $year, $nextNumber);
+        return sprintf('%d-%05d', $year, $nextNumber);
     }
 
     public static function generateNextOcrl(?int $year = null): string

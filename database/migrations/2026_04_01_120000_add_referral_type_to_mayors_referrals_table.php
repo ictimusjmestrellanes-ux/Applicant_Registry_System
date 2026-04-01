@@ -12,20 +12,12 @@ return new class extends Migration
             if (! Schema::hasColumn('mayors_referrals', 'referral_type')) {
                 $table->string('referral_type')->nullable()->after('applicant_id');
             }
-
-            if (Schema::hasColumn('mayors_referrals', 'ref_employer_name') && ! Schema::hasColumn('mayors_referrals', 'ref_employer_name_name')) {
-                $table->renameColumn('ref_employer_name', 'ref_employer_name_name');
-            }
         });
     }
 
     public function down(): void
     {
         Schema::table('mayors_referrals', function (Blueprint $table) {
-            if (Schema::hasColumn('mayors_referrals', 'ref_employer_name_name') && ! Schema::hasColumn('mayors_referrals', 'ref_employer_name')) {
-                $table->renameColumn('ref_employer_name_name', 'ref_employer_name');
-            }
-
             if (Schema::hasColumn('mayors_referrals', 'referral_type')) {
                 $table->dropColumn('referral_type');
             }

@@ -14,11 +14,11 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-                                                                                                                                                                                                                        <div style="font-size:14px;">
-                                                                                                                                                                                                                            <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                                                                                                                            <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `,
+                                                                                                                                                                                                                                <div style="font-size:14px;">
+                                                                                                                                                                                                                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                                                                                                                                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                            `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -114,11 +114,6 @@
             --edit-warm-soft: #fef3c7;
             --edit-deep: #0f172a;
             --edit-glow: rgba(37, 99, 235, 0.18);
-        }
-
-        body {
-            background: #ffffff;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .applicant-wrapper {
@@ -486,11 +481,12 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 18px;
-            color:  black;
+            color: black;
             font-size: 0.7rem;
             font-weight: 500;
             letter-spacing: 0.01em;
         }
+
         .section-title-c::before {
             content: "";
             width: 7px;
@@ -596,7 +592,7 @@
             transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
         }
 
-        .document-upload-card-resume{
+        .document-upload-card-resume {
             padding: 20px;
             border-radius: 22px;
             border: 1px solid #dce7f3;
@@ -607,8 +603,28 @@
 
         .document-upload-card:hover {
             transform: translateY(-2px);
-            border-color: #b8d0fb;
+            border-color: #a5c1f5;
             box-shadow: 0 16px 32px rgba(15, 34, 58, 0.08);
+        }
+
+        .document-upload-card-resume:hover {
+            transform: translateY(-2px);
+            border-color: #a5c1f5;
+            box-shadow: 0 16px 32px rgba(15, 34, 58, 0.08);
+        }
+
+
+        .clearance-upload-row {
+            display: flex;
+            gap: 0;
+            overflow: hidden;
+            padding-bottom: 0.5rem;
+        }
+
+        .clearance-upload-col {
+            flex: 0 0 20%;
+            max-width: 20%;
+            padding: 0;
         }
 
         .upload-disabled {
@@ -741,6 +757,15 @@
                 flex: 0 0 33%;
                 max-width: 33%;
             }
+
+            .clearance-upload-row {
+                overflow: auto;
+            }
+
+            .clearance-upload-col {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
         }
 
         @media (max-width: 768px) {
@@ -754,6 +779,11 @@
             .col-md-5,
             .col-md-6,
             .col-md-1 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .clearance-upload-col {
                 flex: 0 0 100%;
                 max-width: 100%;
             }
@@ -850,160 +880,141 @@
                             @csrf
                             @method('PUT')
 
-                            <h6 class="section-title  text-primary mb-4">Personal Information</h6>
-
-                            <div class="row g-4">
-
-                                {{-- FIRST TIME JOB SEEKER --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">First Time Job Seeker?</label>
-                                    <select name="first_time_job_seeker" class="form-select">
-                                        <option value="No" {{ $applicant->first_time_job_seeker == "No" ? 'selected' : '' }}>
-                                            No
-                                        </option>
-                                        <option value="Yes" {{ $applicant->first_time_job_seeker == "Yes" ? 'selected' : '' }}>Yes
-                                        </option>
-                                    </select>
+                            <section class="form-section">
+                                <h6 class="section-title">Personal Information</h6>
+                                <div class="row g-4">
+                                    <div class="col-md-3">
+                                        <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
+                                        <select name="first_time_job_seeker" class="form-select" required>
+                                            <option value="No" {{ $applicant->first_time_job_seeker == 'No' ? 'selected' : '' }}>No</option>
+                                            <option value="Yes" {{ $applicant->first_time_job_seeker == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">First Name <span class="required-mark">*</span></label>
+                                        <input type="text" name="first_name" class="form-control" value="{{ $applicant->first_name }}" placeholder="e.g. John" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Middle Name</label>
+                                        <input type="text" name="middle_name" class="form-control" value="{{ $applicant->middle_name }}" placeholder="Optional">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Last Name <span class="required-mark">*</span></label>
+                                        <input type="text" name="last_name" class="form-control" value="{{ $applicant->last_name }}" placeholder="e.g. Doe" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Suffix</label>
+                                        <select name="suffix" class="form-select">
+                                            <option value="">None</option>
+                                            <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.</option>
+                                            <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                                            <option value="II" {{ $applicant->suffix == 'II' ? 'selected' : '' }}>II</option>
+                                            <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III</option>
+                                            <option value="IV" {{ $applicant->suffix == 'IV' ? 'selected' : '' }}>IV</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Age <span class="required-mark">*</span></label>
+                                        <input type="number" name="age" class="form-control" value="{{ $applicant->age }}" placeholder="e.g. 25" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
+                                        <select name="gender" class="form-select" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male</option>
+                                            <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>Female</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Civil Status <span class="required-mark">*</span></label>
+                                        <select name="civil_status" class="form-select" required>
+                                            <option value="">Select Status</option>
+                                            <option value="Single" {{ $applicant->civil_status == 'Single' ? 'selected' : '' }}>Single</option>
+                                            <option value="Married" {{ $applicant->civil_status == 'Married' ? 'selected' : '' }}>Married</option>
+                                            <option value="Widowed" {{ $applicant->civil_status == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">PWD <span class="required-mark">*</span></label>
+                                        <select name="pwd" class="form-select" required>
+                                            <option value="No" {{ $applicant->pwd == 'No' ? 'selected' : '' }}>No</option>
+                                            <option value="Yes" {{ $applicant->pwd == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">4Ps Beneficiary <span class="required-mark">*</span></label>
+                                        <select name="four_ps" class="form-select" required>
+                                            <option value="No" {{ $applicant->four_ps == 'No' ? 'selected' : '' }}>No</option>
+                                            <option value="Yes" {{ $applicant->four_ps == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        </select>
+                                    </div>
                                 </div>
+                            </section>
 
-                                {{-- FIRST NAME --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="first_name" value="{{ $applicant->first_name }}"
-                                        class="form-control" required>
+                            <section class="form-section mt-4">
+                                <h6 class="section-title">Contact & Location</h6>
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Contact Number <span class="required-mark">*</span></label>
+                                        <input type="tel" name="contact_no" class="form-control" value="{{ $applicant->contact_no }}"
+                                            placeholder="09123456789" pattern="[0-9]{11}" maxlength="11"
+                                            inputmode="numeric" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Complete Address <span class="required-mark">*</span></label>
+                                        <input type="text" name="address_line" class="form-control" value="{{ $applicant->address_line }}" placeholder="House No. / Street / Phase / Block" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Province <span class="required-mark">*</span></label>
+                                        <select name="province" id="province" class="form-select" required>
+                                            <option value="">Select Province</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
+                                        <select name="city" id="city" class="form-select" required>
+                                            <option value="">Select City</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Barangay <span class="required-mark">*</span></label>
+                                        <select name="barangay" id="barangay" class="form-select" required>
+                                            <option value="">Select Barangay</option>
+                                        </select>
+                                    </div>
                                 </div>
+                            </section>
 
-                                {{-- MIDDLE NAME --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Middle Name (Optional)</label>
-                                    <input type="text" name="middle_name" value="{{ $applicant->middle_name }}"
-                                        class="form-control">
+                            <section class="form-section mt-4">
+                                <h6 class="section-title">Education & Hiring</h6>
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Educational Attainment <span class="required-mark">*</span></label>
+                                        <select name="educational_attainment" id="educationalAttainmentSelect" class="form-select" required>
+                                            <option value="">Select educational attainment</option>
+                                            @foreach(config('educational_attainments', []) as $attainment)
+                                                <option value="{{ $attainment }}"
+                                                    {{ $applicant->educational_attainment === $attainment ? 'selected' : '' }}>
+                                                    {{ $attainment }}
+                                                </option>
+                                            @endforeach
+                                            @if($applicant->educational_attainment && !in_array($applicant->educational_attainment, config('educational_attainments', []), true))
+                                                <option value="{{ $applicant->educational_attainment }}" selected>
+                                                    {{ $applicant->educational_attainment }}
+                                                </option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
+                                        <input type="text" name="hiring_company" class="form-control" value="{{ $applicant->hiring_company }}" placeholder="e.g. Tech Corp" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Position Hired <span class="required-mark">*</span></label>
+                                        <input type="text" name="position_hired" class="form-control" value="{{ $applicant->position_hired }}" placeholder="e.g. Software Engineer" required>
+                                    </div>
                                 </div>
-
-                                {{-- LAST NAME --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="last_name" value="{{ $applicant->last_name }}"
-                                        class="form-control" required>
-                                </div>
-
-                                {{-- SUFFIX --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Suffix (Optional)</label>
-                                    <select name="suffix" class="form-select">
-                                        <option value="">None</option>
-                                        <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.</option>
-                                        <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.</option>
-                                        <option value="II" {{ $applicant->suffix == 'II' ? 'selected' : '' }}>II</option>
-                                        <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III</option>
-                                        <option value="IV" {{ $applicant->suffix == 'IV' ? 'selected' : '' }}>IV</option>
-                                    </select>
-                                </div>
-
-                                {{-- AGE --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Age <span class="required-mark">*</span></label>
-                                    <input type="number" name="age" value="{{ $applicant->age }}" class="form-control"
-                                        required>
-                                </div>
-
-                                {{-- GENDER --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Gender <span class="required-mark">*</span></label>
-                                    <select name="gender" class="form-select" required>
-                                        <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male
-                                        </option>
-                                        <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>Female
-                                        </option>
-                                    </select>
-                                </div>
-
-                                {{-- CIVIL STATUS --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Civil Status<span class="required-mark">*</span></label>
-                                    <select name="civil_status" class="form-select" required>
-                                        <option value="Single" {{ $applicant->civil_status == 'Single' ? 'selected' : '' }}>
-                                            Single</option>
-                                        <option value="Married" {{ $applicant->civil_status == 'Married' ? 'selected' : '' }}>
-                                            Married</option>
-                                        <option value="Widowed" {{ $applicant->civil_status == 'Widowed' ? 'selected' : '' }}>
-                                            Widowed</option>
-                                    </select>
-                                </div>
-
-                                {{-- PWD --}}
-                                <div class="col-md-1">
-                                    <label class="form-label">PWD<span class="required-mark">*</span></label>
-                                    <select name="pwd" class="form-select" required>
-                                        <option value="No" {{ $applicant->pwd == "No" ? 'selected' : '' }}>No</option>
-                                        <option value="Yes" {{ $applicant->pwd == "Yes" ? 'selected' : '' }}>Yes</option>
-                                    </select>
-                                </div>
-
-                                {{-- 4PS --}}
-                                <div class="col-md-1">
-                                    <label class="form-label">4Ps<span class="required-mark">*</span></label>
-                                    <select name="four_ps" class="form-select" required>
-                                        <option value="No" {{ $applicant->four_ps == "No" ? 'selected' : '' }}>No</option>
-                                        <option value="Yes" {{ $applicant->four_ps == "Yes" ? 'selected' : '' }}>Yes</option>
-                                    </select>
-                                </div>
-
-                                {{-- CONTACT --}}
-                                <div class="col-md-3">
-                                    <label class="form-label">Contact No<span class="required-mark">*</span></label>
-                                    <input type="text" name="contact_no" value="{{ $applicant->contact_no }}"
-                                        class="form-control" required>
-                                </div>
-
-                                {{-- ADDRESS --}}
-                                <div class="col-md-5">
-                                    <label class="form-label">Complete Address<span class="required-mark">*</span></label>
-                                    <input type="text" name="address_line" value="{{ $applicant->address_line }}"
-                                        class="form-control" required>
-                                </div>
-
-                                {{-- PROVINCE --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Province<span class="required-mark">*</span></label>
-                                    <select name="province" id="province" class="form-select" required></select>
-                                </div>
-
-                                {{-- CITY --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">City<span class="required-mark">*</span></label>
-                                    <select name="city" id="city" class="form-select" required></select>
-                                </div>
-
-                                {{-- BARANGAY --}}
-                                <div class="col-md-2">
-                                    <label class="form-label">Barangay<span class="required-mark">*</span></label>
-                                    <select name="barangay" id="barangay" class="form-select" required></select>
-                                </div>
-
-                                {{-- EDUCATION --}}
-                                <div class="col-md-4">
-                                    <label class="form-label">Educational Attainment<span
-                                            class="required-mark">*</span></label>
-                                    <input type="text" name="educational_attainment"
-                                        value="{{ $applicant->educational_attainment }}" class="form-control" required>
-                                </div>
-
-                                {{-- COMPANY --}}
-                                <div class="col-md-4">
-                                    <label class="form-label">Hiring Company<span class="required-mark">*</span></label>
-                                    <input type="text" name="hiring_company" value="{{ $applicant->hiring_company }}"
-                                        class="form-control" required>
-                                </div>
-
-                                {{-- POSITION --}}
-                                <div class="col-md-4">
-                                    <label class="form-label">Position Hired<span class="required-mark">*</span></label>
-                                    <input type="text" name="position_hired" value="{{ $applicant->position_hired }}"
-                                        class="form-control" required>
-                                </div>
-
-                            </div>
+                            </section>
 
 
                             <div class="profile-action-bar">
@@ -1177,12 +1188,19 @@
                                         <small id="referral_name" class="file-name-text">
                                             {{ !empty($permit->referral_letter) ? basename($permit->referral_letter) : 'No file selected' }}
                                         </small>
+                                        @if(!empty($permit->referral_letter))
+                                            <a href="{{ asset('storage/' . $permit->referral_letter) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border">
+                                                <i class="fas fa-eye me-1"></i> View Current
+                                            </a>
+                                        @endif
 
                                         @if($isImusResident)
                                             <div class="badge bg-success-soft text-success p-2 mt-1" style="font-size: 11px;">
                                                 Not required for Imus residents
                                             </div>
                                         @endif
+
                                     </div>
                                 </div>
                             </div>
@@ -1224,7 +1242,8 @@
                             {{-- Permit Issued At --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
-                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
+                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select"
+                                    required>
                                     <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
                                         {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
                                     </option>
@@ -1313,9 +1332,9 @@
 
                         <h6 class="section-title text-primary">Mayor's Clearance Requirements</h6>
 
-                        <div class="d-flex gap-3 overflow-auto pb-2">
+                        <div class="clearance-upload-row">
 
-                            <div class="col-md-2">
+                            <div class="clearance-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Prosecutor Clearance<span
                                             class="required-mark">*</span></label>
@@ -1339,7 +1358,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-mb-2">
+                            <div class="clearance-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Municipal Trial Court Clearance<span
                                             class="required-mark">*</span></label>
@@ -1363,7 +1382,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="clearance-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Regional Trial Court Clearance<span
                                             class="required-mark">*</span></label>
@@ -1387,7 +1406,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="clearance-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
@@ -1410,7 +1429,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-2">
+                            <div class="clearance-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
@@ -1445,7 +1464,8 @@
                             </div>
                             {{-- PESO Control No --}}
                             <div class="col-md-2">
-                                <label class="form-label">Peso Control No. (Auto Generate)<span class="required-mark">*</span></label>
+                                <label class="form-label">Peso Control No. (Auto Generate)<span
+                                        class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $clearance->clearance_peso_control_no }}" readonly>
                             </div>
@@ -1557,222 +1577,238 @@
 
 
                         <h4 class="section-title-c text-primary">Choose at least one of the following:</h6>
-                        <div class="d-flex justify-content-center overflow-auto pb-2">
+                            <div class="d-flex justify-content-center overflow-auto pb-2">
 
-                            <div class="col-md-4">
-                                <div class="document-upload-card">
-                                    <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
-                                    <div class="d-grid gap-2">
-                                        <input type="file" id="ref_brgy_input" name="ref_barangay_clearance"
-                                            style="display:none" onchange="showFileName(this, 'ref_brgy_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="document.getElementById('ref_brgy_input').click()">
-                                            <i class="fas fa-upload me-1"></i> Upload File
-                                        </button>
-                                        <small id="ref_brgy_name" class="file-name-text">
-                                            {{ !empty($referral->ref_barangay_clearance) ? basename($referral->ref_barangay_clearance) : 'No file selected' }}
-                                        </small>
-                                        @if(!empty($referral->ref_barangay_clearance))
-                                            <a href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="document-upload-card">
-                                    <label class="form-label">Police Clearance<span class="required-mark">*</span></label>
-                                    <div class="d-grid gap-2">
-                                        <input type="file" id="ref_police_input" name="ref_police_clearance"
-                                            style="display:none" onchange="showFileName(this, 'ref_police_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="document.getElementById('ref_police_input').click()">
-                                            <i class="fas fa-upload me-1"></i> Upload File
-                                        </button>
-                                        <small id="ref_police_name" class="file-name-text">
-                                            {{ !empty($referral->ref_police_clearance) ? basename($referral->ref_police_clearance) : 'No file selected' }}
-                                        </small>
-                                        @if(!empty($referral->ref_police_clearance))
-                                            <a href="{{ asset('storage/' . $referral->ref_police_clearance) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="document-upload-card">
-                                    <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
-                                    <div class="d-grid gap-2">
-                                        <input type="file" id="ref_nbi_input" name="ref_nbi_clearance"
-                                            style="display:none" onchange="showFileName(this, 'ref_nbi_name')">
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="document.getElementById('ref_nbi_input').click()">
-                                            <i class="fas fa-upload me-1"></i> Upload File
-                                        </button>
-                                        <small id="ref_nbi_name" class="file-name-text">
-                                            {{ !empty($referral->ref_nbi_clearance) ? basename($referral->ref_nbi_clearance) : 'No file selected' }}
-                                        </small>
-                                        @if(!empty($referral->ref_nbi_clearance))
-                                            <a href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="mt-4">
-                            <h6 class="section-title text-primary">Mayor's Referral Letter Details</h6>
-                            @php
-                                $selectedReferralType = old(
-                                    'referral_type',
-                                    $referral->referral_type ?? \App\Models\MayorsReferral::TYPE_PESO_OFFICE
-                                );
-                            @endphp
-
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Referral Letter Type</label>
-                                <select name="referral_type" id="referralTypeSelect" class="form-select">
-                                    <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
-                                        {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
-                                        Referral Within Imus
-                                    </option>
-                                    <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
-                                        {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
-                                        Referral Outside Imus (Other City Government)
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div class="border p-4 rounded-4 bg-white">
-                                <div id="pesoOfficeFields" data-referral-group="peso"
-                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
-                                    <div class="row g-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Peso OCRL (Auto Generate)<span class="required-mark">*</span></label>
-                                            @php
-                                                $nextImusOcrl = $referral->ref_imus_ocrl
-                                                    ?? \App\Models\MayorsReferral::generateNextImusOcrl();
-                                            @endphp
-                                            <input type="text" name="ref_imus_ocrl" class="form-control" style="text-align: center"
-                                                value="{{ old('ref_imus_ocrl', $nextImusOcrl) }}" readonly>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">O.R CR<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_or_no" class="form-control"
-                                                value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">Employer Name<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_employer_name" class="form-control"
-                                                value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">Employer Position<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_position" class="form-control"
-                                                value="{{ old('ref_position', $referral->ref_position ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <label class="form-label"> City Address<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
-                                                list="refPlaceList" autocomplete="off"
-                                                placeholder="Type to search city address"
-                                                value="{{ old('ref_place', $referral->ref_place ?? '') }}">
-                                            <datalist id="refPlaceList"></datalist>
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <label class="form-label">Hired Company<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_hired_company" class="form-control"
-                                                value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
+                                <div class="col-md-4">
+                                    <div class="document-upload-card">
+                                        <label class="form-label">Barangay Clearance<span
+                                                class="required-mark">*</span></label>
+                                        <div class="d-grid gap-2">
+                                            <input type="file" id="ref_brgy_input" name="ref_barangay_clearance"
+                                                style="display:none" onchange="showFileName(this, 'ref_brgy_name')">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                onclick="document.getElementById('ref_brgy_input').click()">
+                                                <i class="fas fa-upload me-1"></i> Upload File
+                                            </button>
+                                            <small id="ref_brgy_name" class="file-name-text">
+                                                {{ !empty($referral->ref_barangay_clearance) ? basename($referral->ref_barangay_clearance) : 'No file selected' }}
+                                            </small>
+                                            @if(!empty($referral->ref_barangay_clearance))
+                                                <a href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}"
+                                                    target="_blank" class="btn btn-light btn-sm text-primary border">
+                                                    <i class="fas fa-eye me-1"></i> View Current
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
 
-                                <div id="otherCityFields" data-referral-group="other-city"
-                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
-                                    <div class="row g-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Peso Imus OCRL (Auto Generate)<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_ocrl" class="form-control" style="text-align: center"
-                                                value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}" readonly
-                                                placeholder="Will generate after save when complete">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">O.R No.<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_peso_or_no" class="form-control"
-                                                value="{{ old('ref_peso_or_no', $referral->ref_peso_or_no ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <label class="form-label">Mayor's Name<span class="required-mark">*</span></label>
-                                            <select name="ref_recipient" id="refRecipientSelect" class="form-select">
-                                                <option value=""></option>
-                                                <option value="{{ old('ref_recipient', $referral->ref_recipient ?? '') }}" selected>
-                                                    {{ old('ref_recipient', $referral->ref_recipient ?? 'Search or type mayor\'s name') }}
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <label class="form-label">City Government<span class="required-mark">*</span></label>
-                                            <select name="ref_city_gov" id="cityGovernment" class="form-select">
-                                                <option value="{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}"
-                                                    selected>
-                                                    {{ old('ref_city_gov', $referral->ref_city_gov ?? 'Select City Government') }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="col-md-3">
-                                            <label class="form-label">City Address<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_company_address" id="refCompanyAddressInput" class="form-control"
-                                                list="refCompanyAddressList" autocomplete="off"
-                                                placeholder="Type to search city address"
-                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
-                                            <datalist id="refCompanyAddressList"></datalist>
+                                <div class="col-md-4">
+                                    <div class="document-upload-card">
+                                        <label class="form-label">Police Clearance<span
+                                                class="required-mark">*</span></label>
+                                        <div class="d-grid gap-2">
+                                            <input type="file" id="ref_police_input" name="ref_police_clearance"
+                                                style="display:none" onchange="showFileName(this, 'ref_police_name')">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                onclick="document.getElementById('ref_police_input').click()">
+                                                <i class="fas fa-upload me-1"></i> Upload File
+                                            </button>
+                                            <small id="ref_police_name" class="file-name-text">
+                                                {{ !empty($referral->ref_police_clearance) ? basename($referral->ref_police_clearance) : 'No file selected' }}
+                                            </small>
+                                            @if(!empty($referral->ref_police_clearance))
+                                                <a href="{{ asset('storage/' . $referral->ref_police_clearance) }}"
+                                                    target="_blank" class="btn btn-light btn-sm text-primary border">
+                                                    <i class="fas fa-eye me-1"></i> View Current
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="col-md-4">
+                                    <div class="document-upload-card">
+                                        <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
+                                        <div class="d-grid gap-2">
+                                            <input type="file" id="ref_nbi_input" name="ref_nbi_clearance"
+                                                style="display:none" onchange="showFileName(this, 'ref_nbi_name')">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                onclick="document.getElementById('ref_nbi_input').click()">
+                                                <i class="fas fa-upload me-1"></i> Upload File
+                                            </button>
+                                            <small id="ref_nbi_name" class="file-name-text">
+                                                {{ !empty($referral->ref_nbi_clearance) ? basename($referral->ref_nbi_clearance) : 'No file selected' }}
+                                            </small>
+                                            @if(!empty($referral->ref_nbi_clearance))
+                                                <a href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
+                                                    class="btn btn-light btn-sm text-primary border">
+                                                    <i class="fas fa-eye me-1"></i> View Current
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
-                        </div>
+                            <div class="mt-4">
+                                <h6 class="section-title text-primary">Mayor's Referral Letter Details</h6>
+                                @php
+                                    $selectedReferralType = old(
+                                        'referral_type',
+                                        $referral->referral_type ?? \App\Models\MayorsReferral::TYPE_PESO_OFFICE
+                                    );
+                                @endphp
 
-                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
-                            @if(auth()->user()->hasPermission('update_referral'))
-                                <button type="submit" class="btn btn-primary px-5">
-                                    Save Referral
-                                </button>
-                            @else
-                                <button type="button" class="btn btn-secondary px-5" disabled>
-                                    No permission to update referral
-                                </button>
-                            @endif
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Referral Letter Type</label>
+                                    <select name="referral_type" id="referralTypeSelect" class="form-select">
+                                        <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
+                                            Referral Within Imus
+                                        </option>
+                                        <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
+                                            Referral Outside Imus (Other City Government)
+                                        </option>
+                                    </select>
+                                </div>
 
-                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                <a href="{{ route('referrals.printLetter', $applicant->id) }}"
-                                    class="btn btn-outline-primary px-4 ms-2" target="_blank">
-                                    Print Referral Letter
-                                </a>
-                            @elseif(!auth()->user()->hasPermission('generate_referral'))
-                                <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
-                                    No permission to generate referral letter
-                                </button>
-                            @endif
-                        </div>
+                                <div class="border p-4 rounded-4 bg-white">
+                                    <div id="pesoOfficeFields" data-referral-group="peso"
+                                        class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
+                                        <div class="row g-3">
+                                            <div class="col-md-2">
+                                                <label class="form-label">Peso OCRL (Auto Generate)<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_imus_ocrl" class="form-control"
+                                                    style="text-align: center"
+                                                    value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
+                                                    readonly placeholder="Will generate after save when complete">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">O.R CR<span class="required-mark">*</span></label>
+                                                <input type="text" name="ref_or_no" class="form-control"
+                                                    value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Employer Name<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_employer_name" class="form-control"
+                                                    value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Employer Position<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_position" class="form-control"
+                                                    value="{{ old('ref_position', $referral->ref_position ?? '') }}">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label"> City Address<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
+                                                    list="refPlaceList" autocomplete="off"
+                                                    placeholder="Type to search city address"
+                                                    value="{{ old('ref_place', $referral->ref_place ?? '') }}">
+                                                <datalist id="refPlaceList"></datalist>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Hired Company<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_hired_company" class="form-control"
+                                                    value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="otherCityFields" data-referral-group="other-city"
+                                        class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
+                                        <div class="row g-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Peso Imus OCRL (Auto Generate)<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_ocrl" class="form-control"
+                                                    style="text-align: center"
+                                                    value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}" readonly
+                                                    placeholder="Will generate after save when complete">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">O.R No.<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_peso_or_no" class="form-control"
+                                                    value="{{ old('ref_peso_or_no', $referral->ref_peso_or_no ?? '') }}">
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Mayor's Name<span
+                                                        class="required-mark">*</span></label>
+                                                <select name="ref_recipient" id="refRecipientSelect" class="form-select">
+                                                    <option value=""></option>
+                                                    @foreach(config('philippine_mayors', []) as $mayor)
+                                                        <option value="{{ $mayor['recipient'] }}"
+                                                            data-city-government="{{ $mayor['city_government'] }}"
+                                                            data-company-address="{{ $mayor['company_address'] }}" {{ old('ref_recipient', $referral->ref_recipient ?? '') === $mayor['recipient'] ? 'selected' : '' }}>
+                                                            {{ $mayor['recipient'] }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">City Government<span
+                                                        class="required-mark">*</span></label>
+                                                <select name="ref_city_gov" id="cityGovernment" class="form-select">
+                                                    <option value="">Select City Government</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">City Address<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_company_address" id="refCompanyAddressInput"
+                                                    class="form-control" list="refCompanyAddressList" autocomplete="off"
+                                                    value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
+                                @if(auth()->user()->hasPermission('update_referral'))
+                                    <button type="submit" class="btn btn-primary px-5">
+                                        Save Referral
+                                    </button>
+                                @else
+                                    <button type="button" class="btn btn-secondary px-5" disabled>
+                                        No permission to update referral
+                                    </button>
+                                @endif
+
+                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                    <a href="{{ route('referrals.printLetter', $applicant->id) }}" id="printReferralPesoButton"
+                                        class="btn btn-outline-primary px-4 ms-2 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
+                                        target="_blank">
+                                        Print Referral Within Imus
+                                    </a>
+                                    <a href="{{ route('referrals.printLetter', $applicant->id) }}"
+                                        id="printReferralOtherCityButton"
+                                        class="btn btn-outline-primary px-4 ms-2 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}"
+                                        target="_blank">
+                                        Print Referral Outside Imus
+                                    </a>
+                                @elseif(!auth()->user()->hasPermission('generate_referral'))
+                                    <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
+                                        No permission to generate referral letter
+                                    </button>
+                                @endif
+                            </div>
 
                     </form>
 
@@ -1784,155 +1820,388 @@
         </div>
     </div>
 @endsection
-    {{-- City Government--}}
-    <script>
+{{-- City Government--}}
+<script>
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const referralTypeSelect = document.getElementById("referralTypeSelect");
-            const pesoOfficeFields = document.getElementById("pesoOfficeFields");
-            const otherCityFields = document.getElementById("otherCityFields");
-            const referralForm = referralTypeSelect ? referralTypeSelect.closest("form") : null;
+    document.addEventListener("DOMContentLoaded", function () {
+        const referralTypeSelect = document.getElementById("referralTypeSelect");
+        const pesoOfficeFields = document.getElementById("pesoOfficeFields");
+        const otherCityFields = document.getElementById("otherCityFields");
+        const printReferralPesoButton = document.getElementById("printReferralPesoButton");
+        const printReferralOtherCityButton = document.getElementById("printReferralOtherCityButton");
+        const savedReferralType = `{{ $referral->referral_type ?? '' }}`;
+        const referralForm = referralTypeSelect ? referralTypeSelect.closest("form") : null;
 
-            if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
-                const setGroupDisabledState = (container, shouldDisable) => {
-                    container.querySelectorAll("input, select, textarea").forEach(field => {
-                        field.disabled = shouldDisable;
-                    });
-                };
+        if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
+            const setGroupDisabledState = (container, shouldDisable) => {
+                container.querySelectorAll("input, select, textarea").forEach(field => {
+                    field.disabled = shouldDisable;
+                });
+            };
 
-                const toggleReferralFields = () => {
-                    const selectedType = referralTypeSelect.value;
-                    const isPesoOffice =
-                        selectedType === "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}";
-                    const isOtherCity =
-                        selectedType === "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}";
+            const toggleReferralFields = () => {
+                const selectedType = referralTypeSelect.value;
+                const isPesoOffice =
+                    selectedType === "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}";
+                const isOtherCity =
+                    selectedType === "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}";
 
-                    pesoOfficeFields.classList.toggle(
+                pesoOfficeFields.classList.toggle(
+                    "d-none",
+                    !isPesoOffice
+                );
+                otherCityFields.classList.toggle(
+                    "d-none",
+                    !isOtherCity
+                );
+
+                if (printReferralPesoButton) {
+                    printReferralPesoButton.classList.toggle(
                         "d-none",
-                        !isPesoOffice
+                        !isPesoOffice || savedReferralType !== "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
                     );
-                    otherCityFields.classList.toggle(
+                }
+
+                if (printReferralOtherCityButton) {
+                    printReferralOtherCityButton.classList.toggle(
                         "d-none",
-                        !isOtherCity
+                        !isOtherCity || savedReferralType !== "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
                     );
+                }
 
-                    setGroupDisabledState(pesoOfficeFields, !isPesoOffice);
-                    setGroupDisabledState(otherCityFields, !isOtherCity);
+                setGroupDisabledState(pesoOfficeFields, !isPesoOffice);
+                setGroupDisabledState(otherCityFields, !isOtherCity);
+            };
+
+            toggleReferralFields();
+            referralTypeSelect.addEventListener("change", toggleReferralFields);
+
+            if (referralForm) {
+                referralForm.addEventListener("submit", toggleReferralFields);
+            }
+        }
+
+        const cityDropdown = document.getElementById("cityGovernment");
+        const permitIssuedAtDropdown = document.getElementById("permitIssuedAtSelect");
+        const refRecipientDropdown = document.getElementById("refRecipientSelect");
+        const refPlaceInput = document.getElementById("refPlaceInput");
+        const refPlaceList = document.getElementById("refPlaceList");
+        const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
+        const refCompanyAddressList = document.getElementById("refCompanyAddressList");
+        const selectedPermitIssuedAt = `{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}`;
+        const selectedCityGovernment = `{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}`;
+        const selectedRefRecipient = `{{ old('ref_recipient', $referral->ref_recipient ?? '') }}`;
+        const selectedRefPlace = `{{ old('ref_place', $referral->ref_place ?? '') }}`;
+        const selectedRefCompanyAddress = `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
+        const referralRecipientSearchUrl = `{{ route('referrals.recipients.search') }}`;
+        const configuredMayors = @json(config('philippine_mayors', []));
+
+        const appendOptionIfMissing = (select, value, label, dataAttributes = {}) => {
+            if (!select || !value) {
+                return;
+            }
+
+            const hasExisting = Array.from(select.options).some(option => option.value === value);
+
+            if (!hasExisting) {
+                const option = document.createElement("option");
+                option.value = value;
+                option.text = label;
+                option.selected = true;
+
+                Object.entries(dataAttributes).forEach(([key, attributeValue]) => {
+                    if (attributeValue) {
+                        option.dataset[key] = attributeValue;
+                    }
+                });
+
+                select.appendChild(option);
+            }
+        };
+
+            const formatCityGovernmentLabel = cityName => {
+                if (!cityName) {
+                    return "";
+                }
+
+            const normalizedCityName = cityName
+                .replace(/^City Government of\s+/i, "")
+                .replace(/^City of\s+/i, "");
+
+                return `City Government of ${normalizedCityName}`;
+            };
+
+            const normalizeCityGovernmentValue = cityName => {
+                if (!cityName) {
+                    return "";
+                }
+
+                return cityName
+                    .replace(/^City Government of\s+/i, "")
+                    .replace(/^City of\s+/i, "")
+                    .trim()
+                    .toLowerCase();
+            };
+
+            const ensurePsgcCityData = (() => {
+                let cityDataPromise = null;
+
+                return () => {
+                    if (!cityDataPromise) {
+                        cityDataPromise = fetch("https://psgc.gitlab.io/api/cities-municipalities/")
+                            .then(response => response.json())
+                            .then(data => data.sort((a, b) => a.name.localeCompare(b.name)))
+                            .catch(error => {
+                                console.error("Error loading cities:", error);
+                                return [];
+                            });
+                    }
+
+                    return cityDataPromise;
                 };
+            })();
 
-                toggleReferralFields();
-                referralTypeSelect.addEventListener("change", toggleReferralFields);
+        const setRecipientDetails = (cityGovernment, companyAddress) => {
+            if (cityDropdown && cityGovernment) {
+                appendOptionIfMissing(
+                    cityDropdown,
+                    cityGovernment,
+                    formatCityGovernmentLabel(cityGovernment)
+                );
+                cityDropdown.value = cityGovernment;
 
-                if (referralForm) {
-                    referralForm.addEventListener("submit", toggleReferralFields);
+                if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                    window.jQuery(cityDropdown).trigger("change.select2");
                 }
             }
 
-            const cityDropdown = document.getElementById("cityGovernment");
-            const permitIssuedAtDropdown = document.getElementById("permitIssuedAtSelect");
-            const refRecipientDropdown = document.getElementById("refRecipientSelect");
-            const refPlaceInput = document.getElementById("refPlaceInput");
-            const refPlaceList = document.getElementById("refPlaceList");
-            const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
-            const refCompanyAddressList = document.getElementById("refCompanyAddressList");
-            const selectedPermitIssuedAt = `{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}`;
-            const selectedCityGovernment = `{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}`;
-            const selectedRefRecipient = `{{ old('ref_recipient', $referral->ref_recipient ?? '') }}`;
-            const selectedRefPlace = `{{ old('ref_place', $referral->ref_place ?? '') }}`;
-            const selectedRefCompanyAddress = `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
+            if (refCompanyAddressInput && companyAddress) {
+                refCompanyAddressInput.value = companyAddress;
+            }
+        };
 
-            const allowedRegions = [
-                "130000000", // NCR
-                "040000000"  // Region 4A (CALABARZON)
-            ];
+        appendOptionIfMissing(
+            cityDropdown,
+            selectedCityGovernment,
+            formatCityGovernmentLabel(selectedCityGovernment)
+        );
+        appendOptionIfMissing(permitIssuedAtDropdown, selectedPermitIssuedAt, selectedPermitIssuedAt);
+        appendOptionIfMissing(refRecipientDropdown, selectedRefRecipient, selectedRefRecipient, {
+            cityGovernment: selectedCityGovernment,
+            companyAddress: selectedRefCompanyAddress
+        });
 
-            const appendOptionIfMissing = (select, value, label) => {
-                if (!select || !value) {
+            const syncRecipientDetailsFromSelectedOption = () => {
+                if (!refRecipientDropdown) {
                     return;
                 }
 
-                const hasExisting = Array.from(select.options).some(option => option.value === value);
+            const selectedRecipientOption = refRecipientDropdown.options[refRecipientDropdown.selectedIndex];
 
-                if (!hasExisting) {
-                    const option = document.createElement("option");
-                    option.value = value;
-                    option.text = label;
-                    option.selected = true;
-                    select.appendChild(option);
-                }
-            };
-
-            appendOptionIfMissing(cityDropdown, selectedCityGovernment, selectedCityGovernment);
-            appendOptionIfMissing(permitIssuedAtDropdown, selectedPermitIssuedAt, selectedPermitIssuedAt);
-            appendOptionIfMissing(refRecipientDropdown, selectedRefRecipient, selectedRefRecipient);
-
-            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
-                if (permitIssuedAtDropdown) {
-                    window.jQuery(permitIssuedAtDropdown).select2({
-                        placeholder: "Select City Government",
-                        allowClear: true,
-                        width: "100%",
-                        dropdownAutoWidth: true,
-                        minimumResultsForSearch: 0
-                    });
-                }
-
-                if (cityDropdown) {
-                    window.jQuery(cityDropdown).select2({
-                        placeholder: "Select City Government",
-                        allowClear: true,
-                        width: "100%",
-                        dropdownAutoWidth: true,
-                        minimumResultsForSearch: 0
-                    });
-                }
+            if (!selectedRecipientOption) {
+                return;
             }
 
-            fetch("https://psgc.gitlab.io/api/cities-municipalities/")
-                .then(response => response.json())
-                .then(data => {
-                    const sortedCities = data
-                        .filter(city => allowedRegions.includes(city.regionCode))
-                        .sort((a, b) => a.name.localeCompare(b.name));
+            setRecipientDetails(
+                selectedRecipientOption.dataset.cityGovernment || "",
+                    selectedRecipientOption.dataset.companyAddress || ""
+                );
+            };
 
-                    sortedCities.forEach(city => {
-                        const cityGovernmentValue = city.name;
-                        const cityAddressValue = city.name;
+            const syncRecipientFromCityGovernment = () => {
+                if (!cityDropdown || !refRecipientDropdown) {
+                    return;
+                }
 
-                        if (permitIssuedAtDropdown && !Array.from(permitIssuedAtDropdown.options).some(option => option.value === cityGovernmentValue)) {
+                const normalizedSelectedCity = normalizeCityGovernmentValue(cityDropdown.value);
+
+                if (!normalizedSelectedCity) {
+                    refRecipientDropdown.value = "";
+
+                    if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                        window.jQuery(refRecipientDropdown).val(null).trigger("change");
+                    }
+
+                    if (refCompanyAddressInput) {
+                        refCompanyAddressInput.value = "";
+                    }
+
+                    return;
+                }
+
+                const matchingMayorOption = Array.from(refRecipientDropdown.options).find(option =>
+                    normalizeCityGovernmentValue(option.dataset.cityGovernment || "") === normalizedSelectedCity
+                );
+
+                if (!matchingMayorOption) {
+                    return;
+                }
+
+                matchingMayorOption.selected = true;
+                refRecipientDropdown.value = matchingMayorOption.value;
+
+                if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                    window.jQuery(refRecipientDropdown).trigger("change.select2");
+                }
+
+                setRecipientDetails(
+                    matchingMayorOption.dataset.cityGovernment || "",
+                    matchingMayorOption.dataset.companyAddress || ""
+                );
+            };
+
+        if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+            if (permitIssuedAtDropdown) {
+                window.jQuery(permitIssuedAtDropdown).select2({
+                    placeholder: "Select City Government",
+                    allowClear: true,
+                    width: "100%",
+                    dropdownAutoWidth: true,
+                    minimumResultsForSearch: 0
+                });
+            }
+
+            if (cityDropdown) {
+                window.jQuery(cityDropdown).select2({
+                    placeholder: "Select City Government",
+                    allowClear: true,
+                    width: "100%",
+                    dropdownAutoWidth: true,
+                    minimumResultsForSearch: 0
+                });
+            }
+
+            if (refRecipientDropdown) {
+                window.jQuery(refRecipientDropdown).select2({
+                    placeholder: "Search or type mayor's name",
+                    allowClear: true,
+                    width: "100%",
+                    dropdownAutoWidth: true,
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: referralRecipientSearchUrl,
+                        dataType: "json",
+                        delay: 250,
+                        data: params => {
+                            const cityGovernmentValue = cityDropdown ? cityDropdown.value : "";
+
+                            return {
+                                q: params.term || "",
+                                city_government: cityGovernmentValue && cityGovernmentValue !== "Select City Government"
+                                    ? cityGovernmentValue
+                                    : ""
+                            };
+                        },
+                        processResults: data => ({
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text,
+                                city_government: item.city_government,
+                                company_address: item.company_address
+                            }))
+                        })
+                    },
+                    templateSelection: item => item.text || item.id || ""
+                });
+
+                window.jQuery(refRecipientDropdown).on("select2:select", function (event) {
+                    const selectedMayor = event.params.data;
+
+                    const selectedOption = refRecipientDropdown.options[refRecipientDropdown.selectedIndex];
+
+                    if (selectedOption) {
+                        if (selectedMayor.city_government) {
+                            selectedOption.dataset.cityGovernment = selectedMayor.city_government;
+                        }
+
+                        if (selectedMayor.company_address) {
+                            selectedOption.dataset.companyAddress = selectedMayor.company_address;
+                        }
+                    }
+
+                    setRecipientDetails(
+                        selectedMayor.city_government || "",
+                        selectedMayor.company_address || ""
+                    );
+                });
+
+                window.jQuery(refRecipientDropdown).on("select2:clear", function () {
+                    if (refCompanyAddressInput) {
+                        refCompanyAddressInput.value = "";
+                    }
+                });
+            }
+        }
+
+            if (refRecipientDropdown) {
+                refRecipientDropdown.addEventListener("change", syncRecipientDetailsFromSelectedOption);
+            }
+
+            if (cityDropdown) {
+                cityDropdown.addEventListener("change", syncRecipientFromCityGovernment);
+            }
+
+            const configuredCityGovernments = [...new Set(
+                configuredMayors
+                    .map(mayor => mayor.city_government)
+                    .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b));
+
+            const configuredCompanyAddresses = [...new Set(
+                configuredMayors
+                    .map(mayor => mayor.company_address)
+                    .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b));
+
+            configuredCityGovernments.forEach(cityGovernmentValue => {
+                if (cityDropdown && !Array.from(cityDropdown.options).some(option => option.value === cityGovernmentValue)) {
+                    const option = document.createElement("option");
+                    option.value = cityGovernmentValue;
+                    option.text = cityGovernmentValue;
+
+                    if (cityGovernmentValue === selectedCityGovernment) {
+                        option.selected = true;
+                    }
+
+                    cityDropdown.appendChild(option);
+                }
+            });
+
+            configuredCompanyAddresses.forEach(companyAddressValue => {
+                if (refCompanyAddressList && !Array.from(refCompanyAddressList.options).some(option => option.value === companyAddressValue)) {
+                    const option = document.createElement("option");
+                    option.value = companyAddressValue;
+                    refCompanyAddressList.appendChild(option);
+                }
+            });
+
+            if (refCompanyAddressInput && selectedRefCompanyAddress) {
+                refCompanyAddressInput.value = selectedRefCompanyAddress;
+            }
+
+            syncRecipientDetailsFromSelectedOption();
+
+            const populatePsgcCityData = () => {
+                ensurePsgcCityData().then(cities => {
+                    cities.forEach(city => {
+                        const cityValue = city.name;
+
+                        if (permitIssuedAtDropdown && !Array.from(permitIssuedAtDropdown.options).some(option => option.value === cityValue)) {
                             const option = document.createElement("option");
-                            option.value = cityGovernmentValue;
-                            option.text = cityGovernmentValue;
+                            option.value = cityValue;
+                            option.text = cityValue;
 
-                            if (cityGovernmentValue === selectedPermitIssuedAt) {
+                            if (cityValue === selectedPermitIssuedAt) {
                                 option.selected = true;
                             }
 
                             permitIssuedAtDropdown.appendChild(option);
                         }
 
-                        if (cityDropdown && !Array.from(cityDropdown.options).some(option => option.value === cityGovernmentValue)) {
+                        if (refPlaceList && !Array.from(refPlaceList.options).some(option => option.value === cityValue)) {
                             const option = document.createElement("option");
-                            option.value = cityGovernmentValue;
-                            option.text = cityGovernmentValue;
-
-                            if (cityGovernmentValue === selectedCityGovernment) {
-                                option.selected = true;
-                            }
-
-                            cityDropdown.appendChild(option);
-                        }
-
-                        if (refPlaceList && !Array.from(refPlaceList.options).some(option => option.value === cityAddressValue)) {
-                            const option = document.createElement("option");
-                            option.value = cityAddressValue;
+                            option.value = cityValue;
                             refPlaceList.appendChild(option);
-                        }
-
-                        if (refCompanyAddressList && !Array.from(refCompanyAddressList.options).some(option => option.value === cityAddressValue)) {
-                            const option = document.createElement("option");
-                            option.value = cityAddressValue;
-                            refCompanyAddressList.appendChild(option);
                         }
                     });
 
@@ -1940,48 +2209,55 @@
                         refPlaceInput.value = selectedRefPlace;
                     }
 
-                    if (refCompanyAddressInput && selectedRefCompanyAddress) {
-                        refCompanyAddressInput.value = selectedRefCompanyAddress;
+                    if (window.jQuery && typeof window.jQuery.fn.select2 === "function" && permitIssuedAtDropdown) {
+                        window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
                     }
+                });
+            };
 
-                    if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
-                        if (permitIssuedAtDropdown) {
-                            window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
-                        }
+            if (permitIssuedAtDropdown) {
+                permitIssuedAtDropdown.addEventListener("focus", populatePsgcCityData, { once: true });
+            }
 
-                        if (cityDropdown) {
-                            window.jQuery(cityDropdown).trigger("change.select2");
-                        }
+            if (refPlaceInput) {
+                refPlaceInput.addEventListener("focus", populatePsgcCityData, { once: true });
+            }
 
-                        if (refRecipientDropdown) {
-                            window.jQuery(refRecipientDropdown).trigger("change.select2");
-                        }
-                    }
+            if (selectedPermitIssuedAt || selectedRefPlace) {
+                populatePsgcCityData();
+            }
 
-                })
-                .catch(error => console.error("Error loading cities:", error));
+            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                if (cityDropdown) {
+                    window.jQuery(cityDropdown).trigger("change.select2");
+                }
 
-        });
+                if (refRecipientDropdown) {
+                    window.jQuery(refRecipientDropdown).trigger("change.select2");
+                }
+            }
 
-    </script>
-    {{-- Upload file name --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
+    });
 
-            document.querySelectorAll(".file-input").forEach(input => {
-                input.addEventListener("change", function () {
+</script>
+{{-- Upload file name --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
-                    const previewId = this.dataset.preview;
-                    const previewContainer = document.getElementById(previewId);
+        document.querySelectorAll(".file-input").forEach(input => {
+            input.addEventListener("change", function () {
 
-                    if (!previewContainer) return;
+                const previewId = this.dataset.preview;
+                const previewContainer = document.getElementById(previewId);
 
-                    if (this.files && this.files[0]) {
+                if (!previewContainer) return;
 
-                        const file = this.files[0];
-                        const fileURL = URL.createObjectURL(file);
+                if (this.files && this.files[0]) {
 
-                        previewContainer.innerHTML = `
+                    const file = this.files[0];
+                    const fileURL = URL.createObjectURL(file);
+
+                    previewContainer.innerHTML = `
                     <a href="${fileURL}" 
                        target="_blank"
                        class="badge bg-success text-white border px-3 py-2">
@@ -1989,273 +2265,302 @@
                         ${file.name}
                     </a>
                 `;
-                    }
+                }
+            });
+
+        });
+
+    });
+</script>
+{{-- City Address --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const provinceSelect = document.getElementById('province');
+        const citySelect = document.getElementById('city');
+        const barangaySelect = document.getElementById('barangay');
+
+
+        // SAVED VALUES
+        let savedProvince = "{{ $applicant->province }}";
+        let savedCity = "{{ $applicant->city }}";
+        let savedBarangay = "{{ $applicant->barangay }}";
+
+
+
+        // ---------- LOAD PROVINCES ----------
+        function loadProvinces() {
+
+            provinceSelect.innerHTML = '<option>Loading provinces...</option>';
+
+            fetch('https://psgc.gitlab.io/api/provinces/')
+                .then(response => response.json())
+                .then(data => {
+
+                    provinceSelect.innerHTML = '<option value="">Select Province</option>';
+
+                    data.sort((a, b) => a.name.localeCompare(b.name));
+
+                    data.forEach(province => {
+
+                        let option = document.createElement('option');
+
+                        option.value = province.name;
+                        option.textContent = province.name;
+                        option.dataset.code = province.code;
+
+                        if (province.name === savedProvince) {
+                            option.selected = true;
+                            loadCities(province.code);
+                        }
+
+                        provinceSelect.appendChild(option);
+
+                    });
+
                 });
 
-            });
-
-        });
-    </script>
-    {{-- City Address --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const provinceSelect = document.getElementById('province');
-            const citySelect = document.getElementById('city');
-            const barangaySelect = document.getElementById('barangay');
-
-
-            // SAVED VALUES
-            let savedProvince = "{{ $applicant->province }}";
-            let savedCity = "{{ $applicant->city }}";
-            let savedBarangay = "{{ $applicant->barangay }}";
+        }
 
 
 
-            // ---------- LOAD PROVINCES ----------
-            function loadProvinces() {
+        // ---------- LOAD CITIES ----------
+        function loadCities(provinceCode) {
 
-                provinceSelect.innerHTML = '<option>Loading provinces...</option>';
+            citySelect.innerHTML = '<option>Loading cities...</option>';
 
-                fetch('https://psgc.gitlab.io/api/provinces/')
-                    .then(response => response.json())
-                    .then(data => {
+            fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
+                .then(response => response.json())
+                .then(data => {
 
-                        provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                    citySelect.innerHTML = '<option value="">Select City</option>';
 
-                        data.sort((a, b) => a.name.localeCompare(b.name));
+                    data.sort((a, b) => a.name.localeCompare(b.name));
 
-                        data.forEach(province => {
+                    data.forEach(city => {
 
-                            let option = document.createElement('option');
+                        let option = document.createElement('option');
 
-                            option.value = province.name;
-                            option.textContent = province.name;
-                            option.dataset.code = province.code;
+                        option.value = city.name;
+                        option.textContent = city.name;
+                        option.dataset.code = city.code;
 
-                            if (province.name === savedProvince) {
-                                option.selected = true;
-                                loadCities(province.code);
-                            }
+                        if (city.name === savedCity) {
+                            option.selected = true;
+                            loadBarangays(city.code);
+                        }
 
-                            provinceSelect.appendChild(option);
-
-                        });
+                        citySelect.appendChild(option);
 
                     });
 
-            }
+                });
+
+        }
 
 
 
-            // ---------- LOAD CITIES ----------
-            function loadCities(provinceCode) {
+        // ---------- LOAD BARANGAYS ----------
+        function loadBarangays(cityCode) {
 
-                citySelect.innerHTML = '<option>Loading cities...</option>';
+            barangaySelect.innerHTML = '<option>Loading barangays...</option>';
 
-                fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
-                    .then(response => response.json())
-                    .then(data => {
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+                .then(response => response.json())
+                .then(data => {
 
-                        citySelect.innerHTML = '<option value="">Select City</option>';
+                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
-                        data.sort((a, b) => a.name.localeCompare(b.name));
+                    data.sort((a, b) => a.name.localeCompare(b.name));
 
-                        data.forEach(city => {
+                    data.forEach(barangay => {
 
-                            let option = document.createElement('option');
+                        let option = document.createElement('option');
 
-                            option.value = city.name;
-                            option.textContent = city.name;
-                            option.dataset.code = city.code;
+                        option.value = barangay.name;
+                        option.textContent = barangay.name;
 
-                            if (city.name === savedCity) {
-                                option.selected = true;
-                                loadBarangays(city.code);
-                            }
+                        if (barangay.name === savedBarangay) {
+                            option.selected = true;
+                        }
 
-                            citySelect.appendChild(option);
-
-                        });
+                        barangaySelect.appendChild(option);
 
                     });
 
-            }
+                });
+
+        }
 
 
 
-            // ---------- LOAD BARANGAYS ----------
-            function loadBarangays(cityCode) {
+        // ---------- EVENTS ----------
+        provinceSelect.addEventListener('change', function () {
 
-                barangaySelect.innerHTML = '<option>Loading barangays...</option>';
+            let code = this.options[this.selectedIndex].dataset.code;
 
-                fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
-                    .then(response => response.json())
-                    .then(data => {
+            if (code) {
 
-                        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                loadCities(code);
 
-                        data.sort((a, b) => a.name.localeCompare(b.name));
+            } else {
 
-                        data.forEach(barangay => {
-
-                            let option = document.createElement('option');
-
-                            option.value = barangay.name;
-                            option.textContent = barangay.name;
-
-                            if (barangay.name === savedBarangay) {
-                                option.selected = true;
-                            }
-
-                            barangaySelect.appendChild(option);
-
-                        });
-
-                    });
+                citySelect.innerHTML = '<option>Select City</option>';
+                barangaySelect.innerHTML = '<option>Select Barangay</option>';
 
             }
-
-
-
-            // ---------- EVENTS ----------
-            provinceSelect.addEventListener('change', function () {
-
-                let code = this.options[this.selectedIndex].dataset.code;
-
-                if (code) {
-
-                    loadCities(code);
-
-                } else {
-
-                    citySelect.innerHTML = '<option>Select City</option>';
-                    barangaySelect.innerHTML = '<option>Select Barangay</option>';
-
-                }
-
-            });
-
-
-            citySelect.addEventListener('change', function () {
-
-                let code = this.options[this.selectedIndex].dataset.code;
-
-                if (code) {
-
-                    loadBarangays(code);
-
-                } else {
-
-                    barangaySelect.innerHTML = '<option>Select Barangay</option>';
-
-                }
-
-            });
-
-
-
-            // ---------- INIT ----------
-            loadProvinces();
 
         });
 
-    </script>
-    {{-- Archived File--}}
-    <script>
-        function clearFile(applicantId, field) {
 
-            if (!confirm("Remove this file?")) return;
+        citySelect.addEventListener('change', function () {
 
-            fetch(`/permit/${applicantId}/${field}/delete`, {
-                method: "DELETE",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    "Accept": "application/json",
-                    "X-Requested-With": "XMLHttpRequest"
+            let code = this.options[this.selectedIndex].dataset.code;
+
+            if (code) {
+
+                loadBarangays(code);
+
+            } else {
+
+                barangaySelect.innerHTML = '<option>Select Barangay</option>';
+
+            }
+
+        });
+
+
+
+        // ---------- INIT ----------
+        loadProvinces();
+
+    });
+
+</script>
+{{-- Archived File--}}
+<script>
+    function clearFile(applicantId, field) {
+
+        if (!confirm("Remove this file?")) return;
+
+        fetch(`/permit/${applicantId}/${field}/delete`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("file-" + field).remove();
+                } else {
+                    alert("Error removing file.");
                 }
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Server error");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("file-" + field).remove();
-                    } else {
-                        alert("Error removing file.");
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert("Error removing file.");
-                });
-        }
-    </script>
-    {{-- Expires On --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const permitDate = document.getElementById("permit_date");
-            const expiresOn = document.getElementById("expires_on");
-
-            permitDate.addEventListener("change", function () {
-
-                if (!this.value) return;
-
-                let date = new Date(this.value);
-
-                // Add 6 months
-                date.setMonth(date.getMonth() + 6);
-
-                // Fix date format (YYYY-MM-DD)
-                let formatted = date.toISOString().split('T')[0];
-
-                expiresOn.value = formatted;
-
+            .catch(error => {
+                console.error(error);
+                alert("Error removing file.");
             });
+    }
+</script>
+{{-- Expires On --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const permitDate = document.getElementById("permit_date");
+        const expiresOn = document.getElementById("expires_on");
+
+        permitDate.addEventListener("change", function () {
+
+            if (!this.value) return;
+
+            let date = new Date(this.value);
+
+            // Add 6 months
+            date.setMonth(date.getMonth() + 6);
+
+            // Fix date format (YYYY-MM-DD)
+            let formatted = date.toISOString().split('T')[0];
+
+            expiresOn.value = formatted;
 
         });
-    </script>
-    {{-- nbi or police --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            const dropdown = document.getElementById("clearance_type");
-            const nbi = document.getElementById("nbi_section");
-            const police = document.getElementById("police_section");
+    });
+</script>
+{{-- nbi or police --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
-            function toggleFields() {
-                const value = dropdown.value;
+        const dropdown = document.getElementById("clearance_type");
+        const nbi = document.getElementById("nbi_section");
+        const police = document.getElementById("police_section");
 
-                if (value === "nbi") {
-                    nbi.style.display = "grid";
-                    police.style.display = "none";
-                }
-                else if (value === "police") {
-                    nbi.style.display = "none";
-                    police.style.display = "grid";
-                }
-                else {
-                    nbi.style.display = "none";
-                    police.style.display = "none";
-                }
+        function toggleFields() {
+            const value = dropdown.value;
+
+            if (value === "nbi") {
+                nbi.style.display = "grid";
+                police.style.display = "none";
             }
-
-            // Run on page load (edit mode support)
-            toggleFields();
-
-            // Run when changed
-            dropdown.addEventListener("change", toggleFields);
-
-        });
-    </script>
-
-    <script>
-        function showFileName(input, displayId) {
-            const fileName = input.files.length ? input.files[0].name : '';
-            document.getElementById(displayId).textContent = fileName;
+            else if (value === "police") {
+                nbi.style.display = "none";
+                police.style.display = "grid";
+            }
+            else {
+                nbi.style.display = "none";
+                police.style.display = "none";
+            }
         }
-    </script>
+
+        // Run on page load (edit mode support)
+        toggleFields();
+
+        // Run when changed
+        dropdown.addEventListener("change", toggleFields);
+
+    });
+</script>
+
+<script>
+    function showFileName(input, displayId) {
+        const fileName = input.files.length ? input.files[0].name : '';
+        document.getElementById(displayId).textContent = fileName;
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const educationalAttainmentSelect = document.getElementById('educationalAttainmentSelect');
+
+        if (!educationalAttainmentSelect || !window.jQuery || typeof window.jQuery.fn.select2 !== 'function') {
+            return;
+        }
+
+        window.jQuery(educationalAttainmentSelect).select2({
+            placeholder: 'Select educational attainment',
+            allowClear: true,
+            width: '100%',
+            dropdownAutoWidth: true,
+            minimumResultsForSearch: 0,
+            ajax: {
+                url: '{{ url('/api/educational-attainments') }}',
+                dataType: 'json',
+                delay: 250,
+                data: params => ({
+                    q: params.term || ''
+                }),
+                processResults: data => ({
+                    results: data.results || []
+                })
+            }
+        });
+    });
+</script>

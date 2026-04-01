@@ -43,15 +43,19 @@ class PermitController extends Controller
         // HEALTH CARD
         // =========================
         if ($request->hasFile('health_card')) {
+            $file = $request->file('health_card');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'permits/health_cards/'.$fileName;
 
             if ($permit->health_card) {
                 Storage::disk('public')->delete($permit->health_card);
             }
 
-            $file = $request->file('health_card');
-            $extension = $file->getClientOriginalExtension();
-
-            $fileName = 'health_card_'.$fullName.'.'.$extension;
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $permit->health_card = $file->storeAs(
                 'permits/health_cards',
@@ -72,15 +76,19 @@ class PermitController extends Controller
             }
 
             if ($request->hasFile('permit_nbi_clearance')) {
+                $file = $request->file('permit_nbi_clearance');
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = Str::slug($originalName, '_').'.'.$extension;
+                $filePath = 'permits/permit_nbi_clearance/'.$fileName;
 
                 if ($permit->permit_nbi_clearance) {
                     Storage::disk('public')->delete($permit->permit_nbi_clearance);
                 }
 
-                $file = $request->file('permit_nbi_clearance');
-                $extension = $file->getClientOriginalExtension();
-
-                $fileName = 'nbi_clearance_'.$fullName.'.'.$extension;
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                }
 
                 $permit->permit_nbi_clearance = $file->storeAs(
                     'permits/permit_nbi_clearance',
@@ -99,15 +107,19 @@ class PermitController extends Controller
             }
 
             if ($request->hasFile('permit_police_clearance')) {
+                $file = $request->file('permit_police_clearance');
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = Str::slug($originalName, '_').'.'.$extension;
+                $filePath = 'permits/permit_police_clearance/'.$fileName;
 
                 if ($permit->permit_police_clearance) {
                     Storage::disk('public')->delete($permit->permit_police_clearance);
                 }
 
-                $file = $request->file('permit_police_clearance');
-                $extension = $file->getClientOriginalExtension();
-
-                $fileName = 'police_clearance_'.$fullName.'.'.$extension;
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                }
 
                 $permit->permit_police_clearance = $file->storeAs(
                     'permits/permit_police_clearance',
@@ -121,18 +133,22 @@ class PermitController extends Controller
         // CEDULA
         // =========================
         if ($request->hasFile('cedula')) {
+            $file = $request->file('cedula');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'permits/cedulas/'.$fileName;
 
             if ($permit->cedula) {
                 Storage::disk('public')->delete($permit->cedula);
             }
 
-            $file = $request->file('cedula');
-            $extension = $file->getClientOriginalExtension();
-
-            $fileName = 'cedula_'.$fullName.'.'.$extension;
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $permit->cedula = $file->storeAs(
-                'permits/cedula',
+                'permits/cedulas',
                 $fileName,
                 'public'
             );
@@ -142,15 +158,19 @@ class PermitController extends Controller
         // REFERRAL LETTER
         // =========================
         if ($request->hasFile('referral_letter')) {
+            $file = $request->file('referral_letter');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = 'permits/referral_letters/'.$fileName;
 
             if ($permit->referral_letter) {
                 Storage::disk('public')->delete($permit->referral_letter);
             }
 
-            $file = $request->file('referral_letter');
-            $extension = $file->getClientOriginalExtension();
-
-            $fileName = 'referral_letter_'.$fullName.'.'.$extension;
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $permit->referral_letter = $file->storeAs(
                 'permits/referral_letters',
@@ -196,7 +216,7 @@ class PermitController extends Controller
                 ? ((int) substr($latest->peso_id_no, -7)) + 1
                 : 1;
 
-            $permit->peso_id_no = $year.'-'.str_pad($nextNumber, 7, '0', STR_PAD_LEFT);
+            $permit->peso_id_no = $year.'-'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
             $permit->save();
         }

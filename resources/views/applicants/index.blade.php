@@ -295,7 +295,7 @@
     </div>
 
     <style>
-        .applicant-index-page { max-width: 1680px; }
+        .applicant-index-page { max-width: 1800px; }
         .index-hero {
             overflow: hidden;
             background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.16), transparent 28%), radial-gradient(circle at left bottom, rgba(16, 185, 129, 0.14), transparent 32%), linear-gradient(135deg, #ffffff, #f3f8ff 58%, #edf7f5);
@@ -486,7 +486,7 @@
         .mini-pill { padding: 0.34rem 0.72rem; background: #f8fafc; border: 1px solid #e2e8f0; color: #334155; }
         .contact-line, .mobile-meta-line { color: #334155; font-weight: 600; }
         .location-cell { min-width: 230px; color: #334155; }
-        .requirement-card { min-width: 150px; }
+        .requirement-card { min-width: 100px; }
         .requirement-meta {
             display: flex;
             justify-content: space-between;

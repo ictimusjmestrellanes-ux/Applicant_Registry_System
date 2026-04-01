@@ -6,6 +6,7 @@ use App\Models\Applicant;
 use App\Models\MayorsReferral;
 use App\Support\ActivityLogger;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -14,6 +15,25 @@ use Illuminate\Support\Str;
 
 class ReferralController extends Controller
 {
+    public function searchRecipients(Request $request): JsonResponse
+    {
+        $search = trim((string) $request->query('q', ''));
+        $cityGovernment = trim((string) $request->query('city_government', ''));
+
+        $results = $this->searchPhilippineMayors($search, $cityGovernment)
+            ->map(fn (array $mayor) => [
+                'id' => $mayor['recipient'],
+                'text' => $mayor['recipient'],
+                'city_government' => $mayor['city_government'],
+                'company_address' => $mayor['company_address'],
+            ])
+            ->values();
+
+        return response()->json([
+            'results' => $results,
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $applicant = Applicant::findOrFail($id);
@@ -37,13 +57,19 @@ class ReferralController extends Controller
                 continue;
             }
 
+            $file = $request->file($field);
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+            $filePath = $directory.'/'.$fileName;
+
             if ($referral->{$field}) {
                 Storage::disk('public')->delete($referral->{$field});
             }
 
-            $file = $request->file($field);
-            $extension = $file->getClientOriginalExtension();
-            $fileName = $field.'_'.$fullName.'.'.$extension;
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
 
             $referral->{$field} = $file->storeAs($directory, $fileName, 'public');
         }
@@ -52,7 +78,7 @@ class ReferralController extends Controller
             'referral_type' => $referralType,
 
             'ref_imus_ocrl' => null,
-            'ref_employer_name_name' => null,
+            'ref_employer_name' => null,
             'ref_position' => null,
             'ref_or_no' => null,
             'ref_company_address' => null,
@@ -125,11 +151,51 @@ class ReferralController extends Controller
             ->with('success', 'Referral updated successfully.');
     }
 
-    private function searchPhilippineMayors(string $search, string $cityGovernment): Collection
+    private function searchPhilippineMayors(string $search, string $cityGovernment = ''): Collection
     {
-        // TODO: Implement API call or database lookup for Philippine mayors
-        // For now, returning an empty collection
-        return collect();
+        $directoryResults = collect(Config::get('philippine_mayors', []))
+            ->filter(function (array $mayor) use ($search, $cityGovernment) {
+                $matchesSearch = $search === ''
+                    || str_contains(Str::lower($mayor['recipient']), Str::lower($search));
+                $matchesCity = $cityGovernment === ''
+                    || str_contains(Str::lower($mayor['city_government']), Str::lower($cityGovernment));
+
+                return $matchesSearch && $matchesCity;
+            })
+            ->map(fn (array $mayor) => [
+                'recipient' => $mayor['recipient'],
+                'city_government' => $mayor['city_government'],
+                'company_address' => $mayor['company_address'],
+            ]);
+
+        $savedResults = MayorsReferral::query()
+            ->where('referral_type', MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT)
+            ->whereNotNull('ref_recipient')
+            ->whereNotNull('ref_city_gov')
+            ->whereNotNull('ref_company_address')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('ref_recipient', 'like', '%'.$search.'%');
+            })
+            ->when($cityGovernment !== '', function ($query) use ($cityGovernment) {
+                $query->where('ref_city_gov', 'like', '%'.$cityGovernment.'%');
+            })
+            ->select('ref_recipient', 'ref_city_gov', 'ref_company_address')
+            ->distinct()
+            ->orderBy('ref_recipient')
+            ->limit(20)
+            ->get()
+            ->map(fn (MayorsReferral $referral) => [
+                'recipient' => $referral->ref_recipient,
+                'city_government' => $referral->ref_city_gov,
+                'company_address' => $referral->ref_company_address,
+            ]);
+
+        return $directoryResults
+            ->merge($savedResults)
+            ->unique(fn (array $mayor) => Str::lower($mayor['recipient']).'|'.Str::lower($mayor['city_government']))
+            ->sortBy('recipient')
+            ->values()
+            ->take(20);
     }
 
     public function printLetter($id)

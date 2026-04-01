@@ -89,13 +89,13 @@
 
 <style>
     :root {
-        --sidebar-bg: linear-gradient(180deg, #123c73 0%, #0f2d57 48%, #0a1e39 100%);
-        --sidebar-surface: rgba(255, 255, 255, 0.08);
-        --sidebar-border: rgba(255, 255, 255, 0.12);
-        --sidebar-text: rgba(255, 255, 255, 0.92);
-        --sidebar-muted: rgba(255, 255, 255, 0.62);
-        --sidebar-accent: #34d399;
-        --sidebar-accent-strong: #10b981;
+        --sidebar-bg: #ffffff;           /* white background */
+        --sidebar-surface: #f3f4f6;      /* light surface */
+        --sidebar-border: #e6e6e6;       /* light border */
+        --sidebar-text: #000000;         /* black text & icons */
+        --sidebar-muted: #6b6b6b;        /* muted gray */
+        --sidebar-accent: #000000;       /* accent dark */
+        --sidebar-accent-strong: #000000;/* strong accent (black) */
     }
 
     .sidebar {
@@ -107,16 +107,14 @@
         z-index: 1050;
         background: var(--sidebar-bg);
         color: var(--sidebar-text);
-        box-shadow: 8px 0 30px rgba(7, 16, 31, 0.22);
+        box-shadow: 8px 0 30px rgba(7, 16, 31, 0.06);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
     }
 
     .sidebar-top {
         position: relative;
-        background:
-            radial-gradient(circle at top right, rgba(52, 211, 153, 0.25), transparent 38%),
-            radial-gradient(circle at left center, rgba(255, 255, 255, 0.08), transparent 30%);
+        background: var(--sidebar-surface);
     }
 
     .brand-card {
@@ -124,11 +122,9 @@
         overflow: hidden;
         padding: 1rem;
         border-radius: 22px;
-        background:
-            linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
-            rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 30px rgba(7, 16, 31, 0.16);
+        background: var(--sidebar-surface);
+        border: 1px solid var(--sidebar-border);
+        box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.04), 0 16px 30px rgba(7, 16, 31, 0.06);
         backdrop-filter: blur(10px);
     }
 
@@ -140,7 +136,7 @@
         width: 120px;
         height: 120px;
         border-radius: 999px;
-        background: rgba(52, 211, 153, 0.12);
+        background: rgba(0, 0, 0, 0.03);
     }
 
     .brand-shell {
@@ -168,20 +164,16 @@
         margin-bottom: 0.45rem;
         padding: 0.3rem 0.65rem;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.1);
-        color: #d1fae5;
-        font-size: 0.7rem;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+        background: rgba(0, 0, 0, 0.03);
+        color: var(--sidebar-muted);
     }
 
     .brand-badge-dot {
         width: 8px;
         height: 8px;
         border-radius: 999px;
-        background: #34d399;
-        box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.16);
+        background: var(--sidebar-accent);
+        box-shadow: 0 0 0 4px rgba(43, 43, 43, 0.06);
     }
 
     .brand-label {
@@ -189,6 +181,7 @@
         font-weight: 600;
         letter-spacing: 0.01em;
         line-height: 1.15;
+        color: var(--sidebar-text);
     }
 
     .brand-subtitle {
@@ -212,11 +205,9 @@
         gap: 0.4rem;
         padding: 0.45rem 0.7rem;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.84);
-        font-size: 0.72rem;
-        font-weight: 700;
+        background: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.02);
+        color: var(--sidebar-text);
     }
 
     .sidebar-account {
@@ -238,14 +229,15 @@
         align-items: center;
         justify-content: center;
         font-weight: 800;
-        background: rgba(255, 255, 255, 0.14);
-        color: #fff;
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--sidebar-text);
     }
 
     .account-name {
         font-size: 0.92rem;
         font-weight: 700;
         line-height: 1.2;
+        color: var(--sidebar-text);
     }
 
     .account-role {
@@ -282,14 +274,14 @@
     }
 
     .sidebar-link:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.03);
+        border-color: rgba(0, 0, 0, 0.02);
     }
 
     .sidebar-link.active {
-        background: linear-gradient(135deg, rgba(52, 211, 153, 0.24), rgba(16, 185, 129, 0.16));
-        border-color: rgba(52, 211, 153, 0.35);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.06);
+        border-color: rgba(0, 0, 0, 0.08);
+        box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.02);
     }
 
     .sidebar-icon {
@@ -300,20 +292,19 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.08);
-        color: #fff;
-        flex-shrink: 0;
+        background: rgba(0, 0, 0, 0.03);
+        color: var(--sidebar-text);
     }
 
     .sidebar-link.active .sidebar-icon {
-        background: rgba(52, 211, 153, 0.22);
-        color: #d1fae5;
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--sidebar-text);
     }
 
     .sidebar-submenu {
         margin: 8px 0 0 18px;
         padding: 8px 0 2px 16px;
-        border-left: 1px solid rgba(255, 255, 255, 0.12);
+        border-left: 1px solid rgba(0, 0, 0, 0.04);
         gap: 4px;
     }
 
@@ -328,13 +319,13 @@
     }
 
     .sidebar-child-link:hover {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.06);
+        color: var(--sidebar-text);
+        background: rgba(0, 0, 0, 0.03);
     }
 
     .sidebar-child-link.active-child {
-        color: #fff;
-        background: rgba(52, 211, 153, 0.18);
+        color: var(--sidebar-text);
+        background: rgba(0, 0, 0, 0.05);
     }
 
     .chevron-icon {
@@ -350,8 +341,8 @@
     .system-status {
         padding: 14px 15px;
         border-radius: 16px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.02);
     }
 
     .status-line {
@@ -367,12 +358,13 @@
         color: var(--sidebar-muted);
     }
 
+    // ...existing code...
     .status-dot {
         width: 9px;
         height: 9px;
         border-radius: 999px;
         background: var(--sidebar-accent-strong);
-        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16);
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
     }
 
     .btn-close-sidebar {
@@ -382,8 +374,25 @@
         z-index: 2;
         border: 0;
         background: transparent;
-        color: #fff;
+        color: var(--sidebar-text);
         padding: 8px;
+    }
+
+    /* OVERRIDE: remove Bootstrap/blue "active" color */
+    .nav-pills .nav-link.active,
+    .nav-pills .nav-link.active:focus,
+    .nav-pills .nav-link.active:hover {
+        background: transparent !important;
+        color: var(--sidebar-text) !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+    }
+
+    /* keep icon area matching sidebar style (no blue) */
+    .nav-pills .nav-link.active .sidebar-icon,
+    .nav-pills .nav-link.active .sidebar-icon i {
+        background: rgba(0, 0, 0, 0.03) !important;
+        color: var(--sidebar-text) !important;
     }
 
     @media (max-width: 991.98px) {

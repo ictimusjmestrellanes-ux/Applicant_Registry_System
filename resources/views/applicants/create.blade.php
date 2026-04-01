@@ -19,10 +19,7 @@
         }
 
         body {
-            background:
-                radial-gradient(circle at top left, rgba(59, 130, 246, 0.09), transparent 26%),
-                radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 20%),
-                linear-gradient(180deg, #eef4f9 0%, #e8eef6 100%);
+            background-color: #eef4f9;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
 
@@ -36,9 +33,7 @@
             padding: 28px 30px;
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.75);
-            background:
-                radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 26%),
-                linear-gradient(135deg, #ffffff 0%, #f4f8ff 55%, #eef6ff 100%);
+            background-color: #ffffff;
             box-shadow: 0 18px 40px rgba(15, 34, 58, 0.08);
         }
 
@@ -76,7 +71,7 @@
             margin-bottom: 10px;
             padding: 7px 12px;
             border-radius: 999px;
-            background: var(--create-primary-soft);
+            background-color: var(--create-primary-soft);
             color: var(--create-primary);
         }
 
@@ -109,7 +104,7 @@
         .form-section {
             border-radius: 22px;
             border: 1px solid rgba(255, 255, 255, 0.72);
-            background: rgba(255, 255, 255, 0.78);
+            background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             box-shadow: 0 18px 40px rgba(15, 34, 58, 0.06);
         }
@@ -139,6 +134,7 @@
         .quick-guide {
             padding: 1.4rem;
             height: 100%;
+            background-color: #ffffff;
         }
 
         .guide-title {
@@ -159,7 +155,7 @@
             gap: 0.75rem;
             padding: 0.85rem 0.95rem;
             border-radius: 16px;
-            background: linear-gradient(180deg, #ffffff, #f7fbff);
+            background-color: #ffffff;
             border: 1px solid #e2ebf4;
         }
 
@@ -175,17 +171,17 @@
         }
 
         .icon-blue {
-            background: rgba(59, 130, 246, 0.12);
+            background-color: rgba(59, 130, 246, 0.12);
             color: #2563eb;
         }
 
         .icon-emerald {
-            background: rgba(16, 185, 129, 0.12);
+            background-color: rgba(16, 185, 129, 0.12);
             color: #059669;
         }
 
         .icon-amber {
-            background: rgba(245, 158, 11, 0.16);
+            background-color: rgba(245, 158, 11, 0.16);
             color: #b45309;
         }
 
@@ -207,7 +203,7 @@
             align-items: center;
             padding: 0.45rem 0.8rem;
             border-radius: 999px;
-            background: var(--create-success-soft);
+            background-color: var(--create-success-soft);
             color: var(--create-success);
             font-size: 0.8rem;
             font-weight: 700;
@@ -239,7 +235,7 @@
             width: 10px;
             height: 10px;
             border-radius: 999px;
-            background: linear-gradient(135deg, #10b981, #3b82f6);
+            background-color: #10b981;
             box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08);
         }
 
@@ -290,7 +286,7 @@
             padding: 1.2rem;
             border-radius: 20px;
             border: 1px solid #dfe9f3;
-            background: linear-gradient(180deg, #fbfdff, #f3f8fd);
+            background-color: #fbfdff;
         }
 
         .aside-title {
@@ -355,7 +351,7 @@
         }
 
         .btn-save {
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            background-color: #1d4ed8;
             border: none;
             color: #fff;
             box-shadow: 0 10px 22px rgba(29, 78, 216, 0.24);
@@ -429,7 +425,8 @@
                 <div class="form-header">
                     <div>
                         <h5 class="fw-bold mb-1">Applicant Information Form</h5>
-                        <p class="form-note mb-0">Fill out the profile below. After saving, you’ll continue in the applicant workspace to manage requirements.</p>
+                        <p class="form-note mb-0">Fill out the profile below. After saving, you’ll continue in the applicant
+                            workspace to manage requirements.</p>
                     </div>
                 </div>
 
@@ -439,23 +436,28 @@
                             <h6 class="section-title">Personal Information</h6>
                             <div class="row g-4">
                                 <div class="col-md-3">
-                                    <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
+                                    <label class="form-label">First Time Jobseeker <span
+                                            class="required-mark">*</span></label>
                                     <select name="first_time_job_seeker" class="form-select" required>
                                         <option value="No" {{ old('first_time_job_seeker', 'No') === 'No' ? 'selected' : '' }}>No</option>
-                                        <option value="Yes" {{ old('first_time_job_seeker') === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="Yes" {{ old('first_time_job_seeker') === 'Yes' ? 'selected' : '' }}>Yes
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name') }}" placeholder="e.g. John" required>
+                                    <input type="text" name="first_name" class="form-control"
+                                        value="{{ old('first_name') }}" placeholder="e.g. John" required>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Middle Name</label>
-                                    <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name') }}" placeholder="Optional">
+                                    <input type="text" name="middle_name" class="form-control"
+                                        value="{{ old('middle_name') }}" placeholder="Optional">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" placeholder="e.g. Doe" required>
+                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}"
+                                        placeholder="e.g. Doe" required>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Suffix</label>
@@ -470,23 +472,28 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Age <span class="required-mark">*</span></label>
-                                    <input type="number" name="age" class="form-control" value="{{ old('age') }}" placeholder="e.g. 25" required>
+                                    <input type="number" name="age" class="form-control" value="{{ old('age') }}"
+                                        placeholder="e.g. 25" required>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
                                     <select name="gender" class="form-select" required>
                                         <option value="">Select Gender</option>
                                         <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Male</option>
-                                        <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female</option>
+                                        <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Civil Status <span class="required-mark">*</span></label>
                                     <select name="civil_status" class="form-select" required>
                                         <option value="">Select Status</option>
-                                        <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single</option>
-                                        <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>Married</option>
-                                        <option value="Widowed" {{ old('civil_status') === 'Widowed' ? 'selected' : '' }}>Widowed</option>
+                                        <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single
+                                        </option>
+                                        <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>
+                                            Married</option>
+                                        <option value="Widowed" {{ old('civil_status') === 'Widowed' ? 'selected' : '' }}>
+                                            Widowed</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -511,11 +518,15 @@
                             <div class="row g-4">
                                 <div class="col-md-4">
                                     <label class="form-label">Contact Number <span class="required-mark">*</span></label>
-                                    <input type="tel" name="contact_no" class="form-control" value="{{ old('contact_no') }}" placeholder="09123456789" required>
+                                    <input type="tel" name="contact_no" class="form-control" value="{{ old('contact_no') }}"
+                                        placeholder="09123456789" pattern="[0-9]{11}" maxlength="11" inputmode="numeric"
+                                        required>
                                 </div>
                                 <div class="col-md-8">
                                     <label class="form-label">Complete Address <span class="required-mark">*</span></label>
-                                    <input type="text" name="address_line" class="form-control" value="{{ old('address_line') }}" placeholder="House No. / Street / Phase / Block" required>
+                                    <input type="text" name="address_line" class="form-control"
+                                        value="{{ old('address_line') }}" placeholder="House No. / Street / Phase / Block"
+                                        required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Province <span class="required-mark">*</span></label>
@@ -524,7 +535,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
+                                    <label class="form-label">City / Municipality <span
+                                            class="required-mark">*</span></label>
                                     <select name="city" id="city" class="form-select" required>
                                         <option value="">Select City</option>
                                     </select>
@@ -542,16 +554,32 @@
                             <h6 class="section-title">Education & Hiring</h6>
                             <div class="row g-4">
                                 <div class="col-md-4">
-                                    <label class="form-label">Educational Attainment <span class="required-mark">*</span></label>
-                                    <input type="text" name="educational_attainment" class="form-control" value="{{ old('educational_attainment') }}" placeholder="e.g. Bachelor's Degree" required>
+                                    <label class="form-label">Educational Attainment <span
+                                            class="required-mark">*</span></label>
+                                    <select name="educational_attainment" id="educationalAttainmentSelect" class="form-select" required>
+                                        <option value="">Select educational attainment</option>
+                                        @foreach(config('educational_attainments', []) as $attainment)
+                                            <option value="{{ $attainment }}"
+                                                {{ old('educational_attainment') === $attainment ? 'selected' : '' }}>
+                                                {{ $attainment }}
+                                            </option>
+                                        @endforeach
+                                        @if(old('educational_attainment') && !in_array(old('educational_attainment'), config('educational_attainments', []), true))
+                                            <option value="{{ old('educational_attainment') }}" selected>
+                                                {{ old('educational_attainment') }}
+                                            </option>
+                                        @endif
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
-                                    <input type="text" name="hiring_company" class="form-control" value="{{ old('hiring_company') }}" placeholder="e.g. Tech Corp" required>
+                                    <input type="text" name="hiring_company" class="form-control"
+                                        value="{{ old('hiring_company') }}" placeholder="e.g. Tech Corp" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Position Hired <span class="required-mark">*</span></label>
-                                    <input type="text" name="position_hired" class="form-control" value="{{ old('position_hired') }}" placeholder="e.g. Software Engineer" required>
+                                    <input type="text" name="position_hired" class="form-control"
+                                        value="{{ old('position_hired') }}" placeholder="e.g. Software Engineer" required>
                                 </div>
                             </div>
                         </section>
@@ -570,6 +598,35 @@
 @endsection
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const educationalAttainmentSelect = document.getElementById('educationalAttainmentSelect');
+
+        if (!educationalAttainmentSelect || !window.jQuery || typeof window.jQuery.fn.select2 !== 'function') {
+            return;
+        }
+
+        window.jQuery(educationalAttainmentSelect).select2({
+            placeholder: 'Select educational attainment',
+            allowClear: true,
+            width: '100%',
+            dropdownAutoWidth: true,
+            minimumResultsForSearch: 0,
+            ajax: {
+                url: '{{ url('/api/educational-attainments') }}',
+                dataType: 'json',
+                delay: 250,
+                data: params => ({
+                    q: params.term || ''
+                }),
+                processResults: data => ({
+                    results: data.results || []
+                })
+            }
+        });
+    });
+</script>
+
+<script>
     document.addEventListener("DOMContentLoaded", function () {
         const provinceSelect = document.getElementById('province');
         const citySelect = document.getElementById('city');
@@ -577,6 +634,10 @@
         const savedProvince = @json(old('province'));
         const savedCity = @json(old('city'));
         const savedBarangay = @json(old('barangay'));
+
+        if (!provinceSelect || !citySelect || !barangaySelect) {
+            return;
+        }
 
         function loadProvinces() {
             provinceSelect.innerHTML = '<option>Loading provinces...</option>';
@@ -605,12 +666,15 @@
                     if (selectedProvince && selectedProvince.dataset.code) {
                         loadCities(selectedProvince.dataset.code);
                     }
+                })
+                .catch(() => {
+                    provinceSelect.innerHTML = '<option value="">Unable to load provinces</option>';
                 });
         }
 
         function loadCities(provinceCode) {
             citySelect.innerHTML = '<option>Loading cities...</option>';
-            barangaySelect.innerHTML = '<option>Select Barangay</option>';
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
             fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
                 .then(response => response.json())
@@ -636,6 +700,9 @@
                     if (selectedCity && selectedCity.dataset.code) {
                         loadBarangays(selectedCity.dataset.code);
                     }
+                })
+                .catch(() => {
+                    citySelect.innerHTML = '<option value="">Unable to load cities</option>';
                 });
         }
 
@@ -660,6 +727,9 @@
 
                         barangaySelect.appendChild(option);
                     });
+                })
+                .catch(() => {
+                    barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
                 });
         }
 
