@@ -297,7 +297,7 @@
     }
 
     .sidebar-link.active .sidebar-icon {
-        background: rgba(0, 0, 0, 0.06);
+        background: rgba(0, 0, 0, 0.308);
         color: var(--sidebar-text);
     }
 
