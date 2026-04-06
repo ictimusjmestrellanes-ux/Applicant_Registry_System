@@ -15,11 +15,11 @@
                     title: 'Applicant Successfully Created',
                     html: `
 
-                                    <div style="font-size:14px;">
-                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                    </div>
-                                    `,
+                                                    <div style="font-size:14px;">
+                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                    </div>
+                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -363,6 +363,9 @@
             display: inline-flex;
             align-items: center;
             gap: 0.55rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            text-align: center;
         }
 
         .record-meta-row {
@@ -400,6 +403,11 @@
             flex-wrap: wrap;
         }
 
+        .nav-tabs .nav-item {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
         .nav-tabs .nav-link {
             border: none;
             padding: 14px 20px;
@@ -409,6 +417,11 @@
             font-weight: 700;
             transition: all .25s ease;
             border: 1px solid transparent;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .nav-tabs .nav-link:hover {
@@ -454,6 +467,66 @@
             padding: 4px 2px 0;
         }
 
+        .personal-pane .form-section+.form-section {
+            margin-top: 1.5rem !important;
+        }
+
+        .personal-pane .row {
+            --bs-gutter-x: 1.25rem;
+        }
+
+        .clearance-pane .row {
+            --bs-gutter-x: 1rem;
+        }
+
+        .clearance-pane .clearance-upload-row {
+            flex-wrap: wrap;
+            overflow: visible;
+        }
+
+        .clearance-pane .clearance-upload-col {
+            min-width: 0;
+        }
+
+        .clearance-pane .clearance-action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .referral-pane .row {
+            --bs-gutter-x: 1rem;
+        }
+
+        .referral-pane .referral-upload-row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .referral-pane .referral-upload-row>.col-md-4 {
+            display: flex;
+        }
+
+        .referral-pane .referral-upload-row .document-upload-card {
+            width: 100%;
+        }
+
+        .referral-pane .referral-letter-shell {
+            border: 1px solid #e4edf7;
+        }
+
+        .referral-pane .referral-action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .referral-pane .referral-action-bar>* {
+            margin-left: 0 !important;
+        }
+
         .profile-action-bar {
             display: flex;
             align-items: center;
@@ -465,15 +538,14 @@
         }
 
         .section-title {
-            position: relative;
-            display: flex;
-            align-items: center;
             gap: 10px;
             margin-bottom: 18px;
             color: var(--edit-ink);
             font-size: 0.96rem;
             font-weight: 800;
             letter-spacing: 0.01em;
+            flex-wrap: wrap;
+            overflow: visible;
         }
 
         .section-title-c {
@@ -769,6 +841,62 @@
             }
         }
 
+        @media (max-width: 992px) {
+            .tab-shell {
+                padding: 10px;
+                border-radius: 22px;
+            }
+
+            .nav-tabs .nav-item {
+                flex: 1 1 calc(50% - 10px);
+            }
+
+            .nav-tabs .nav-link {
+                min-height: 64px;
+                padding: 12px 16px;
+            }
+
+            .personal-pane .row {
+                --bs-gutter-y: 1rem;
+            }
+
+            .personal-pane .col-md-1,
+            .personal-pane .col-md-2 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .clearance-pane .row {
+                --bs-gutter-y: 1rem;
+            }
+
+            .clearance-pane .clearance-upload-col {
+                flex: 0 0 calc(50% - 0.5rem);
+                max-width: calc(50% - 0.5rem);
+            }
+
+            .clearance-pane .col-md-2 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
+
+            .referral-pane .row {
+                --bs-gutter-y: 1rem;
+            }
+
+            .referral-pane .referral-upload-row>.col-md-4 {
+                width: calc(50% - 0.5rem);
+            }
+
+            .referral-pane #pesoOfficeFields .col-md-2,
+            .referral-pane #otherCityFields .col-md-2,
+            .referral-pane #otherCityFields .col-md-3,
+            .referral-pane>form>.mt-4>.col-md-4 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
         @media (max-width: 768px) {
             .summary-grid {
                 grid-template-columns: 1fr;
@@ -806,12 +934,177 @@
                 margin-top: 1rem;
             }
 
+            .tab-shell {
+                padding: 8px;
+                border-radius: 20px;
+            }
+
+            .nav-tabs {
+                gap: 0.75rem;
+            }
+
+            .nav-tabs .nav-item {
+                flex: 0 0 100%;
+            }
+
+            .nav-tabs .nav-link {
+                min-height: auto;
+                padding: 12px 14px;
+                border-radius: 16px;
+                justify-content: flex-start;
+            }
+
+            .nav-tab-label {
+                justify-content: flex-start;
+                text-align: left;
+            }
+
             .tab-content {
                 padding: 18px;
             }
 
+            .personal-pane .form-card {
+                padding: 0;
+            }
+
+            .personal-pane .row {
+                --bs-gutter-x: 0.9rem;
+                --bs-gutter-y: 0.9rem;
+            }
+
+            .personal-pane .form-section+.form-section {
+                margin-top: 1.25rem !important;
+            }
+
+            .personal-pane .section-title {
+                margin-bottom: 14px;
+            }
+
+            .clearance-pane .row {
+                --bs-gutter-x: 0.9rem;
+                --bs-gutter-y: 0.9rem;
+            }
+
+            .clearance-pane .clearance-upload-col {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .clearance-pane .document-upload-card {
+                padding: 16px;
+            }
+
+            .clearance-pane .file-name-text {
+                white-space: normal;
+                overflow: visible;
+                text-overflow: unset;
+                word-break: break-word;
+            }
+
+            .clearance-pane .clearance-action-bar>* {
+                width: 100%;
+            }
+
+            .referral-pane .row {
+                --bs-gutter-x: 0.9rem;
+                --bs-gutter-y: 0.9rem;
+            }
+
+            .referral-pane .document-upload-card,
+            .referral-pane .document-upload-card-resume {
+                padding: 16px;
+            }
+
+            .referral-pane .file-name-text {
+                white-space: normal;
+                overflow: visible;
+                text-overflow: unset;
+                word-break: break-word;
+            }
+
+            .referral-pane .referral-upload-row>.col-md-4,
+            .referral-pane #pesoOfficeFields .col-md-2,
+            .referral-pane #otherCityFields .col-md-2,
+            .referral-pane #otherCityFields .col-md-3,
+            .referral-pane>form>.mt-4>.col-md-4 {
+                width: 100%;
+                max-width: 100%;
+                flex: 0 0 100%;
+            }
+
+            .referral-pane .referral-letter-shell {
+                padding: 1rem !important;
+            }
+
+            .referral-pane .referral-action-bar>* {
+                width: 100%;
+            }
+
             .profile-action-bar>* {
                 width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .personal-pane .row {
+                --bs-gutter-x: 0.75rem;
+                --bs-gutter-y: 0.85rem;
+            }
+
+            .personal-pane .col-md-1,
+            .personal-pane .col-md-2,
+            .personal-pane .col-md-3,
+            .personal-pane .col-md-4,
+            .personal-pane .col-md-5,
+            .personal-pane .col-md-6,
+            .personal-pane .col-md-8 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .personal-pane .form-control,
+            .personal-pane .form-select {
+                min-height: 46px;
+                padding: 10px 12px;
+            }
+
+            .personal-pane .profile-action-bar {
+                gap: 0.75rem;
+                margin-top: 1.25rem;
+                padding-top: 1rem;
+            }
+
+            .personal-pane .profile-action-bar .btn {
+                width: 100%;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .clearance-pane .row {
+                --bs-gutter-x: 0.75rem;
+                --bs-gutter-y: 0.85rem;
+            }
+
+            .clearance-pane .col-md-2 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .clearance-pane .clearance-action-bar .btn {
+                width: 100%;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .referral-pane .row {
+                --bs-gutter-x: 0.75rem;
+                --bs-gutter-y: 0.85rem;
+            }
+
+            .referral-pane .referral-action-bar .btn {
+                width: 100%;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
             }
         }
     </style>
@@ -873,7 +1166,7 @@
                 <!-- PERSONAL INFORMATION -->
                 <!-- ===================================================== -->
 
-                <div class="tab-pane fade show active" id="personal">
+                <div class="tab-pane fade show active personal-pane" id="personal">
 
                     <div class="form-card">
 
@@ -1239,7 +1532,8 @@
                                 <label class="form-label">Peso ID No. (Auto Generate)<span
                                         class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
-                                    value="{{ $permit->peso_id_no ?? '' }}" placeholder="Will generate after save when complete" readonly>
+                                    value="{{ $permit->peso_id_no ?? '' }}"
+                                    placeholder="Will generate after save when complete" readonly>
                             </div>
 
                             {{-- OR NUMBER --}}
@@ -1346,7 +1640,7 @@
                 <!-- CLEARANCE -->
                 <!-- ===================================================== -->
 
-                <div class="tab-pane fade" id="clearance">
+                <div class="tab-pane fade clearance-pane" id="clearance">
                     <form action="{{ route('clearances.update', $applicant->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
@@ -1485,7 +1779,8 @@
                                 <label class="form-label">Peso Control No. (Auto Generate)<span
                                         class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
-                                    value="{{ $clearance->clearance_peso_control_no }}" placeholder="Will generate after save when complete" readonly>
+                                    value="{{ $clearance->clearance_peso_control_no }}"
+                                    placeholder="Will generate after save when complete" readonly>
                             </div>
 
                             {{-- Official Receipt No --}}
@@ -1494,7 +1789,7 @@
                                 <input type="text" name="clearance_or_no" class="form-control"
                                     value="{{$clearance->clearance_or_no}}" required>
                             </div>
-                            
+
                             {{-- Hired Company --}}
                             <div class="col-md-2">
                                 <label class="form-label">Hired Company<span class="required-mark">*</span></label>
@@ -1524,7 +1819,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
+                        <div class="clearance-action-bar mt-4">
                             {{-- Update/Save Section --}}
                             @if(auth()->user()->hasPermission('update_clearance'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
@@ -1567,7 +1862,7 @@
                 <!-- REFERRAL -->
                 <!-- ===================================================== -->
 
-                <div class="tab-pane fade" id="referral">
+                <div class="tab-pane fade referral-pane" id="referral">
 
                     <form action="{{ route('referrals.update', $applicant->id) }}" method="POST"
                         enctype="multipart/form-data">
@@ -1603,7 +1898,7 @@
 
 
                         <h4 class="section-title-c text-primary">Choose at least one of the following:</h6>
-                            <div class="d-flex justify-content-center overflow-auto pb-2">
+                            <div class="referral-upload-row pb-2">
 
                                 <div class="col-md-4">
                                     <div class="document-upload-card">
@@ -1699,7 +1994,7 @@
                                     </select>
                                 </div>
 
-                                <div class="border p-4 rounded-4 bg-white">
+                                <div class="referral-letter-shell border p-4 rounded-4 bg-white">
                                     <div id="pesoOfficeFields" data-referral-group="peso"
                                         class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
                                         <div class="row g-3">
@@ -1806,7 +2101,7 @@
 
                             </div>
 
-                            <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
+                            <div class="referral-action-bar mt-4">
                                 @if(auth()->user()->hasPermission('update_referral'))
                                     <button type="submit" class="btn btn-primary px-5">
                                         Save Referral
@@ -1839,9 +2134,6 @@
                     </form>
 
                 </div>
-
-
-
             </div>
         </div>
     </div>
