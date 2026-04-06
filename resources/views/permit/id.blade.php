@@ -83,15 +83,16 @@
         }
 
         .peso-id {
-            left: 24%;
-            top: 49.8%;
+            left: 23.5%;
+            top: 191.39px;
             width: 25.8%;
-            font-size: 7pt;
+            font-size: 9px;
+            position: absolute;
         }
 
         .front-name {
             left: 12.5%;
-            top: 57.1%;
+            top: 56.8%;
             width: 33.5%;
             font-size: 9pt;
             text-align: center;
