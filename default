@@ -3,6 +3,7 @@ server {
     #proxy_cache_valid 200 1s;
     listen 8080;
     listen [::]:8080;
+    client_max_body_size 25M;
     root /home/site/wwwroot/public; # Changed for Laravel
     index  index.php index.html index.htm;
     server_name  example.com www.example.com; 
