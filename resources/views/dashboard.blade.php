@@ -36,9 +36,9 @@
                         <i class="bi bi-patch-check-fill"></i>
                     </div>
                     <div>
-                        <div class="metric-label">Permit Completion</div>
-                        <div class="metric-value">{{ data_get($completion, 'permit.percent', 0) }}%</div>
-                        <div class="metric-note">{{ data_get($completion, 'permit.count', 0) }} applicants complete</div>
+                        <div class="metric-label">Total Permit</div>
+                        <div class="metric-value">{{ data_get($completion, 'permit.count', 0) }}</div>
+                        <div class="metric-note">Applicants who have completed</div>
                     </div>
                 </div>
             </div>
@@ -103,13 +103,11 @@
 
     <style>
         .dashboard-page {
-            max-width: 1600px;
+            max-width: 1800px;
         }
 
         .hero-panel {
-            background:
-                radial-gradient(circle at top right, rgba(13, 110, 253, 0.18), transparent 34%),
-                linear-gradient(135deg, #ffffff, #eef4ff);
+            background: white;
             border: 1px solid rgba(148, 163, 184, 0.2);
             border-radius: 24px;
             padding: 2rem;
@@ -333,8 +331,8 @@
         .chart-bar {
             width: 100%;
             border-radius: 14px 14px 10px 10px;
-            background: linear-gradient(180deg, #2563eb, #0f172a);
-            box-shadow: 0 14px 24px rgba(37, 99, 235, 0.22);
+            background: linear-gradient(180deg, #7997da, #2960e0);
+            box-shadow: 0 14px 24px rgba(88, 100, 124, 0.22);
             transition: height 0.3s ease;
         }
 
