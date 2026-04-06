@@ -120,7 +120,6 @@
         .applicant-wrapper {
             max-width: 1800px;
         }
-
         .page-header {
             padding: 32px 32px;
             border-radius: 30px;
@@ -475,19 +474,23 @@
             --bs-gutter-x: 1.25rem;
         }
 
+        .permit-pane .row,
         .clearance-pane .row {
             --bs-gutter-x: 1rem;
         }
 
+        .permit-pane .permit-upload-row,
         .clearance-pane .clearance-upload-row {
             flex-wrap: wrap;
             overflow: visible;
         }
 
+        .permit-pane .permit-upload-col,
         .clearance-pane .clearance-upload-col {
             min-width: 0;
         }
 
+        .permit-pane .permit-action-bar,
         .clearance-pane .clearance-action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -866,8 +869,19 @@
                 max-width: 50%;
             }
 
+            .permit-pane .row,
             .clearance-pane .row {
                 --bs-gutter-y: 1rem;
+            }
+
+            .permit-pane .permit-upload-col {
+                flex: 0 0 calc(50% - 0.5rem);
+                max-width: calc(50% - 0.5rem);
+            }
+
+            .permit-pane .col-md-2 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
             }
 
             .clearance-pane .clearance-upload-col {
@@ -980,20 +994,24 @@
                 margin-bottom: 14px;
             }
 
+            .permit-pane .row,
             .clearance-pane .row {
                 --bs-gutter-x: 0.9rem;
                 --bs-gutter-y: 0.9rem;
             }
 
+            .permit-pane .permit-upload-col,
             .clearance-pane .clearance-upload-col {
                 flex: 0 0 100%;
                 max-width: 100%;
             }
 
+            .permit-pane .document-upload-card,
             .clearance-pane .document-upload-card {
                 padding: 16px;
             }
 
+            .permit-pane .file-name-text,
             .clearance-pane .file-name-text {
                 white-space: normal;
                 overflow: visible;
@@ -1001,6 +1019,7 @@
                 word-break: break-word;
             }
 
+            .permit-pane .permit-action-bar>*,
             .clearance-pane .clearance-action-bar>* {
                 width: 100%;
             }
@@ -1080,16 +1099,19 @@
                 padding-right: 1rem !important;
             }
 
+            .permit-pane .row,
             .clearance-pane .row {
                 --bs-gutter-x: 0.75rem;
                 --bs-gutter-y: 0.85rem;
             }
 
+            .permit-pane .col-md-2,
             .clearance-pane .col-md-2 {
                 flex: 0 0 100%;
                 max-width: 100%;
             }
 
+            .permit-pane .permit-action-bar .btn,
             .clearance-pane .clearance-action-bar .btn {
                 width: 100%;
                 padding-left: 1rem !important;
@@ -1353,7 +1375,7 @@
                 <!-- PERMIT -->
                 <!-- ===================================================== -->
 
-                <div class="tab-pane fade" id="permit">
+                <div class="tab-pane fade permit-pane" id="permit">
                     <form action="{{ route('permits.update', $applicant->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
@@ -1369,9 +1391,9 @@
 
                         <h6 class="section-title text-primary">Mayor’s Permit to Work Requirements</h6>
 
-                        <div class="row g-3">
+                        <div class="row g-3 permit-upload-row">
                             {{-- 1. NBI / Police Clearance --}}
-                            <div class="col-md-3">
+                            <div class="col-md-3 permit-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Clearance Type (NBI or Police)<span
                                             class="required-mark">*</span></label>
@@ -1438,7 +1460,7 @@
                             </div>
 
                             {{-- 2. Health Card --}}
-                            <div class="col-md-3">
+                            <div class="col-md-3 permit-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Health Card <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
@@ -1462,7 +1484,7 @@
                             </div>
 
                             {{-- 3. Cedula --}}
-                            <div class="col-md-3">
+                            <div class="col-md-3 permit-upload-col">
                                 <div class="document-upload-card">
                                     <label class="form-label">Cedula <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
@@ -1486,7 +1508,7 @@
                             </div>
 
                             {{-- 4. Referral Letter --}}
-                            <div class="col-md-3">
+                            <div class="col-md-3 permit-upload-col">
                                 <div class="document-upload-card {{ $isImusResident ? 'upload-disabled' : '' }}">
                                     <label class="form-label">
                                         Referral Letter
@@ -1597,7 +1619,7 @@
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2 mt-4">
+                        <div class="permit-action-bar mt-4">
                             {{-- Action: Save/Update --}}
                             @if(auth()->user()->hasPermission('update_permit'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
