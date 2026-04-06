@@ -8,7 +8,7 @@
             --archive-ink: #10243d;
             --archive-slate: #5f7088;
             --archive-line: #d9e4ef;
-            --archive-panel: rgba(255, 255, 255, 0.95);
+            --archive-panel: rgb(255, 255, 255);
             --archive-primary: #1d4ed8;
             --archive-success: #059669;
             --archive-success-soft: #d1fae5;
@@ -50,7 +50,6 @@
             width: 240px;
             height: 240px;
             border-radius: 999px;
-            background: radial-gradient(circle, rgba(180, 83, 9, 0.14), rgba(180, 83, 9, 0));
         }
 
         .archive-hero>* {
@@ -252,7 +251,7 @@
         .btn-primary-soft:hover {
             transform: translateY(-1px);
             box-shadow: 0 14px 28px rgba(29, 78, 216, 0.28);
-            color: #fff;
+            color: #000000;
         }
 
         .table-label {
@@ -295,6 +294,45 @@
 
         .archive-table tbody tr:hover {
             background: #fbfdff;
+        }
+
+        .mobile-archive-list {
+            display: none;
+            gap: 1rem;
+        }
+
+        .mobile-archive-card {
+            padding: 1rem;
+            border-radius: 20px;
+            border: 1px solid #e2ebf4;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+            box-shadow: 0 12px 28px rgba(15, 34, 58, 0.05);
+        }
+
+        .mobile-archive-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .mobile-archive-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .mobile-archive-row {
+            display: grid;
+            gap: 0.25rem;
+        }
+
+        .mobile-archive-label {
+            color: var(--archive-slate);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .applicant-cell {
@@ -384,6 +422,42 @@
             flex-wrap: wrap;
         }
 
+        .pagination-wrap .pagination {
+            margin-bottom: 0;
+            gap: 0.35rem;
+        }
+
+        .pagination-wrap .page-link {
+            min-width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid #dbe6f2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #334155;
+            background: #ffffff;
+            box-shadow: none;
+        }
+
+        .pagination-wrap .page-link:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: var(--archive-primary);
+        }
+
+        .pagination-wrap .page-item.active .page-link {
+            background: var(--archive-primary);
+            border-color: var(--archive-primary);
+            color: #ffffff;
+        }
+
+        .pagination-wrap .page-item.disabled .page-link {
+            background: #f8fafc;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+        }
+
         .alert-success {
             border-radius: 18px;
             background: #ecfdf5;
@@ -424,6 +498,18 @@
             .archive-actions .btn {
                 width: 100%;
             }
+
+            .archive-table-wrap {
+                display: none;
+            }
+
+            .mobile-archive-list {
+                display: grid;
+            }
+
+            .pagination-wrap .pagination {
+                flex-wrap: wrap;
+            }
         }
     </style>
 
@@ -446,6 +532,27 @@
                         <i class="bi bi-arrow-left me-2"></i>Back to Active List
                     </a>
                 </div>
+                <form method="GET" action="{{ route('applicants.archive') }}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-8">
+                            <label class="form-label">Archived Applicant Search</label>
+                            <div class="archive-search-wrap">
+                                <i class="bi bi-search archive-search-icon"></i>
+                                <input type="text" name="search" class="archive-search-input"
+                                    placeholder="Search by name, contact number, barangay, or city..."
+                                    value="{{ $search ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="archive-actions">
+                                <button type="submit" class="btn btn-primary-soft">
+                                    <i class="bi bi-search me-2"></i>Search
+                                </button>
+                                <a href="{{ route('applicants.archive') }}" class="btn btn-ghost">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </section>
 
             @if(session('success'))
@@ -453,42 +560,6 @@
                     <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
                 </div>
             @endif
-
-            <section class="archive-panel">
-                <div class="panel-header">
-                    <div>
-                        <h5 class="fw-bold mb-1">Search Archive</h5>
-                        <p class="panel-copy mb-0">Find archived applicants by name, contact number, barangay, or city.</p>
-                    </div>
-                    <span class="panel-chip">
-                        <i class="bi bi-funnel me-2"></i>Filter records
-                    </span>
-                </div>
-
-                <form method="GET" action="{{ route('applicants.archive') }}">
-                    <div class="search-card">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-lg-8">
-                                <label class="form-label">Archived Applicant Search</label>
-                                <div class="archive-search-wrap">
-                                    <i class="bi bi-search archive-search-icon"></i>
-                                    <input type="text" name="search" class="archive-search-input"
-                                        placeholder="Search by name, contact number, barangay, or city..."
-                                        value="{{ $search ?? '' }}">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="archive-actions">
-                                    <button type="submit" class="btn btn-primary-soft">
-                                        <i class="bi bi-search me-2"></i>Search
-                                    </button>
-                                    <a href="{{ route('applicants.archive') }}" class="btn btn-ghost">Reset</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </section>
 
             <section class="archive-table-shell">
                 <div class="table-header">
@@ -532,7 +603,8 @@
                                         <td>
                                             <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
                                             <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} /
-                                                {{ $applicant->civil_status ?: 'N/A' }}</div>
+                                                {{ $applicant->civil_status ?: 'N/A' }}
+                                            </div>
                                         </td>
                                         <td>
                                             <span class="address-pill">
@@ -574,6 +646,65 @@
                     </div>
                 </div>
 
+                <div class="mobile-archive-list">
+                    @forelse($applicants as $applicant)
+                        <article class="mobile-archive-card">
+                            <div class="mobile-archive-head">
+                                <div class="applicant-cell">
+                                    <div class="applicant-avatar">
+                                        {{ strtoupper(substr($applicant->first_name, 0, 1)) }}{{ strtoupper(substr($applicant->last_name, 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="applicant-name">
+                                            {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
+                                        </div>
+                                        <div class="applicant-meta">ID: #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mobile-archive-grid">
+                                <div class="mobile-archive-row">
+                                    <div class="mobile-archive-label">Contact</div>
+                                    <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
+                                    <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} / {{ $applicant->civil_status ?: 'N/A' }}</div>
+                                </div>
+
+                                <div class="mobile-archive-row">
+                                    <div class="mobile-archive-label">Address</div>
+                                    <span class="address-pill">
+                                        {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
+                                    </span>
+                                </div>
+
+                                <div class="mobile-archive-row">
+                                    <div class="mobile-archive-label">Archived On</div>
+                                    <div class="archive-date">{{ $applicant->deleted_at?->format('M d, Y') ?? 'N/A' }}</div>
+                                    <div class="archive-time">{{ $applicant->deleted_at?->format('h:i A') ?? '' }}</div>
+                                </div>
+
+                                <div class="mobile-archive-row">
+                                    <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-restore w-100"
+                                            onclick="return confirm('Restore this applicant to the active list?')">
+                                            <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="bi bi-archive"></i>
+                            </div>
+                            <div class="empty-title">No archived applicants found</div>
+                            <p class="empty-copy mb-0">Try clearing the search or archive a record from the active applicants list.</p>
+                        </div>
+                    @endforelse
+                </div>
+
                 @if($applicants->hasPages())
                     <div class="pagination-wrap">
                         <div class="pagination-copy">
@@ -581,7 +712,7 @@
                             {{ $applicants->total() }} archived applicants
                         </div>
                         <div>
-                            {{ $applicants->links() }}
+                            {{ $applicants->appends(request()->query())->links('vendor.pagination.activity-logs') }}
                         </div>
                     </div>
                 @endif

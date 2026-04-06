@@ -1,3 +1,7 @@
+@php
+    $sidebarProfileImageUrl = auth()->user()?->profileImageUrl();
+@endphp
+
 <div class="sidebar d-flex flex-column">
     <button class="btn-close-sidebar d-lg-none" type="button" onclick="toggleSidebar()">
         <i class="bi bi-x-lg"></i>
@@ -84,6 +88,72 @@
                 @endif
             @endforeach
         </ul>
+    </div>
+
+    <div class="sidebar-divider mx-3 mt-auto"></div>
+
+    <div class="sidebar-footer px-3 py-3">
+        <div class="dropdown">
+            <a
+                class="user-menu-link sidebar-user-menu d-flex align-items-center"
+                href="#"
+                id="sidebarUserDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+            >
+                @if($sidebarProfileImageUrl)
+                    <img src="{{ $sidebarProfileImageUrl }}" alt="{{ auth()->user()->name }}" class="avatar-image me-2">
+                @else
+                    <div class="avatar-circle me-2">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                    </div>
+                @endif
+                <div class="flex-grow-1 min-w-0">
+                    <span class="d-block user-name">
+                        {{ auth()->user()->name ?? 'User' }}
+                    </span>
+                    <small class="user-role">{{ ucfirst(auth()->user()->role ?? 'user') }}</small>
+                </div>
+                <i class="bi bi-chevron-down ms-2 dropdown-arrow"></i>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end navbar-dropdown border-0 mt-3 sidebar-dropdown-menu"
+                aria-labelledby="sidebarUserDropdown">
+                <li>
+                    <a class="dropdown-item navbar-item py-2 mt-2" href="{{ route('profile.edit') }}">
+                        <i class="bi bi-person-circle me-2"></i>
+                        My Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item navbar-item py-2" href="{{ route('activity-logs.index') }}">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Activity Logs
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item navbar-item py-2" href="#">
+                        <i class="bi bi-gear me-2"></i>
+                        Settings
+                    </a>
+                </li>
+
+                <li><hr class="dropdown-divider"></li>
+
+                <li>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="dropdown-item navbar-item logout-item py-2 mb-1">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Logout Account
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -254,6 +324,10 @@
         overflow-y: auto;
     }
 
+    .sidebar-footer {
+        background: var(--sidebar-bg);
+    }
+
     .sidebar-section-label {
         margin-bottom: 12px;
         font-size: 0.72rem;
@@ -377,6 +451,72 @@
         color: var(--sidebar-text);
         padding: 8px;
     }
+
+
+    .user-menu-link {
+        text-decoration: none;
+        padding: 6px 8px 6px 6px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--bg-white);
+        transition: all 0.12s ease;
+    }
+    .user-menu-link:hover { background: rgba(0,0,0,0.03); }
+
+    .avatar-circle {
+        width: 42px;
+        height: 42px;
+        background: var(--surface);
+        color: var(--ink);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        font-weight: 800;
+    }
+    .avatar-image { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; }
+
+    .user-name { color: var(--ink); font-size: 0.84rem; font-weight: 700; }
+    .user-role { color: var(--muted); font-size: 0.71rem; font-weight: 600; }
+    .dropdown-arrow { color: var(--muted); font-size: 0.78rem; }
+
+    .navbar-dropdown {
+        min-width: 247px;
+        padding: 0;
+        overflow: hidden;
+        border-radius: 12px;
+        background: rgb(209, 209, 209);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+    }
+
+    .dropdown-header-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 14px 12px;
+        background: linear-gradient(180deg, #b6b6b6, #636363);
+    }
+    .dropdown-avatar { width: 46px; height: 46px; border-radius: 10px; background: var(--surface); color: var(--ink); font-weight: 800; display:flex; align-items:center; justify-content:center; }
+    .dropdown-kicker { color: var(--accent-dark); font-size: 0.64rem; font-weight: 800; text-transform: uppercase; }
+
+    .dropdown-name { color: var(--ink); font-weight: 700; }
+    .dropdown-email { color: var(--muted); font-size: 0.75rem; word-break: break-word; }
+
+    .navbar-item {
+        padding-left: 1.1rem;
+        padding-right: 1.1rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--ink);
+        transition: all 0.12s ease;
+    }
+    .navbar-item i { color: var(--ink); }
+    .navbar-item:hover { background: rgba(0,0,0,0.03); color: var(--accent-dark); padding-left: 1.25rem; }
+
+    .logout-item { color: var(--danger); }
+    .logout-item i { color: var(--danger); }
+    .logout-item:hover { background: #fff5f5; color: #b91c1c; }
 
     /* OVERRIDE: remove Bootstrap/blue "active" color */
     .nav-pills .nav-link.active,

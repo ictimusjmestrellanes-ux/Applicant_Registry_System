@@ -24,77 +24,6 @@
                     <div class="utility-value">{{ now()->format('M d, Y') }}</div>
                 </div>
             </div>
-
-            <a class="nav-action-btn" href="{{ route('activity-logs.index') }}" title="Activity Logs">
-                <i class="bi bi-journal-text"></i>
-            </a>
-
-            <a class="nav-action-btn" href="#" title="Notifications">
-                <i class="bi bi-bell"></i>
-                <span class="notification-dot"></span>
-            </a>
-
-            <div class="dropdown">
-                <a
-                    class="user-menu-link d-flex align-items-center"
-                    href="#"
-                    id="userDropdown"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
-                    @if($navProfileImageUrl)
-                        <img src="{{ $navProfileImageUrl }}" alt="{{ auth()->user()->name }}" class="avatar-image me-2">
-                    @else
-                        <div class="avatar-circle me-2">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                        </div>
-                    @endif
-                    <div class="d-none d-md-block">
-                        <span class="d-block user-name">
-                            {{ auth()->user()->name ?? 'User' }}
-                        </span>
-                        <small class="user-role">{{ ucfirst(auth()->user()->role ?? 'user') }}</small>
-                    </div>
-                    <i class="bi bi-chevron-down ms-2 dropdown-arrow d-none d-md-inline-flex"></i>
-                </a>
-
-                <ul class="dropdown-menu dropdown-menu-end navbar-dropdown border-0 mt-3" aria-labelledby="userDropdown">
-
-                    <li>
-                        <a class="dropdown-item navbar-item py-2 mt-2" href="{{ route('profile.edit') }}">
-                            <i class="bi bi-person-circle me-2"></i>
-                            My Profile
-                        </a>
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item navbar-item py-2" href="{{ route('activity-logs.index') }}">
-                            <i class="bi bi-clock-history me-2"></i>
-                            Activity Logs
-                        </a>
-                    </li>
-
-                    <li>
-                        <a class="dropdown-item navbar-item py-2" href="#">
-                            <i class="bi bi-gear me-2"></i>
-                            Settings
-                        </a>
-                    </li>
-
-                    <li><hr class="dropdown-divider"></li>
-
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="dropdown-item navbar-item logout-item py-2 mb-1">
-                                <i class="bi bi-box-arrow-right me-2"></i>
-                                Logout Account
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
         </div>
     </div>
 </nav>
@@ -106,7 +35,7 @@
         --muted: #6b7280;
         --line: #e5e7eb;
         --ink: #000000;
-        --surface: #f3f4f6;
+        --surface: #9b9b9b;
         --accent-dark: #111827;
         --danger: #dc2626;
     }
@@ -167,105 +96,11 @@
     .utility-label { font-size: 0.68rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
     .utility-value { font-size: 0.85rem; font-weight: 700; color: var(--ink); }
 
-    .nav-action-btn {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        border: 1px solid var(--line);
-        background: var(--bg-white);
-        color: var(--ink);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.98rem;
-        transition: all 0.12s ease;
-    }
-    .nav-action-btn:hover {
-        color: var(--accent-dark);
-        background: rgba(0,0,0,0.03);
-        transform: translateY(-1px);
-    }
-
-    .notification-dot {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: #ef4444;
-        box-shadow: 0 0 0 3px var(--bg-white);
-    }
-
-    .user-menu-link {
-        text-decoration: none;
-        padding: 6px 8px 6px 6px;
-        border-radius: 14px;
-        border: 1px solid var(--line);
-        background: var(--bg-white);
-        transition: all 0.12s ease;
-    }
-    .user-menu-link:hover { background: rgba(0,0,0,0.03); }
-
-    .avatar-circle {
-        width: 42px;
-        height: 42px;
-        background: var(--surface);
-        color: var(--ink);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.95rem;
-        font-weight: 800;
-    }
-    .avatar-image { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; }
-
-    .user-name { color: var(--ink); font-size: 0.84rem; font-weight: 700; }
-    .user-role { color: var(--muted); font-size: 0.71rem; font-weight: 600; }
-    .dropdown-arrow { color: var(--muted); font-size: 0.78rem; }
-
-    .navbar-dropdown {
-        min-width: 270px;
-        padding: 0;
-        overflow: hidden;
-        border-radius: 12px;
-        background: var(--bg-white);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
-    }
-
-    .dropdown-header-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 14px 14px 12px;
-        background: linear-gradient(180deg, #ffffff, #fafafa);
-    }
-    .dropdown-avatar { width: 46px; height: 46px; border-radius: 10px; background: var(--surface); color: var(--ink); font-weight: 800; display:flex; align-items:center; justify-content:center; }
-    .dropdown-kicker { color: var(--accent-dark); font-size: 0.64rem; font-weight: 800; text-transform: uppercase; }
-
-    .dropdown-name { color: var(--ink); font-weight: 700; }
-    .dropdown-email { color: var(--muted); font-size: 0.75rem; word-break: break-word; }
-
-    .navbar-item {
-        padding-left: 1.1rem;
-        padding-right: 1.1rem;
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: var(--ink);
-        transition: all 0.12s ease;
-    }
-    .navbar-item i { color: var(--ink); }
-    .navbar-item:hover { background: rgba(0,0,0,0.03); color: var(--accent-dark); padding-left: 1.25rem; }
-
-    .logout-item { color: var(--danger); }
-    .logout-item i { color: var(--danger); }
-    .logout-item:hover { background: #fff5f5; color: #b91c1c; }
+    
 
     @media (max-width: 767.98px) {
         .dashboard-navbar { padding: 10px 0; }
         .nav-page-title { font-size: 1rem; }
-        .user-menu-link { padding-right: 6px; }
     }
 
 </style>

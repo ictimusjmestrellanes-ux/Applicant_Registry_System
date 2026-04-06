@@ -185,6 +185,45 @@
             background: #fbfdff;
         }
 
+        .mobile-log-list {
+            display: none;
+            gap: 1rem;
+        }
+
+        .mobile-log-card {
+            padding: 1rem;
+            border-radius: 20px;
+            border: 1px solid #e2ebf4;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+            box-shadow: 0 12px 28px rgba(15, 34, 58, 0.05);
+        }
+
+        .mobile-log-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .mobile-log-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .mobile-log-row {
+            display: grid;
+            gap: 0.25rem;
+        }
+
+        .mobile-log-label {
+            color: var(--logs-slate);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
         .log-date {
             color: var(--logs-ink);
             font-weight: 700;
@@ -343,6 +382,22 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logs-table-wrap {
+                display: none;
+            }
+
+            .mobile-log-list {
+                display: grid;
+            }
+
+            .pagination-wrap .pagination {
+                flex-wrap: wrap;
+            }
         }
     </style>
 
@@ -445,6 +500,66 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <div class="mobile-log-list">
+                    @forelse($activityLogs as $log)
+                        <article class="mobile-log-card">
+                            <div class="mobile-log-head">
+                                <div>
+                                    <div class="log-date">
+                                        {{ $log->created_at ? $log->created_at->timezone(config('app.timezone'))->format('M d, Y') : 'N/A' }}
+                                    </div>
+                                    <div class="log-time">
+                                        {{ $log->created_at ? $log->created_at->timezone(config('app.timezone'))->format('h:i A') : '' }}
+                                    </div>
+                                </div>
+                                <a href="{{ route('activity-logs.show', $log) }}" class="btn-view-log" title="View log details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+
+                            <div class="mobile-log-grid">
+                                <div class="mobile-log-row">
+                                    <div class="mobile-log-label">User</div>
+                                    <div class="entity-name">{{ $log->causer?->name ?? 'System' }}</div>
+                                    <div class="log-muted">{{ $log->causer?->role ? ucfirst($log->causer->role) : 'Automated event' }}</div>
+                                </div>
+
+                                <div class="mobile-log-row">
+                                    <div class="mobile-log-label">Applicant</div>
+                                    <div class="entity-name">
+                                        @if($log->applicant)
+                                            {{ trim($log->applicant->first_name . ' ' . $log->applicant->last_name) }}
+                                        @else
+                                            System Event
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="mobile-log-row">
+                                    <div class="mobile-log-label">Tags</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge-soft badge-module">{{ $log->module }}</span>
+                                        <span class="badge-soft badge-action">{{ $log->action }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="mobile-log-row">
+                                    <div class="mobile-log-label">Description</div>
+                                    <div class="description-copy">{{ $log->description }}</div>
+                                </div>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="bi bi-journal-x"></i>
+                            </div>
+                            <div class="empty-title">No activity logs available yet</div>
+                            <p class="empty-copy mb-0">Once actions are recorded in the system, they will appear here for review.</p>
+                        </div>
+                    @endforelse
                 </div>
 
                 @if($activityLogs->hasPages())
