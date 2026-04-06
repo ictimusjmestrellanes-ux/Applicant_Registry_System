@@ -104,30 +104,7 @@
                         </ul>
                     </div>
                 @endif
-
-                <!-- Traditional Login -->
-                {{-- <form method="POST" action="{{ route('login') }}">
-                    @csrf
-
-                    <div class="mb-3">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" name="email" value="{{ old('email') }}" class="form-control" required
-                            autofocus>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        Login
-                    </button>
-                </form> --}}
-
-                <!-- Divider -->
-                {{-- <div class="divider my-4">OR</div> --}}
-
+                
                 <!-- Microsoft Login -->
                 <a href="{{ route('login.azure.redirect') }}"
                     class="btn microsoft-btn w-100 d-flex align-items-center justify-content-center gap-2">

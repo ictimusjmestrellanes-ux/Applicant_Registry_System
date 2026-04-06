@@ -45,6 +45,9 @@ Route::middleware('auth')->group(function () {
 Route::get('applicants/archive', [ApplicantController::class, 'archive'])->middleware('auth')
     ->name('applicants.archive');
 
+Route::get('applicants/export', [ApplicantController::class, 'export'])->middleware('auth')
+    ->name('applicants.export');
+
 Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->middleware('auth')
     ->name('applicants.restore');
 

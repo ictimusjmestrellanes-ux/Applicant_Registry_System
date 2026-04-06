@@ -52,18 +52,62 @@ class ApplicantController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->search;
+        $search = trim((string) $request->search);
 
-        $applicants = Applicant::with(['permit', 'clearance', 'referral'])
-            ->when($search, function ($query) use ($search) {
-                $query->where('first_name', 'like', "%$search%")
-                    ->orWhere('last_name', 'like', "%$search%")
-                    ->orWhere('contact_no', 'like', "%$search%")
-                    ->orWhere('gender', 'like', "%$search%");
-            })
+        $applicants = $this->buildApplicantSearchQuery($search)
+            ->with(['permit', 'clearance', 'referral'])
             ->paginate(10);
 
         return view('applicants.index', compact('applicants', 'search'));
+    }
+
+    public function export(Request $request)
+    {
+        $search = trim((string) $request->search);
+
+        $applicants = $this->buildApplicantSearchQuery($search)
+            ->orderBy('id')
+            ->get();
+
+        $rows = [];
+
+        foreach ($applicants as $applicant) {
+            $permit = optional($applicant->permit);
+            $rows[] = [
+                'OR no.' => (string) $permit->permit_or_no,
+                'Full Name' => trim(implode(' ', array_filter([
+                    (string) $applicant->first_name,
+                    (string) ($applicant->middle_name ?? ''),
+                    (string) $applicant->last_name,
+                    (string) ($applicant->suffix ?? ''),
+                ]))),
+                'Age' => $applicant->age !== null ? (string) $applicant->age : '',
+                'Contact No' => (string) ($applicant->contact_no ?? ''),
+                'Gender' => (string) ($applicant->gender ?? ''),
+                'Civil Status' => (string) ($applicant->civil_status ?? ''),
+                'PWD' => (string) ($applicant->pwd ?? ''),
+                '4Ps' => (string) ($applicant->four_ps ?? ''),
+                'Address' => trim(implode(' ', array_filter([
+                    (string) $applicant->address_line ?? '',
+                    (string) $applicant->barangay ?? '',
+                    (string) $applicant->city ?? '',
+                    (string) $applicant->province ?? '',
+                ]))),
+                'Educational Attainment' => (string) ($applicant->educational_attainment ?? ''),
+                'Hiring Company' => (string) ($applicant->hiring_company ?? ''),
+                'Position Hired' => (string) ($applicant->position_hired ?? ''),
+                'First Time Job Seeker' => (string) ($applicant->first_time_job_seeker ?? ''),
+            ];
+        }
+
+        $filePath = $this->createApplicantsExportXlsx($rows);
+        $fileName = 'applicants-export-'.now()->format('Y-m-d-His').'.xlsx';
+
+        return response()->download(
+            $filePath,
+            $fileName,
+            ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        )->deleteFileAfterSend(true);
     }
 
     public function edit($id)
@@ -200,5 +244,236 @@ class ApplicantController extends Controller
 
         return redirect()->route('applicants.index')
             ->with('success', 'Applicant restored successfully.');
+    }
+
+    private function buildApplicantSearchQuery(string $search)
+    {
+        return Applicant::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('middle_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('contact_no', 'like', "%{$search}%")
+                        ->orWhere('gender', 'like', "%{$search}%");
+                });
+            });
+    }
+
+    private function createApplicantsExportXlsx(array $rows): string
+    {
+        $headers = [
+            'OR no.',
+            'Full Name',
+            'Age',
+            'Contact No',
+            'Gender',
+            'Civil Status',
+            'PWD',
+            '4Ps',
+            'Address',
+            'Educational Attainment',
+            'Hiring Company',
+            'Position Hired',
+            'First Time Job Seeker',
+        ];
+
+        $sheetRows = [$headers];
+
+        foreach ($rows as $row) {
+            $sheetRows[] = array_map(
+                fn ($header) => (string) ($row[$header] ?? ''),
+                $headers
+            );
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), 'applicants_export_');
+        $xlsxPath = $tempFile.'.xlsx';
+
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
+        }
+
+        $zip = new \ZipArchive;
+
+        if ($zip->open($xlsxPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Unable to create export file.');
+        }
+
+        $zip->addFromString('[Content_Types].xml', $this->buildContentTypesXml());
+        $zip->addFromString('_rels/.rels', $this->buildRootRelsXml());
+        $zip->addFromString('xl/workbook.xml', $this->buildWorkbookXml());
+        $zip->addFromString('xl/_rels/workbook.xml.rels', $this->buildWorkbookRelsXml());
+        $zip->addFromString('xl/worksheets/sheet1.xml', $this->buildWorksheetXml($sheetRows));
+        $zip->addFromString('xl/styles.xml', $this->buildStylesXml());
+        $zip->addFromString('docProps/core.xml', $this->buildCorePropertiesXml());
+        $zip->addFromString('docProps/app.xml', $this->buildAppPropertiesXml());
+        $zip->close();
+
+        return $xlsxPath;
+    }
+
+    private function buildWorksheetXml(array $rows): string
+    {
+        $sheetData = '';
+
+        foreach ($rows as $rowIndex => $row) {
+            $sheetData .= '<row r="'.($rowIndex + 1).'">';
+
+            foreach ($row as $columnIndex => $value) {
+                $cellReference = $this->excelColumnName($columnIndex + 1).($rowIndex + 1);
+                $styleIndex = $rowIndex === 0 ? ' s="1"' : '';
+
+                $sheetData .= '<c r="'.$cellReference.'" t="inlineStr"'.$styleIndex.'><is><t>'
+                    .$this->escapeXml($value)
+                    .'</t></is></c>';
+            }
+
+            $sheetData .= '</row>';
+        }
+
+        $lastColumn = $this->excelColumnName(count($rows[0]));
+        $lastRow = count($rows);
+
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
+            .' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+            .'<dimension ref="A1:'.$lastColumn.$lastRow.'"/>'
+            .'<sheetViews><sheetView workbookViewId="0"/></sheetViews>'
+            .'<sheetFormatPr defaultRowHeight="15"/>'
+            .'<cols>'
+            .'<col min="1" max="1" width="10" customWidth="1"/>'
+            .'<col min="2" max="5" width="18" customWidth="1"/>'
+            .'<col min="6" max="6" width="10" customWidth="1"/>'
+            .'<col min="7" max="11" width="16" customWidth="1"/>'
+            .'<col min="12" max="15" width="22" customWidth="1"/>'
+            .'<col min="16" max="20" width="24" customWidth="1"/>'
+            .'</cols>'
+            .'<sheetData>'.$sheetData.'</sheetData>'
+            .'</worksheet>';
+    }
+
+    private function buildContentTypesXml(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+            .'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+            .'<Default Extension="xml" ContentType="application/xml"/>'
+            .'<Override PartName="/xl/workbook.xml"'
+            .' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+            .'<Override PartName="/xl/worksheets/sheet1.xml"'
+            .' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
+            .'<Override PartName="/xl/styles.xml"'
+            .' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+            .'<Override PartName="/docProps/core.xml"'
+            .' ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
+            .'<Override PartName="/docProps/app.xml"'
+            .' ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'
+            .'</Types>';
+    }
+
+    private function buildRootRelsXml(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            .'<Relationship Id="rId1"'
+            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"'
+            .' Target="xl/workbook.xml"/>'
+            .'<Relationship Id="rId2"'
+            .' Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"'
+            .' Target="docProps/core.xml"/>'
+            .'<Relationship Id="rId3"'
+            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"'
+            .' Target="docProps/app.xml"/>'
+            .'</Relationships>';
+    }
+
+    private function buildWorkbookXml(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
+            .' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
+            .'<sheets><sheet name="Applicants" sheetId="1" r:id="rId1"/></sheets>'
+            .'</workbook>';
+    }
+
+    private function buildWorkbookRelsXml(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            .'<Relationship Id="rId1"'
+            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"'
+            .' Target="worksheets/sheet1.xml"/>'
+            .'<Relationship Id="rId2"'
+            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"'
+            .' Target="styles.xml"/>'
+            .'</Relationships>';
+    }
+
+    private function buildStylesXml(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+            .'<fonts count="2">'
+            .'<font><sz val="11"/><name val="Calibri"/><family val="2"/></font>'
+            .'<font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font>'
+            .'</fonts>'
+            .'<fills count="2">'
+            .'<fill><patternFill patternType="none"/></fill>'
+            .'<fill><patternFill patternType="gray125"/></fill>'
+            .'</fills>'
+            .'<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
+            .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+            .'<cellXfs count="2">'
+            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+            .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
+            .'</cellXfs>'
+            .'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
+            .'</styleSheet>';
+    }
+
+    private function buildCorePropertiesXml(): string
+    {
+        $timestamp = now()->utc()->format('Y-m-d\TH:i:s\Z');
+
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"'
+            .' xmlns:dc="http://purl.org/dc/elements/1.1/"'
+            .' xmlns:dcterms="http://purl.org/dc/terms/"'
+            .' xmlns:dcmitype="http://purl.org/dc/dcmitype/"'
+            .' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
+            .'<dc:title>Applicants Export</dc:title>'
+            .'<dc:creator>Applicant Registry System</dc:creator>'
+            .'<cp:lastModifiedBy>Applicant Registry System</cp:lastModifiedBy>'
+            .'<dcterms:created xsi:type="dcterms:W3CDTF">'.$timestamp.'</dcterms:created>'
+            .'<dcterms:modified xsi:type="dcterms:W3CDTF">'.$timestamp.'</dcterms:modified>'
+            .'</cp:coreProperties>';
+    }
+
+    private function buildAppPropertiesXml(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            .'<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"'
+            .' xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">'
+            .'<Application>Applicant Registry System</Application>'
+            .'</Properties>';
+    }
+
+    private function excelColumnName(int $index): string
+    {
+        $name = '';
+
+        while ($index > 0) {
+            $index--;
+            $name = chr(65 + ($index % 26)).$name;
+            $index = intdiv($index, 26);
+        }
+
+        return $name;
+    }
+
+    private function escapeXml(string $value): string
+    {
+        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 }

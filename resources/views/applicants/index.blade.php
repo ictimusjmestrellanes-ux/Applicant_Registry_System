@@ -25,8 +25,14 @@
                     <h5 class="section-title mb-1">Find Applicants</h5>
                     <p class="section-copy mb-0">Search by applicant name, contact number, or gender.</p>
                 </div>
-                <div class="results-chip">
-                    Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }}
+                <div class="section-head-actions">
+                    <a href="{{ route('applicants.export', request()->only('search')) }}"
+                        class="btn index-btn-export">
+                        <i class="bi bi-download me-2"></i>Export XLSX
+                    </a>
+                    <div class="results-chip">
+                        Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }}
+                    </div>
                 </div>
             </div>
 
@@ -400,7 +406,8 @@
         }
 
         .hero-side-actions,
-        .filter-actions {
+        .filter-actions,
+        .section-head-actions {
             display: flex;
             gap: 0.75rem;
             flex-wrap: wrap;
@@ -423,6 +430,22 @@
             background: #fff;
             border: 1px solid #dbeafe;
             color: #1e3a8a;
+        }
+
+        .index-btn-export {
+            border-radius: 14px;
+            padding: 0.82rem 1.15rem;
+            font-weight: 700;
+            background: #fff;
+            border: 1px solid #dbeafe;
+            color: #0f766e;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+        }
+
+        .index-btn-export:hover {
+            background: #f0fdf4;
+            border-color: #a7f3d0;
+            color: #065f46;
         }
 
         .view-switcher {
@@ -794,7 +817,8 @@
         @media (max-width: 1199.98px) {
 
             .hero-side-actions,
-            .filter-actions {
+            .filter-actions,
+            .section-head-actions {
                 justify-content: flex-start;
             }
         }

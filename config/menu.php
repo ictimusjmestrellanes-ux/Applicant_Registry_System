@@ -34,11 +34,4 @@ return [
         'icon' => 'bi bi-journal-text',
         'route' => 'activity-logs.index',
     ],
-
-    [
-        'label' => 'Reports',
-        'icon' => 'bi bi-graph-up',
-        'route' => 'reports.index',
-    ],
-
 ];
