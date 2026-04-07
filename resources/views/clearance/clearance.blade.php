@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mayor's Clearance -
-        {{ strtoupper(trim($applicant->first_name . ' ' . ($applicant->middle_name ?? '') . ' ' . $applicant->last_name . ' ' . ($applicant->suffix ?? ''))) }}
-    </title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
+    <title>Mayor's Clearance Letter</title>
     <style>
         @page {
             size: legal;
@@ -271,7 +270,7 @@
 <body>
     @php
         $clearance = optional($applicant->clearance);
-        $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ?? '') . ' ' . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
+        $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr(trim($applicant->middle_name), 0, 1)).'.' : null) . ' ' . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
         $fullAddress = collect([
             $applicant->address_line,
             $applicant->barangay,
@@ -292,7 +291,7 @@
         $gorSerialNo = strtoupper($clearance->clearance_or_no);
     @endphp
     <div class="no-print">
-        <button onclick="window.print()">Print Clearance Letter</button>
+        <button onclick="window.print()">Print Mayor's Clearance Letter</button>
     </div>
     <div class="page">
         <div class="sheet">

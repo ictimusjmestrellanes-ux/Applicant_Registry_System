@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Mayor's Permit ID</title>
+    <title>Mayor's Permit to Work ID</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         @page {
             size: A4;
@@ -243,7 +245,7 @@
         $paymentDate = $permit->permit_date_of_payment ? strtoupper(\Carbon\Carbon::parse($permit->permit_date_of_payment)->format('F j, Y')) : 'N/A';
     @endphp
     <div class="no-print">
-        <button onclick="window.print()">Print Permit ID</button>
+        <button onclick="window.print()">Print Permit to Work ID</button>
     </div>
 
     <div class="print-page">

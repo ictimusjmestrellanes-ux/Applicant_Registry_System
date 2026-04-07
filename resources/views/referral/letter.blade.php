@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Referral Letter</title>
+    <title>Referral Letter Whitin Imus</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
 
     <style>
         @page {
@@ -195,7 +196,7 @@
 
         $applicantName = trim(collect([
             $applicant->first_name,
-            $applicant->middle_name,
+            $applicant->middle_name ? strtoupper(substr(trim($applicant->middle_name), 0, 1)).'.' : null,
             $applicant->last_name,
             $applicant->suffix,
         ])->filter()->implode(' '));
@@ -205,7 +206,7 @@
             $applicant->barangay,
             $applicant->city,
             $applicant->province,
-        ])->filter()->implode(' ')));
+        ])->filter()->implode(', ')));
 
         $recipientName = strtoupper($referral->ref_employer_name);
         $recipientTitle = $referral->ref_position;
@@ -221,7 +222,7 @@
     @endphp
 
     <div class="no-print">
-        <button onclick="window.print()">Print Referral Letter</button>
+        <button onclick="window.print()">Print Referral Letter Within Imus</button>
     </div>
 
     <div class="page">
