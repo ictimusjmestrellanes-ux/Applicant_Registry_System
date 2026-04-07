@@ -200,24 +200,13 @@ class PermitController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | AUTO GENERATE PESO ID
+        | AUTO GENERATE PESO ID ONLY WHEN PERMIT IS READY
         |--------------------------------------------------------------------------
         */
-        if (empty($permit->peso_id_no)) {
+        $permit->loadMissing('applicant');
 
-            $year = date('Y');
-
-            $latest = MayorsPermit::whereYear('created_at', $year)
-                ->whereNotNull('peso_id_no')
-                ->orderBy('id', 'desc')
-                ->first();
-
-            $nextNumber = $latest
-                ? ((int) substr($latest->peso_id_no, -7)) + 1
-                : 1;
-
-            $permit->peso_id_no = $year.'-'.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
-
+        if (empty($permit->peso_id_no) && $permit->isReadyForIdGeneration()) {
+            $permit->peso_id_no = MayorsPermit::generateNextPesoIdNo();
             $permit->save();
         }
 

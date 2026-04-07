@@ -44,7 +44,26 @@ class MayorsPermit extends Model
         return $this->belongsTo(Applicant::class);
     }
 
-    public function isComplete()
+    public static function generateNextPesoIdNo(?int $year = null): string
+    {
+        $year = $year ?? (int) now()->format('Y');
+        $prefix = $year.'-';
+
+        $latest = static::query()
+            ->where('peso_id_no', 'like', $prefix.'%')
+            ->orderByDesc('peso_id_no')
+            ->value('peso_id_no');
+
+        $nextNumber = 1;
+
+        if ($latest && preg_match('/^\d{4}-(\d{5})$/', $latest, $matches)) {
+            $nextNumber = ((int) $matches[1]) + 1;
+        }
+
+        return $prefix.str_pad((string) $nextNumber, 5, '0', STR_PAD_LEFT);
+    }
+
+    public function isReadyForIdGeneration()
     {
         return
             // REQUIREMENTS
@@ -55,19 +74,25 @@ class MayorsPermit extends Model
                 ! empty($this->permit_police_clearance)
             ) &&
             (
-                // Referral only required if NOT Imus
                 stripos(optional($this->applicant)->city, 'City of Imus') !== false
                 || ! empty($this->referral_letter)
             ) &&
 
-            // DETAILS
+            // DETAILS REQUIRED BEFORE ID NUMBER CAN BE GENERATED
             ! empty($this->permit_or_no) &&
-            ! empty($this->peso_id_no) &&
             ! empty($this->community_tax_no) &&
             ! empty($this->permit_issued_on) &&
             ! empty($this->permit_issued_at) &&
             ! empty($this->permit_date) &&
             ! empty($this->expires_on) &&
             ! empty($this->permit_doc_stamp_control_no);
+    }
+
+    public function isComplete()
+    {
+        return
+            $this->isReadyForIdGeneration() &&
+            ! empty($this->peso_id_no) &&
+            ! empty($this->permit_date_of_payment);
     }
 }

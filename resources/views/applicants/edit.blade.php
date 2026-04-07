@@ -1555,35 +1555,34 @@
                                         class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $permit->peso_id_no ?? '' }}"
-                                    placeholder="Will generate after save when complete" readonly>
+                                    placeholder="Will generate after save when complete" disabled>
                             </div>
 
                             {{-- OR NUMBER --}}
                             <div class="col-md-2">
                                 <label class="form-label">O.R No. <span class="required-mark">*</span></label>
                                 <input type="text" name="permit_or_no" value="{{ $permit->permit_or_no }}"
-                                    class="form-control" required>
+                                    class="form-control">
                             </div>
 
                             {{-- Community Tax No --}}
                             <div class="col-md-2">
                                 <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
                                 <input type="text" name="community_tax_no" class="form-control"
-                                    value="{{$permit->community_tax_no}}" required>
+                                    value="{{$permit->community_tax_no}}">
                             </div>
 
                             {{-- Issued On --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="permit_issued_on" class="form-control"
-                                    value="{{$permit->permit_issued_on}}" required>
+                                    value="{{$permit->permit_issued_on}}">
                             </div>
 
                             {{-- Permit Issued At --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
-                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select"
-                                    required>
+                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select">
                                     <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
                                         {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
                                     </option>
@@ -1594,7 +1593,7 @@
                             <div class="col-md-2">
                                 <label class="form-label">Permit Date<span class="required-mark">*</span></label>
                                 <input type="date" id="permit_date" name="permit_date" class="form-control"
-                                    value="{{$permit->permit_date}}" required>
+                                    value="{{$permit->permit_date}}">
                             </div>
 
                             {{-- Expiration --}}
@@ -1609,7 +1608,7 @@
                                 <label class="form-label">Documentary Stamp Control No.<span
                                         class="required-mark">*</span></label>
                                 <input type="text" name="permit_doc_stamp_control_no" class="form-control"
-                                    value="{{$permit->permit_doc_stamp_control_no}}" required>
+                                    value="{{$permit->permit_doc_stamp_control_no}}">
                             </div>
                             {{-- Date of Payment --}}
                             <div class="col-md-2">
@@ -1802,28 +1801,28 @@
                                         class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $clearance->clearance_peso_control_no }}"
-                                    placeholder="Will generate after save when complete" readonly>
+                                    placeholder="Will generate after save when complete" disabled>
                             </div>
 
                             {{-- Official Receipt No --}}
                             <div class="col-md-2">
                                 <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_or_no" class="form-control"
-                                    value="{{$clearance->clearance_or_no}}" required>
+                                    value="{{$clearance->clearance_or_no}}">
                             </div>
 
                             {{-- Hired Company --}}
                             <div class="col-md-2">
                                 <label class="form-label">Hired Company<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_hired_company" class="form-control"
-                                    value="{{$clearance->clearance_hired_company}}" required>
+                                    value="{{$clearance->clearance_hired_company}}">
                             </div>
 
                             {{-- Issued On --}}
                             <div class="col-md-2">
                                 <label class="form-label">Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="clearance_issued_on" class="form-control"
-                                    value="{{$clearance->clearance_issued_on}}" required>
+                                    value="{{$clearance->clearance_issued_on}}">
                             </div>
 
                             {{-- Documentary Stamp Control No --}}
@@ -1831,13 +1830,13 @@
                                 <label class="form-label">Documentary Stamp Control No.<span
                                         class="required-mark">*</span></label>
                                 <input type="text" name="clearance_doc_stamp_control_no" class="form-control"
-                                    value="{{$clearance->clearance_doc_stamp_control_no}}" required>
+                                    value="{{$clearance->clearance_doc_stamp_control_no}}">
                             </div>
                             {{-- Date of Payment --}}
                             <div class="col-md-2">
                                 <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                 <input type="date" name="clearance_date_of_payment" class="form-control"
-                                    value="{{$clearance->clearance_date_of_payment}}" required>
+                                    value="{{$clearance->clearance_date_of_payment}}">
                             </div>
                         </div>
 
@@ -2026,7 +2025,8 @@
                                                 <input type="text" name="ref_imus_ocrl" class="form-control"
                                                     style="text-align: center"
                                                     value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
-                                                    readonly placeholder="Will generate after save when complete">
+                                                    placeholder="Will generate after save when complete"
+                                                    readonly>
                                             </div>
 
                                             <div class="col-md-2">
@@ -2076,8 +2076,8 @@
                                                         class="required-mark">*</span></label>
                                                 <input type="text" name="ref_ocrl" class="form-control"
                                                     style="text-align: center"
-                                                    value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}" readonly
-                                                    placeholder="Will generate after save when complete">
+                                                    value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
+                                                    placeholder="Will generate after save when complete" disabled>
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label">O.R No.<span
@@ -2175,7 +2175,12 @@
         if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
             const setGroupDisabledState = (container, shouldDisable) => {
                 container.querySelectorAll("input, select, textarea").forEach(field => {
-                    field.disabled = shouldDisable;
+                    const forceDisabled = field.dataset.forceDisabled === "true";
+                    field.disabled = shouldDisable || forceDisabled;
+
+                    if (forceDisabled) {
+                        field.setAttribute("readonly", "readonly");
+                    }
                 });
             };
 
