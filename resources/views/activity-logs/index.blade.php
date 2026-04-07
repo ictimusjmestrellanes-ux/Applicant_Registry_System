@@ -3,6 +3,10 @@
 @section('title', 'Activity Logs')
 
 @section('content')
+    @php
+        $searchTerm = trim((string) ($search ?? request('search')));
+    @endphp
+
     <style>
         :root {
             --logs-ink: #10243d;
@@ -150,7 +154,56 @@
             color: var(--logs-slate);
         }
 
-        
+        .logs-search-form {
+            width: min(100%, 420px);
+        }
+
+        .logs-search-shell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-height: 52px;
+            padding: 0 14px;
+            border-radius: 16px;
+            border: 1px solid var(--logs-line);
+            background: #ffffff;
+            transition: all 0.25s ease;
+        }
+
+        .logs-search-shell:focus-within {
+            border-color: #7aa2ff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+
+        .logs-search-icon {
+            color: var(--logs-slate);
+            font-size: 0.95rem;
+        }
+
+        .logs-search-input {
+            width: 100%;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--logs-ink);
+            font-size: 0.95rem;
+        }
+
+        .logs-search-input::placeholder {
+            color: #91a0b5;
+        }
+
+        .search-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
 
         .logs-table-wrap {
             overflow: hidden;
@@ -383,6 +436,10 @@
                 align-items: flex-start;
             }
 
+            .logs-search-form {
+                width: 100%;
+            }
+
             .metrics-grid {
                 grid-template-columns: 1fr;
             }
@@ -421,7 +478,27 @@
                         <div class="table-kicker">System Timeline</div>
                         <h5 class="fw-bold mb-1">Recent activity records</h5>
                         <p class="table-copy mb-0">Review the latest actions performed in the system and open a full detail view for any specific entry.</p>
+                        @if($searchTerm !== '')
+                            <div class="search-chip mt-3">
+                                <i class="bi bi-stars"></i>
+                                Search: "{{ $searchTerm }}"
+                            </div>
+                        @endif
                     </div>
+                    <form method="GET" action="{{ route('activity-logs.index') }}" class="logs-search-form">
+                        <div class="logs-search-shell">
+                            <span class="logs-search-icon">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input
+                                type="text"
+                                name="search"
+                                class="logs-search-input"
+                                placeholder="Search user, applicant, module, action, or description..."
+                                value="{{ $searchTerm }}"
+                            >
+                        </div>
+                    </form>
                 </div>
 
                 <div class="logs-table-wrap">

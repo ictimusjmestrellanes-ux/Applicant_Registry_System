@@ -6,6 +6,8 @@
     @php
         $visibleApplicants = $applicants->getCollection();
         $searchTerm = trim((string) request('search'));
+        $perPage = (string) request('per_page', '10');
+        $isUnpaginatedView = $perPage === 'all';
         $showingFrom = $applicants->firstItem() ?? 0;
         $showingTo = $applicants->lastItem() ?? 0;
         $totalApplicants = $applicants->total();
@@ -26,12 +28,15 @@
                     <p class="section-copy mb-0">Search by applicant name, contact number, or gender.</p>
                 </div>
                 <div class="section-head-actions">
-                    <a href="{{ route('applicants.export', request()->only('search')) }}"
-                        class="btn index-btn-export">
+                    <a href="{{ route('applicants.export', request()->only('search')) }}" class="btn index-btn-export">
                         <i class="bi bi-download me-2"></i>Export XLSX
                     </a>
                     <div class="results-chip">
-                        Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }}
+                        @if($isUnpaginatedView)
+                            Viewing all {{ number_format($totalApplicants) }} applicants
+                        @else
+                            Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }}
+                        @endif
                     </div>
                 </div>
             </div>
@@ -51,7 +56,8 @@
                             <button type="submit" class="btn btn-primary index-btn-primary">
                                 <i class="bi bi-funnel-fill me-2"></i>Search Records
                             </button>
-                            <a href="{{ route('applicants.index') }}" class="btn index-btn-secondary">Reset</a>
+                            <a href="{{ route('applicants.index', ['per_page' => $perPage]) }}"
+                                class="btn index-btn-secondary">Reset</a>
                         </div>
                     </div>
                 </div>
@@ -72,11 +78,40 @@
                     <p class="section-copy mb-0">Review profile details and document readiness before opening the full
                         applicant workspace.</p>
                 </div>
-                @if($searchTerm !== '')
-                    <div class="search-chip">
-                        <i class="bi bi-stars me-1"></i>Search: "{{ $searchTerm }}"
-                    </div>
-                @endif
+                <div class="section-head-actions">
+                    @if($searchTerm !== '')
+                        <div class="search-chip">
+                            <i class="bi bi-stars me-1"></i>Search: "{{ $searchTerm }}"
+                        </div>
+                    @endif
+
+                    <form method="GET" action="{{ route('applicants.index') }}" class="records-view-form">
+                        @if($searchTerm !== '')
+                            <input type="hidden" name="search" value="{{ $searchTerm }}">
+                        @endif
+
+                        
+                        <div class="limit-shell js-limit-dropdown">
+                            <div class="limit-shell-copy">
+                                <span class="limit-shell-label">View Page</span>
+                                <select name="per_page" class="form-select index-limit-select js-limit-native"
+                                    onchange="this.form.submit()">
+                                    @foreach([10, 20, 30, 40, 50, 100] as $limit)
+                                        <option value="{{ $limit }}" {{ $perPage === (string) $limit ? 'selected' : '' }}>
+                                            {{ $limit }}
+                                        </option>
+                                    @endforeach
+                                    <option value="all" {{ $isUnpaginatedView ? 'selected' : '' }}>View all</option>
+                                </select>
+                                <button type="button" class="limit-trigger js-limit-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="limit-trigger-text js-limit-trigger-text">Select view</span>
+                                    <i class="bi bi-chevron-down limit-trigger-icon"></i>
+                                </button>
+                                <div class="limit-menu js-limit-menu" role="listbox"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div class="table-responsive d-none d-lg-block">
@@ -145,7 +180,8 @@
                                 <td class="location-cell">
                                     <div>{{ $applicant->address_line ?: 'Address line not set' }}</div>
                                     <div class="applicant-meta mt-1">{{ $applicant->barangay ?: 'Barangay not set' }},
-                                        {{ $applicant->city ?: 'City not set' }}</div>
+                                        {{ $applicant->city ?: 'City not set' }}
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="requirement-card">
@@ -257,7 +293,8 @@
                             <div>
                                 <div class="applicant-name">{{ $fullName }}</div>
                                 <div class="applicant-meta">#{{ $applicant->id }} •
-                                    {{ $applicant->created_at->format('M d, Y') }}</div>
+                                    {{ $applicant->created_at->format('M d, Y') }}
+                                </div>
                             </div>
                             <div class="mobile-actions">
                                 <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
@@ -280,7 +317,8 @@
                                 class="bi bi-telephone-fill me-2"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
                         <div class="mobile-meta-line"><i
                                 class="bi bi-geo-alt-fill me-2"></i>{{ $applicant->barangay ?: 'Barangay not set' }},
-                            {{ $applicant->city ?: 'City not set' }}</div>
+                            {{ $applicant->city ?: 'City not set' }}
+                        </div>
                         <div class="mobile-progress-list">
                             <div class="requirement-card">
                                 <div class="requirement-meta"><span>Mayor's
@@ -318,11 +356,22 @@
             </div>
         </section>
 
-        <div class="pagination-wrap mt-4">
-            <div class="pagination-summary">Showing {{ $showingFrom }} to {{ $showingTo }} of
-                {{ number_format($totalApplicants) }} applicants</div>
-            <div>{{ $applicants->appends(request()->query())->links() }}</div>
-        </div>
+        @if($applicants->hasPages())
+            <div class="pagination-wrap mt-4">
+                <div class="pagination-copy">
+                    Showing {{ $showingFrom }} to {{ $showingTo }} of {{ number_format($totalApplicants) }} applicants
+                </div>
+                <div>
+                    {{ $applicants->appends(request()->query())->links('vendor.pagination.activity-logs') }}
+                </div>
+            </div>
+        @elseif($isUnpaginatedView && $totalApplicants > 0)
+            <div class="pagination-wrap mt-4">
+                <div class="pagination-copy">
+                    Showing all {{ number_format($totalApplicants) }} applicants in one list
+                </div>
+            </div>
+        @endif
     </div>
 
     <style>
@@ -411,6 +460,7 @@
             display: flex;
             gap: 0.75rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .index-btn-primary,
@@ -574,7 +624,7 @@
         .section-head {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             gap: 1rem;
             margin-bottom: 1.4rem;
         }
@@ -604,6 +654,149 @@
             background: transparent;
         }
 
+        .limit-shell-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+            font-size: 1rem;
+        }
+
+        .limit-shell-copy {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+        }
+
+        .records-view-form {
+            margin: 0;
+        }
+
+        .limit-shell-label {
+            text-align: center;
+            display: block;
+            margin-bottom: 0.3rem;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .index-limit-select {
+            display: flex;
+            min-height: 30px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            color: #0f172a;
+            font-weight: 500;
+            text-align: center;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .index-limit-select:focus {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .limit-trigger {
+            width: 100%;
+            min-height: 30px;
+            padding: 0.55rem 0.9rem;
+            border: 1px solid rgba(191, 219, 254, 0.9);
+            border-radius: 14px;
+            background: #ffffff;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .limit-trigger:hover {
+            border-color: #93c5fd;
+            transform: translateY(-1px);
+        }
+
+        .limit-trigger:focus-visible {
+            outline: none;
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+        }
+
+        .limit-trigger-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .limit-trigger-icon {
+            color: #64748b;
+            transition: transform 0.2s ease;
+        }
+
+        .limit-shell.is-open .limit-trigger-icon {
+            transform: rotate(180deg);
+        }
+
+        .limit-menu {
+            position: absolute;
+            top: calc(100% + 0.55rem);
+            left: 0;
+            right: 0;
+            z-index: 20;
+            display: none;
+            padding: 0.45rem;
+            border-radius: 16px;
+            border: 1px solid #dbeafe;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+            backdrop-filter: blur(12px);
+        }
+
+        .limit-shell.is-open .limit-menu {
+            display: grid;
+            gap: 0.2rem;
+        }
+
+        .limit-menu-option {
+            width: 100%;
+            padding: 0.7rem 0.85rem;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #334155;
+            text-align: left;
+            font-size: 0.92rem;
+            font-weight: 700;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .limit-menu-option:hover,
+        .limit-menu-option:focus-visible {
+            background: #eff6ff;
+            color: #1d4ed8;
+            outline: none;
+        }
+
+        .limit-menu-option.is-active {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
         .results-chip,
         .search-chip,
         .mini-pill {
@@ -618,6 +811,7 @@
             padding: 0.55rem 0.9rem;
             background: #eff6ff;
             color: #1d4ed8;
+            justify-content: center;
         }
 
         .search-chip {
@@ -644,7 +838,7 @@
         }
 
         .applicants-table tbody td {
-            padding: 1rem;
+            padding: 6px;
             border-top: 1px solid #eef2f7;
             vertical-align: middle;
         }
@@ -851,7 +1045,8 @@
             }
 
             .index-btn-primary,
-            .index-btn-secondary {
+            .index-btn-secondary,
+            .limit-shell {
                 width: 100%;
             }
 
@@ -861,4 +1056,67 @@
             }
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.js-limit-dropdown').forEach(function (dropdown) {
+                const select = dropdown.querySelector('.js-limit-native');
+                const trigger = dropdown.querySelector('.js-limit-trigger');
+                const triggerText = dropdown.querySelector('.js-limit-trigger-text');
+                const menu = dropdown.querySelector('.js-limit-menu');
+
+                if (!select || !trigger || !triggerText || !menu) {
+                    return;
+                }
+
+                const renderOptions = () => {
+                    const options = Array.from(select.options);
+                    const selectedOption = options.find(option => option.selected) || options[0];
+
+                    triggerText.textContent = selectedOption ? selectedOption.textContent.trim() : 'Select view';
+                    menu.innerHTML = '';
+
+                    options.forEach(option => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'limit-menu-option' + (option.selected ? ' is-active' : '');
+                        button.textContent = option.textContent.trim();
+                        button.setAttribute('role', 'option');
+                        button.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+
+                        button.addEventListener('click', function () {
+                            select.value = option.value;
+                            renderOptions();
+                            dropdown.classList.remove('is-open');
+                            trigger.setAttribute('aria-expanded', 'false');
+                            select.form.submit();
+                        });
+
+                        menu.appendChild(button);
+                    });
+                };
+
+                trigger.addEventListener('click', function () {
+                    const isOpen = dropdown.classList.toggle('is-open');
+                    trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+
+                document.addEventListener('click', function (event) {
+                    if (!dropdown.contains(event.target)) {
+                        dropdown.classList.remove('is-open');
+                        trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        dropdown.classList.remove('is-open');
+                        trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                renderOptions();
+            });
+        });
+    </script>
 @endsection

@@ -53,10 +53,26 @@ class ApplicantController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->search);
+        $perPageInput = strtolower((string) $request->query('per_page', '10'));
+        $allowedPerPage = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-        $applicants = $this->buildApplicantSearchQuery($search)
-            ->with(['permit', 'clearance', 'referral'])
-            ->paginate(10);
+        $query = $this->buildApplicantSearchQuery($search)
+            ->with(['permit', 'clearance', 'referral']);
+
+        if ($perPageInput === 'all') {
+            $total = (clone $query)->count();
+            $perPage = max($total, 1);
+        } else {
+            $perPage = (int) $perPageInput;
+
+            if (! in_array($perPage, $allowedPerPage, true)) {
+                $perPage = 10;
+            }
+        }
+
+        $applicants = $query
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('applicants.index', compact('applicants', 'search'));
     }
@@ -112,9 +128,13 @@ class ApplicantController extends Controller
 
     public function edit($id)
     {
-        $applicant = Applicant::with(['permit', 'clearance', 'referral', 'activityLogs.causer'])->findOrFail($id);
+        $applicant = Applicant::with(['permit', 'clearance', 'referral'])->findOrFail($id);
+        $activityLogs = $applicant->activityLogs()
+            ->with('causer')
+            ->paginate(10, ['*'], 'activity_page')
+            ->withQueryString();
 
-        return view('applicants.edit', compact('applicant'));
+        return view('applicants.edit', compact('applicant', 'activityLogs'));
     }
 
     public function update(Request $request, $id)

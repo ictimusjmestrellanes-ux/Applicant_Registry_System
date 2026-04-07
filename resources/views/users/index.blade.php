@@ -32,6 +32,17 @@
             gap: 1rem;
         }
 
+        .users-page,
+        .users-shell,
+        .users-hero,
+        .users-panel,
+        .users-table-shell,
+        .users-table-wrap,
+        .mobile-user-list,
+        .mobile-user-card {
+            min-width: 0;
+        }
+
         .users-hero,
         .users-panel,
         .users-table-shell {
@@ -44,7 +55,7 @@
         .users-hero {
             position: relative;
             overflow: hidden;
-            padding: 30px;
+            padding: clamp(1.25rem, 2vw, 1.875rem);
         }
 
         .users-hero::after {
@@ -145,7 +156,7 @@
 
         .users-panel,
         .users-table-shell {
-            padding: 22px;
+            padding: clamp(1rem, 1.8vw, 1.375rem);
         }
 
         .section-kicker {
@@ -291,6 +302,7 @@
             display: flex;
             align-items: center;
             gap: 0.9rem;
+            min-width: 0;
         }
 
         .user-avatar {
@@ -311,12 +323,14 @@
         .provider-main {
             color: var(--users-ink);
             font-weight: 700;
+            word-break: break-word;
         }
 
         .user-meta,
         .provider-meta {
             color: var(--users-slate);
             font-size: 0.83rem;
+            word-break: break-word;
         }
 
         .role-pill,
@@ -497,6 +511,28 @@
             }
         }
 
+        @media (max-width: 991.98px) {
+            .container-fluid.users-page {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .users-hero::after {
+                width: 180px;
+                height: 180px;
+                right: -50px;
+                top: -50px;
+            }
+
+            .users-table-wrap {
+                display: none;
+            }
+
+            .mobile-user-list {
+                display: grid;
+            }
+        }
+
         @media (max-width: 768px) {
             .users-hero,
             .users-panel,
@@ -525,16 +561,58 @@
                 width: 100%;
             }
 
-            .users-table-wrap {
-                display: none;
-            }
-
-            .mobile-user-list {
-                display: grid;
-            }
-
             .pagination-wrap .pagination {
                 flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .container-fluid.users-page {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+            }
+
+            .users-hero h2 {
+                font-size: 1.35rem;
+            }
+
+            .mobile-user-card {
+                padding: 0.9rem;
+                border-radius: 18px;
+            }
+
+            .mobile-user-head {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .mobile-user-head .btn-edit-user {
+                width: 100%;
+            }
+
+            .user-cell {
+                align-items: flex-start;
+            }
+
+            .user-avatar {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+            }
+
+            .permission-pills {
+                gap: 0.35rem;
+            }
+
+            .permission-pill,
+            .role-pill {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .pagination-wrap .page-link {
+                min-width: 36px;
+                height: 36px;
             }
         }
     </style>
