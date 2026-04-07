@@ -360,7 +360,7 @@
         .btn-save:hover {
             transform: translateY(-1px);
             box-shadow: 0 14px 28px rgba(29, 78, 216, 0.28);
-            color: #fff;
+            color: #5b6b8b;
         }
 
         @media (max-width: 1400px) {
