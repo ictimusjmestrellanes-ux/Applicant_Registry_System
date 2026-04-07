@@ -91,12 +91,10 @@
         }
 
         .front-name {
-            left: 12.5%;
-            top: 56.8%;
-            width: 33.5%;
-            font-size: 9pt;
-            text-align: center;
-            
+            left: 15.6%;
+            top: 56.6%;
+            width: 32%;
+            font-size: 8pt;
         }
 
         .employer {
@@ -227,7 +225,7 @@
         $permit = optional($applicant->permit);
         $fullName = strtoupper(trim(collect([
             $applicant->first_name,
-            $applicant->middle_name,
+            $applicant->middle_name ? strtoupper(substr(trim($applicant->middle_name), 0, 1)).'.' : null,
             $applicant->last_name,
             $applicant->suffix,
         ])->filter()->implode(' ')));

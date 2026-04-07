@@ -1555,7 +1555,7 @@
                                         class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $permit->peso_id_no ?? '' }}"
-                                    placeholder="Will generate after save when complete" disabled>
+                                    placeholder="Auto generate when complete" disabled>
                             </div>
 
                             {{-- OR NUMBER --}}
@@ -1801,7 +1801,7 @@
                                         class="required-mark">*</span></label>
                                 <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
                                     value="{{ $clearance->clearance_peso_control_no }}"
-                                    placeholder="Will generate after save when complete" disabled>
+                                    placeholder="Auto generate when complete" disabled>
                             </div>
 
                             {{-- Official Receipt No --}}
@@ -2025,7 +2025,7 @@
                                                 <input type="text" name="ref_imus_ocrl" class="form-control"
                                                     style="text-align: center"
                                                     value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
-                                                    placeholder="Will generate after save when complete"
+                                                    placeholder="Auto generate when complete"
                                                     readonly>
                                             </div>
 
@@ -2077,7 +2077,7 @@
                                                 <input type="text" name="ref_ocrl" class="form-control"
                                                     style="text-align: center"
                                                     value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
-                                                    placeholder="Will generate after save when complete" disabled>
+                                                    placeholder="Auto generate when complete" readonly>
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label">O.R No.<span
@@ -2090,7 +2090,7 @@
                                                 <label class="form-label">Mayor's Name<span
                                                         class="required-mark">*</span></label>
                                                 <select name="ref_recipient" id="refRecipientSelect" class="form-select">
-                                                    <option value=""></option>
+                                                    <option value="">Select City Mayor</option>
                                                     @foreach(config('philippine_mayors', []) as $mayor)
                                                         <option value="{{ $mayor['recipient'] }}"
                                                             data-city-government="{{ $mayor['city_government'] }}"
@@ -2240,6 +2240,10 @@
         const selectedRefCompanyAddress = `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
         const referralRecipientSearchUrl = `{{ route('referrals.recipients.search') }}`;
         const configuredMayors = @json(config('philippine_mayors', []));
+        const permitIssuedAtAllowedRegions = new Set([
+            "040000000", // CALABARZON
+            "130000000", // NCR
+        ]);
 
         const appendOptionIfMissing = (select, value, label, dataAttributes = {}) => {
             if (!select || !value) {
@@ -2305,6 +2309,12 @@
                 return cityDataPromise;
             };
         })();
+
+        const isAllowedPermitIssuedAtCity = city => {
+            const regionCode = city?.regionCode || city?.region_code || "";
+
+            return permitIssuedAtAllowedRegions.has(regionCode);
+        };
 
         const setRecipientDetails = (cityGovernment, companyAddress) => {
             if (cityDropdown && cityGovernment) {
@@ -2528,22 +2538,49 @@
 
         const populatePsgcCityData = () => {
             ensurePsgcCityData().then(cities => {
+                const allowedPermitCities = cities
+                    .filter(isAllowedPermitIssuedAtCity)
+                    .sort((a, b) => a.name.localeCompare(b.name));
+
+                if (permitIssuedAtDropdown) {
+                    const currentValue = permitIssuedAtDropdown.value || selectedPermitIssuedAt || "";
+
+                    permitIssuedAtDropdown.innerHTML = "";
+
+                    const placeholderOption = document.createElement("option");
+                    placeholderOption.value = "";
+                    placeholderOption.text = "Select City Government";
+                    placeholderOption.selected = currentValue === "";
+                    permitIssuedAtDropdown.appendChild(placeholderOption);
+
+                    allowedPermitCities.forEach(city => {
+                        const option = document.createElement("option");
+                        option.value = city.name;
+                        option.text = city.name;
+                        option.selected = city.name === currentValue;
+                        permitIssuedAtDropdown.appendChild(option);
+                    });
+
+                    if (
+                        currentValue &&
+                        !allowedPermitCities.some(city => city.name === currentValue)
+                    ) {
+                        const currentOption = document.createElement("option");
+                        currentOption.value = currentValue;
+                        currentOption.text = currentValue;
+                        currentOption.selected = true;
+                        permitIssuedAtDropdown.appendChild(currentOption);
+                    }
+                }
+
                 cities.forEach(city => {
                     const cityValue = city.name;
 
-                    if (permitIssuedAtDropdown && !Array.from(permitIssuedAtDropdown.options).some(option => option.value === cityValue)) {
-                        const option = document.createElement("option");
-                        option.value = cityValue;
-                        option.text = cityValue;
-
-                        if (cityValue === selectedPermitIssuedAt) {
-                            option.selected = true;
-                        }
-
-                        permitIssuedAtDropdown.appendChild(option);
-                    }
-
-                    if (refPlaceList && !Array.from(refPlaceList.options).some(option => option.value === cityValue)) {
+                    if (
+                        refPlaceList &&
+                        isAllowedPermitIssuedAtCity(city) &&
+                        !Array.from(refPlaceList.options).some(option => option.value === cityValue)
+                    ) {
                         const option = document.createElement("option");
                         option.value = cityValue;
                         refPlaceList.appendChild(option);
