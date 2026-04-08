@@ -88,9 +88,7 @@ class ApplicantController extends Controller
         $rows = [];
 
         foreach ($applicants as $applicant) {
-            $permit = optional($applicant->permit);
             $rows[] = [
-                'OR no.' => (string) $permit->permit_or_no,
                 'Full Name' => trim(implode(' ', array_filter([
                     (string) $applicant->first_name,
                     (string) ($applicant->middle_name ?? ''),

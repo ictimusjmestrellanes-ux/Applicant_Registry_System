@@ -486,8 +486,8 @@
         padding: 0;
         overflow: hidden;
         border-radius: 12px;
-        background: rgb(209, 209, 209);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        background: rgba(255, 255, 255, 0.959);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.384);
     }
 
     .dropdown-header-card {
