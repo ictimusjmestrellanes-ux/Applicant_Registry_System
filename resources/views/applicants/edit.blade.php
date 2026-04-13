@@ -1518,7 +1518,7 @@
                                         <input type="file" id="referral_input" name="referral_letter" style="display:none"
                                             onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }}>
 
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                        <button type="button" id="referral_upload_btn" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('referral_input').click()" {{ $isImusResident ? 'disabled' : '' }}>
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
@@ -1527,17 +1527,15 @@
                                             {{ !empty($permit->referral_letter) ? basename($permit->referral_letter) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->referral_letter))
-                                            <a href="{{ asset('storage/' . $permit->referral_letter) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a id="referral_view_link" href="{{ asset('storage/' . $permit->referral_letter) }}" target="_blank"
+                                                class="btn btn-light btn-sm text-primary border {{ $isImusResident ? 'd-none' : '' }}">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
 
-                                        @if($isImusResident)
-                                            <div class="badge bg-success-soft text-success p-2 mt-1" style="font-size: 11px;">
-                                                Not required for Imus residents
-                                            </div>
-                                        @endif
+                                        <div id="referral_imus_badge" class="badge bg-success-soft text-success p-2 mt-1 {{ $isImusResident ? '' : 'd-none' }}" style="font-size: 11px;">
+                                            Not required for Imus residents
+                                        </div>
 
                                     </div>
                                 </div>
