@@ -1799,7 +1799,7 @@
                             <div class="col-md-2">
                                 <label class="form-label">Peso Control No. (Auto Generate)<span
                                         class="required-mark">*</span></label>
-                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
+                                <input type="text" name="clearance_peso_control_no" class="form-control" style="text-align: center"
                                     value="{{ $clearance->clearance_peso_control_no }}"
                                     placeholder="Auto generate when complete" disabled>
                             </div>
