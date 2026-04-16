@@ -66,8 +66,8 @@ class Applicant extends Model
                 (! empty($permit->permit_nbi_clearance) || ! empty($permit->permit_police_clearance))
             );
 
-        // Detect if resident of City of Imus
-        $isImusResident = stripos($this->city, 'City of Imus') !== false;
+        // Detect if resident of IMUS CITY
+        $isImusResident = stripos($this->city, 'IMUS CITY') !== false;
 
         // Always required
         if (

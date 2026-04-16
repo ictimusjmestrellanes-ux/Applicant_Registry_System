@@ -134,7 +134,7 @@
                             @php
                                 $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
                                 $permit = optional($applicant->permit);
-                                $isImusResident = $applicant->city && stripos($applicant->city, 'City of Imus') !== false;
+                                $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
                                 $hasPermitClearance =
                                     ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
                                     ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
@@ -254,7 +254,7 @@
                     @php
                         $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
                         $permit = optional($applicant->permit);
-                        $isImusResident = $applicant->city && stripos($applicant->city, 'City of Imus') !== false;
+                        $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
                         $hasPermitClearance =
                             ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
                             ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));

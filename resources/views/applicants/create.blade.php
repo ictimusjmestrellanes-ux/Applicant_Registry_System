@@ -439,32 +439,32 @@
                                     <label class="form-label">First Time Jobseeker <span
                                             class="required-mark">*</span></label>
                                     <select name="first_time_job_seeker" class="form-select" required>
-                                        <option value="No" {{ old('first_time_job_seeker', 'No') === 'No' ? 'selected' : '' }}>No</option>
-                                        <option value="Yes" {{ old('first_time_job_seeker') === 'Yes' ? 'selected' : '' }}>Yes
+                                        <option value="NO" {{ old('first_time_job_seeker', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
+                                        <option value="YES" {{ old('first_time_job_seeker', 'YES') === 'YES' ? 'selected' : '' }}>YES
                                         </option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="first_name" class="form-control"
+                                    <input type="text" name="first_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                         value="{{ old('first_name') }}" placeholder="e.g. John" required>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Middle Name</label>
-                                    <input type="text" name="middle_name" class="form-control"
+                                    <input type="text" name="middle_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                         value="{{ old('middle_name') }}" placeholder="Optional">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}"
+                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" oninput="this.value = this.value.toUpperCase()"
                                         placeholder="e.g. Doe" required>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="form-label">Suffix</label>
                                     <select name="suffix" class="form-select">
                                         <option value="">Optional</option>
-                                        <option value="Jr." {{ old('suffix') === 'Jr.' ? 'selected' : '' }}>Jr.</option>
-                                        <option value="Sr." {{ old('suffix') === 'Sr.' ? 'selected' : '' }}>Sr.</option>
+                                        <option value="JR." {{ old('suffix') === 'JR.' ? 'selected' : '' }}>JR.</option>
+                                        <option value="SR." {{ old('suffix') === 'SR.' ? 'selected' : '' }}>SR.</option>
                                         <option value="II" {{ old('suffix') === 'II' ? 'selected' : '' }}>II</option>
                                         <option value="III" {{ old('suffix') === 'III' ? 'selected' : '' }}>III</option>
                                         <option value="IV" {{ old('suffix') === 'IV' ? 'selected' : '' }}>IV</option>
@@ -479,8 +479,8 @@
                                     <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
                                     <select name="gender" class="form-select" required>
                                         <option value="">Select Gender</option>
-                                        <option value="Male" {{ old('gender') === 'Male' ? 'selected' : '' }}>Male</option>
-                                        <option value="Female" {{ old('gender') === 'Female' ? 'selected' : '' }}>Female
+                                        <option value="MALE" {{ old('gender') === 'MALE' ? 'selected' : '' }}>MALE</option>
+                                        <option value="FEMALE" {{ old('gender') === 'FEMALE' ? 'selected' : '' }}>FEMALE
                                         </option>
                                     </select>
                                 </div>
@@ -499,15 +499,15 @@
                                 <div class="col-md-1" style="text-align: center">
                                     <label class="form-label">PWD?<span class="required-mark">*</span></label>
                                     <select name="pwd" class="form-select" required>
-                                        <option value="No" {{ old('pwd', 'No') === 'No' ? 'selected' : '' }}>No</option>
-                                        <option value="Yes" {{ old('pwd') === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="NO" {{ old('pwd', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
+                                        <option value="YES" {{ old('pwd') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1" style="text-align: center">
                                     <label class="form-label">4Ps?<span class="required-mark">*</span></label>
                                     <select name="four_ps" class="form-select" required>
-                                        <option value="No" {{ old('four_ps', 'No') === 'No' ? 'selected' : '' }}>No</option>
-                                        <option value="Yes" {{ old('four_ps') === 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="NO" {{ old('four_ps', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
+                                        <option value="YES" {{ old('four_ps') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
                             </div>
@@ -524,13 +524,13 @@
                                 </div>
                                 <div class="col-md-8">
                                     <label class="form-label">Complete Address <span class="required-mark">*</span></label>
-                                    <input type="text" name="address_line" class="form-control"
+                                    <input type="text" name="address_line" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                         value="{{ old('address_line') }}" placeholder="House No. / Street / Phase / Block"
                                         required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Province <span class="required-mark">*</span></label>
-                                    <select name="province" id="province" class="form-select" required>
+                                    <select name="province" id="province" class="form-select" required> 
                                         <option value="">Select Province</option>
                                     </select>
                                 </div>
@@ -556,11 +556,11 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Educational Attainment <span
                                             class="required-mark">*</span></label>
-                                    <select name="educational_attainment" id="educationalAttainmentSelect" class="form-select" required>
+                                    <select name="educational_attainment" id="educationalAttainmentSelect"
+                                        class="form-select" required>
                                         <option value="">Select educational attainment</option>
                                         @foreach(config('educational_attainments', []) as $attainment)
-                                            <option value="{{ $attainment }}"
-                                                {{ old('educational_attainment') === $attainment ? 'selected' : '' }}>
+                                            <option value="{{ $attainment }}" {{ old('educational_attainment') === $attainment ? 'selected' : '' }}>
                                                 {{ $attainment }}
                                             </option>
                                         @endforeach
@@ -574,11 +574,12 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
                                     <input type="text" name="hiring_company" class="form-control"
-                                        value="{{ old('hiring_company') }}" placeholder="e.g. Tech Corp" required>
+                                        oninput="this.value = this.value.toUpperCase()" value="{{ old('hiring_company') }}"
+                                        placeholder="e.g. TECH CORP" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Position Hired <span class="required-mark">*</span></label>
-                                    <input type="text" name="position_hired" class="form-control"
+                                    <input type="text" name="position_hired" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                         value="{{ old('position_hired') }}" placeholder="e.g. Software Engineer" required>
                                 </div>
                             </div>
@@ -635,48 +636,160 @@
         const savedCity = @json(old('city'));
         const savedBarangay = @json(old('barangay'));
 
+        // Local barangay mappings: add cityName: [ 'Barangay 1', 'Barangay 2', ... ]
+        const localBarangays = {
+            // Example:
+            // 'BATANGAS CITY': ['Poblacion I', 'Poblacion II']
+        };
+
         if (!provinceSelect || !citySelect || !barangaySelect) {
             return;
         }
 
         function loadProvinces() {
-            provinceSelect.innerHTML = '<option>Loading provinces...</option>';
+            const provinces = [
+                'BATANGAS','CAVITE','LAGUNA','QUEZON','RIZAL'
+            ];
 
-            fetch('https://psgc.gitlab.io/api/provinces/')
-                .then(response => response.json())
-                .then(data => {
-                    provinceSelect.innerHTML = '<option value="">Select Province</option>';
+            provinceSelect.innerHTML = '<option value="">Select Province</option>';
 
-                    data.sort((a, b) => a.name.localeCompare(b.name));
+            provinces.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                option.dataset.code = '';
 
-                    data.forEach(province => {
-                        const option = document.createElement('option');
-                        option.value = province.name;
-                        option.textContent = province.name;
-                        option.dataset.code = province.code;
+                if (savedProvince && name === savedProvince) {
+                    option.selected = true;
+                }
 
-                        if (savedProvince && province.name === savedProvince) {
-                            option.selected = true;
-                        }
+                provinceSelect.appendChild(option);
+            });
 
-                        provinceSelect.appendChild(option);
-                    });
-
-                    const selectedProvince = provinceSelect.options[provinceSelect.selectedIndex];
-                    if (selectedProvince && selectedProvince.dataset.code) {
-                        loadCities(selectedProvince.dataset.code);
-                    }
-                })
-                .catch(() => {
-                    provinceSelect.innerHTML = '<option value="">Unable to load provinces</option>';
-                });
+            // Trigger city loading for a saved selection
+            const selected = provinceSelect.options[provinceSelect.selectedIndex];
+            if (selected) {
+                const id = selected.dataset.code || selected.value;
+                if (id) loadCities(id);
+            }
         }
 
-        function loadCities(provinceCode) {
+        function loadCities(provinceIdentifier) {
             citySelect.innerHTML = '<option>Loading cities...</option>';
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
-            fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
+            // Local list for BATANGAS
+            if (String(provinceIdentifier).toUpperCase() === 'BATANGAS' || String(provinceIdentifier).toUpperCase() === 'BATANGAS PROVINCE') {
+                const batangasCities = [
+                    'AGONCILLO','ALITAGTAG','BALAYAN','BALETE','BATANGAS CITY','BAUAN','CALACA','CALATAGAN','CUENCA','IBAAN','LAUREL','LEMERY','LIAN','LIPA CITY','LOBO','MABINI','MALVAR','MATAASNAKAHOY','NASUGBU','PADRE GARCIA','ROSARIO','SAN JOSE','SAN JUAN','SAN LUIS','SAN NICOLAS','SAN PASCUAL','SANTA TERESITA','SANTO TOMAS','TAAL','TALISAY','TANAUAN CITY','TAYSAN','TINGLOY','TUY','BATANGAS STATE UNIVERSITY','UNIVERSITY OF BATANGAS-MAIN','RIZAL COLLEGE OF TAAL'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                batangasCities.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (savedCity && name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Local list for CAVITE
+            if (String(provinceIdentifier).toUpperCase() === 'CAVITE' || String(provinceIdentifier).toUpperCase() === 'CAVITE PROVINCE') {
+                const caviteCities = [
+                    'ALFONSO','AMADEO','BACOOR CITY','CARMONA','CAVITE CITY','DASMARIÑAS CITY','GENERAL EMILIO AGUINALDO','GENERAL MARIANO ALVAREZ','CITY OF GENERAL TRIAS','IMUS CITY','INDANG','KAWIT','MAGALLANES','MARAGONDON','MENDEZ','NAIC','NOVELETA','ROSARIO','SILANG','TAGAYTAY CITY','TANZA','TERNATE','TRECE MARTIRES CITY'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                caviteCities.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (savedCity && name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Local list for LAGUNA
+            if (String(provinceIdentifier).toUpperCase() === 'LAGUNA' || String(provinceIdentifier).toUpperCase() === 'LAGUNA PROVINCE') {
+                const lagunaCities = [
+                    'ALAMINOS','BAY','CITY OF BIÑAN','CABUYAO CITY','CITY OF CALAMBA','CALAUAN','CAVINTI','FAMY','KALAYAAN','LILIW','LOS BAÑOS','LUISIANA','LUMBAN','MABITAC','MAGDALENA','MAJAYJAY','NAGCARLAN','PAETE','PAGSANJAN','PAKIL','PANGIL','PILA','RIZAL','SAN PABLO CITY','SAN PEDRO CITY','SANTA CRUZ','SANTA MARIA','CITY OF SANTA ROSA','SINILOAN','VICTORIA','LAGUNA PROVINCE','LAGUNA STATE POLYTECHNIC UNIVERSITY-MAIN'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                lagunaCities.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (savedCity && name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+                // Local list for QUEZON
+                if (String(provinceIdentifier).toUpperCase() === 'QUEZON' || String(provinceIdentifier).toUpperCase() === 'QUEZON PROVINCE') {
+                    const quezonCities = [
+                        'AGDANGAN','ALABAT','ATIMONAN','BUENAVISTA','BURDEOS','CALAUAG','CANDELARIA','CATANAUAN','DOLORES','GENERAL LUNA','GENERAL NAKAR','GUINAYANGAN','GUMACA','INFANTA','JOMALIG','LOPEZ','LUCBAN','LUCENA CITY','MACALELON','MAUBAN','MULANAY','PADRE BURGOS','PAGBILAO','PANUKULAN','PATNANUNGAN','PEREZ','PITOGO','PLARIDEL','POLILLO','QUEZON','REAL','SAMPALOC','SAN ANDRES','SAN ANTONIO','SAN FRANCISCO','SAN NARCISO','SARIAYA','TAGKAWAYAN','TAYABAS CITY','TIAONG','UNISAN','QUEZON PROVINCE','ACEBA SCIENCE AND TECHNOLOGY INSTITUTE-MAUBAN','SOUTHERN LUZON STATE UNIVERSITY-LUCBAN'
+                    ];
+
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+
+                    quezonCities.forEach(name => {
+                        const option = document.createElement('option');
+                        option.value = name;
+                        option.textContent = name;
+                        option.dataset.code = '';
+
+                        if (savedCity && name === savedCity) option.selected = true;
+
+                        citySelect.appendChild(option);
+                    });
+
+                    return;
+                }
+
+                // Local list for RIZAL
+                if (String(provinceIdentifier).toUpperCase() === 'RIZAL' || String(provinceIdentifier).toUpperCase() === 'RIZAL PROVINCE') {
+                    const rizalCities = [
+                        'ANGONO','CITY OF ANTIPOLO','BARAS','BINANGONAN','CAINTA','CARDONA','JALAJALA','MORONG','PILILLA','RODRIGUEZ','SAN MATEO','TANAY','TAYTAY','TERESA','RIZAL PROVINCE'
+                    ];
+
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+
+                    rizalCities.forEach(name => {
+                        const option = document.createElement('option');
+                        option.value = name;
+                        option.textContent = name;
+                        option.dataset.code = '';
+
+                        if (savedCity && name === savedCity) option.selected = true;
+
+                        citySelect.appendChild(option);
+                    });
+
+                    return;
+                }
+
+            // Fallback to PSGC API when we have a code
+            fetch(`https://psgc.gitlab.io/api/provinces/${provinceIdentifier}/cities-municipalities/`)
                 .then(response => response.json())
                 .then(data => {
                     citySelect.innerHTML = '<option value="">Select City</option>';
@@ -706,10 +819,29 @@
                 });
         }
 
-        function loadBarangays(cityCode) {
+        function loadBarangays(cityIdentifier) {
             barangaySelect.innerHTML = '<option>Loading barangays...</option>';
 
-            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+            // If we have a local mapping for this city name, use it
+            if (cityIdentifier && localBarangays[cityIdentifier]) {
+                const list = localBarangays[cityIdentifier];
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+
+                list.forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+
+                    if (savedBarangay && name === savedBarangay) option.selected = true;
+
+                    barangaySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Fallback: assume cityIdentifier is a PSGC city code and fetch barangays
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityIdentifier}/barangays/`)
                 .then(response => response.json())
                 .then(data => {
                     barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
@@ -734,10 +866,14 @@
         }
 
         provinceSelect.addEventListener('change', function () {
-            const code = this.options[this.selectedIndex]?.dataset.code;
+            const selected = this.options[this.selectedIndex];
+            const code = selected?.dataset.code;
+            const val = selected?.value;
 
             if (code) {
                 loadCities(code);
+            } else if (val) {
+                loadCities(val);
             } else {
                 citySelect.innerHTML = '<option value="">Select City</option>';
                 barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
@@ -745,10 +881,14 @@
         });
 
         citySelect.addEventListener('change', function () {
-            const code = this.options[this.selectedIndex]?.dataset.code;
+            const selected = this.options[this.selectedIndex];
+            const code = selected?.dataset.code;
+            const val = selected?.value;
 
             if (code) {
                 loadBarangays(code);
+            } else if (val && localBarangays[val]) {
+                loadBarangays(val);
             } else {
                 barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
             }

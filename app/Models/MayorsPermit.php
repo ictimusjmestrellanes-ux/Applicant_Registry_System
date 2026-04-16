@@ -74,7 +74,7 @@ class MayorsPermit extends Model
                 ! empty($this->permit_police_clearance)
             ) &&
             (
-                stripos(optional($this->applicant)->city, 'City of Imus') !== false
+                stripos(optional($this->applicant)->city, 'IMUS CITY') !== false
                 || ! empty($this->referral_letter)
             ) &&
 

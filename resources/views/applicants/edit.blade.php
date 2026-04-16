@@ -59,7 +59,7 @@
         $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
 
         $permit = optional($applicant->permit);
-        $isImusResident = $applicant->city && stripos($applicant->city, 'City of Imus') !== false;
+        $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
         $hasPermitClearance =
             ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
             ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
@@ -1203,32 +1203,32 @@
                                         <label class="form-label">First Time Jobseeker <span
                                                 class="required-mark">*</span></label>
                                         <select name="first_time_job_seeker" class="form-select" required>
-                                            <option value="No" {{ $applicant->first_time_job_seeker == 'No' ? 'selected' : '' }}>No</option>
-                                            <option value="Yes" {{ $applicant->first_time_job_seeker == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                            <option value="NO" {{ $applicant->first_time_job_seeker == 'NO' ? 'selected' : '' }}>NO</option>
+                                            <option value="YES" {{ $applicant->first_time_job_seeker == 'YES' ? 'selected' : '' }}>YES</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                        <input type="text" name="first_name" class="form-control"
+                                        <input type="text" name="first_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                             value="{{ $applicant->first_name }}" placeholder="e.g. John" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Middle Name</label>
-                                        <input type="text" name="middle_name" class="form-control"
+                                        <input type="text" name="middle_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                             value="{{ $applicant->middle_name }}" placeholder="Optional">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                        <input type="text" name="last_name" class="form-control"
+                                        <input type="text" name="last_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
                                             value="{{ $applicant->last_name }}" placeholder="e.g. Doe" required>
                                     </div>
                                     <div class="col-md-1">
                                         <label class="form-label">Suffix</label>
                                         <select name="suffix" class="form-select">
                                             <option value="">None</option>
-                                            <option value="Jr." {{ $applicant->suffix == 'Jr.' ? 'selected' : '' }}>Jr.
+                                            <option value="JR." {{ $applicant->suffix == 'JR.' ? 'selected' : '' }}>JR.
                                             </option>
-                                            <option value="Sr." {{ $applicant->suffix == 'Sr.' ? 'selected' : '' }}>Sr.
+                                            <option value="SR." {{ $applicant->suffix == 'SR.' ? 'selected' : '' }}>SR.
                                             </option>
                                             <option value="II" {{ $applicant->suffix == 'II' ? 'selected' : '' }}>II</option>
                                             <option value="III" {{ $applicant->suffix == 'III' ? 'selected' : '' }}>III
@@ -1242,36 +1242,36 @@
                                             placeholder="e.g. 25" required>
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
+                                        <label class="form-label">Sex <span class="required-mark">*</span></label>
                                         <select name="gender" class="form-select" required>
-                                            <option value="">Select Gender</option>
-                                            <option value="Male" {{ $applicant->gender == 'Male' ? 'selected' : '' }}>Male
+                                            <option value="">Select</option>
+                                            <option value="MALE" {{ $applicant->gender == 'MALE' ? 'selected' : '' }}>MALE
                                             </option>
-                                            <option value="Female" {{ $applicant->gender == 'Female' ? 'selected' : '' }}>
-                                                Female</option>
+                                            <option value="FEMALE" {{ $applicant->gender == 'FEMALE' ? 'selected' : '' }}>
+                                                FEMALE</option>
                                         </select>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Civil Status <span class="required-mark">*</span></label>
                                         <select name="civil_status" class="form-select" required>
                                             <option value="">Select Status</option>
-                                            <option value="Single" {{ $applicant->civil_status == 'Single' ? 'selected' : '' }}>Single</option>
-                                            <option value="Married" {{ $applicant->civil_status == 'Married' ? 'selected' : '' }}>Married</option>
-                                            <option value="Widowed" {{ $applicant->civil_status == 'Widowed' ? 'selected' : '' }}>Widowed</option>
+                                            <option value="SINGLE" {{ $applicant->civil_status == 'SINGLE' ? 'selected' : '' }}>SINGLE</option>
+                                            <option value="MARRIED" {{ $applicant->civil_status == 'MARRIED' ? 'selected' : '' }}>MARRIED</option>
+                                            <option value="WIDOWED" {{ $applicant->civil_status == 'WIDOWED' ? 'selected' : '' }}>WIDOWED</option>
                                         </select>
                                     </div>
                                     <div class="col-md-1">
                                         <label class="form-label">PWD?<span class="required-mark">*</span></label>
                                         <select name="pwd" class="form-select" required>
-                                            <option value="No" {{ $applicant->pwd == 'No' ? 'selected' : '' }}>No</option>
-                                            <option value="Yes" {{ $applicant->pwd == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                            <option value="NO" {{ $applicant->pwd == 'NO' ? 'selected' : '' }}>NO</option>
+                                            <option value="YES" {{ $applicant->pwd == 'YES' ? 'selected' : '' }}>YES</option>
                                         </select>
                                     </div>
                                     <div class="col-md-1">
                                         <label class="form-label">4Ps?<span class="required-mark">*</span></label>
                                         <select name="four_ps" class="form-select" required>
-                                            <option value="No" {{ $applicant->four_ps == 'No' ? 'selected' : '' }}>No</option>
-                                            <option value="Yes" {{ $applicant->four_ps == 'Yes' ? 'selected' : '' }}>Yes
+                                            <option value="NO" {{ $applicant->four_ps == 'NO' ? 'selected' : '' }}>NO</option>
+                                            <option value="YES" {{ $applicant->four_ps == 'YES' ? 'selected' : '' }}>YES
                                             </option>
                                         </select>
                                     </div>
@@ -1292,7 +1292,7 @@
                                         <label class="form-label">Complete Address <span
                                                 class="required-mark">*</span></label>
                                         <input type="text" name="address_line" class="form-control"
-                                            value="{{ $applicant->address_line }}"
+                                            value="{{ $applicant->address_line }}" oninput="this.value = this.value.toUpperCase()"
                                             placeholder="House No. / Street / Phase / Block" required>
                                     </div>
                                     <div class="col-md-4">
@@ -1386,7 +1386,7 @@
 
                         @php
                             $permit = optional($applicant->permit);
-                            $isImusResident = stripos($applicant->city, 'City of Imus') !== false;
+                            $isImusResident = stripos($applicant->city, 'IMUS CITY') !== false;
                         @endphp
 
                         <h6 class="section-title text-primary">Mayor’s Permit to Work Requirements</h6>
@@ -2666,50 +2666,164 @@
         let savedCity = "{{ $applicant->city }}";
         let savedBarangay = "{{ $applicant->barangay }}";
 
+        // Local barangay mappings: add cityName: [ 'Barangay 1', 'Barangay 2', ... ]
+        const localBarangays = {
+            // 'BATANGAS CITY': ['Poblacion I', 'Poblacion II']
+        };
+
 
 
         // ---------- LOAD PROVINCES ----------
         function loadProvinces() {
+            const provinces = [
+                'ABRA','AGUSAN DEL NORTE','AGUSAN DEL SUR','AKLAN','ALBAY','ANTIQUE','APAYAO','AURORA','BASILAN','BATAAN','BATANES','BATANGAS','BENGUET','BILIRAN','BOHOL','BUKIDNON','BULACAN','CAGAYAN','CAMARINES NORTE','CAMARINES SUR','CAMIGUIN','CAPIZ','CATANDUANES','CAVITE','CEBU','COTABATO','DAVAO DE ORO','DAVAO DEL NORTE','DAVAO DEL SUR','DAVAO OCCIDENTAL','DAVAO ORIENTAL','DINAGAT ISLANDS','EASTERN SAMAR','GUIMARAS','IFUGAO','ILOCOS NORTE','ILOCOS SUR','ILOILO','ISABELA','KALINGA','LA UNION','LAGUNA','LANAO DEL NORTE','LANAO DEL SUR','LEYTE','MAGUINDANAO DEL NORTE','MAGUINDANAO DEL SUR','MARINDUQUE','MASBATE','MISAMIS OCCIDENTAL','MISAMIS ORIENTAL','MOUNTAIN PROVINCE','NEGROS OCCIDENTAL','NEGROS ORIENTAL','NORTHERN SAMAR','NUEVA ECIJA','NUEVA VIZCAYA','OCCIDENTAL MINDORO','ORIENTAL MINDORO','PALAWAN','PAMPANGA','PANGASINAN','QUEZON','QUIRINO','RIZAL','ROMBLON','SAMAR','SORSOGON','SOUTH COTABATO','SOUTHERN LEYTE','SULTAN KUDARAT','SULU','SURIGAO DEL NORTE','SURIGAO DEL SUR','TARLAC','TAWI-TAWI','ZAMBALES','ZAMBOANGA DEL NORTE','ZAMBOANGA DEL SUR','ZAMBOANGA SIBUGAY','BATANGAS PROVINCE','CAVITE PROVINCE'
+            ];
 
-            provinceSelect.innerHTML = '<option>Loading provinces...</option>';
+            provinceSelect.innerHTML = '<option value="">Select Province</option>';
 
-            fetch('https://psgc.gitlab.io/api/provinces/')
-                .then(response => response.json())
-                .then(data => {
+            provinces.forEach(name => {
+                let option = document.createElement('option');
 
-                    provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                option.value = name;
+                option.textContent = name;
+                option.dataset.code = '';
 
-                    data.sort((a, b) => a.name.localeCompare(b.name));
+                if (name === savedProvince) {
+                    option.selected = true;
+                }
 
-                    data.forEach(province => {
+                provinceSelect.appendChild(option);
+            });
 
-                        let option = document.createElement('option');
-
-                        option.value = province.name;
-                        option.textContent = province.name;
-                        option.dataset.code = province.code;
-
-                        if (province.name === savedProvince) {
-                            option.selected = true;
-                            loadCities(province.code);
-                        }
-
-                        provinceSelect.appendChild(option);
-
-                    });
-
-                });
-
+            // If a province was preselected, try to load its cities
+            const selected = provinceSelect.options[provinceSelect.selectedIndex];
+            if (selected) {
+                const id = selected.dataset.code || selected.value;
+                if (id) loadCities(id);
+            }
         }
 
 
 
         // ---------- LOAD CITIES ----------
-        function loadCities(provinceCode) {
+        function loadCities(provinceIdentifier) {
 
             citySelect.innerHTML = '<option>Loading cities...</option>';
 
-            fetch(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities/`)
+            // Local list for BATANGAS
+            if (String(provinceIdentifier).toUpperCase() === 'BATANGAS' || String(provinceIdentifier).toUpperCase() === 'BATANGAS PROVINCE') {
+                const batangasCities = [
+                    'AGONCILLO','ALITAGTAG','BALAYAN','BALETE','BATANGAS CITY','BAUAN','CALACA','CALATAGAN','CUENCA','IBAAN','LAUREL','LEMERY','LIAN','LIPA CITY','LOBO','MABINI','MALVAR','MATAASNAKAHOY','NASUGBU','PADRE GARCIA','ROSARIO','SAN JOSE','SAN JUAN','SAN LUIS','SAN NICOLAS','SAN PASCUAL','SANTA TERESITA','SANTO TOMAS','TAAL','TALISAY','TANAUAN CITY','TAYSAN','TINGLOY','TUY','BATANGAS STATE UNIVERSITY','UNIVERSITY OF BATANGAS-MAIN','RIZAL COLLEGE OF TAAL'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                batangasCities.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Local list for CAVITE
+            if (String(provinceIdentifier).toUpperCase() === 'CAVITE' || String(provinceIdentifier).toUpperCase() === 'CAVITE PROVINCE') {
+                const caviteCities = [
+                    'ALFONSO','AMADEO','BACOOR CITY','CARMONA','CAVITE CITY','DASMARIÑAS CITY','GENERAL EMILIO AGUINALDO','GENERAL MARIANO ALVAREZ','CITY OF GENERAL TRIAS','IMUS CITY','INDANG','KAWIT','MAGALLANES','MARAGONDON','MENDEZ','NAIC','NOVELETA','ROSARIO','SILANG','TAGAYTAY CITY','TANZA','TERNATE','TRECE MARTIRES CITY'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                caviteCities.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Local list for LAGUNA
+            if (String(provinceIdentifier).toUpperCase() === 'LAGUNA' || String(provinceIdentifier).toUpperCase() === 'LAGUNA PROVINCE') {
+                const lagunaCities = [
+                    'ALAMINOS','BAY','CITY OF BIÑAN','CABUYAO CITY','CITY OF CALAMBA','CALAUAN','CAVINTI','FAMY','KALAYAAN','LILIW','LOS BAÑOS','LUISIANA','LUMBAN','MABITAC','MAGDALENA','MAJAYJAY','NAGCARLAN','PAETE','PAGSANJAN','PAKIL','PANGIL','PILA','RIZAL','SAN PABLO CITY','SAN PEDRO CITY','SANTA CRUZ','SANTA MARIA','CITY OF SANTA ROSA','SINILOAN','VICTORIA','LAGUNA PROVINCE','LAGUNA STATE POLYTECHNIC UNIVERSITY-MAIN'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                lagunaCities.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Local list for QUEZON
+            if (String(provinceIdentifier).toUpperCase() === 'QUEZON' || String(provinceIdentifier).toUpperCase() === 'QUEZON PROVINCE') {
+                const quezonCities = [
+                    'AGDANGAN','ALABAT','ATIMONAN','BUENAVISTA','BURDEOS','CALAUAG','CANDELARIA','CATANAUAN','DOLORES','GENERAL LUNA','GENERAL NAKAR','GUINAYANGAN','GUMACA','INFANTA','JOMALIG','LOPEZ','LUCBAN','LUCENA CITY','MACALELON','MAUBAN','MULANAY','PADRE BURGOS','PAGBILAO','PANUKULAN','PATNANUNGAN','PEREZ','PITOGO','PLARIDEL','POLILLO','QUEZON','REAL','SAMPALOC','SAN ANDRES','SAN ANTONIO','SAN FRANCISCO','SAN NARCISO','SARIAYA','TAGKAWAYAN','TAYABAS CITY','TIAONG','UNISAN','QUEZON PROVINCE','ACEBA SCIENCE AND TECHNOLOGY INSTITUTE-MAUBAN','SOUTHERN LUZON STATE UNIVERSITY-LUCBAN'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                quezonCities.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Local list for RIZAL
+            if (String(provinceIdentifier).toUpperCase() === 'RIZAL' || String(provinceIdentifier).toUpperCase() === 'RIZAL PROVINCE') {
+                const rizalCities = [
+                    'ANGONO','CITY OF ANTIPOLO','BARAS','BINANGONAN','CAINTA','CARDONA','JALAJALA','MORONG','PILILLA','RODRIGUEZ','SAN MATEO','TANAY','TAYTAY','TERESA','RIZAL PROVINCE'
+                ];
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                rizalCities.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    option.dataset.code = '';
+
+                    if (name === savedCity) option.selected = true;
+
+                    citySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Fallback to PSGC API when we have a code
+            citySelect.innerHTML = '<option>Loading cities...</option>';
+
+            fetch(`https://psgc.gitlab.io/api/provinces/${provinceIdentifier}/cities-municipalities/`)
                 .then(response => response.json())
                 .then(data => {
 
@@ -2741,11 +2855,32 @@
 
 
         // ---------- LOAD BARANGAYS ----------
-        function loadBarangays(cityCode) {
+        function loadBarangays(cityIdentifier) {
 
             barangaySelect.innerHTML = '<option>Loading barangays...</option>';
 
-            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays/`)
+            // If we have a local mapping for this city name, use it
+            if (cityIdentifier && localBarangays[cityIdentifier]) {
+                const list = localBarangays[cityIdentifier];
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+
+                list.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+
+                    if (name === savedBarangay) option.selected = true;
+
+                    barangaySelect.appendChild(option);
+                });
+
+                return;
+            }
+
+            // Fallback: assume cityIdentifier is a PSGC city code and fetch barangays
+            barangaySelect.innerHTML = '<option>Loading barangays...</option>';
+
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityIdentifier}/barangays/`)
                 .then(response => response.json())
                 .then(data => {
 
@@ -2768,6 +2903,9 @@
 
                     });
 
+                })
+                .catch(() => {
+                    barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
                 });
 
         }
@@ -2777,17 +2915,17 @@
         // ---------- EVENTS ----------
         provinceSelect.addEventListener('change', function () {
 
-            let code = this.options[this.selectedIndex].dataset.code;
+            let selected = this.options[this.selectedIndex];
+            let code = selected?.dataset.code;
+            let val = selected?.value;
 
             if (code) {
-
                 loadCities(code);
-
+            } else if (val) {
+                loadCities(val);
             } else {
-
                 citySelect.innerHTML = '<option>Select City</option>';
                 barangaySelect.innerHTML = '<option>Select Barangay</option>';
-
             }
 
         });
@@ -2795,16 +2933,16 @@
 
         citySelect.addEventListener('change', function () {
 
-            let code = this.options[this.selectedIndex].dataset.code;
+            let selected = this.options[this.selectedIndex];
+            let code = selected?.dataset.code;
+            let val = selected?.value;
 
             if (code) {
-
                 loadBarangays(code);
-
+            } else if (val && localBarangays[val]) {
+                loadBarangays(val);
             } else {
-
                 barangaySelect.innerHTML = '<option>Select Barangay</option>';
-
             }
 
         });
@@ -2812,39 +2950,36 @@
 
 
         // ---------- INIT ----------
-        loadProvinces();
+        function loadProvinces() {
+            const provinces = [
+                'ABRA','AGUSAN DEL NORTE','AGUSAN DEL SUR','AKLAN','ALBAY','ANTIQUE','APAYAO','AURORA','BASILAN','BATAAN','BATANES','BATANGAS','BENGUET','BILIRAN','BOHOL','BUKIDNON','BULACAN','CAGAYAN','CAMARINES NORTE','CAMARINES SUR','CAMIGUIN','CAPIZ','CATANDUANES','CAVITE','CEBU','COTABATO','DAVAO DE ORO','DAVAO DEL NORTE','DAVAO DEL SUR','DAVAO OCCIDENTAL','DAVAO ORIENTAL','DINAGAT ISLANDS','EASTERN SAMAR','GUIMARAS','IFUGAO','ILOCOS NORTE','ILOCOS SUR','ILOILO','ISABELA','KALINGA','LA UNION','LAGUNA','LANAO DEL NORTE','LANAO DEL SUR','LEYTE','MAGUINDANAO DEL NORTE','MAGUINDANAO DEL SUR','MARINDUQUE','MASBATE','MISAMIS OCCIDENTAL','MISAMIS ORIENTAL','MOUNTAIN PROVINCE','NEGROS OCCIDENTAL','NEGROS ORIENTAL','NORTHERN SAMAR','NUEVA ECIJA','NUEVA VIZCAYA','OCCIDENTAL MINDORO','ORIENTAL MINDORO','PALAWAN','PAMPANGA','PANGASINAN','QUEZON','QUIRINO','RIZAL','ROMBLON','SAMAR','SORSOGON','SOUTH COTABATO','SOUTHERN LEYTE','SULTAN KUDARAT','SULU','SURIGAO DEL NORTE','SURIGAO DEL SUR','TARLAC','TAWI-TAWI','ZAMBALES','ZAMBOANGA DEL NORTE','ZAMBOANGA DEL SUR','ZAMBOANGA SIBUGAY','BATANGAS PROVINCE','CAVITE PROVINCE'
+            ];
 
-    });
+            provinceSelect.innerHTML = '<option value="">Select Province</option>';
 
-</script>
-{{-- Archived File--}}
-<script>
-    function clearFile(applicantId, field) {
+            provinces.forEach(name => {
+                let option = document.createElement('option');
 
-        if (!confirm("Remove this file?")) return;
+                option.value = name;
+                option.textContent = name;
+                option.dataset.code = '';
 
-        fetch(`/permit/${applicantId}/${field}/delete`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                "Accept": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
+                if (name === savedProvince) {
+                    option.selected = true;
+                }
+
+                provinceSelect.appendChild(option);
+            });
+
+            // If a province was preselected, try to load its cities
+            const selected = provinceSelect.options[provinceSelect.selectedIndex];
+            if (selected) {
+                const id = selected.dataset.code || selected.value;
+                if (id) {
+                    loadCities(id);
+                }
             }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Server error");
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("file-" + field).remove();
-                } else {
-                    alert("Error removing file.");
-                }
-            })
-            .catch(error => {
+        }
                 console.error(error);
                 alert("Error removing file.");
             });
