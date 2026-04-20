@@ -74,58 +74,6 @@
             background-color: var(--create-primary-soft);
             color: var(--create-primary);
         }
-
-        .create-hero h2 {
-            margin-bottom: 6px;
-            color: var(--create-ink);
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-
-        .page-subtitle,
-        .section-copy,
-        .guide-copy,
-        .stat-copy,
-        .form-note {
-            color: var(--create-slate);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
-            margin: 20px 0 22px;
-        }
-
-        .stat-card,
-        .quick-guide,
-        .form-shell,
-        .form-section {
-            border-radius: 22px;
-            border: 1px solid rgba(255, 255, 255, 0.72);
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 18px 40px rgba(15, 34, 58, 0.06);
-        }
-
-        .stat-card {
-            padding: 18px 18px 16px;
-        }
-
-        .stat-label {
-            color: var(--create-slate);
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            color: var(--create-ink);
-            font-size: 1.08rem;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        .stat-copy {
             display: block;
             margin-top: 6px;
             font-size: 0.82rem;
@@ -636,262 +584,158 @@
         const savedCity = @json(old('city'));
         const savedBarangay = @json(old('barangay'));
 
-        // Local barangay mappings: add cityName: [ 'Barangay 1', 'Barangay 2', ... ]
-        const localBarangays = {
-            // Example:
-            // 'BATANGAS CITY': ['Poblacion I', 'Poblacion II']
-        };
-
-        if (!provinceSelect || !citySelect || !barangaySelect) {
-            return;
-        }
+        if (!provinceSelect || !citySelect || !barangaySelect) return;
 
         function loadProvinces() {
-            const provinces = [
-                'BATANGAS','CAVITE','LAGUNA','QUEZON','RIZAL'
-            ];
+            provinceSelect.innerHTML = '<option value="">Loading provinces...</option>';
+            fetch('https://psgc.gitlab.io/api/provinces/')
+                .then(res => res.json())
+                .then(data => {
+                    const provinces = Array.isArray(data) ? data : [];
+                    provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                    window._provinceCodeMap = window._provinceCodeMap || {};
 
-            provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                    provinces.sort((a, b) => {
+                        const an = (a.name || a.province || a.description || '').toString();
+                        const bn = (b.name || b.province || b.description || '').toString();
+                        return an.localeCompare(bn, undefined, { sensitivity: 'base' });
+                    });
 
-            provinces.forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                option.dataset.code = '';
+                    provinces.forEach(p => {
+                        const rawName = p.name || p.province || p.description || '';
+                        const name = String(rawName).toUpperCase();
+                        const code = p.code || '';
+                        const option = document.createElement('option');
+                        option.value = name;
+                        option.textContent = name;
+                        option.dataset.code = code;
+                        if (savedProvince && name === String(savedProvince).toUpperCase()) option.selected = true;
+                        provinceSelect.appendChild(option);
+                        if (name && code) window._provinceCodeMap[name] = code;
+                    });
 
-                if (savedProvince && name === savedProvince) {
-                    option.selected = true;
-                }
-
-                provinceSelect.appendChild(option);
-            });
-
-            // Trigger city loading for a saved selection
-            const selected = provinceSelect.options[provinceSelect.selectedIndex];
-            if (selected) {
-                const id = selected.dataset.code || selected.value;
-                if (id) loadCities(id);
-            }
+                    const selected = provinceSelect.options[provinceSelect.selectedIndex];
+                    if (selected) {
+                        const code = selected.dataset.code || window._provinceCodeMap[selected.value];
+                        if (code) loadCities(code);
+                    }
+                })
+                .catch(() => provinceSelect.innerHTML = '<option value="">Unable to load provinces</option>');
         }
 
-        function loadCities(provinceIdentifier) {
+        async function loadCities(provinceIdentifier) {
             citySelect.innerHTML = '<option>Loading cities...</option>';
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
-            // Local list for BATANGAS
-            if (String(provinceIdentifier).toUpperCase() === 'BATANGAS' || String(provinceIdentifier).toUpperCase() === 'BATANGAS PROVINCE') {
-                const batangasCities = [
-                    'AGONCILLO','ALITAGTAG','BALAYAN','BALETE','BATANGAS CITY','BAUAN','CALACA','CALATAGAN','CUENCA','IBAAN','LAUREL','LEMERY','LIAN','LIPA CITY','LOBO','MABINI','MALVAR','MATAASNAKAHOY','NASUGBU','PADRE GARCIA','ROSARIO','SAN JOSE','SAN JUAN','SAN LUIS','SAN NICOLAS','SAN PASCUAL','SANTA TERESITA','SANTO TOMAS','TAAL','TALISAY','TANAUAN CITY','TAYSAN','TINGLOY','TUY','BATANGAS STATE UNIVERSITY','UNIVERSITY OF BATANGAS-MAIN','RIZAL COLLEGE OF TAAL'
-                ];
+            let provinceCode = provinceIdentifier;
+            if (isNaN(Number(provinceCode))) provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode] ? window._provinceCodeMap[provinceCode] : provinceCode;
 
+            try {
+                const res = await fetch(`https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`);
+                if (!res.ok) throw new Error('no-cities');
+                const data = await res.json();
                 citySelect.innerHTML = '<option value="">Select City</option>';
-
-                batangasCities.forEach(name => {
+                data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                data.forEach(city => {
+                    const rawName = city.name || city.description || '';
+                    const cleaned = String(rawName).replace(/^\s*(city of|municipality of)\s+/i, '');
+                    let name = String(cleaned).toUpperCase().trim();
+                    const isCity = /city/i.test(rawName);
+                    if (isCity && !/\bCITY$/.test(name)) name = (name + ' CITY').trim();
                     const option = document.createElement('option');
                     option.value = name;
                     option.textContent = name;
-                    option.dataset.code = '';
-
-                    if (savedCity && name === savedCity) option.selected = true;
-
+                    option.dataset.code = city.code || '';
+                    if (savedCity && name === String(savedCity).toUpperCase()) option.selected = true;
                     citySelect.appendChild(option);
                 });
 
-                return;
-            }
-
-            // Local list for CAVITE
-            if (String(provinceIdentifier).toUpperCase() === 'CAVITE' || String(provinceIdentifier).toUpperCase() === 'CAVITE PROVINCE') {
-                const caviteCities = [
-                    'ALFONSO','AMADEO','BACOOR CITY','CARMONA','CAVITE CITY','DASMARIÑAS CITY','GENERAL EMILIO AGUINALDO','GENERAL MARIANO ALVAREZ','CITY OF GENERAL TRIAS','IMUS CITY','INDANG','KAWIT','MAGALLANES','MARAGONDON','MENDEZ','NAIC','NOVELETA','ROSARIO','SILANG','TAGAYTAY CITY','TANZA','TERNATE','TRECE MARTIRES CITY'
-                ];
-
-                citySelect.innerHTML = '<option value="">Select City</option>';
-
-                caviteCities.forEach(name => {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = name;
-                    option.dataset.code = '';
-
-                    if (savedCity && name === savedCity) option.selected = true;
-
-                    citySelect.appendChild(option);
-                });
-
-                return;
-            }
-
-            // Local list for LAGUNA
-            if (String(provinceIdentifier).toUpperCase() === 'LAGUNA' || String(provinceIdentifier).toUpperCase() === 'LAGUNA PROVINCE') {
-                const lagunaCities = [
-                    'ALAMINOS','BAY','CITY OF BIÑAN','CABUYAO CITY','CITY OF CALAMBA','CALAUAN','CAVINTI','FAMY','KALAYAAN','LILIW','LOS BAÑOS','LUISIANA','LUMBAN','MABITAC','MAGDALENA','MAJAYJAY','NAGCARLAN','PAETE','PAGSANJAN','PAKIL','PANGIL','PILA','RIZAL','SAN PABLO CITY','SAN PEDRO CITY','SANTA CRUZ','SANTA MARIA','CITY OF SANTA ROSA','SINILOAN','VICTORIA','LAGUNA PROVINCE','LAGUNA STATE POLYTECHNIC UNIVERSITY-MAIN'
-                ];
-
-                citySelect.innerHTML = '<option value="">Select City</option>';
-
-                lagunaCities.forEach(name => {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = name;
-                    option.dataset.code = '';
-
-                    if (savedCity && name === savedCity) option.selected = true;
-
-                    citySelect.appendChild(option);
-                });
-
-                return;
-            }
-
-                // Local list for QUEZON
-                if (String(provinceIdentifier).toUpperCase() === 'QUEZON' || String(provinceIdentifier).toUpperCase() === 'QUEZON PROVINCE') {
-                    const quezonCities = [
-                        'AGDANGAN','ALABAT','ATIMONAN','BUENAVISTA','BURDEOS','CALAUAG','CANDELARIA','CATANAUAN','DOLORES','GENERAL LUNA','GENERAL NAKAR','GUINAYANGAN','GUMACA','INFANTA','JOMALIG','LOPEZ','LUCBAN','LUCENA CITY','MACALELON','MAUBAN','MULANAY','PADRE BURGOS','PAGBILAO','PANUKULAN','PATNANUNGAN','PEREZ','PITOGO','PLARIDEL','POLILLO','QUEZON','REAL','SAMPALOC','SAN ANDRES','SAN ANTONIO','SAN FRANCISCO','SAN NARCISO','SARIAYA','TAGKAWAYAN','TAYABAS CITY','TIAONG','UNISAN','QUEZON PROVINCE','ACEBA SCIENCE AND TECHNOLOGY INSTITUTE-MAUBAN','SOUTHERN LUZON STATE UNIVERSITY-LUCBAN'
-                    ];
-
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-
-                    quezonCities.forEach(name => {
-                        const option = document.createElement('option');
-                        option.value = name;
-                        option.textContent = name;
-                        option.dataset.code = '';
-
-                        if (savedCity && name === savedCity) option.selected = true;
-
-                        citySelect.appendChild(option);
-                    });
-
-                    return;
-                }
-
-                // Local list for RIZAL
-                if (String(provinceIdentifier).toUpperCase() === 'RIZAL' || String(provinceIdentifier).toUpperCase() === 'RIZAL PROVINCE') {
-                    const rizalCities = [
-                        'ANGONO','CITY OF ANTIPOLO','BARAS','BINANGONAN','CAINTA','CARDONA','JALAJALA','MORONG','PILILLA','RODRIGUEZ','SAN MATEO','TANAY','TAYTAY','TERESA','RIZAL PROVINCE'
-                    ];
-
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-
-                    rizalCities.forEach(name => {
-                        const option = document.createElement('option');
-                        option.value = name;
-                        option.textContent = name;
-                        option.dataset.code = '';
-
-                        if (savedCity && name === savedCity) option.selected = true;
-
-                        citySelect.appendChild(option);
-                    });
-
-                    return;
-                }
-
-            // Fallback to PSGC API when we have a code
-            fetch(`https://psgc.gitlab.io/api/provinces/${provinceIdentifier}/cities-municipalities/`)
-                .then(response => response.json())
-                .then(data => {
-                    citySelect.innerHTML = '<option value="">Select City</option>';
-
-                    data.sort((a, b) => a.name.localeCompare(b.name));
-
-                    data.forEach(city => {
-                        const option = document.createElement('option');
-                        option.value = city.name;
-                        option.textContent = city.name;
-                        option.dataset.code = city.code;
-
-                        if (savedCity && city.name === savedCity) {
-                            option.selected = true;
+                // If provinceIdentifier corresponds to Batangas, append extra institutions/entries
+                (function appendBatangasExtras() {
+                    let provinceNameUpper = '';
+                    if (isNaN(Number(provinceIdentifier))) provinceNameUpper = String(provinceIdentifier).toUpperCase();
+                    else if (window._provinceCodeMap) {
+                        for (const k in window._provinceCodeMap) {
+                            if (window._provinceCodeMap[k] === provinceCode) { provinceNameUpper = k; break; }
                         }
-
-                        citySelect.appendChild(option);
-                    });
-
-                    const selectedCity = citySelect.options[citySelect.selectedIndex];
-                    if (selectedCity && selectedCity.dataset.code) {
-                        loadBarangays(selectedCity.dataset.code);
                     }
-                })
-                .catch(() => {
-                    citySelect.innerHTML = '<option value="">Unable to load cities</option>';
-                });
+
+                    if (provinceNameUpper && provinceNameUpper.includes('BATANGAS')) {
+                        const extras = ['BATANGAS PROVINCE','BATANGAS STATE UNIVERSITY','UNIVERSITY OF BATANGAS-MAIN','RIZAL COLLEGE OF TAAL'];
+                        extras.forEach(raw => {
+                            const base = String(raw).replace(/^\s*(city of|municipality of)\s+/i, '').toUpperCase().trim();
+                            const isCityExtra = /city/i.test(raw);
+                            const name = (isCityExtra && !/\bCITY$/.test(base)) ? (base + ' CITY') : base;
+                            if (!Array.from(citySelect.options).some(o => o.value === name)) {
+                                const option = document.createElement('option');
+                                option.value = name;
+                                option.textContent = name;
+                                option.dataset.code = '';
+                                if (savedCity && name === String(savedCity).toUpperCase()) option.selected = true;
+                                citySelect.appendChild(option);
+                            }
+                        });
+                    }
+
+                    if (provinceNameUpper && provinceNameUpper.includes('CAVITE')) {
+                        const caviteExtras = [
+                            'ALFONSO','AMADEO','BACOOR CITY','CARMONA','CAVITE CITY','DASMARIÑAS CITY','GENERAL EMILIO AGUINALDO','GENERAL MARIANO ALVAREZ','CITY OF GENERAL TRIAS','IMUS CITY','INDANG','KAWIT','MAGALLANES','MARAGONDON','MENDEZ','NAIC','NOVELETA','ROSARIO','SILANG','TAGAYTAY CITY','TANZA','TERNATE','TRECE MARTIRES CITY','CAVITE PROVINCE'
+                        ];
+                        caviteExtras.forEach(raw => {
+                            const base = String(raw).replace(/^\s*(city of|municipality of)\s+/i, '').toUpperCase().trim();
+                            const isCityExtra = /city/i.test(raw);
+                            const name = (isCityExtra && !/\bCITY$/.test(base)) ? (base + ' CITY') : base;
+                            if (!Array.from(citySelect.options).some(o => o.value === name)) {
+                                const option = document.createElement('option');
+                                option.value = name;
+                                option.textContent = name;
+                                option.dataset.code = '';
+                                if (savedCity && name === String(savedCity).toUpperCase()) option.selected = true;
+                                citySelect.appendChild(option);
+                            }
+                        });
+                    }
+                })();
+
+                const selectedCity = citySelect.options[citySelect.selectedIndex];
+                if (selectedCity && selectedCity.dataset.code) loadBarangays(selectedCity.dataset.code);
+            } catch (e) {
+                citySelect.innerHTML = '<option value="">Unable to load cities</option>';
+            }
         }
 
-        function loadBarangays(cityIdentifier) {
+        function loadBarangays(cityCode) {
             barangaySelect.innerHTML = '<option>Loading barangays...</option>';
+            if (!cityCode) return barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
-            // If we have a local mapping for this city name, use it
-            if (cityIdentifier && localBarangays[cityIdentifier]) {
-                const list = localBarangays[cityIdentifier];
-                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-
-                list.forEach(name => {
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = name;
-
-                    if (savedBarangay && name === savedBarangay) option.selected = true;
-
-                    barangaySelect.appendChild(option);
-                });
-
-                return;
-            }
-
-            // Fallback: assume cityIdentifier is a PSGC city code and fetch barangays
-            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityIdentifier}/barangays/`)
-                .then(response => response.json())
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(cityCode)}/barangays/`)
+                .then(res => res.json())
                 .then(data => {
                     barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-
-                    data.sort((a, b) => a.name.localeCompare(b.name));
-
-                    data.forEach(barangay => {
+                    data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    data.forEach(b => {
+                        const rawName = b.name || '';
+                        const name = String(rawName).toUpperCase();
                         const option = document.createElement('option');
-                        option.value = barangay.name;
-                        option.textContent = barangay.name;
-
-                        if (savedBarangay && barangay.name === savedBarangay) {
-                            option.selected = true;
-                        }
-
+                        option.value = name;
+                        option.textContent = name;
+                        if (savedBarangay && name === String(savedBarangay).toUpperCase()) option.selected = true;
                         barangaySelect.appendChild(option);
                     });
                 })
-                .catch(() => {
-                    barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
-                });
+                .catch(() => barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>');
         }
 
         provinceSelect.addEventListener('change', function () {
             const selected = this.options[this.selectedIndex];
             const code = selected?.dataset.code;
-            const val = selected?.value;
-
-            if (code) {
-                loadCities(code);
-            } else if (val) {
-                loadCities(val);
-            } else {
-                citySelect.innerHTML = '<option value="">Select City</option>';
-                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-            }
+            if (code) loadCities(code); else loadCities(selected?.value);
         });
 
         citySelect.addEventListener('change', function () {
             const selected = this.options[this.selectedIndex];
             const code = selected?.dataset.code;
-            const val = selected?.value;
-
-            if (code) {
-                loadBarangays(code);
-            } else if (val && localBarangays[val]) {
-                loadBarangays(val);
-            } else {
-                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-            }
+            if (code) loadBarangays(code); else loadBarangays(selected?.value);
         });
 
         loadProvinces();

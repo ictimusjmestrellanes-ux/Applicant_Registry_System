@@ -89,7 +89,7 @@ class ApplicantController extends Controller
 
         foreach ($applicants as $applicant) {
             $rows[] = [
-                'Date Referred' => (string) ($applicant->created_at ?? ''),
+                'Date Visited' => optional($applicant->created_at)->format('m/d/Y'),
                 'Last Name' => (string) $applicant->last_name,
                 'First Name' => (string) $applicant->first_name,
                 'Middle Name' => (string) ($applicant->middle_name ?? ''),
@@ -105,6 +105,7 @@ class ApplicantController extends Controller
                 'City' => (string) ($applicant->city ?? ''),
                 'Contact No' => (string) ($applicant->contact_no ?? ''),
                 'Hiring Company' => (string) ($applicant->hiring_company ?? ''),
+                'Date Referred' => optional($applicant->created_at)->format('d F Y'),
                 'Position Hired' => (string) ($applicant->position_hired ?? ''),
                 'First Time Job Seeker' => (string) ($applicant->first_time_job_seeker ?? ''),
             ];
