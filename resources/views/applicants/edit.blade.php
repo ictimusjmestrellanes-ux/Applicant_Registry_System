@@ -1253,11 +1253,14 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Civil Status <span class="required-mark">*</span></label>
+                                        @php
+                                            $cs = strtoupper(trim((string) ($applicant->civil_status ?? '')));
+                                        @endphp
                                         <select name="civil_status" class="form-select" required>
-                                            <option value="">Select Status</option>
-                                            <option value="SINGLE" {{ $applicant->civil_status == 'SINGLE' ? 'selected' : '' }}>SINGLE</option>
-                                            <option value="MARRIED" {{ $applicant->civil_status == 'MARRIED' ? 'selected' : '' }}>MARRIED</option>
-                                            <option value="WIDOWED" {{ $applicant->civil_status == 'WIDOWED' ? 'selected' : '' }}>WIDOWED</option>
+                                            <option value="" {{ $cs === '' ? 'selected' : '' }}>Select Status</option>
+                                            <option value="SINGLE" {{ $cs === 'SINGLE' ? 'selected' : '' }}>SINGLE</option>
+                                            <option value="MARRIED" {{ $cs === 'MARRIED' ? 'selected' : '' }}>MARRIED</option>
+                                            <option value="WIDOWED" {{ $cs === 'WIDOWED' ? 'selected' : '' }}>WIDOWED</option>
                                         </select>
                                     </div>
                                     <div class="col-md-1">
@@ -1535,6 +1538,10 @@
 
                                         <div id="referral_imus_badge" class="badge bg-success-soft text-success p-2 mt-1 {{ $isImusResident ? '' : 'd-none' }}" style="font-size: 11px;">
                                             Not required for Imus residents
+                                        </div>
+
+                                        <div id="referral_imus_badge" class="badge bg-danger-soft text-danger p-2 mt-1 {{ !$isImusResident ? '' : 'd-none' }}" style="font-size: 11px;">
+                                            Required for Not Imus residents
                                         </div>
 
                                     </div>
