@@ -433,7 +433,8 @@
             .table-header,
             .pagination-wrap {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
+                justify-content: center;
             }
 
             .logs-search-form {
