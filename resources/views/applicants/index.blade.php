@@ -101,7 +101,7 @@
                                             {{ $limit }}
                                         </option>
                                     @endforeach
-                                    <option value="all" {{ $isUnpaginatedView ? 'selected' : '' }}>View all</option>
+                                    {{-- 'View all' option removed per request --}}
                                 </select>
                                 <button type="button" class="limit-trigger js-limit-trigger" aria-haspopup="listbox" aria-expanded="false">
                                     <span class="limit-trigger-text js-limit-trigger-text">Select view</span>
@@ -359,8 +359,8 @@
         @if($applicants->hasPages())
             <div class="pagination-wrap" style="margin-top:0.5rem;gap:0.5rem;align-items:center;">
                 <div class="pagination-copy" style="font-size:0.92rem;white-space:nowrap;margin-right:0.5rem;">
-                    <span class="pagination-copy--full">Showing {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }}</span>
-                    <span class="pagination-copy--mobile" style="display:none">{{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }}</span>
+                    <span class="pagination-copy--full">Showing {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants</span>
+                    <span class="pagination-copy--mobile" style="display:none">Showing {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants</span>
                 </div>
                 <div style="flex:0 0 auto;">
                     {{ $applicants->appends(request()->query())->links('vendor.pagination.activity-logs') }}
@@ -370,7 +370,7 @@
             <div class="pagination-wrap" style="margin-top:0.5rem;">
                 <div class="pagination-copy" style="font-size:0.92rem;">
                     <span class="pagination-copy--full">Showing all {{ number_format($totalApplicants) }} applicants</span>
-                    <span class="pagination-copy--mobile" style="display:none">All {{ number_format($totalApplicants) }}</span>
+                    <span class="pagination-copy--mobile" style="display:none">All {{ number_format($totalApplicants) }} Applicants</span>
                 </div>
             </div>
         @endif
