@@ -715,7 +715,9 @@
                     data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                     data.forEach(b => {
                         const rawName = b.name || '';
-                        const name = String(rawName).toUpperCase();
+                        // remove occurrences like (POB.) or (Pob) that appear in some datasets
+                        const cleaned = String(rawName).replace(/\(\s*POB\.?\s*\)/ig, '').trim();
+                        const name = String(cleaned).toUpperCase();
                         const option = document.createElement('option');
                         option.value = name;
                         option.textContent = name;
