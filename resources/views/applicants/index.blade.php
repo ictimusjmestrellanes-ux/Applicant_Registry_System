@@ -357,21 +357,31 @@
         </section>
 
         @if($applicants->hasPages())
-            <div class="pagination-wrap mt-4">
-                <div class="pagination-copy">
-                    Showing {{ $showingFrom }} to {{ $showingTo }} of {{ number_format($totalApplicants) }} applicants
+            <div class="pagination-wrap" style="margin-top:0.5rem;gap:0.5rem;align-items:center;">
+                <div class="pagination-copy" style="font-size:0.92rem;white-space:nowrap;margin-right:0.5rem;">
+                    <span class="pagination-copy--full">Showing {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }}</span>
+                    <span class="pagination-copy--mobile" style="display:none">{{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }}</span>
                 </div>
-                <div>
+                <div style="flex:0 0 auto;">
                     {{ $applicants->appends(request()->query())->links('vendor.pagination.activity-logs') }}
                 </div>
             </div>
         @elseif($isUnpaginatedView && $totalApplicants > 0)
-            <div class="pagination-wrap mt-4">
-                <div class="pagination-copy">
-                    Showing all {{ number_format($totalApplicants) }} applicants in one list
+            <div class="pagination-wrap" style="margin-top:0.5rem;">
+                <div class="pagination-copy" style="font-size:0.92rem;">
+                    <span class="pagination-copy--full">Showing all {{ number_format($totalApplicants) }} applicants</span>
+                    <span class="pagination-copy--mobile" style="display:none">All {{ number_format($totalApplicants) }}</span>
                 </div>
             </div>
         @endif
+
+        <style>
+            @media (max-width: 767.98px) {
+                .pagination-copy--full { display: none !important; }
+                .pagination-copy--mobile { display: inline !important; }
+                .pagination-wrap { gap: 0.4rem !important; }
+            }
+        </style>
     </div>
 
     <style>
