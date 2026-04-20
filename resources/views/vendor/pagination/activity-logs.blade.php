@@ -29,6 +29,11 @@
         }
         .compact-pagination .page-link span,
         .compact-pagination .page-link svg { display: inline-block; }
+
+        /* Center pagination on small screens */
+        @media (max-width: 640px) {
+            .compact-pagination { justify-content: center; flex-wrap: wrap; }
+        }
     </style>
 
     <nav aria-label="Activity log pagination">
@@ -59,8 +64,8 @@
                     @endif
                 @endfor
             @else
-                {{-- pages 1,2,3 always visible --}}
-                @for ($i = 1; $i <= 3; $i++)
+                {{-- pages 1,2 always visible --}}
+                @for ($i = 1; $i <= 2; $i++)
                     @if ($i == $current)
                         <li class="page-item active" aria-current="page"><span class="page-link">{{ $i }}</span></li>
                     @else
