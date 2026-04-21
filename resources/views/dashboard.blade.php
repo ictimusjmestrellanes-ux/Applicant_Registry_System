@@ -79,26 +79,102 @@
                     </div>
 
                     <div class="chart-card">
-                        <div class="chart-grid">
-                            @foreach($monthlyApplicants as $month)
-                                @php
-                                    $height = max(12, ($month['count'] / $maxMonthlyApplicants) * 100);
-                                @endphp
-                                <div class="chart-column">
-                                    <div class="chart-value">{{ $month['count'] }}</div>
-                                    <div class="chart-bar-wrap">
-                                        <div class="chart-bar" style="height: {{ $height }}%;"></div>
-                                    </div>
-                                    <div class="chart-label">{{ $month['label'] }}</div>
-                                </div>
-                            @endforeach
+                        <div class="chart-canvas-wrap">
+                            <canvas id="monthlyApplicantsChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        
+        <section class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="dashboard-card h-100">
+                    <div class="section-header">
+                        <div>
+                            <h5 class="section-title mb-1">Sex Pie Chart</h5>
+                            <p class="section-copy mb-0">Male and female applicant distribution.</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                            <canvas id="sexPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="dashboard-card h-100">
+                    <div class="section-header">
+                        <div>
+                            <h5 class="section-title mb-1">PWD Pie Chart</h5>
+                            <p class="section-copy mb-0">Applicants marked as PWD: Yes versus No.</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                            <canvas id="pwdPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-12">
+                <div class="dashboard-card h-100">
+                    <div class="section-header">
+                        <div>
+                            <h5 class="section-title mb-1">4Ps Pie Chart</h5>
+                            <p class="section-copy mb-0">Applicants enrolled in 4Ps: Yes versus No.</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                            <canvas id="fourPsPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="row g-4 mb-4">
+            <div class="col-xl-6">
+                <div class="dashboard-card h-100">
+                    <div class="section-header">
+                        <div>
+                            <h5 class="section-title mb-1">City Column Chart</h5>
+                            <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-canvas-wrap">
+                            <canvas id="cityColumnChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="dashboard-card h-100">
+                    <div class="section-header">
+                        <div>
+                            <h5 class="section-title mb-1">Province Column Chart</h5>
+                            <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-canvas-wrap">
+                            <canvas id="provinceColumnChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <style>
@@ -305,6 +381,15 @@
             min-height: 320px;
         }
 
+        .chart-grid--compact {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            min-height: 260px;
+        }
+
+        .chart-grid--top {
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+        }
+
         .chart-column {
             display: flex;
             flex-direction: column;
@@ -336,12 +421,60 @@
             transition: height 0.3s ease;
         }
 
+        .chart-bar--emerald {
+            background: linear-gradient(180deg, #6ee7b7, #059669);
+        }
+
+        .chart-bar--amber {
+            background: linear-gradient(180deg, #fcd34d, #d97706);
+        }
+
+        .chart-bar--violet {
+            background: linear-gradient(180deg, #c4b5fd, #7c3aed);
+        }
+
+        .chart-bar--slate {
+            background: linear-gradient(180deg, #cbd5e1, #475569);
+        }
+
+        .chart-bar--rose {
+            background: linear-gradient(180deg, #fda4af, #e11d48);
+        }
+
         .chart-label {
             font-size: 0.86rem;
             font-weight: 700;
             color: #475569;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .chart-label--stacked {
+            min-height: 2.8rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .chart-bar-wrap--short {
+            height: 180px;
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            height: 360px;
+            width: 100%;
+        }
+
+        .chart-canvas-wrap--pie {
+            height: 300px;
+        }
+
+        .chart-canvas-wrap canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .action-tile {
@@ -473,6 +606,14 @@
             .chart-grid {
                 grid-template-columns: repeat(6, minmax(0, 1fr));
             }
+
+            .chart-grid--compact {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .chart-grid--top {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 575.98px) {
@@ -480,9 +621,175 @@
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
 
+            .chart-grid--compact {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .chart-grid--top {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .chart-bar-wrap {
                 height: 180px;
             }
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const monthlyLabels = @json($monthlyApplicants->pluck('label')->values());
+            const monthlyData = @json($monthlyApplicants->pluck('count')->values());
+
+            const sexLabels = @json($genderBreakdown->pluck('label')->values());
+            const sexData = @json($genderBreakdown->pluck('count')->values());
+
+            const pwdLabels = @json($pwdBreakdown->pluck('label')->values());
+            const pwdData = @json($pwdBreakdown->pluck('count')->values());
+
+            const fourPsLabels = @json($fourPsBreakdown->pluck('label')->values());
+            const fourPsData = @json($fourPsBreakdown->pluck('count')->values());
+
+            const cityLabels = @json($cityBreakdown->pluck('label')->values());
+            const cityData = @json($cityBreakdown->pluck('count')->values());
+
+            const provinceLabels = @json($provinceBreakdown->pluck('label')->values());
+            const provinceData = @json($provinceBreakdown->pluck('count')->values());
+
+            const pieOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18,
+                        },
+                    },
+                },
+            };
+
+            const columnOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 25,
+                        },
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+            };
+
+            const createChart = (id, config) => {
+                const canvas = document.getElementById(id);
+
+                if (!canvas) {
+                    return;
+                }
+
+                new Chart(canvas, config);
+            };
+
+            createChart('monthlyApplicantsChart', {
+                type: 'bar',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        data: monthlyData,
+                        backgroundColor: '#2563eb',
+                        borderRadius: 8,
+                        maxBarThickness: 42,
+                    }],
+                },
+                options: columnOptions,
+            });
+
+            createChart('sexPieChart', {
+                type: 'pie',
+                data: {
+                    labels: sexLabels,
+                    datasets: [{
+                        data: sexData,
+                        backgroundColor: ['#2563eb', '#ec4899'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                    }],
+                },
+                options: pieOptions,
+            });
+
+            createChart('pwdPieChart', {
+                type: 'pie',
+                data: {
+                    labels: pwdLabels,
+                    datasets: [{
+                        data: pwdData,
+                        backgroundColor: ['#10b981', '#f59e0b'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                    }],
+                },
+                options: pieOptions,
+            });
+
+            createChart('fourPsPieChart', {
+                type: 'pie',
+                data: {
+                    labels: fourPsLabels,
+                    datasets: [{
+                        data: fourPsData,
+                        backgroundColor: ['#8b5cf6', '#f43f5e'],
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                    }],
+                },
+                options: pieOptions,
+            });
+
+            createChart('cityColumnChart', {
+                type: 'bar',
+                data: {
+                    labels: cityLabels,
+                    datasets: [{
+                        data: cityData,
+                        backgroundColor: '#7c3aed',
+                        borderRadius: 8,
+                        maxBarThickness: 42,
+                    }],
+                },
+                options: columnOptions,
+            });
+
+            createChart('provinceColumnChart', {
+                type: 'bar',
+                data: {
+                    labels: provinceLabels,
+                    datasets: [{
+                        data: provinceData,
+                        backgroundColor: '#475569',
+                        borderRadius: 8,
+                        maxBarThickness: 42,
+                    }],
+                },
+                options: columnOptions,
+            });
+        });
+    </script>
 @endsection

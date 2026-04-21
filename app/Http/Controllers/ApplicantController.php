@@ -52,11 +52,11 @@ class ApplicantController extends Controller
 
     public function index(Request $request)
     {
-        $search = trim((string) $request->search);
+        $filters = $this->getApplicantFilters($request);
         $perPageInput = strtolower((string) $request->query('per_page', '10'));
         $allowedPerPage = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-        $query = $this->buildApplicantSearchQuery($search)
+        $query = $this->buildApplicantSearchQuery($filters)
             ->with(['permit', 'clearance', 'referral']);
 
         if ($perPageInput === 'all') {
@@ -74,14 +74,26 @@ class ApplicantController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        return view('applicants.index', compact('applicants', 'search'));
+        $genderOptions = $this->getDistinctApplicantFieldOptions('gender');
+        $civilStatusOptions = $this->getDistinctApplicantFieldOptions('civil_status');
+        $cityOptions = $this->getDistinctApplicantFieldOptions('city');
+        $barangayOptions = $this->getDistinctApplicantFieldOptions('barangay');
+
+        return view('applicants.index', compact(
+            'applicants',
+            'filters',
+            'genderOptions',
+            'civilStatusOptions',
+            'cityOptions',
+            'barangayOptions'
+        ));
     }
 
     public function export(Request $request)
     {
-        $search = trim((string) $request->search);
+        $filters = $this->getApplicantFilters($request);
 
-        $applicants = $this->buildApplicantSearchQuery($search)
+        $applicants = $this->buildApplicantSearchQuery($filters)
             ->orderBy('id')
             ->get();
 
@@ -261,8 +273,16 @@ class ApplicantController extends Controller
             ->with('success', 'Applicant restored successfully.');
     }
 
-    private function buildApplicantSearchQuery(string $search)
+    private function buildApplicantSearchQuery(array $filters)
     {
+        $search = trim((string) ($filters['search'] ?? ''));
+        $gender = trim((string) ($filters['gender'] ?? ''));
+        $civilStatus = trim((string) ($filters['civil_status'] ?? ''));
+        $city = trim((string) ($filters['city'] ?? ''));
+        $barangay = trim((string) ($filters['barangay'] ?? ''));
+        $dateFrom = trim((string) ($filters['date_from'] ?? ''));
+        $dateTo = trim((string) ($filters['date_to'] ?? ''));
+
         return Applicant::query()
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($innerQuery) use ($search) {
@@ -272,7 +292,56 @@ class ApplicantController extends Controller
                         ->orWhere('contact_no', 'like', "%{$search}%")
                         ->orWhere('gender', 'like', "%{$search}%");
                 });
-            });
+            })
+            ->when($gender !== '', fn ($query) => $query->where('gender', $gender))
+            ->when($civilStatus !== '', fn ($query) => $query->where('civil_status', $civilStatus))
+            ->when($city !== '', fn ($query) => $query->where('city', $city))
+            ->when($barangay !== '', fn ($query) => $query->where('barangay', $barangay))
+            ->when(
+                preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom),
+                fn ($query) => $query->whereDate('created_at', '>=', $dateFrom)
+            )
+            ->when(
+                preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo),
+                fn ($query) => $query->whereDate('created_at', '<=', $dateTo)
+            );
+    }
+
+    private function getApplicantFilters(Request $request): array
+    {
+        $dateFrom = $this->normalizeDateFilter((string) $request->query('date_from', ''));
+        $dateTo = $this->normalizeDateFilter((string) $request->query('date_to', ''));
+
+        if ($dateFrom !== '' && $dateTo !== '' && $dateFrom > $dateTo) {
+            [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        }
+
+        return [
+            'search' => trim((string) $request->query('search', '')),
+            'gender' => trim((string) $request->query('gender', '')),
+            'civil_status' => trim((string) $request->query('civil_status', '')),
+            'city' => trim((string) $request->query('city', '')),
+            'barangay' => trim((string) $request->query('barangay', '')),
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+        ];
+    }
+
+    private function normalizeDateFilter(string $value): string
+    {
+        $value = trim($value);
+
+        return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
+    }
+
+    private function getDistinctApplicantFieldOptions(string $field)
+    {
+        return Applicant::query()
+            ->whereNotNull($field)
+            ->where($field, '!=', '')
+            ->distinct()
+            ->orderBy($field)
+            ->pluck($field);
     }
 
     private function createApplicantsExportXlsx(array $rows): string

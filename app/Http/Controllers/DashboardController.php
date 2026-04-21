@@ -27,6 +27,67 @@ class DashboardController extends Controller
                 ];
             });
 
+        $normalizeValue = static function ($value, string $fallback = 'UNSPECIFIED') {
+            $value = is_string($value) ? trim($value) : '';
+
+            if ($value === '') {
+                return $fallback;
+            }
+
+            return strtoupper(preg_replace('/\s+/', ' ', $value));
+        };
+
+        $mapBreakdown = static function ($items, array $labels, callable $resolver) {
+            return collect($labels)->map(function (string $label) use ($items, $resolver) {
+                return [
+                    'label' => $label,
+                    'count' => $items->filter(fn (Applicant $applicant) => $resolver($applicant) === $label)->count(),
+                ];
+            });
+        };
+
+        $genderBreakdown = $mapBreakdown(
+            $applicants,
+            ['MALE', 'FEMALE'],
+            function (Applicant $applicant) use ($normalizeValue) {
+                return $normalizeValue($applicant->gender, 'UNSPECIFIED');
+            }
+        );
+        $pwdBreakdown = $mapBreakdown(
+            $applicants,
+            ['YES', 'NO'],
+            function (Applicant $applicant) use ($normalizeValue) {
+                return $normalizeValue($applicant->pwd, 'NO');
+            }
+        );
+        $fourPsBreakdown = $mapBreakdown(
+            $applicants,
+            ['YES', 'NO'],
+            function (Applicant $applicant) use ($normalizeValue) {
+                return $normalizeValue($applicant->four_ps, 'NO');
+            }
+        );
+
+        $cityBreakdown = $applicants
+            ->groupBy(fn (Applicant $applicant) => $normalizeValue($applicant->city))
+            ->map(fn ($group, $label) => [
+                'label' => $label,
+                'count' => $group->count(),
+            ])
+            ->sortByDesc('count')
+            ->take(10)
+            ->values();
+
+        $provinceBreakdown = $applicants
+            ->groupBy(fn (Applicant $applicant) => $normalizeValue($applicant->province))
+            ->map(fn ($group, $label) => [
+                'label' => $label,
+                'count' => $group->count(),
+            ])
+            ->sortByDesc('count')
+            ->take(10)
+            ->values();
+
         $totalApplicants = $applicants->count();
         $newThisMonth = Applicant::query()
             ->whereYear('created_at', now()->year)
@@ -72,6 +133,11 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
         $maxMonthlyApplicants = max($monthlyApplicants->max('count') ?? 0, 1);
+        $maxGenderApplicants = max($genderBreakdown->max('count') ?? 0, 1);
+        $maxCityApplicants = max($cityBreakdown->max('count') ?? 0, 1);
+        $maxProvinceApplicants = max($provinceBreakdown->max('count') ?? 0, 1);
+        $maxPwdApplicants = max($pwdBreakdown->max('count') ?? 0, 1);
+        $maxFourPsApplicants = max($fourPsBreakdown->max('count') ?? 0, 1);
 
         return view('dashboard', compact(
             'menuItems',
@@ -80,6 +146,16 @@ class DashboardController extends Controller
             'chartYear',
             'monthlyApplicants',
             'maxMonthlyApplicants',
+            'genderBreakdown',
+            'maxGenderApplicants',
+            'cityBreakdown',
+            'maxCityApplicants',
+            'provinceBreakdown',
+            'maxProvinceApplicants',
+            'pwdBreakdown',
+            'maxPwdApplicants',
+            'fourPsBreakdown',
+            'maxFourPsApplicants',
             'recentApplicants',
             'recentActivity'
         ));

@@ -5,12 +5,27 @@
 @section('content')
     @php
         $visibleApplicants = $applicants->getCollection();
-        $searchTerm = trim((string) request('search'));
+        $searchTerm = $filters['search'] ?? '';
+        $selectedGender = $filters['gender'] ?? '';
+        $selectedCivilStatus = $filters['civil_status'] ?? '';
+        $selectedCity = $filters['city'] ?? '';
+        $selectedBarangay = $filters['barangay'] ?? '';
+        $dateFrom = $filters['date_from'] ?? '';
+        $dateTo = $filters['date_to'] ?? '';
         $perPage = (string) request('per_page', '10');
         $isUnpaginatedView = $perPage === 'all';
         $showingFrom = $applicants->firstItem() ?? 0;
         $showingTo = $applicants->lastItem() ?? 0;
         $totalApplicants = $applicants->total();
+        $hasActiveFilters = collect([
+            $searchTerm,
+            $selectedGender,
+            $selectedCivilStatus,
+            $selectedCity,
+            $selectedBarangay,
+            $dateFrom,
+            $dateTo,
+        ])->contains(fn($value) => trim((string) $value) !== '');
         $permitCompleteCount = $visibleApplicants->filter(fn($applicant) => $applicant->isPermitComplete())->count();
         $clearanceCompleteCount = $visibleApplicants->filter(fn($applicant) => $applicant->isClearanceComplete())->count();
         $referralCompleteCount = $visibleApplicants->filter(fn($applicant) => $applicant->isReferralComplete())->count();
@@ -24,11 +39,11 @@
         <section class="filter-card mb-4">
             <div class="section-head">
                 <div>
-                    <h5 class="section-title mb-1">Find Applicants</h5>
-                    <p class="section-copy mb-0">Search by applicant name, contact number, or gender.</p>
+                    <h5 class="section-title mb-1">Filter Applicants</h5>
+                    <p class="section-copy mb-0">Narrow records by keyword, profile details, location, and created date range.</p>
                 </div>
                 <div class="section-head-actions">
-                    <a href="{{ route('applicants.export', request()->only('search')) }}" class="btn index-btn-export">
+                    <a href="{{ route('applicants.export', array_filter($filters, fn($value) => trim((string) $value) !== '')) }}" class="btn index-btn-export">
                         <i class="bi bi-download me-2"></i>Export XLSX
                     </a>
                     <div class="results-chip">
@@ -43,18 +58,82 @@
 
             <form method="GET" action="{{ route('applicants.index') }}">
                 <div class="row g-3 align-items-end">
-                    <div class="col-lg-8">
-                        <label class="form-label field-label">Search</label>
+                    <div class="col-12 col-xl-4">
+                        <label class="form-label field-label">Keyword Search</label>
                         <div class="search-shell">
                             <span class="search-icon"><i class="bi bi-search"></i></span>
                             <input type="text" name="search" class="form-control index-field-control"
-                                placeholder="Type applicant name, phone number, or gender..." value="{{ $searchTerm }}">
+                                placeholder="Name, contact number, or gender..." value="{{ $searchTerm }}">
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="filter-actions">
+                    <div class="col-12 col-md-6 col-xl-2">
+                        <label class="form-label field-label">Gender</label>
+                        <div class="filter-input-shell">
+                            <select name="gender" class="form-select index-select-control">
+                                <option value="">All genders</option>
+                                @foreach($genderOptions as $genderOption)
+                                    <option value="{{ $genderOption }}" {{ $selectedGender === $genderOption ? 'selected' : '' }}>
+                                        {{ $genderOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                        <label class="form-label field-label">Civil Status</label>
+                        <div class="filter-input-shell">
+                            <select name="civil_status" class="form-select index-select-control">
+                                <option value="">All civil statuses</option>
+                                @foreach($civilStatusOptions as $civilStatusOption)
+                                    <option value="{{ $civilStatusOption }}" {{ $selectedCivilStatus === $civilStatusOption ? 'selected' : '' }}>
+                                        {{ $civilStatusOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                        <label class="form-label field-label">City</label>
+                        <div class="filter-input-shell">
+                            <select name="city" class="form-select index-select-control">
+                                <option value="">All cities</option>
+                                @foreach($cityOptions as $cityOption)
+                                    <option value="{{ $cityOption }}" {{ $selectedCity === $cityOption ? 'selected' : '' }}>
+                                        {{ $cityOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                        <label class="form-label field-label">Barangay</label>
+                        <div class="filter-input-shell">
+                            <select name="barangay" class="form-select index-select-control">
+                                <option value="">All barangays</option>
+                                @foreach($barangayOptions as $barangayOption)
+                                    <option value="{{ $barangayOption }}" {{ $selectedBarangay === $barangayOption ? 'selected' : '' }}>
+                                        {{ $barangayOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                        <label class="form-label field-label">Date From</label>
+                        <div class="filter-input-shell">
+                            <input type="date" name="date_from" class="form-control index-date-control" value="{{ $dateFrom }}">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                        <label class="form-label field-label">Date To</label>
+                        <div class="filter-input-shell">
+                            <input type="date" name="date_to" class="form-control index-date-control" value="{{ $dateTo }}">
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-4">
+                        <div class="filter-actions filter-actions--end">
                             <button type="submit" class="btn btn-primary index-btn-primary">
-                                <i class="bi bi-funnel-fill me-2"></i>Search Records
+                                <i class="bi bi-funnel-fill me-2"></i>Apply Filters
                             </button>
                             <a href="{{ route('applicants.index', ['per_page' => $perPage]) }}"
                                 class="btn index-btn-secondary">Reset</a>
@@ -79,9 +158,41 @@
                         applicant workspace.</p>
                 </div>
                 <div class="section-head-actions">
-                    @if($searchTerm !== '')
-                        <div class="search-chip">
-                            <i class="bi bi-stars me-1"></i>Search: "{{ $searchTerm }}"
+                    @if($hasActiveFilters)
+                        <div class="active-filter-list">
+                            @if($searchTerm !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-search me-1"></i>Keyword: "{{ $searchTerm }}"
+                                </div>
+                            @endif
+                            @if($selectedGender !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-person-badge me-1"></i>Gender: {{ $selectedGender }}
+                                </div>
+                            @endif
+                            @if($selectedCivilStatus !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-heart me-1"></i>Status: {{ $selectedCivilStatus }}
+                                </div>
+                            @endif
+                            @if($selectedCity !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-geo-alt me-1"></i>City: {{ $selectedCity }}
+                                </div>
+                            @endif
+                            @if($selectedBarangay !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-pin-map me-1"></i>Barangay: {{ $selectedBarangay }}
+                                </div>
+                            @endif
+                            @if($dateFrom !== '' || $dateTo !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-calendar-range me-1"></i>Date:
+                                    {{ $dateFrom !== '' ? \Illuminate\Support\Carbon::parse($dateFrom)->format('M d, Y') : 'Any' }}
+                                    -
+                                    {{ $dateTo !== '' ? \Illuminate\Support\Carbon::parse($dateTo)->format('M d, Y') : 'Any' }}
+                                </div>
+                            @endif
                         </div>
                     @endif
 
@@ -89,8 +200,25 @@
                         @if($searchTerm !== '')
                             <input type="hidden" name="search" value="{{ $searchTerm }}">
                         @endif
+                        @if($selectedGender !== '')
+                            <input type="hidden" name="gender" value="{{ $selectedGender }}">
+                        @endif
+                        @if($selectedCivilStatus !== '')
+                            <input type="hidden" name="civil_status" value="{{ $selectedCivilStatus }}">
+                        @endif
+                        @if($selectedCity !== '')
+                            <input type="hidden" name="city" value="{{ $selectedCity }}">
+                        @endif
+                        @if($selectedBarangay !== '')
+                            <input type="hidden" name="barangay" value="{{ $selectedBarangay }}">
+                        @endif
+                        @if($dateFrom !== '')
+                            <input type="hidden" name="date_from" value="{{ $dateFrom }}">
+                        @endif
+                        @if($dateTo !== '')
+                            <input type="hidden" name="date_to" value="{{ $dateTo }}">
+                        @endif
 
-                        
                         <div class="limit-shell js-limit-dropdown">
                             <div class="limit-shell-copy">
                                 <span class="limit-shell-label">View Page</span>
@@ -240,7 +368,7 @@
                                     <div class="empty-state">
                                         <i class="bi bi-people"></i>
                                         <h6 class="mb-1">No applicants found</h6>
-                                        <p class="mb-0">Try adjusting the search term to bring more records into view.</p>
+                                        <p class="mb-0">Try adjusting the filters to bring more records into view.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -350,7 +478,7 @@
                     <div class="empty-state">
                         <i class="bi bi-people"></i>
                         <h6 class="mb-1">No applicants found</h6>
-                        <p class="mb-0">Try adjusting the search term to bring more records into view.</p>
+                        <p class="mb-0">Try adjusting the filters to bring more records into view.</p>
                     </div>
                 @endforelse
             </div>
@@ -639,7 +767,8 @@
             margin-bottom: 1.4rem;
         }
 
-        .search-shell {
+        .search-shell,
+        .filter-input-shell {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -649,19 +778,33 @@
             padding: 0 0.95rem;
         }
 
+        .filter-input-shell {
+            padding: 0 0.75rem;
+        }
+
         .search-icon {
             color: #64748b;
         }
 
-        .index-field-control {
+        .index-field-control,
+        .index-select-control,
+        .index-date-control {
             min-height: 54px;
             border: none;
             background: transparent;
         }
 
-        .index-field-control:focus {
+        .index-field-control:focus,
+        .index-select-control:focus,
+        .index-date-control:focus {
             box-shadow: none;
             background: transparent;
+        }
+
+        .index-select-control,
+        .index-date-control {
+            padding-left: 0;
+            padding-right: 0;
         }
 
         .limit-shell-icon {
@@ -815,6 +958,14 @@
             border-radius: 999px;
             font-size: 0.82rem;
             font-weight: 700;
+        }
+
+        .active-filter-list {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
         }
 
         .results-chip {
@@ -1047,6 +1198,10 @@
             }
         }
 
+        .filter-actions--end {
+            justify-content: flex-end;
+        }
+
         @media (max-width: 767.98px) {
 
             .filter-actions,
@@ -1063,6 +1218,10 @@
             .pagination-wrap {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .active-filter-list {
+                justify-content: flex-start;
             }
         }
     </style>
