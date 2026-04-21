@@ -1244,7 +1244,7 @@
                                     <div class="col-md-2">
                                         <label class="form-label">Sex <span class="required-mark">*</span></label>
                                         <select name="gender" class="form-select" required>
-                                            <option value="">Select</option>
+                                            <option value="">Select Sex</option>
                                             <option value="MALE" {{ $applicant->gender == 'MALE' ? 'selected' : '' }}>MALE
                                             </option>
                                             <option value="FEMALE" {{ $applicant->gender == 'FEMALE' ? 'selected' : '' }}>

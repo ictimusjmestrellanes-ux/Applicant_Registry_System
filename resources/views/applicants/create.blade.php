@@ -424,9 +424,9 @@
                                         placeholder="e.g. 25" required>
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label">Sex/Gender <span class="required-mark">*</span></label>
+                                    <label class="form-label">Sex <span class="required-mark">*</span></label>
                                     <select name="gender" class="form-select" required>
-                                        <option value="">Select Gender</option>
+                                        <option value="">Select Sex</option>
                                         <option value="MALE" {{ old('gender') === 'MALE' ? 'selected' : '' }}>MALE</option>
                                         <option value="FEMALE" {{ old('gender') === 'FEMALE' ? 'selected' : '' }}>FEMALE
                                         </option>

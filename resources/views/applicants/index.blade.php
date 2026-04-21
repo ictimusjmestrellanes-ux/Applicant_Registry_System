@@ -67,10 +67,10 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">Gender</label>
+                        <label class="form-label field-label">Sex</label>
                         <div class="filter-input-shell">
                             <select name="gender" class="form-select index-select-control">
-                                <option value="">All genders</option>
+                                <option value="">Select Sex</option>
                                 @foreach($genderOptions as $genderOption)
                                     <option value="{{ $genderOption }}" {{ $selectedGender === $genderOption ? 'selected' : '' }}>
                                         {{ $genderOption }}
