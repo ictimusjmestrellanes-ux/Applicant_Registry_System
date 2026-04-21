@@ -32,6 +32,7 @@
         $fullyReadyCount = $visibleApplicants->filter(
             fn($applicant) => $applicant->isPermitComplete() && $applicant->isClearanceComplete() && $applicant->isReferralComplete()
         )->count();
+        $filterPanelOpen = $hasActiveFilters;
     @endphp
 
     <div class="applicant-index-page container-fluid ">
@@ -43,104 +44,115 @@
                     <p class="section-copy mb-0">Narrow records by keyword, profile details, location, and created date range.</p>
                 </div>
                 <div class="section-head-actions">
+                    <button type="button"
+                        class="btn filter-toggle js-filter-toggle {{ $filterPanelOpen ? 'is-open' : '' }}"
+                        aria-expanded="{{ $filterPanelOpen ? 'true' : 'false' }}"
+                        aria-controls="applicant-filter-panel">
+                        <span class="filter-toggle-label js-filter-toggle-text">
+                            {{ $filterPanelOpen ? 'Hide Filters' : 'Show Filters' }}
+                        </span>
+                        <i class="bi bi-chevron-down filter-toggle-icon"></i>
+                    </button>
                     <a href="{{ route('applicants.export', array_filter($filters, fn($value) => trim((string) $value) !== '')) }}" class="btn index-btn-export">
                         <i class="bi bi-download me-2"></i>Export XLSX
                     </a>
                     <div class="results-chip">
                         @if($isUnpaginatedView)
-                            Viewing all {{ number_format($totalApplicants) }} applicants
+                            Viewing all {{ number_format($totalApplicants) }} Applicants
                         @else
-                            Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }}
+                            Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants
                         @endif
                     </div>
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('applicants.index') }}">
-                <div class="row g-3 align-items-end">
-                    <div class="col-12 col-xl-4">
-                        <label class="form-label field-label">Keyword Search</label>
-                        <div class="search-shell">
-                            <span class="search-icon"><i class="bi bi-search"></i></span>
-                            <input type="text" name="search" class="form-control index-field-control"
-                                placeholder="Name, contact number, or gender..." value="{{ $searchTerm }}">
+            <div id="applicant-filter-panel" class="filter-panel js-filter-panel {{ $filterPanelOpen ? 'is-open' : '' }}">
+                <form method="GET" action="{{ route('applicants.index') }}">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-xl-4">
+                            <label class="form-label field-label">Keyword Search</label>
+                            <div class="search-shell">
+                                <span class="search-icon"><i class="bi bi-search"></i></span>
+                                <input type="text" name="search" class="form-control index-field-control"
+                                    placeholder="Name" value="{{ $searchTerm }}">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">Sex</label>
+                            <div class="filter-input-shell">
+                                <select name="gender" class="form-select index-select-control">
+                                    <option value="">Select Sex</option>
+                                    @foreach($genderOptions as $genderOption)
+                                        <option value="{{ $genderOption }}" {{ $selectedGender === $genderOption ? 'selected' : '' }}>
+                                            {{ $genderOption }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">Civil Status</label>
+                            <div class="filter-input-shell">
+                                <select name="civil_status" class="form-select index-select-control">
+                                    <option value="">All civil statuses</option>
+                                    @foreach($civilStatusOptions as $civilStatusOption)
+                                        <option value="{{ $civilStatusOption }}" {{ $selectedCivilStatus === $civilStatusOption ? 'selected' : '' }}>
+                                            {{ $civilStatusOption }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">City</label>
+                            <div class="filter-input-shell">
+                                <select name="city" class="form-select index-select-control">
+                                    <option value="">All cities</option>
+                                    @foreach($cityOptions as $cityOption)
+                                        <option value="{{ $cityOption }}" {{ $selectedCity === $cityOption ? 'selected' : '' }}>
+                                            {{ $cityOption }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">Barangay</label>
+                            <div class="filter-input-shell">
+                                <select name="barangay" class="form-select index-select-control">
+                                    <option value="">All barangays</option>
+                                    @foreach($barangayOptions as $barangayOption)
+                                        <option value="{{ $barangayOption }}" {{ $selectedBarangay === $barangayOption ? 'selected' : '' }}>
+                                            {{ $barangayOption }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">Date From</label>
+                            <div class="filter-input-shell">
+                                <input type="date" name="date_from" class="form-control index-date-control" value="{{ $dateFrom }}">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">Date To</label>
+                            <div class="filter-input-shell">
+                                <input type="date" name="date_to" class="form-control index-date-control" value="{{ $dateTo }}">
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-4">
+                            <div class="filter-actions filter-actions--end">
+                                <button type="submit" class="btn btn-primary index-btn-primary">
+                                    <i class="bi bi-funnel-fill me-2"></i>Apply Filters
+                                </button>
+                                <a href="{{ route('applicants.index', ['per_page' => $perPage]) }}"
+                                    class="btn index-btn-secondary">Reset</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">Sex</label>
-                        <div class="filter-input-shell">
-                            <select name="gender" class="form-select index-select-control">
-                                <option value="">Select Sex</option>
-                                @foreach($genderOptions as $genderOption)
-                                    <option value="{{ $genderOption }}" {{ $selectedGender === $genderOption ? 'selected' : '' }}>
-                                        {{ $genderOption }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">Civil Status</label>
-                        <div class="filter-input-shell">
-                            <select name="civil_status" class="form-select index-select-control">
-                                <option value="">All civil statuses</option>
-                                @foreach($civilStatusOptions as $civilStatusOption)
-                                    <option value="{{ $civilStatusOption }}" {{ $selectedCivilStatus === $civilStatusOption ? 'selected' : '' }}>
-                                        {{ $civilStatusOption }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">City</label>
-                        <div class="filter-input-shell">
-                            <select name="city" class="form-select index-select-control">
-                                <option value="">All cities</option>
-                                @foreach($cityOptions as $cityOption)
-                                    <option value="{{ $cityOption }}" {{ $selectedCity === $cityOption ? 'selected' : '' }}>
-                                        {{ $cityOption }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">Barangay</label>
-                        <div class="filter-input-shell">
-                            <select name="barangay" class="form-select index-select-control">
-                                <option value="">All barangays</option>
-                                @foreach($barangayOptions as $barangayOption)
-                                    <option value="{{ $barangayOption }}" {{ $selectedBarangay === $barangayOption ? 'selected' : '' }}>
-                                        {{ $barangayOption }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">Date From</label>
-                        <div class="filter-input-shell">
-                            <input type="date" name="date_from" class="form-control index-date-control" value="{{ $dateFrom }}">
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-2">
-                        <label class="form-label field-label">Date To</label>
-                        <div class="filter-input-shell">
-                            <input type="date" name="date_to" class="form-control index-date-control" value="{{ $dateTo }}">
-                        </div>
-                    </div>
-                    <div class="col-12 col-xl-4">
-                        <div class="filter-actions filter-actions--end">
-                            <button type="submit" class="btn btn-primary index-btn-primary">
-                                <i class="bi bi-funnel-fill me-2"></i>Apply Filters
-                            </button>
-                            <a href="{{ route('applicants.index', ['per_page' => $perPage]) }}"
-                                class="btn index-btn-secondary">Reset</a>
-                        </div>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </section>
 
         @if(session('success'))
@@ -767,6 +779,48 @@
             margin-bottom: 1.4rem;
         }
 
+        .filter-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            border-radius: 14px;
+            padding: 0.72rem 1rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+            font-weight: 700;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08);
+        }
+
+        .filter-toggle:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .filter-toggle-icon {
+            transition: transform 0.2s ease;
+        }
+
+        .filter-toggle.is-open .filter-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .filter-panel {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 24px;
+            border: 1px solid rgba(219, 234, 254, 0.9);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .filter-panel.is-open {
+            display: block;
+        }
+
         .search-shell,
         .filter-input-shell {
             display: flex;
@@ -1175,6 +1229,7 @@
             .filter-actions,
             .section-head-actions {
                 justify-content: flex-start;
+                max-width: 100%;
             }
         }
 
@@ -1203,6 +1258,15 @@
         }
 
         @media (max-width: 767.98px) {
+            .section-head-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-toggle {
+                width: 295px;
+                justify-content: center;
+            }
 
             .filter-actions,
             .hero-side-actions {
@@ -1213,6 +1277,10 @@
             .index-btn-secondary,
             .limit-shell {
                 width: 100%;
+            }
+
+            .index-btn-export {
+                width: 295px;
             }
 
             .pagination-wrap {
@@ -1228,6 +1296,38 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.querySelector('input[name="search"]');
+
+            if (searchInput && searchInput.form) {
+                let searchTimer = null;
+
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(searchTimer);
+
+                    searchTimer = setTimeout(function () {
+                        if (typeof searchInput.form.requestSubmit === 'function') {
+                            searchInput.form.requestSubmit();
+                        } else {
+                            searchInput.form.submit();
+                        }
+                    }, 350);
+                });
+            }
+
+            const filterToggle = document.querySelector('.js-filter-toggle');
+            const filterPanel = document.querySelector('.js-filter-panel');
+            const filterToggleText = document.querySelector('.js-filter-toggle-text');
+
+            if (filterToggle && filterPanel && filterToggleText) {
+                filterToggle.addEventListener('click', function () {
+                    const isOpen = filterPanel.classList.toggle('is-open');
+
+                    filterToggle.classList.toggle('is-open', isOpen);
+                    filterToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                    filterToggleText.textContent = isOpen ? 'Hide Filters' : 'Show Filters';
+                });
+            }
+
             document.querySelectorAll('.js-limit-dropdown').forEach(function (dropdown) {
                 const select = dropdown.querySelector('.js-limit-native');
                 const trigger = dropdown.querySelector('.js-limit-trigger');

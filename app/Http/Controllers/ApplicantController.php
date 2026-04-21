@@ -233,6 +233,7 @@ class ApplicantController extends Controller
                     $innerQuery->where('first_name', 'like', "%{$search}%")
                         ->orWhere('middle_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"])
                         ->orWhere('contact_no', 'like', "%{$search}%")
                         ->orWhere('barangay', 'like', "%{$search}%")
                         ->orWhere('city', 'like', "%{$search}%");
@@ -276,12 +277,6 @@ class ApplicantController extends Controller
     private function buildApplicantSearchQuery(array $filters)
     {
         $search = trim((string) ($filters['search'] ?? ''));
-        $gender = trim((string) ($filters['gender'] ?? ''));
-        $civilStatus = trim((string) ($filters['civil_status'] ?? ''));
-        $city = trim((string) ($filters['city'] ?? ''));
-        $barangay = trim((string) ($filters['barangay'] ?? ''));
-        $dateFrom = trim((string) ($filters['date_from'] ?? ''));
-        $dateTo = trim((string) ($filters['date_to'] ?? ''));
 
         return Applicant::query()
             ->when($search !== '', function ($query) use ($search) {
@@ -289,22 +284,9 @@ class ApplicantController extends Controller
                     $innerQuery->where('first_name', 'like', "%{$search}%")
                         ->orWhere('middle_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('contact_no', 'like', "%{$search}%")
-                        ->orWhere('gender', 'like', "%{$search}%");
+                        ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"]);
                 });
-            })
-            ->when($gender !== '', fn ($query) => $query->where('gender', $gender))
-            ->when($civilStatus !== '', fn ($query) => $query->where('civil_status', $civilStatus))
-            ->when($city !== '', fn ($query) => $query->where('city', $city))
-            ->when($barangay !== '', fn ($query) => $query->where('barangay', $barangay))
-            ->when(
-                preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom),
-                fn ($query) => $query->whereDate('created_at', '>=', $dateFrom)
-            )
-            ->when(
-                preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo),
-                fn ($query) => $query->whereDate('created_at', '<=', $dateTo)
-            );
+            });
     }
 
     private function getApplicantFilters(Request $request): array
