@@ -32,6 +32,11 @@ class MayorsReferral extends Model
         'ref_place',
         'ref_ocrl',
         'ref_city_gov',
+        'referral_details',
+    ];
+
+    protected $casts = [
+        'referral_details' => 'array',
     ];
 
     public static function generateNextSequence(string $column, ?int $year = null): string
@@ -60,7 +65,35 @@ class MayorsReferral extends Model
 
     public static function generateNextImusOcrl(?int $year = null): string
     {
-        return static::generateNextSequence('ref_imus_ocrl', $year);
+        $year ??= (int) Carbon::now()->format('Y');
+        $prefix = $year.'-';
+
+        $candidates = static::query()
+            ->get(['ref_imus_ocrl', 'referral_details'])
+            ->flatMap(function (self $referral) {
+                $details = is_array($referral->referral_details ?? null) ? $referral->referral_details : [];
+
+                return collect([$referral->ref_imus_ocrl])
+                    ->merge(
+                        collect($details)->map(function ($detail) {
+                            $detail = is_array($detail) ? $detail : [];
+
+                            return $detail['ref_imus_ocrl'] ?? null;
+                        })
+                    );
+            })
+            ->filter(fn ($value) => is_string($value) && preg_match('/^\d{4}-\d{5}$/', $value))
+            ->values();
+
+        $highestNumber = 0;
+
+        foreach ($candidates as $candidate) {
+            if (preg_match('/^(\d{4})-(\d{5})$/', $candidate, $matches) && (int) $matches[1] === $year) {
+                $highestNumber = max($highestNumber, (int) $matches[2]);
+            }
+        }
+
+        return sprintf('%d-%05d', $year, $highestNumber + 1);
     }
 
     public function hasRequiredDetails(): bool

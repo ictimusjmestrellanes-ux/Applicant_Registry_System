@@ -225,7 +225,7 @@ class PermitController extends Controller
         }
 
         return redirect()
-            ->route('applicants.edit', $applicant->id)
+            ->to(route('applicants.edit', $applicant->id).'#permit')
             ->with('success', 'Permit updated successfully.');
     }
 

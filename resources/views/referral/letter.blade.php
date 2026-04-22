@@ -173,6 +173,51 @@
             font-style: italic;
         }
 
+        .extra-details {
+            margin: 3mm 0 0;
+            padding: 0;
+        }
+
+        .extra-detail-card {
+            margin: 0 0 3mm;
+            padding: 3mm 4mm;
+            border: 1px solid rgba(23, 59, 143, 0.18);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.62);
+        }
+
+        .extra-detail-title {
+            margin: 0 0 2mm;
+            font-weight: 700;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .extra-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 2mm 4mm;
+        }
+
+        .extra-detail-item {
+            margin: 0;
+        }
+
+        .extra-detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #4b5563;
+            letter-spacing: 0.03em;
+        }
+
+        .extra-detail-value {
+            display: block;
+            margin-top: 0.5mm;
+            font-size: 13px;
+        }
+
         @media print {
             body {
                 background: #fff;
@@ -208,13 +253,20 @@
             $applicant->province,
         ])->filter()->implode(', ')));
 
-        $recipientName = strtoupper($referral->ref_employer_name);
-        $recipientTitle = $referral->ref_position;
-        $companyName = strtoupper($referral->ref_hired_company);
-        $recipientAddress = $referral->ref_place;
+        $printDetail = is_array($printDetail ?? null) ? $printDetail : null;
+        $recipientName = strtoupper($printDetail['ref_employer_name'] ?? $referral->ref_employer_name);
+        $recipientTitle = $printDetail['ref_position'] ?? $referral->ref_position;
+        $companyName = strtoupper($printDetail['ref_hired_company'] ?? $referral->ref_hired_company);
+        $recipientAddress = $printDetail['ref_place'] ?? $referral->ref_place;
         $letterDate = now()->format('F d, Y');
         $letterYear = now()->format('Y');
-        $referralNumber = $referral->ref_imus_ocrl;
+        $referralNumber = $printDetail['ref_imus_ocrl'] ?? $referral->ref_imus_ocrl;
+        $referralDetails = $referral->referral_details ?? [];
+        if (!is_array($referralDetails)) {
+            $referralDetails = [];
+        }
+        $supplementaryReferralDetails = array_values(array_slice($referralDetails, 1));
+        $detailsToPrint = $printDetail ? [$printDetail] : $supplementaryReferralDetails;
         $residentName = strtoupper($applicantName);
         $residentAddress = $applicantAddress;
         $surname = strtoupper($applicant->last_name);
@@ -226,7 +278,7 @@
     </div>
 
     <div class="page">
-        <div class="content">`
+        <div class="content">
             <div class="letter">
                 <p class="letter-title" style="font-size: 20px">Referral Letter</p>
 

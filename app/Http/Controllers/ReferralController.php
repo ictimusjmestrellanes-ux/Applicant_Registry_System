@@ -74,32 +74,85 @@ class ReferralController extends Controller
             $referral->{$field} = $file->storeAs($directory, $fileName, 'public');
         }
 
+        $nextImusOcrl = null;
+        $allocateImusOcrl = function ($value = null) use (&$nextImusOcrl) {
+            $value = trim((string) $value);
+
+            if ($value !== '') {
+                return $value;
+            }
+
+            if ($nextImusOcrl === null) {
+                $nextImusOcrl = MayorsReferral::generateNextImusOcrl();
+            }
+
+            $assigned = $nextImusOcrl;
+            $nextImusOcrl = $this->incrementImusOcrl($nextImusOcrl);
+
+            return $assigned;
+        };
+
         $referralData = [
             'referral_type' => $referralType,
-
-            'ref_imus_ocrl' => null,
-            'ref_employer_name' => null,
-            'ref_position' => null,
-            'ref_or_no' => null,
-            'ref_company_address' => null,
-            'ref_hired_company' => null,
-
-
-            'ref_peso_or_no' => null,
-            'ref_recipient' => null,
-            'ref_place' => null,
-            'ref_ocrl' => null,
-            'ref_city_gov' => null,
         ];
 
         if ($referralType === MayorsReferral::TYPE_PESO_OFFICE) {
-            $referralData = array_merge($referralData, [
-                'ref_imus_ocrl' => $request->ref_imus_ocrl,
+            $existingDetails = array_values(array_slice($referral->referral_details ?? [], 1));
+            $submittedDetails = array_values($request->input('referral_details', []));
+            $submittedFiles = array_values($request->file('referral_details', []));
+
+            $primaryDetails = [
+                'ref_imus_ocrl' => $allocateImusOcrl($request->ref_imus_ocrl),
                 'ref_employer_name' => $request->ref_employer_name,
                 'ref_position' => $request->ref_position,
                 'ref_or_no' => $request->ref_or_no,
                 'ref_place' => $request->ref_place,
                 'ref_hired_company' => $request->ref_hired_company,
+            ];
+
+            $supplementaryDetails = collect($submittedDetails)
+                ->map(function ($detail, $index) use ($existingDetails, $allocateImusOcrl, $submittedFiles) {
+                    $detail = is_array($detail) ? $detail : [];
+                    $existingDetail = is_array($existingDetails[$index] ?? null) ? $existingDetails[$index] : [];
+                    $uploadedAttachment = data_get($submittedFiles, $index.'.ref_attachment');
+
+                    $attachmentPath = $existingDetail['ref_attachment'] ?? null;
+
+                    if ($uploadedAttachment && method_exists($uploadedAttachment, 'getClientOriginalName')) {
+                        if (! empty($attachmentPath)) {
+                            Storage::disk('public')->delete($attachmentPath);
+                        }
+
+                        $originalName = pathinfo($uploadedAttachment->getClientOriginalName(), PATHINFO_FILENAME);
+                        $extension = $uploadedAttachment->getClientOriginalExtension();
+                        $fileName = Str::slug($originalName, '_').'_'.time().'_'.$index.'.'.$extension;
+                        $attachmentPath = $uploadedAttachment->storeAs('referrals/extra-details', $fileName, 'public');
+                    }
+
+                    return [
+                        'ref_imus_ocrl' => trim((string) ($detail['ref_imus_ocrl'] ?? '')),
+                        'ref_employer_name' => trim((string) ($detail['ref_employer_name'] ?? '')),
+                        'ref_position' => trim((string) ($detail['ref_position'] ?? '')),
+                        'ref_place' => trim((string) ($detail['ref_place'] ?? '')),
+                        'ref_hired_company' => trim((string) ($detail['ref_hired_company'] ?? '')),
+                        'ref_attachment' => $attachmentPath,
+                    ];
+                })
+                ->filter(fn (array $detail) => collect($detail)->contains(fn ($value) => trim((string) $value) !== ''))
+                ->values()
+                ->map(fn (array $detail) => [
+                    'ref_imus_ocrl' => $allocateImusOcrl($detail['ref_imus_ocrl'] ?? null),
+                    'ref_employer_name' => $detail['ref_employer_name'] ?? '',
+                    'ref_position' => $detail['ref_position'] ?? '',
+                    'ref_place' => $detail['ref_place'] ?? '',
+                    'ref_hired_company' => $detail['ref_hired_company'] ?? '',
+                    'ref_attachment' => $detail['ref_attachment'] ?? null,
+                ])
+                ->all();
+
+            $referralData = array_merge($referralData, [
+                ...$primaryDetails,
+                'referral_details' => array_values(array_merge([$primaryDetails], $supplementaryDetails)),
             ]);
         } elseif ($referralType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT) {
             $referralData = array_merge($referralData, [
@@ -147,7 +200,7 @@ class ReferralController extends Controller
         }
 
         return redirect()
-            ->route('applicants.edit', $applicant->id)
+            ->to(route('applicants.edit', $applicant->id).'#referral')
             ->with('success', 'Referral updated successfully.');
     }
 
@@ -198,12 +251,29 @@ class ReferralController extends Controller
             ->take(20);
     }
 
-    public function printLetter($id)
+    public function printLetter(Request $request, $id)
     {
         $applicant = Applicant::with('referral')->findOrFail($id);
 
         if (! $applicant->referral || ! $applicant->referral->canPrint()) {
             return back()->with('error', 'Referral is not complete.');
+        }
+
+        $printDetail = null;
+        $detailIndex = $request->query('detail');
+
+        if (
+            $applicant->referral->referral_type === MayorsReferral::TYPE_PESO_OFFICE &&
+            $detailIndex !== null &&
+            $detailIndex !== ''
+        ) {
+            $supplementaryDetails = array_values(array_slice($applicant->referral->referral_details ?? [], 1));
+            $resolvedIndex = (int) $detailIndex;
+            $printDetail = $supplementaryDetails[$resolvedIndex] ?? null;
+
+            if (! is_array($printDetail)) {
+                return back()->with('error', 'Referral detail not found.');
+            }
         }
 
         if (
@@ -237,6 +307,15 @@ class ReferralController extends Controller
             ? 'referral.other-city-municipality'
             : 'referral.letter';
 
-        return view($view, compact('applicant'));
+        return view($view, compact('applicant', 'printDetail'));
+    }
+
+    private function incrementImusOcrl(string $value): string
+    {
+        if (preg_match('/^(\d{4})-(\d{5})$/', $value, $matches)) {
+            return sprintf('%d-%05d', (int) $matches[1], ((int) $matches[2]) + 1);
+        }
+
+        return MayorsReferral::generateNextImusOcrl();
     }
 }

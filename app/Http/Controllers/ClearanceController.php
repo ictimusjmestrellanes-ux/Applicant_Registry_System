@@ -205,7 +205,7 @@ class ClearanceController extends Controller
         }
 
         return redirect()
-            ->route('applicants.edit', $applicant->id)
+            ->to(route('applicants.edit', $applicant->id).'#clearance')
             ->with('success', 'Clearance updated successfully.');
     }
 

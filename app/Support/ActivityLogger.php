@@ -50,6 +50,7 @@ class ActivityLogger
     {
         return match (true) {
             is_string($value) => trim($value),
+            is_array($value) => json_encode($value),
             default => $value,
         };
     }
@@ -62,6 +63,12 @@ class ActivityLogger
 
         if (is_bool($value)) {
             return $value ? 'Yes' : 'No';
+        }
+
+        if (is_array($value)) {
+            $encoded = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            return $encoded === false || $encoded === '[]' ? null : $encoded;
         }
 
         if (is_string($value) && str_contains($value, '/')) {
