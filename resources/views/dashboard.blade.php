@@ -93,7 +93,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">Sex Distribution Chart</h5>
+                            <h5 class="section-title mb-1">Gender Chart</h5>
                             <p class="section-copy mb-0">Male and female applicant distribution.</p>
                         </div>
                     </div>
@@ -110,7 +110,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">PWD Distribution Chart</h5>
+                            <h5 class="section-title mb-1">PWD</h5>
                             <p class="section-copy mb-0">Applicants marked as PWD:</p>
                         </div>
                     </div>
@@ -127,8 +127,8 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">4Ps Distribution Chart</h5>
-                            <p class="section-copy mb-0">Applicants enrolled in 4Ps:</p>
+                            <h5 class="section-title mb-1">4Ps</h5>
+                            <p class="section-copy mb-0">Applicants marked as 4Ps:</p>
                         </div>
                     </div>
 
@@ -146,7 +146,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">City Column Chart</h5>
+                            <h5 class="section-title mb-1">City Chart</h5>
                             <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
                         </div>
                     </div>
@@ -163,7 +163,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">Province Column Chart</h5>
+                            <h5 class="section-title mb-1">Province Chart</h5>
                             <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
                         </div>
                     </div>

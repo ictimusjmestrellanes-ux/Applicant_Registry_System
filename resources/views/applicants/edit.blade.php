@@ -2161,6 +2161,14 @@
                                                 Print Employer Detail
                                             </a>
                                         </div>
+                                    @else
+                                        <div class="mt-3">
+                                            <button type="button" id="printReferralPesoButton"
+                                                class="btn btn-outline-secondary px-4 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
+                                                disabled>
+                                                <i class="fas fa-print me-1"></i> Print Employer Detail
+                                            </button>
+                                        </div>
                                     @endif
 
                                     <div class="js-peso-extra-details mt-4 d-grid gap-3">
@@ -2211,12 +2219,12 @@
                                                 <div class="mt-3 d-flex flex-wrap gap-2">
                                                     @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
                                                         <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
-                                                            class="btn btn-outline-primary btn-sm" target="_blank">
+                                                            class="btn btn-outline-primary px-4" target="_blank">
                                                             <i class="fas fa-print me-1"></i> Print Employer Detail
                                                             {{ $extraIndex + 2 }}
                                                         </a>
                                                     @else
-                                                        <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                        <button type="button" class="btn btn-outline-primary px-4" disabled>
                                                             <i class="fas fa-print me-1"></i> Print Employer Detail
                                                             {{ $extraIndex + 2 }}
                                                         </button>
@@ -2281,7 +2289,7 @@
                                                 </div>
                                             </div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled
+                                                <button type="button" class="btn btn-outline-primary px-4" disabled
                                                     title="Complete the employer detail fields first">
                                                     <i class="fas fa-print me-1"></i> Print Employer Detail
                                                 </button>
@@ -2367,6 +2375,12 @@
                             @elseif(!auth()->user()->hasPermission('generate_referral'))
                                 <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
                                     No permission to generate referral letter
+                                </button>
+                            @else
+                                <button type="button" id="printReferralOtherCityButton"
+                                    class="btn btn-outline-secondary px-4 ms-2 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}"
+                                    disabled>
+                                    <i class="fas fa-print me-1"></i> Print Referral Outside Imus
                                 </button>
                             @endif
                         </div>
