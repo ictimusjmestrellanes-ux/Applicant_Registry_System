@@ -547,6 +547,11 @@
             gap: 0.5rem;
         }
 
+        .peso-extra-detail-card .row {
+            --bs-gutter-x: 0.85rem;
+            --bs-gutter-y: 0.85rem;
+        }
+
         .referral-pane .referral-action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -1081,6 +1086,25 @@
                 width: 100%;
                 max-width: 100%;
                 flex: 0 0 100%;
+            }
+
+            .peso-extra-detail-card {
+                padding: 1rem !important;
+            }
+
+            .peso-extra-detail-card .d-flex.align-items-center.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            .peso-extra-detail-card .js-remove-peso-detail {
+                align-self: flex-end;
+            }
+
+            .peso-extra-detail-card .btn,
+            .peso-extra-detail-card .btn-outline-primary,
+            .peso-extra-detail-card .btn-outline-secondary {
+                width: 100%;
             }
 
             .referral-pane .referral-letter-shell {

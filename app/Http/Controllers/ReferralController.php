@@ -100,10 +100,22 @@ class ReferralController extends Controller
             $existingDetails = array_values(array_slice($referral->referral_details ?? [], 1));
             $submittedDetails = array_values($request->input('referral_details', []));
             $submittedFiles = array_values($request->file('referral_details', []));
-            $hasPesoDetailRequirements = fn (array $detail) => MayorsReferral::hasPesoDetailRequirements($detail);
+            $primaryDetail = [
+                'ref_employer_name' => $request->ref_employer_name,
+                'ref_position' => $request->ref_position,
+                'ref_place' => $request->ref_place,
+                'ref_hired_company' => $request->ref_hired_company,
+            ];
+
+            $primaryHasRequirements = MayorsReferral::hasPesoDetailRequirements($primaryDetail);
+            $primaryOcrl = trim((string) ($request->ref_imus_ocrl ?? $referral->ref_imus_ocrl ?? ''));
+
+            if ($primaryHasRequirements) {
+                $primaryOcrl = $allocateImusOcrl($primaryOcrl);
+            }
 
             $primaryDetails = [
-                'ref_imus_ocrl' => $allocateImusOcrl($request->ref_imus_ocrl),
+                'ref_imus_ocrl' => $primaryOcrl,
                 'ref_employer_name' => $request->ref_employer_name,
                 'ref_position' => $request->ref_position,
                 'ref_or_no' => $request->ref_or_no,
@@ -149,7 +161,7 @@ class ReferralController extends Controller
                 ->filter(fn (array $detail) => collect($detail)->contains(fn ($value) => trim((string) $value) !== ''))
                 ->values()
                 ->map(fn (array $detail) => [
-                    'ref_imus_ocrl' => $allocateImusOcrl($detail['ref_imus_ocrl'] ?? null),
+                    'ref_imus_ocrl' => trim((string) ($detail['ref_imus_ocrl'] ?? '')),
                     'ref_employer_name' => $detail['ref_employer_name'] ?? '',
                     'ref_position' => $detail['ref_position'] ?? '',
                     'ref_place' => $detail['ref_place'] ?? '',
