@@ -159,7 +159,9 @@ class ClearanceController extends Controller
         $clearance->clearance_or_no = $request->clearance_or_no;
         $clearance->clearance_issued_on = $request->clearance_issued_on;
 
-        $clearance->clearance_peso_control_no = $request->clearance_peso_control_no;
+        $clearance->clearance_peso_control_no = $request->filled('clearance_peso_control_no')
+            ? $request->clearance_peso_control_no
+            : $clearance->clearance_peso_control_no;
         $clearance->clearance_doc_stamp_control_no = $request->clearance_doc_stamp_control_no;
         $clearance->clearance_date_of_payment = $request->clearance_date_of_payment;
 
@@ -173,7 +175,7 @@ class ClearanceController extends Controller
 
         $clearance->save();
 
-        if (empty($clearance->clearance_peso_control_no)) {
+        if (empty($clearance->clearance_peso_control_no) && $clearance->isReadyForControlNumber()) {
             $year = date('Y');
 
             $latest = MayorsClearance::whereYear('created_at', $year)

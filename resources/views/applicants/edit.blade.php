@@ -1848,7 +1848,7 @@
                                         class="required-mark">*</span></label>
                                 <input type="text" name="clearance_peso_control_no" class="form-control"
                                     style="text-align: center" value="{{ $clearance->clearance_peso_control_no }}"
-                                    placeholder="Auto generate when complete" disabled>
+                                    placeholder="Auto generate when complete" readonly>
                             </div>
 
                             {{-- Official Receipt No --}}
@@ -2099,6 +2099,7 @@
                                             <label class="form-label">Employer Name<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_employer_name" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
                                                 value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
                                         </div>
 
@@ -2106,6 +2107,7 @@
                                             <label class="form-label">Employer Position<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_position" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
                                                 value="{{ old('ref_position', $referral->ref_position ?? '') }}">
                                         </div>
 
@@ -2121,6 +2123,7 @@
                                             <label class="form-label">Hired Company<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_hired_company" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
                                                 value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
                                         </div>
                                     </div>
@@ -2187,11 +2190,19 @@
                                                     </div>
                                                 </div>
                                                 <div class="mt-3 d-flex flex-wrap gap-2">
-                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
-                                                        class="btn btn-outline-primary btn-sm" target="_blank">
-                                                        <i class="fas fa-print me-1"></i> Print Employer Detail
-                                                        {{ $extraIndex + 2 }}
-                                                    </a>
+                                                    @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
+                                                        <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
+                                                            class="btn btn-outline-primary btn-sm" target="_blank">
+                                                            <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                            {{ $extraIndex + 2 }}
+                                                        </a>
+                                                    @else
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm" disabled
+                                                            title="Complete the referral requirements first">
+                                                            <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                            {{ $extraIndex + 2 }}
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </div>
                                         @endforeach
@@ -2211,7 +2222,7 @@
                                             class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
                                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                                 <span class="badge bg-primary-subtle text-primary">Employer
-                                                    Detail</span>
+                                                    Detail </span>
                                                 <button type="button"
                                                     class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
                                                     <i class="fas fa-trash-alt me-1"></i>Remove
@@ -2251,10 +2262,10 @@
                                                 </div>
                                             </div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
-                                                <span class="btn btn-outline-secondary btn-sm disabled">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled
+                                                    title="Complete the employer detail fields first">
                                                     <i class="fas fa-print me-1"></i> Print Employer Detail
-                                                    {{ $extraIndex + 2 }}
-                                                </span>
+                                                </button>
                                             </div>
                                         </div>
                                     </template>

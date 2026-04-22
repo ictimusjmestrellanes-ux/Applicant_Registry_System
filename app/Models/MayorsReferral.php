@@ -116,6 +116,39 @@ class MayorsReferral extends Model
         return false;
     }
 
+    public static function hasPesoDetailRequirements(array $detail): bool
+    {
+        return ! empty(trim((string) ($detail['ref_employer_name'] ?? '')))
+            && ! empty(trim((string) ($detail['ref_position'] ?? '')))
+            && ! empty(trim((string) ($detail['ref_place'] ?? '')))
+            && ! empty(trim((string) ($detail['ref_hired_company'] ?? '')));
+    }
+
+    public static function hasPrintablePesoDetail(array $detail): bool
+    {
+        return static::hasPesoDetailRequirements($detail)
+            && ! empty(trim((string) ($detail['ref_imus_ocrl'] ?? '')));
+    }
+
+    public function hasCompletePesoExtraDetails(): bool
+    {
+        if ($this->referral_type !== self::TYPE_PESO_OFFICE) {
+            return true;
+        }
+
+        $supplementaryDetails = array_values(array_slice($this->referral_details ?? [], 1));
+
+        foreach ($supplementaryDetails as $detail) {
+            $detail = is_array($detail) ? $detail : [];
+
+            if (collect($detail)->contains(fn ($value) => trim((string) $value) !== '') && ! static::hasPrintablePesoDetail($detail)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function canPrint(): bool
     {
         return $this->isComplete();
@@ -137,6 +170,6 @@ class MayorsReferral extends Model
             || ! empty($this->ref_police_clearance)
             || ! empty($this->ref_nbi_clearance);
 
-        return $hasProfile && $hasClearance && $this->hasRequiredDetails();
+        return $hasProfile && $hasClearance && $this->hasRequiredDetails() && $this->hasCompletePesoExtraDetails();
     }
 }

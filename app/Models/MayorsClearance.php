@@ -45,4 +45,19 @@ class MayorsClearance extends Model
             ! empty($this->clearance_date_of_payment) &&
             ! empty($this->clearance_hired_company);
     }
+
+    public function isReadyForControlNumber(): bool
+    {
+        return
+            ! empty($this->prosecutor_clearance) &&
+            ! empty($this->mtc_clearance) &&
+            ! empty($this->rtc_clearance) &&
+            ! empty($this->nbi_clearance) &&
+            ! empty($this->barangay_clearance) &&
+            ! empty($this->clearance_or_no) &&
+            ! empty($this->clearance_issued_on) &&
+            ! empty($this->clearance_doc_stamp_control_no) &&
+            ! empty($this->clearance_date_of_payment) &&
+            ! empty($this->clearance_hired_company);
+    }
 }

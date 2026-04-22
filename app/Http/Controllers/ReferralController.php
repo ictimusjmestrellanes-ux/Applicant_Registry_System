@@ -100,6 +100,7 @@ class ReferralController extends Controller
             $existingDetails = array_values(array_slice($referral->referral_details ?? [], 1));
             $submittedDetails = array_values($request->input('referral_details', []));
             $submittedFiles = array_values($request->file('referral_details', []));
+            $hasPesoDetailRequirements = fn (array $detail) => MayorsReferral::hasPesoDetailRequirements($detail);
 
             $primaryDetails = [
                 'ref_imus_ocrl' => $allocateImusOcrl($request->ref_imus_ocrl),
@@ -129,8 +130,15 @@ class ReferralController extends Controller
                         $attachmentPath = $uploadedAttachment->storeAs('referrals/extra-details', $fileName, 'public');
                     }
 
+                    $detailHasRequirements = MayorsReferral::hasPesoDetailRequirements($detail);
+                    $detailOcrl = trim((string) ($detail['ref_imus_ocrl'] ?? $existingDetail['ref_imus_ocrl'] ?? ''));
+
+                    if ($detailHasRequirements) {
+                        $detailOcrl = $allocateImusOcrl($detailOcrl);
+                    }
+
                     return [
-                        'ref_imus_ocrl' => trim((string) ($detail['ref_imus_ocrl'] ?? '')),
+                        'ref_imus_ocrl' => $detailOcrl,
                         'ref_employer_name' => trim((string) ($detail['ref_employer_name'] ?? '')),
                         'ref_position' => trim((string) ($detail['ref_position'] ?? '')),
                         'ref_place' => trim((string) ($detail['ref_place'] ?? '')),
@@ -273,6 +281,10 @@ class ReferralController extends Controller
 
             if (! is_array($printDetail)) {
                 return back()->with('error', 'Referral detail not found.');
+            }
+
+            if (! MayorsReferral::hasPrintablePesoDetail($printDetail)) {
+                return back()->with('error', 'Referral detail is incomplete.');
             }
         }
 
