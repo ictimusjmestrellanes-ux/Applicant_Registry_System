@@ -17,7 +17,7 @@
             </div>
         </section>
 
-        <section class="row g-4 mb-4">
+        <section class="row g-3 mb-4">
             <div class="col-xl-3 col-md-6">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-blue">
@@ -42,27 +42,28 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="metric-card h-100">
-                    <div class="metric-icon icon-amber">
-                        <i class="bi bi-folder2-open"></i>
-                    </div>
-                    <div>
-                        <div class="metric-label">Archived Applicants</div>
-                        <div class="metric-value">{{ number_format($summary['archivedApplicants']) }}</div>
-                        <div class="metric-note">Stored outside the active list</div>
-                    </div>
-                </div>
-            </div>
+
             <div class="col-xl-3 col-md-6">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-slate">
                         <i class="bi bi-person-badge-fill"></i>
                     </div>
                     <div>
-                        <div class="metric-label">System Users</div>
-                        <div class="metric-value">{{ number_format($summary['totalUsers']) }}</div>
-                        <div class="metric-note">Users with dashboard access</div>
+                        <div class="metric-label">Total Clearance</div>
+                        <div class="metric-value">{{ number_format($summary['totalClearances']) }}</div>
+                        <div class="metric-note">Clearance with clearance records</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="metric-card h-100">
+                    <div class="metric-icon icon-amber">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                    <div>
+                        <div class="metric-label">Total Referral</div>
+                        <div class="metric-value">{{ number_format($summary['totalReferrals']) }}</div>
+                        <div class="metric-note">Including extra employer details</div>
                     </div>
                 </div>
             </div>
@@ -92,7 +93,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">Sex Pie Chart</h5>
+                            <h5 class="section-title mb-1">Sex Distribution Chart</h5>
                             <p class="section-copy mb-0">Male and female applicant distribution.</p>
                         </div>
                     </div>
@@ -109,8 +110,8 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">PWD Pie Chart</h5>
-                            <p class="section-copy mb-0">Applicants marked as PWD: Yes versus No.</p>
+                            <h5 class="section-title mb-1">PWD Distribution Chart</h5>
+                            <p class="section-copy mb-0">Applicants marked as PWD:</p>
                         </div>
                     </div>
 
@@ -126,8 +127,8 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">4Ps Pie Chart</h5>
-                            <p class="section-copy mb-0">Applicants enrolled in 4Ps: Yes versus No.</p>
+                            <h5 class="section-title mb-1">4Ps Distribution Chart</h5>
+                            <p class="section-copy mb-0">Applicants enrolled in 4Ps:</p>
                         </div>
                     </div>
 

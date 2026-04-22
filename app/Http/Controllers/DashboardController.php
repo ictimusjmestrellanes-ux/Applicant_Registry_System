@@ -93,7 +93,31 @@ class DashboardController extends Controller
             ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->count();
-        $archivedApplicants = Applicant::onlyTrashed()->count();
+        $totalClearances = Applicant::query()
+            ->whereHas('clearance', function ($query) {
+                $query->whereNotNull('clearance_peso_control_no');
+            })
+            ->count();
+        $totalReferrals = $applicants->sum(function (Applicant $applicant) {
+            $referral = $applicant->referral;
+
+            if (! $referral) {
+                return 0;
+            }
+
+            $count = ! empty($referral->ref_imus_ocrl) ? 1 : 0;
+            $details = is_array($referral->referral_details ?? null) ? array_slice($referral->referral_details, 1) : [];
+
+            foreach ($details as $detail) {
+                $detail = is_array($detail) ? $detail : [];
+
+                if (! empty(trim((string) ($detail['ref_imus_ocrl'] ?? '')))) {
+                    $count += 1;
+                }
+            }
+
+            return $count;
+        });
 
         $completePermitCount = $applicants->filter(fn (Applicant $applicant) => $applicant->isPermitComplete())->count();
         $completeClearanceCount = $applicants->filter(fn (Applicant $applicant) => $applicant->isClearanceComplete())->count();
@@ -122,7 +146,8 @@ class DashboardController extends Controller
         $summary = [
             'totalApplicants' => $totalApplicants,
             'newThisMonth' => $newThisMonth,
-            'archivedApplicants' => $archivedApplicants,
+            'totalClearances' => $totalClearances,
+            'totalReferrals' => $totalReferrals,
             'fullyReadyCount' => $fullyReadyCount,
             'totalUsers' => User::count(),
         ];
