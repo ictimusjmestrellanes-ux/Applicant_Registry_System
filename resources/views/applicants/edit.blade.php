@@ -15,11 +15,11 @@
                     title: 'Applicant Successfully Created',
                     html: `
 
-                                                                            <div style="font-size:14px;">
-                                                                                <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                            </div>
-                                                                            `,
+                                                                                    <div style="font-size:14px;">
+                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                    </div>
+                                                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -2123,7 +2123,7 @@
                                             <label class="form-label">Employer Name<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_employer_name" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
+                                                oninput="this.value = this.value.toUpperCase()"
                                                 value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
                                         </div>
 
@@ -2131,7 +2131,7 @@
                                             <label class="form-label">Employer Position<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_position" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
+                                                oninput="this.value = this.value.toUpperCase()"
                                                 value="{{ old('ref_position', $referral->ref_position ?? '') }}">
                                         </div>
 
@@ -2147,7 +2147,7 @@
                                             <label class="form-label">Hired Company<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_hired_company" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
+                                                oninput="this.value = this.value.toUpperCase()"
                                                 value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
                                         </div>
                                     </div>
@@ -2165,15 +2165,10 @@
 
                                     <div class="js-peso-extra-details mt-4 d-grid gap-3">
                                         @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
-                                            <div
-                                                class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                            <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
                                                 <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                                     <span class="badge bg-primary-subtle text-primary">Employer Detail
                                                         {{ $extraIndex + 2 }}</span>
-                                                    <button type="button"
-                                                        class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
-                                                        <i class="fas fa-trash-alt me-1"></i>Remove
-                                                    </button>
                                                 </div>
                                                 <div class="row g-3">
                                                     <div class="col-md-2">
@@ -2221,12 +2216,15 @@
                                                             {{ $extraIndex + 2 }}
                                                         </a>
                                                     @else
-                                                        <button type="button" class="btn btn-outline-secondary btn-sm" disabled
-                                                            title="Complete the referral requirements first">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
                                                             <i class="fas fa-print me-1"></i> Print Employer Detail
                                                             {{ $extraIndex + 2 }}
                                                         </button>
                                                     @endif
+                                                    <button type="button"
+                                                        class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
+                                                        <i class="fas fa-trash-alt me-1"></i>Remove
+                                                    </button>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -2247,10 +2245,7 @@
                                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                                 <span class="badge bg-primary-subtle text-primary">Employer
                                                     Detail </span>
-                                                <button type="button"
-                                                    class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
-                                                    <i class="fas fa-trash-alt me-1"></i>Remove
-                                                </button>
+                                                
                                             </div>
                                             <div class="row g-3">
                                                 <div class="col-md-2">
@@ -2289,6 +2284,10 @@
                                                 <button type="button" class="btn btn-outline-secondary btn-sm" disabled
                                                     title="Complete the employer detail fields first">
                                                     <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
+                                                    <i class="fas fa-trash-alt me-1"></i>Remove
                                                 </button>
                                             </div>
                                         </div>
