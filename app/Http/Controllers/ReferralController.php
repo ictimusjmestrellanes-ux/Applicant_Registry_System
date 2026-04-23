@@ -279,11 +279,16 @@ class ReferralController extends Controller
             return back()->with('error', 'Referral is not complete.');
         }
 
+        $printType = $request->query('type', $applicant->referral->referral_type);
+        if (! in_array($printType, [MayorsReferral::TYPE_PESO_OFFICE, MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT], true)) {
+            $printType = $applicant->referral->referral_type;
+        }
+
         $printDetail = null;
         $detailIndex = $request->query('detail');
 
         if (
-            $applicant->referral->referral_type === MayorsReferral::TYPE_PESO_OFFICE &&
+            $printType === MayorsReferral::TYPE_PESO_OFFICE &&
             $detailIndex !== null &&
             $detailIndex !== ''
         ) {
@@ -301,7 +306,7 @@ class ReferralController extends Controller
         }
 
         if (
-            $applicant->referral->referral_type === MayorsReferral::TYPE_PESO_OFFICE &&
+            $printType === MayorsReferral::TYPE_PESO_OFFICE &&
             empty($applicant->referral->ref_imus_ocrl)
         ) {
             $applicant->referral->ref_imus_ocrl = MayorsReferral::generateNextImusOcrl();
@@ -310,7 +315,7 @@ class ReferralController extends Controller
         }
 
         if (
-            $applicant->referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT &&
+            $printType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT &&
             empty($applicant->referral->ref_ocrl)
         ) {
             $applicant->referral->ref_ocrl = MayorsReferral::generateNextOcrl();
@@ -327,7 +332,7 @@ class ReferralController extends Controller
             request()->user()
         );
 
-        $view = $applicant->referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT
+        $view = $printType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT
             ? 'referral.other-city-municipality'
             : 'referral.letter';
 

@@ -15,11 +15,11 @@
                     title: 'Applicant Successfully Created',
                     html: `
 
-                                                                                    <div style="font-size:14px;">
-                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                    </div>
-                                                                                    `,
+                                                                                                    <div style="font-size:14px;">
+                                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                    </div>
+                                                                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -2104,6 +2104,9 @@
                                 <div id="pesoOfficeFields" data-referral-group="peso"
                                     class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
                                     <div class="row g-3">
+                                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                            <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
+                                        </div>
                                         <div class="col-md-2">
                                             <label class="form-label">Peso OCRL (Auto Generate)<span
                                                     class="required-mark">*</span></label>
@@ -2154,9 +2157,8 @@
 
                                     @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
                                         <div class="mt-3">
-                                            <a href="{{ route('referrals.printLetter', $applicant->id) }}"
-                                                id="printReferralPesoButton"
-                                                class="btn btn-outline-primary px-4 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
+                                            <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
+                                                id="printReferralPesoButton" class="btn btn-outline-primary px-4"
                                                 target="_blank">
                                                 Print Employer Detail
                                             </a>
@@ -2164,8 +2166,7 @@
                                     @else
                                         <div class="mt-3">
                                             <button type="button" id="printReferralPesoButton"
-                                                class="btn btn-outline-secondary px-4 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
-                                                disabled>
+                                                class="btn btn-outline-secondary px-4" disabled>
                                                 <i class="fas fa-print me-1"></i> Print Employer Detail
                                             </button>
                                         </div>
@@ -2173,7 +2174,8 @@
 
                                     <div class="js-peso-extra-details mt-4 d-grid gap-3">
                                         @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
-                                            <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                            <div
+                                                class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
                                                 <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                                     <span class="badge bg-primary-subtle text-primary">Employer Detail
                                                         {{ $extraIndex + 2 }}</span>
@@ -2253,7 +2255,7 @@
                                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                                                 <span class="badge bg-primary-subtle text-primary">Employer
                                                     Detail </span>
-                                                
+
                                             </div>
                                             <div class="row g-3">
                                                 <div class="col-md-2">
@@ -2349,6 +2351,23 @@
                                                 class="form-control" list="refCompanyAddressList" autocomplete="off"
                                                 value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
                                         </div>
+
+                                        @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                            <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
+                                                id="printReferralOtherCityButton" class="btn btn-outline-primary"
+                                                target="_blank">
+                                                Print Referral Outside Imus
+                                            </a>
+                                        @elseif(!auth()->user()->hasPermission('generate_referral'))
+                                            <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
+                                                No permission to generate referral letter
+                                            </button>
+                                        @else
+                                            <button type="button" id="printReferralOtherCityButton"
+                                                class="btn btn-outline-secondary px-4 ms-2" disabled>
+                                                <i class="fas fa-print me-1"></i> Print Referral Outside Imus
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2363,24 +2382,6 @@
                             @else
                                 <button type="button" class="btn btn-secondary px-5" disabled>
                                     No permission to update referral
-                                </button>
-                            @endif
-
-                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                <a href="{{ route('referrals.printLetter', $applicant->id) }}" id="printReferralOtherCityButton"
-                                    class="btn btn-outline-primary px-4 ms-2 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}"
-                                    target="_blank">
-                                    Print Referral Outside Imus
-                                </a>
-                            @elseif(!auth()->user()->hasPermission('generate_referral'))
-                                <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
-                                    No permission to generate referral letter
-                                </button>
-                            @else
-                                <button type="button" id="printReferralOtherCityButton"
-                                    class="btn btn-outline-secondary px-4 ms-2 {{ ($referral->referral_type ?? null) === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}"
-                                    disabled>
-                                    <i class="fas fa-print me-1"></i> Print Referral Outside Imus
                                 </button>
                             @endif
                         </div>
@@ -2402,7 +2403,6 @@
         const pesoExtraDetails = pesoOfficeFields ? pesoOfficeFields.querySelector(".js-peso-extra-details") : null;
         const printReferralPesoButton = document.getElementById("printReferralPesoButton");
         const printReferralOtherCityButton = document.getElementById("printReferralOtherCityButton");
-        const savedReferralType = `{{ $referral->referral_type ?? '' }}`;
         const referralForm = referralTypeSelect ? referralTypeSelect.closest("form") : null;
         let nextPesoDetailIndex = pesoExtraDetails ? pesoExtraDetails.querySelectorAll(".js-peso-extra-detail").length : 0;
 
@@ -2473,20 +2473,6 @@
                     "d-none",
                     !isOtherCity
                 );
-
-                if (printReferralPesoButton) {
-                    printReferralPesoButton.classList.toggle(
-                        "d-none",
-                        !isPesoOffice || savedReferralType !== "{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}"
-                    );
-                }
-
-                if (printReferralOtherCityButton) {
-                    printReferralOtherCityButton.classList.toggle(
-                        "d-none",
-                        !isOtherCity || savedReferralType !== "{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}"
-                    );
-                }
 
                 setGroupDisabledState(pesoOfficeFields, !isPesoOffice);
                 setGroupDisabledState(otherCityFields, !isOtherCity);
