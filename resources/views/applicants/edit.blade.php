@@ -15,11 +15,11 @@
                     title: 'Applicant Successfully Created',
                     html: `
 
-                                                                                                                                                    <div style="font-size:14px;">
-                                                                                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                                                    </div>
-                                                                                                                                                    `,
+                                                                                                                                                                            <div style="font-size:14px;">
+                                                                                                                                                                                <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                                                                                                <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                                                                                            </div>
+                                                                                                                                                                            `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -2147,73 +2147,80 @@
 
                             <div id="pesoOfficeFields" data-referral-group="peso"
                                 class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
-                                <div class="row g-3">
-                                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                        <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Peso OCRL (Auto Generate)<span
-                                                class="required-mark">*</span></label>
-                                        <input type="text" name="ref_imus_ocrl" class="form-control"
-                                            style="text-align: center"
-                                            value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
-                                            placeholder="Auto generate when complete" readonly>
-                                    </div>
+                                <div class="js-peso-extra-details mt-4 d-grid gap-3">
+                                    <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                            <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-2">
+                                                <label class="form-label">Peso OCRL (Auto Generate)<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_imus_ocrl" class="form-control"
+                                                    style="text-align: center"
+                                                    value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
+                                                    placeholder="Auto generate when complete" readonly>
+                                            </div>
 
-                                    <div class="col-md-2">
-                                        <label class="form-label">Employer Name<span class="required-mark">*</span></label>
-                                        <input type="text" name="ref_employer_name" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
-                                            value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
-                                    </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Employer Name<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_employer_name" class="form-control"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
+                                            </div>
 
-                                    <div class="col-md-2">
-                                        <label class="form-label">Employer Position<span
-                                                class="required-mark">*</span></label>
-                                        <input type="text" name="ref_position" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
-                                            value="{{ old('ref_position', $referral->ref_position ?? '') }}">
-                                    </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Employer Position<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_position" class="form-control"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    value="{{ old('ref_position', $referral->ref_position ?? '') }}">
+                                            </div>
 
-                                    <div class="col-md-2">
-                                        <label class="form-label"> City Address<span class="required-mark">*</span></label>
-                                        <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
-                                            list="refPlaceOptions"
-                                            value="{{ old('ref_place', $referral->ref_place ?? '') }}"
-                                            oninput="this.value = this.value.toUpperCase()"
-                                            placeholder="Search City Address">
-                                        <datalist id="refPlaceOptions"></datalist>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Province</label>
-                                        <input type="text" name="ref_province" id="refProvinceInput" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
-                                            value="{{ old('ref_province', $referral->ref_province ?? '') }}"
-                                            placeholder="Enter Province">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Hired Company<span class="required-mark">*</span></label>
-                                        <input type="text" name="ref_hired_company" class="form-control"
-                                            oninput="this.value = this.value.toUpperCase()"
-                                            value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
+                                            <div class="col-md-2">
+                                                <label class="form-label"> City Address<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
+                                                    list="refPlaceOptions"
+                                                    value="{{ old('ref_place', $referral->ref_place ?? '') }}"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    placeholder="Search City Address">
+                                                <datalist id="refPlaceOptions"></datalist>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Province</label>
+                                                <input type="text" name="ref_province" id="refProvinceInput"
+                                                    class="form-control" oninput="this.value = this.value.toUpperCase()"
+                                                    value="{{ old('ref_province', $referral->ref_province ?? '') }}"
+                                                    placeholder="Enter Province">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Hired Company<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" name="ref_hired_company" class="form-control"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
+                                            </div>
+                                        </div>
+                                        @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                            <div class="mt-3">
+                                                <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
+                                                    id="printReferralPesoButton" class="btn btn-outline-primary px-4"
+                                                    target="_blank">
+                                                    View Employer Detail 1
+                                                </a>
+                                            </div>
+                                        @else
+                                            <div class="mt-3">
+                                                <button type="button" id="printReferralPesoButton"
+                                                    class="btn btn-outline-secondary justify-content-center px-4" disabled>
+                                                    <i class="fas fa-print me-1"></i> View Employer Detail 1
+                                                </button>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
-
-                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                    <div class="mt-3">
-                                        <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
-                                            id="printReferralPesoButton" class="btn btn-outline-primary px-4" target="_blank">
-                                            View Employer Detail 1
-                                        </a>
-                                    </div>
-                                @else
-                                    <div class="mt-3">
-                                        <button type="button" id="printReferralPesoButton"
-                                            class="btn btn-outline-secondary justify-content-center px-4" disabled>
-                                            <i class="fas fa-print me-1"></i> View Employer Detail 1
-                                        </button>
-                                    </div>
-                                @endif
 
                                 <div class="js-peso-extra-details mt-4 d-grid gap-3">
                                     @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
@@ -2422,16 +2429,19 @@
                                         <div class="d-flex flex-wrap gap-2 mt-3">
                                             @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
                                                 <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
-                                                    id="printReferralOtherCityButton" class="btn btn-outline-primary px-4" target="_blank">
+                                                    id="printReferralOtherCityButton" class="btn btn-outline-primary px-4"
+                                                    target="_blank">
                                                     <i class="fas fa-print me-1"></i> View Referral Letter
                                                 </a>
                                             @elseif(!auth()->user()->hasPermission('generate_referral'))
-                                                <button type="button" class="btn btn-outline-secondary px-4" disabled title="No permission to view referral letter">
+                                                <button type="button" class="btn btn-outline-secondary px-4" disabled
+                                                    title="No permission to view referral letter">
                                                     <i class="fas fa-print me-1"></i> No Permission
                                                 </button>
                                             @else
                                                 <button type="button" id="printReferralOtherCityButton"
-                                                    class="btn btn-outline-secondary px-4" disabled title="Complete all requirements first">
+                                                    class="btn btn-outline-secondary px-4" disabled
+                                                    title="Complete all requirements first">
                                                     <i class="fas fa-print me-1"></i> View Referral Letter
                                                 </button>
                                             @endif
