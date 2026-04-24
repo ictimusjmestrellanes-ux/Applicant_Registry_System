@@ -257,7 +257,10 @@
         $recipientName = strtoupper($printDetail['ref_employer_name'] ?? $referral->ref_employer_name);
         $recipientTitle = $printDetail['ref_position'] ?? $referral->ref_position;
         $companyName = strtoupper($printDetail['ref_hired_company'] ?? $referral->ref_hired_company);
-        $recipientAddress = $printDetail['ref_place'] ?? $referral->ref_place;
+        $recipientAddress = trim(collect([
+            $printDetail['ref_place'] ?? $referral->ref_place,
+            $printDetail['ref_province'] ?? $referral->ref_province,
+        ])->filter()->implode(', '));
         $letterDate = now()->format('F d, Y');
         $letterYear = now()->format('Y');
         $referralNumber = $printDetail['ref_imus_ocrl'] ?? $referral->ref_imus_ocrl;

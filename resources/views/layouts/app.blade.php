@@ -94,12 +94,14 @@
 
 <body>
     <div id="sidebar-overlay"></div>
+    
+    <button id="sidebarToggle" class="btn-toggle-sidebar d-lg-none" type="button" aria-label="Toggle sidebar">
+        <i class="bi bi-list"></i>
+    </button>
 
     @include('partials.sidebar')
 
     <div class="main-content">
-        @include('partials.navbar')
-
         <div class="content">
             @yield('content')
         </div>
@@ -114,6 +116,7 @@
         function toggleSidebar() {
             $('.sidebar').toggleClass('active');
             $('#sidebar-overlay').toggleClass('active');
+            $('#sidebarToggle').toggleClass('sidebar-open');
         }
 
         $(document).ready(function () {

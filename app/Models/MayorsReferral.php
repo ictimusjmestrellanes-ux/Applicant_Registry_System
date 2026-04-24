@@ -25,6 +25,7 @@ class MayorsReferral extends Model
         'ref_position',
         'ref_company_address',
         'ref_hired_company',
+        'ref_province',
 
         'ref_recipient',
         'ref_place',
@@ -100,6 +101,7 @@ class MayorsReferral extends Model
             return ! empty($this->ref_employer_name)
                 && ! empty($this->ref_position)
                 && ! empty($this->ref_place)
+                && ! empty($this->ref_province)
                 && ! empty($this->ref_hired_company);
         }
 
@@ -117,6 +119,7 @@ class MayorsReferral extends Model
         return ! empty(trim((string) ($detail['ref_employer_name'] ?? '')))
             && ! empty(trim((string) ($detail['ref_position'] ?? '')))
             && ! empty(trim((string) ($detail['ref_place'] ?? '')))
+            && ! empty(trim((string) ($detail['ref_province'] ?? '')))
             && ! empty(trim((string) ($detail['ref_hired_company'] ?? '')));
     }
 

@@ -74,6 +74,29 @@ class ReferralController extends Controller
             $referral->{$field} = $file->storeAs($directory, $fileName, 'public');
         }
 
+        $clearanceFields = [
+            'ref_barangay_clearance',
+            'ref_police_clearance',
+            'ref_nbi_clearance',
+        ];
+
+        $uploadedClearanceField = collect($clearanceFields)
+            ->first(fn (string $field) => $request->hasFile($field));
+
+        if ($uploadedClearanceField) {
+            foreach ($clearanceFields as $field) {
+                if ($field === $uploadedClearanceField) {
+                    continue;
+                }
+
+                if (! empty($referral->{$field})) {
+                    Storage::disk('public')->delete($referral->{$field});
+                }
+
+                $referral->{$field} = '';
+            }
+        }
+
         $nextImusOcrl = null;
         $allocateImusOcrl = function ($value = null) use (&$nextImusOcrl) {
             $value = trim((string) $value);
@@ -104,6 +127,7 @@ class ReferralController extends Controller
                 'ref_employer_name' => $request->ref_employer_name,
                 'ref_position' => $request->ref_position,
                 'ref_place' => $request->ref_place,
+                'ref_province' => $request->ref_province,
                 'ref_hired_company' => $request->ref_hired_company,
             ];
 
@@ -119,6 +143,7 @@ class ReferralController extends Controller
                 'ref_employer_name' => $request->ref_employer_name,
                 'ref_position' => $request->ref_position,
                 'ref_place' => $request->ref_place,
+                'ref_province' => $request->ref_province,
                 'ref_hired_company' => $request->ref_hired_company,
             ];
 
@@ -153,6 +178,7 @@ class ReferralController extends Controller
                         'ref_employer_name' => trim((string) ($detail['ref_employer_name'] ?? '')),
                         'ref_position' => trim((string) ($detail['ref_position'] ?? '')),
                         'ref_place' => trim((string) ($detail['ref_place'] ?? '')),
+                        'ref_province' => trim((string) ($detail['ref_province'] ?? '')),
                         'ref_hired_company' => trim((string) ($detail['ref_hired_company'] ?? '')),
                         'ref_attachment' => $attachmentPath,
                     ];
@@ -164,6 +190,7 @@ class ReferralController extends Controller
                     'ref_employer_name' => $detail['ref_employer_name'] ?? '',
                     'ref_position' => $detail['ref_position'] ?? '',
                     'ref_place' => $detail['ref_place'] ?? '',
+                    'ref_province' => $detail['ref_province'] ?? '',
                     'ref_hired_company' => $detail['ref_hired_company'] ?? '',
                     'ref_attachment' => $detail['ref_attachment'] ?? null,
                 ])

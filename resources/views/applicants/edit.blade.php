@@ -15,11 +15,11 @@
                     title: 'Applicant Successfully Created',
                     html: `
 
-                                                                                                    <div style="font-size:14px;">
-                                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                    </div>
-                                                                                                    `,
+                                                                                                                                                    <div style="font-size:14px;">
+                                                                                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                                                                    </div>
+                                                                                                                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -520,13 +520,6 @@
             border: 1px solid #e4edf7;
         }
 
-        .referral-details-panel {
-            padding: 1rem;
-            border: 1px solid #e4edf7;
-            border-radius: 24px;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-            box-shadow: 0 14px 30px rgba(15, 34, 58, 0.05);
-        }
 
         .referral-details-head {
             display: flex;
@@ -780,7 +773,7 @@
             border: 1px solid #d8e3ee !important;
             color: #10243d !important;
             box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
-        
+
         }
 
         .btn-primary:hover,
@@ -1089,6 +1082,10 @@
                 flex: 0 0 100%;
             }
 
+            .referral-pane #otherCityFields .col-12 .d-flex {
+                justify-content: center !important;
+            }
+
             .peso-extra-detail-card {
                 padding: 1rem !important;
             }
@@ -1112,8 +1109,14 @@
                 padding: 1rem !important;
             }
 
+            .referral-pane .referral-action-bar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+
             .referral-pane .referral-action-bar>* {
-                width: 100%;
+                width: auto;
             }
 
             .referral-pane .referral-type-field {
@@ -1193,15 +1196,16 @@
             }
 
             .referral-pane .referral-action-bar .btn {
-                width: 100%;
+                width: auto;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
             }
+
             #printReferralPesoButton,
             #printReferralOtherCityButton {
                 font-size: 0.74rem;
                 line-height: 1.15;
-                
+
             }
 
             .js-peso-extra-print-button {
@@ -2047,7 +2051,8 @@
                                     <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_brgy_input" name="ref_barangay_clearance"
-                                            style="display:none" onchange="showFileName(this, 'ref_brgy_name')">
+                                            style="display:none"
+                                            onchange="handleReferralClearanceChange(this, 'ref_brgy_name', ['ref_police_input', 'ref_nbi_input'], ['ref_police_name', 'ref_nbi_name'])">
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2057,7 +2062,8 @@
                                         </small>
                                         @if(!empty($referral->ref_barangay_clearance))
                                             <a href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
+                                                target="_blank" class="btn btn-light btn-sm text-primary border"
+                                                id="ref_brgy_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2070,7 +2076,8 @@
                                     <label class="form-label">Police Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_police_input" name="ref_police_clearance"
-                                            style="display:none" onchange="showFileName(this, 'ref_police_name')">
+                                            style="display:none"
+                                            onchange="handleReferralClearanceChange(this, 'ref_police_name', ['ref_brgy_input', 'ref_nbi_input'], ['ref_brgy_name', 'ref_nbi_name'])">
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_police_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2080,7 +2087,7 @@
                                         </small>
                                         @if(!empty($referral->ref_police_clearance))
                                             <a href="{{ asset('storage/' . $referral->ref_police_clearance) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                                class="btn btn-light btn-sm text-primary border" id="ref_police_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2093,7 +2100,7 @@
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_nbi_input" name="ref_nbi_clearance" style="display:none"
-                                            onchange="showFileName(this, 'ref_nbi_name')">
+                                            onchange="handleReferralClearanceChange(this, 'ref_nbi_name', ['ref_brgy_input', 'ref_police_input'], ['ref_brgy_name', 'ref_police_name'])">
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2103,7 +2110,7 @@
                                         </small>
                                         @if(!empty($referral->ref_nbi_clearance))
                                             <a href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                                class="btn btn-light btn-sm text-primary border" id="ref_nbi_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2113,7 +2120,7 @@
 
                         </div>
 
-                        <div class="mt-4 referral-details-panel">
+                        <div class="mt-2">
                             <div class="referral-details-head mb-3">
                                 <div>
                                     <h6 class="section-title text-primary mb-1">Mayor's Referral Letter Details</h6>
@@ -2137,266 +2144,298 @@
                                 </select>
                             </div>
 
-                            <div class="referral-letter-shell border p-4 rounded-4 bg-white">
-                                <div id="pesoOfficeFields" data-referral-group="peso"
-                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
-                                    <div class="row g-3">
-                                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                            <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
-                                        </div>
-                                        <div class="col-md-2">
-                                            <label class="form-label">Peso OCRL (Auto Generate)<span
-                                                    class="required-mark">*</span></label>
-                                            <input type="text" name="ref_imus_ocrl" class="form-control"
-                                                style="text-align: center"
-                                                value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
-                                                placeholder="Auto generate when complete" readonly>
-                                        </div>
 
-                                        <div class="col-md-2">
-                                            <label class="form-label">Employer Name<span
-                                                    class="required-mark">*</span></label>
-                                            <input type="text" name="ref_employer_name" class="form-control"
-                                                oninput="this.value = this.value.toUpperCase()"
-                                                value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">Employer Position<span
-                                                    class="required-mark">*</span></label>
-                                            <input type="text" name="ref_position" class="form-control"
-                                                oninput="this.value = this.value.toUpperCase()"
-                                                value="{{ old('ref_position', $referral->ref_position ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label"> City Address<span
-                                                    class="required-mark">*</span></label>
-                                            <select name="ref_place" id="refPlaceSelect" class="form-select">
-                                                <option value="">Select City Address</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <label class="form-label">Hired Company<span
-                                                    class="required-mark">*</span></label>
-                                            <input type="text" name="ref_hired_company" class="form-control"
-                                                oninput="this.value = this.value.toUpperCase()"
-                                                value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
-                                        </div>
+                            <div id="pesoOfficeFields" data-referral-group="peso"
+                                class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
+                                <div class="row g-3">
+                                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                        <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Peso OCRL (Auto Generate)<span
+                                                class="required-mark">*</span></label>
+                                        <input type="text" name="ref_imus_ocrl" class="form-control"
+                                            style="text-align: center"
+                                            value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
+                                            placeholder="Auto generate when complete" readonly>
                                     </div>
 
-                                    @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                        <div class="mt-3">
-                                            <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
-                                                id="printReferralPesoButton" class="btn btn-outline-primary px-4"
-                                                target="_blank">
-                                                View Employer Detail 1
-                                            </a>
-                                        </div>
-                                    @else
-                                        <div class="mt-3">
-                                            <button type="button" id="printReferralPesoButton"
-                                                class="btn btn-outline-secondary px-4" disabled> 
-                                                <i class="fas fa-print me-1"></i> View Employer Detail 1
-                                            </button>
-                                        </div>
-                                    @endif
-
-                                    <div class="js-peso-extra-details mt-4 d-grid gap-3">
-                                        @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
-                                            <div
-                                                class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
-                                                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                                    <span class="badge bg-primary-subtle text-primary">Employer Detail
-                                                        {{ $extraIndex + 2 }}</span>
-                                                </div>
-                                                <div class="row g-3">
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">Peso OCRL (Auto Generated)</label>
-                                                        <input type="text" class="form-control" style="text-align: center"
-                                                            name="referral_details[{{ $extraIndex }}][ref_imus_ocrl]"
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_imus_ocrl', $extraDetail['ref_imus_ocrl'] ?? '') }}"
-                                                            placeholder="Auto generate when saved" readonly>
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">Employer Name</label>
-                                                        <input type="text" class="form-control"
-                                                            oninput="this.value = this.value.toUpperCase()"
-                                                            name="referral_details[{{ $extraIndex }}][ref_employer_name]"
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">Employer Position</label>
-                                                        <input type="text" class="form-control"
-                                                            oninput="this.value = this.value.toUpperCase()"
-                                                            name="referral_details[{{ $extraIndex }}][ref_position]"
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">City Address</label>
-                                                        <select class="form-select js-peso-ref-place-select"
-                                                            name="referral_details[{{ $extraIndex }}][ref_place]"
-                                                            data-selected="{{ old('referral_details.' . $extraIndex . '.ref_place', $extraDetail['ref_place'] ?? '') }}">
-                                                            <option value="">Select City Address</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Hired Company</label>
-                                                        <input type="text" class="form-control"
-                                                            oninput="this.value = this.value.toUpperCase()"
-                                                            name="referral_details[{{ $extraIndex }}][ref_hired_company]"
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company', $extraDetail['ref_hired_company'] ?? '') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="mt-3 d-flex flex-wrap gap-2">
-                                                    @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
-                                                        <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
-                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button" target="_blank">
-                                                            <i class="fas fa-print me-1"></i> View Employer Detail
-                                                            {{ $extraIndex + 2 }}
-                                                        </a>
-                                                    @else
-                                                        <button type="button"
-                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button"
-                                                            disabled>
-                                                            <i class="fas fa-print me-1"></i> View Employer Detail
-                                                            {{ $extraIndex + 2 }}
-                                                        </button>
-                                                    @endif
-                                                    <button type="button"
-                                                        class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
-                                                        <i class="fas fa-trash-alt me-1"></i>Remove
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        @endforeach
+                                    <div class="col-md-2">
+                                        <label class="form-label">Employer Name<span class="required-mark">*</span></label>
+                                        <input type="text" name="ref_employer_name" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
+                                            value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
                                     </div>
 
-                                    <div class="mt-3 d-flex justify-content-end">
-                                        <button type="button" id="addPesoDetailButton"
-                                            class="btn btn-outline-primary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center text-primary {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
-                                            style="width: 40px; height: 40px;" aria-label="Add More Employer Details"
-                                            title="Add More Employer Details">
-                                            <i class="bi bi-plus-lg" style="font-size: 1.25rem; line-height: 1;"></i>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Employer Position<span
+                                                class="required-mark">*</span></label>
+                                        <input type="text" name="ref_position" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
+                                            value="{{ old('ref_position', $referral->ref_position ?? '') }}">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label"> City Address<span class="required-mark">*</span></label>
+                                        <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
+                                            list="refPlaceOptions"
+                                            value="{{ old('ref_place', $referral->ref_place ?? '') }}"
+                                            oninput="this.value = this.value.toUpperCase()"
+                                            placeholder="Search City Address">
+                                        <datalist id="refPlaceOptions"></datalist>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Province</label>
+                                        <input type="text" name="ref_province" id="refProvinceInput" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
+                                            value="{{ old('ref_province', $referral->ref_province ?? '') }}"
+                                            placeholder="Enter Province">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Hired Company<span class="required-mark">*</span></label>
+                                        <input type="text" name="ref_hired_company" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
+                                            value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
+                                    </div>
+                                </div>
+
+                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                    <div class="mt-3">
+                                        <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
+                                            id="printReferralPesoButton" class="btn btn-outline-primary px-4" target="_blank">
+                                            View Employer Detail 1
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="mt-3">
+                                        <button type="button" id="printReferralPesoButton"
+                                            class="btn btn-outline-secondary justify-content-center px-4" disabled>
+                                            <i class="fas fa-print me-1"></i> View Employer Detail 1
                                         </button>
                                     </div>
+                                @endif
 
-                                    <template id="pesoDetailTemplate">
-                                        <div
-                                            class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                <div class="js-peso-extra-details mt-4 d-grid gap-3">
+                                    @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
+                                        <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
                                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                                <span class="badge bg-primary-subtle text-primary">Employer
-                                                    Detail </span>
-
+                                                <span class="badge bg-primary-subtle text-primary">Employer Detail
+                                                    {{ $extraIndex + 2 }}</span>
                                             </div>
                                             <div class="row g-3">
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Peso OCRL (Auto Generated)</label>
+                                                    <label class="form-label">Peso OCRL (Auto Generated)<span
+                                                            class="required-mark">*</span></label>
                                                     <input type="text" class="form-control" style="text-align: center"
-                                                        name="referral_details[__INDEX__][ref_imus_ocrl]"
+                                                        name="referral_details[{{ $extraIndex }}][ref_imus_ocrl]"
+                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_imus_ocrl', $extraDetail['ref_imus_ocrl'] ?? '') }}"
                                                         placeholder="Auto generate when saved" readonly>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Employer Name</label>
+                                                    <label class="form-label">Employer Name<span
+                                                            class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[__INDEX__][ref_employer_name]">
+                                                        name="referral_details[{{ $extraIndex }}][ref_employer_name]"
+                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Employer Position</label>
+                                                    <label class="form-label">Employer Position<span
+                                                            class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[__INDEX__][ref_position]">
+                                                        name="referral_details[{{ $extraIndex }}][ref_position]"
+                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">City Address</label>
-                                                    <select class="form-select js-peso-ref-place-select"
-                                                        name="referral_details[__INDEX__][ref_place]">
-                                                        <option value="">Select City Address</option>
-                                                    </select>
+                                                    <label class="form-label">City Address<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" class="form-control js-peso-ref-place-input"
+                                                        name="referral_details[{{ $extraIndex }}][ref_place]"
+                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_place', $extraDetail['ref_place'] ?? '') }}"
+                                                        oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
+                                                        placeholder="Search City Address">
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Hired Company</label>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Province<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" class="form-control js-peso-ref-province-input"
+                                                        name="referral_details[{{ $extraIndex }}][ref_province]"
+                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_province', $extraDetail['ref_province'] ?? '') }}"
+                                                        oninput="this.value = this.value.toUpperCase()"
+                                                        placeholder="Enter Province">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Hired Company<span
+                                                            class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[__INDEX__][ref_hired_company]">
+                                                        name="referral_details[{{ $extraIndex }}][ref_hired_company]"
+                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company', $extraDetail['ref_hired_company'] ?? '') }}">
                                                 </div>
                                             </div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
-                                                <button type="button"
-                                                    class="btn btn-outline-primary px-4 js-peso-extra-print-button"
-                                                    disabled
-                                                    title="Complete the employer detail fields first">
-                                                    <i class="fas fa-print me-1"></i> View Employer Detail
-                                                </button>
+                                                @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
+                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
+                                                        class="btn btn-outline-primary px-4 js-peso-extra-print-button"
+                                                        target="_blank">
+                                                        <i class="fas fa-print me-1"></i> View Employer Detail
+                                                        {{ $extraIndex + 2 }}
+                                                    </a>
+                                                @else
+                                                    <button type="button"
+                                                        class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled>
+                                                        <i class="fas fa-print me-1"></i> View Employer Detail
+                                                        {{ $extraIndex + 2 }}
+                                                    </button>
+                                                @endif
                                                 <button type="button"
                                                     class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
                                                     <i class="fas fa-trash-alt me-1"></i>Remove
                                                 </button>
                                             </div>
                                         </div>
-                                    </template>
+                                    @endforeach
                                 </div>
 
-                                <div id="otherCityFields" data-referral-group="other-city"
-                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
-                                    <div class="row g-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Peso Imus OCRL (Auto Generate)<span
-                                                    class="required-mark">*</span></label>
-                                            <input type="text" name="ref_ocrl" class="form-control"
-                                                style="text-align: center"
-                                                value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
-                                                placeholder="Auto generate when complete" readonly>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Mayor's Name<span
-                                                    class="required-mark">*</span></label>
-                                            <select name="ref_recipient" id="refRecipientSelect" class="form-select">
-                                                <option value="">Select City Mayor</option>
-                                                @foreach(config('philippine_mayors', []) as $mayor)
-                                                    <option value="{{ $mayor['recipient'] }}"
-                                                        data-city-government="{{ $mayor['city_government'] }}"
-                                                        data-company-address="{{ $mayor['company_address'] }}" {{ old('ref_recipient', $referral->ref_recipient ?? '') === $mayor['recipient'] ? 'selected' : '' }}>
-                                                        {{ $mayor['recipient'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                <div class="mt-3 d-flex justify-content-end">
+                                    <button type="button" id="addPesoDetailButton"
+                                        class="btn btn-outline-primary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center text-primary {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
+                                        style="width: 40px; height: 40px;" aria-label="Add More Employer Details"
+                                        title="Add More Employer Details">
+                                        <i class="bi bi-plus-lg" style="font-size: 1.25rem; line-height: 1;"></i>
+                                    </button>
+                                </div>
 
-                                        <div class="col-md-3">
-                                            <label class="form-label">City Government<span
-                                                    class="required-mark">*</span></label>
-                                            <select name="ref_city_gov" id="cityGovernment" class="form-select">
-                                                <option value="">Select City Government</option>
-                                            </select>
-                                        </div>
+                                <template id="pesoDetailTemplate">
+                                    <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                            <span class="badge bg-primary-subtle text-primary">Employer
+                                                Detail </span>
 
-                                        <div class="col-md-3">
-                                            <label class="form-label">City Address<span
-                                                    class="required-mark">*</span></label>
-                                            <input type="text" name="ref_company_address" id="refCompanyAddressInput"
-                                                class="form-control" list="refCompanyAddressList" autocomplete="off"
-                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
                                         </div>
-
-                                        @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                            <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
-                                                id="printReferralOtherCityButton" class="btn btn-outline-primary"
-                                                target="_blank">
-                                                View Referral Letter
-                                            </a>
-                                        @elseif(!auth()->user()->hasPermission('generate_referral'))
-                                            <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
-                                                No permission to view referral letter
+                                        <div class="row g-3">
+                                            <div class="col-md-2">
+                                                <label class="form-label">Peso OCRL (Auto Generated)<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" class="form-control" style="text-align: center"
+                                                    name="referral_details[__INDEX__][ref_imus_ocrl]"
+                                                    placeholder="Auto generate when saved" readonly>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Employer Name<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" class="form-control"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    name="referral_details[__INDEX__][ref_employer_name]">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Employer Position<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" class="form-control"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    name="referral_details[__INDEX__][ref_position]">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">City Address<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" class="form-control js-peso-ref-place-input"
+                                                    name="referral_details[__INDEX__][ref_place]"
+                                                    oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
+                                                    placeholder="Search City Address">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="row g-3">
+                                                    <div class="col-6">
+                                                        <label class="form-label">Province<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control js-peso-ref-province-input"
+                                                            name="referral_details[__INDEX__][ref_province]"
+                                                            oninput="this.value = this.value.toUpperCase()"
+                                                            placeholder="Enter Province">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label">Hired Company<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            oninput="this.value = this.value.toUpperCase()"
+                                                            name="referral_details[__INDEX__][ref_hired_company]">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 d-flex flex-wrap gap-2">
+                                            <button type="button"
+                                                class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled
+                                                title="Complete the employer detail fields first">
+                                                <i class="fas fa-print me-1"></i> View Employer Detail
                                             </button>
-                                        @else
-                                            <button type="button" id="printReferralOtherCityButton"
-                                                class="btn btn-outline-secondary px-4 ms-2" disabled>
-                                                <i class="fas fa-print me-1"></i> View Referral Letter
+                                            <button type="button"
+                                                class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
+                                                <i class="fas fa-trash-alt me-1"></i>Remove
                                             </button>
-                                        @endif
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div id="otherCityFields" data-referral-group="other-city"
+                                class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Peso Imus OCRL (Auto Generate)<span
+                                                class="required-mark">*</span></label>
+                                        <input type="text" name="ref_ocrl" class="form-control" style="text-align: center"
+                                            value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
+                                            placeholder="Auto generate when complete" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Mayor's Name<span class="required-mark">*</span></label>
+                                        <select name="ref_recipient" id="refRecipientSelect" class="form-select">
+                                            <option value="">Select City Mayor</option>
+                                            @foreach(config('philippine_mayors', []) as $mayor)
+                                                <option value="{{ $mayor['recipient'] }}"
+                                                    data-city-government="{{ $mayor['city_government'] }}"
+                                                    data-company-address="{{ $mayor['company_address'] }}" {{ old('ref_recipient', $referral->ref_recipient ?? '') === $mayor['recipient'] ? 'selected' : '' }}>
+                                                    {{ $mayor['recipient'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">City Government<span
+                                                class="required-mark">*</span></label>
+                                        <select name="ref_city_gov" id="cityGovernment" class="form-select">
+                                            <option value="">Select City Government</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">City Address<span class="required-mark">*</span></label>
+                                        <input type="text" name="ref_company_address" id="refCompanyAddressInput"
+                                            class="form-control" list="refCompanyAddressList" autocomplete="off"
+                                            value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="d-flex flex-wrap gap-2 mt-3">
+                                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                                <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
+                                                    id="printReferralOtherCityButton" class="btn btn-outline-primary px-4" target="_blank">
+                                                    <i class="fas fa-print me-1"></i> View Referral Letter
+                                                </a>
+                                            @elseif(!auth()->user()->hasPermission('generate_referral'))
+                                                <button type="button" class="btn btn-outline-secondary px-4" disabled title="No permission to view referral letter">
+                                                    <i class="fas fa-print me-1"></i> No Permission
+                                                </button>
+                                            @else
+                                                <button type="button" id="printReferralOtherCityButton"
+                                                    class="btn btn-outline-secondary px-4" disabled title="Complete all requirements first">
+                                                    <i class="fas fa-print me-1"></i> View Referral Letter
+                                                </button>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2556,7 +2595,9 @@
         const cityDropdown = document.getElementById("cityGovernment");
         const permitIssuedAtDropdown = document.getElementById("permitIssuedAtSelect");
         const refRecipientDropdown = document.getElementById("refRecipientSelect");
-        const refPlaceSelect = document.getElementById("refPlaceSelect");
+        const refPlaceInput = document.getElementById("refPlaceInput");
+        const refPlaceOptions = document.getElementById("refPlaceOptions");
+        const refProvinceInput = document.getElementById("refProvinceInput");
         const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
         const refCompanyAddressList = document.getElementById("refCompanyAddressList");
         const selectedPermitIssuedAt = `{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}`;
@@ -2618,27 +2659,23 @@
                 .toLowerCase();
         };
 
-        const populateCityAddressSelect = (select, cities, currentValue = "") => {
-            if (!select) {
+        const populateCityAddressOptions = (datalist, cities, currentValue = "") => {
+            if (!datalist) {
                 return;
             }
 
             const normalizePlaceValue = value => String(value || "").toUpperCase().trim();
             const selectedValue = normalizePlaceValue(currentValue);
 
-            select.innerHTML = "";
-
-            const placeholderOption = document.createElement("option");
-            placeholderOption.value = "";
-            placeholderOption.text = "Select City Address";
-            placeholderOption.selected = selectedValue === "";
-            select.appendChild(placeholderOption);
+            datalist.innerHTML = "";
 
             cities.forEach(city => {
                 const rawName = city.name || city.description || "";
                 const cleaned = String(rawName).replace(/^\s*(city of|municipality of)\s+/i, "");
                 let name = String(cleaned).toUpperCase().trim();
                 const isCity = /city/i.test(rawName);
+                const provinceCode = city.provinceCode || city.province_code || city.province?.code || city.province?.provinceCode || "";
+                const provinceName = city.province?.name || city.province?.description || (typeof city.province === "string" ? city.province : "");
 
                 if (isCity && !/\bCITY$/.test(name)) {
                     name = (name + " CITY").trim();
@@ -2646,18 +2683,88 @@
 
                 const option = document.createElement("option");
                 option.value = name;
-                option.text = name;
-                option.selected = normalizePlaceValue(name) === selectedValue;
-                select.appendChild(option);
+                if (provinceCode) {
+                    option.dataset.provinceCode = provinceCode;
+                }
+                if (provinceName) {
+                    option.dataset.provinceName = String(provinceName).toUpperCase().trim();
+                }
+                datalist.appendChild(option);
             });
 
-            if (selectedValue && !Array.from(select.options).some(option => option.value === selectedValue)) {
+            if (selectedValue && !Array.from(datalist.options).some(option => option.value === selectedValue)) {
                 const currentOption = document.createElement("option");
                 currentOption.value = selectedValue;
-                currentOption.text = selectedValue;
-                currentOption.selected = true;
-                select.appendChild(currentOption);
+                datalist.appendChild(currentOption);
             }
+        };
+
+        const ensurePsgcProvinceData = (() => {
+            let provinceDataPromise = null;
+
+            return () => {
+                if (!provinceDataPromise) {
+                    provinceDataPromise = fetch("https://psgc.gitlab.io/api/provinces/")
+                        .then(response => response.json())
+                        .then(data => data.sort((a, b) => a.name.localeCompare(b.name)))
+                        .catch(error => {
+                            console.error("Error loading provinces:", error);
+                            return [];
+                        });
+                }
+
+                return provinceDataPromise;
+            };
+        })();
+
+        const getProvinceNameFromCityOption = (option, provinces = []) => {
+            if (!option) {
+                return "";
+            }
+
+            const directProvinceName = option.dataset.provinceName || "";
+            if (directProvinceName) {
+                return String(directProvinceName).toUpperCase().trim();
+            }
+
+            const provinceCode = option.dataset.provinceCode || "";
+            if (!provinceCode) {
+                return "";
+            }
+
+            const matchingProvince = provinces.find(province => String(province.code || "") === String(provinceCode));
+
+            return String(
+                matchingProvince?.name ||
+                matchingProvince?.province ||
+                matchingProvince?.description ||
+                ""
+            ).toUpperCase().trim();
+        };
+
+        const getCityOptionFromValue = (value) => {
+            if (!refPlaceOptions) {
+                return null;
+            }
+
+            const normalizedValue = String(value || "").toUpperCase().trim();
+
+            return Array.from(refPlaceOptions.options).find(option => option.value === normalizedValue) || null;
+        };
+
+        const syncProvinceInputFromCityValue = (value, provinceInput, provinces = []) => {
+            if (!provinceInput) {
+                return;
+            }
+
+            const selectedOption = getCityOptionFromValue(value);
+
+            if (!selectedOption || !selectedOption.value) {
+                provinceInput.value = "";
+                return;
+            }
+
+            provinceInput.value = (getProvinceNameFromCityOption(selectedOption, provinces) || provinceInput.value || "").toUpperCase();
         };
 
         const ensurePsgcCityData = (() => {
@@ -2854,6 +2961,7 @@
                     }
                 });
             }
+
         }
 
         if (refRecipientDropdown) {
@@ -2905,7 +3013,7 @@
         syncRecipientDetailsFromSelectedOption();
 
         const populatePsgcCityData = () => {
-            ensurePsgcCityData().then(cities => {
+            Promise.all([ensurePsgcCityData(), ensurePsgcProvinceData()]).then(([cities, provinces]) => {
                 const allowedPermitCities = cities
                     .filter(isAllowedPermitIssuedAtCity)
                     .sort((a, b) => a.name.localeCompare(b.name));
@@ -2941,17 +3049,17 @@
                     }
                 }
 
-                if (refPlaceSelect) {
-                    populateCityAddressSelect(refPlaceSelect, cities, refPlaceSelect.value || selectedRefPlace || "");
+                if (refPlaceOptions) {
+                    populateCityAddressOptions(refPlaceOptions, cities, refPlaceInput ? refPlaceInput.value : selectedRefPlace || "");
+                    syncProvinceInputFromCityValue(refPlaceInput ? refPlaceInput.value : selectedRefPlace || "", refProvinceInput, provinces);
                 }
 
-                document.querySelectorAll(".js-peso-ref-place-select").forEach(select => {
-                    populateCityAddressSelect(
-                        select,
-                        cities,
-                        select.value || select.dataset.selected || ""
-                    );
-                    select.dataset.selected = select.value;
+                document.querySelectorAll(".js-peso-ref-place-input").forEach(input => {
+                    syncProvinceInputFromCityValue(input.value || "", input.closest(".peso-extra-detail-card")?.querySelector(".js-peso-ref-province-input"), provinces);
+
+                    if (input.value) {
+                        input.value = input.value.toUpperCase();
+                    }
                 });
 
                 if (window.jQuery && typeof window.jQuery.fn.select2 === "function" && permitIssuedAtDropdown) {
@@ -2964,11 +3072,40 @@
             permitIssuedAtDropdown.addEventListener("focus", populatePsgcCityData, { once: true });
         }
 
-        if (refPlaceSelect) {
-            refPlaceSelect.addEventListener("focus", populatePsgcCityData, { once: true });
+        if (refPlaceInput) {
+            refPlaceInput.addEventListener("focus", populatePsgcCityData, { once: true });
+            refPlaceInput.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+                ensurePsgcProvinceData().then(provinces => {
+                    syncProvinceInputFromCityValue(this.value, refProvinceInput, provinces);
+                });
+            });
+            refPlaceInput.addEventListener("change", function () {
+                ensurePsgcProvinceData().then(provinces => {
+                    syncProvinceInputFromCityValue(this.value, refProvinceInput, provinces);
+                });
+            });
         }
 
-        if (selectedPermitIssuedAt || selectedRefPlace || document.querySelector(".js-peso-ref-place-select")) {
+        document.addEventListener("change", function (event) {
+            const cityInput = event.target.closest(".js-peso-ref-place-input");
+
+            if (!cityInput) {
+                return;
+            }
+
+            const provinceInput = cityInput.closest(".peso-extra-detail-card")?.querySelector(".js-peso-ref-province-input");
+
+            ensurePsgcProvinceData().then(provinces => {
+                syncProvinceInputFromCityValue(cityInput.value, provinceInput, provinces);
+            });
+        });
+
+        if (
+            selectedPermitIssuedAt ||
+            selectedRefPlace ||
+            document.querySelector(".js-peso-ref-place-input")
+        ) {
             populatePsgcCityData();
         }
 
@@ -3304,6 +3441,39 @@
     function showFileName(input, displayId) {
         const fileName = input.files.length ? input.files[0].name : '';
         document.getElementById(displayId).textContent = fileName;
+    }
+
+    function handleReferralClearanceChange(input, displayId, otherInputIds = [], otherDisplayIds = []) {
+        showFileName(input, displayId);
+
+        otherInputIds.forEach(id => {
+            const otherInput = document.getElementById(id);
+            if (otherInput) {
+                otherInput.value = '';
+            }
+        });
+
+        otherDisplayIds.forEach(id => {
+            const otherDisplay = document.getElementById(id);
+            if (otherDisplay) {
+                otherDisplay.textContent = 'No file selected';
+            }
+        });
+
+        const currentLinkMap = {
+            ref_brgy_name: 'ref_brgy_current_link',
+            ref_police_name: 'ref_police_current_link',
+            ref_nbi_name: 'ref_nbi_current_link',
+        };
+
+        Object.entries(currentLinkMap).forEach(([keepDisplayId, linkId]) => {
+            const link = document.getElementById(linkId);
+            if (!link) {
+                return;
+            }
+
+            link.style.display = keepDisplayId === displayId ? '' : 'none';
+        });
     }
 </script>
 
