@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="dashboard-page container-fluid py-4 px-md-4 px-xl-5">
+    <div class="dashboard-page container-fluid px-md-4 px-xl-1">
         <section class="hero-panel mb-4">
             <div class="row g-4 align-items-center">
                 <div class="col-lg-8">
@@ -74,8 +74,7 @@
                 <div class="dashboard-card">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">Applicant Registrations Bar Graph</h5>
-                            <p class="section-copy mb-0">Monthly applicant registrations for {{ $chartYear }} only.</p>
+                            <h5 class="section-title mb-1">{{ now()->format('Y') }} Applicant Registrations Summary</h5>
                         </div>
                     </div>
 
@@ -93,8 +92,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">Gender Chart</h5>
-                            <p class="section-copy mb-0">Male and female applicant distribution.</p>
+                            <h5 class="section-title mb-1">Total of Male and Female Summary</h5>
                         </div>
                     </div>
 
@@ -110,7 +108,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">PWD</h5>
+                            <h5 class="section-title mb-1">PWD Summary</h5>
                             <p class="section-copy mb-0">Applicants marked as PWD:</p>
                         </div>
                     </div>
@@ -127,7 +125,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">4Ps</h5>
+                            <h5 class="section-title mb-1">4Ps Summary</h5>
                             <p class="section-copy mb-0">Applicants marked as 4Ps:</p>
                         </div>
                     </div>
@@ -146,7 +144,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">City Chart</h5>
+                            <h5 class="section-title mb-1">City Summary</h5>
                             <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
                         </div>
                     </div>
@@ -163,7 +161,7 @@
                 <div class="dashboard-card h-100">
                     <div class="section-header">
                         <div>
-                            <h5 class="section-title mb-1">Province Chart</h5>
+                            <h5 class="section-title mb-1">Province Summary</h5>
                             <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
                         </div>
                     </div>

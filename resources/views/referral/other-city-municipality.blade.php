@@ -260,7 +260,7 @@
         $letterDate = now()->format('F d, Y');
         $residentName = strtoupper($applicantName);
         $residentAddress = $applicantAddress;
-        $companyName = strtoupper($referral->ref_hired_company ?: $applicant->hiring_company);
+        $companyName = strtoupper($applicant->hiring_company);
         $surname = strtoupper($applicant->last_name);
         $salutationName = trim(collect(explode(' ', preg_replace('/\s+/', ' ', $recipientName)))->last());
     @endphp

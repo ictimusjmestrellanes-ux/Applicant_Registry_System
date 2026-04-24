@@ -617,7 +617,7 @@
         }
     </style>
 
-    <div class="container-fluid users-page py-4 px-md-4 px-xl-5">
+    <div class="container-fluid users-page py-1 px-md-4 px-xl-1">
         <div class="users-shell">
             <section class="users-hero">
                 <span class="page-kicker">

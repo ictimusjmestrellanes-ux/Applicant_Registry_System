@@ -81,7 +81,7 @@
         }
 
         .letter {
-            margin-top: 50mm;
+            margin-top: 57mm;
         }
 
         .letter-title,

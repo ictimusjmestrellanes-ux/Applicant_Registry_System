@@ -23,11 +23,9 @@ class MayorsReferral extends Model
         'ref_imus_ocrl',
         'ref_employer_name',
         'ref_position',
-        'ref_or_no',
         'ref_company_address',
         'ref_hired_company',
 
-        'ref_peso_or_no',
         'ref_recipient',
         'ref_place',
         'ref_ocrl',
@@ -99,16 +97,14 @@ class MayorsReferral extends Model
     public function hasRequiredDetails(): bool
     {
         if ($this->referral_type === self::TYPE_PESO_OFFICE) {
-            return ! empty($this->ref_or_no)
-                && ! empty($this->ref_employer_name)
+            return ! empty($this->ref_employer_name)
                 && ! empty($this->ref_position)
                 && ! empty($this->ref_place)
                 && ! empty($this->ref_hired_company);
         }
 
         if ($this->referral_type === self::TYPE_OTHER_CITY_GOVERNMENT) {
-            return ! empty($this->ref_peso_or_no)
-                && ! empty($this->ref_recipient)
+            return ! empty($this->ref_recipient)
                 && ! empty($this->ref_company_address)
                 && ! empty($this->ref_city_gov);
         }

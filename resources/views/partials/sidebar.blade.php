@@ -168,6 +168,16 @@
         --sidebar-accent-strong: #000000;/* strong accent (black) */
     }
 
+    :root {
+        --bg-white: #ffffff;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --ink: #000000;
+        --surface: #9b9b9b;
+        --accent-dark: #111827;
+        --danger: #dc2626;
+    }
+
     .sidebar {
         width: 280px;
         height: 100vh;

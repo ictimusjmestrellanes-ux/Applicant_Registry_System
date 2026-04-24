@@ -118,7 +118,6 @@ class ReferralController extends Controller
                 'ref_imus_ocrl' => $primaryOcrl,
                 'ref_employer_name' => $request->ref_employer_name,
                 'ref_position' => $request->ref_position,
-                'ref_or_no' => $request->ref_or_no,
                 'ref_place' => $request->ref_place,
                 'ref_hired_company' => $request->ref_hired_company,
             ];
@@ -176,7 +175,6 @@ class ReferralController extends Controller
             ]);
         } elseif ($referralType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT) {
             $referralData = array_merge($referralData, [
-                'ref_peso_or_no' => $request->ref_peso_or_no,
                 'ref_ocrl' => $request->ref_ocrl,
                 'ref_recipient' => $request->ref_recipient,
                 'ref_company_address' => $request->ref_company_address,

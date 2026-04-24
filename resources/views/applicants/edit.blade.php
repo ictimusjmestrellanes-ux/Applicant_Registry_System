@@ -780,6 +780,7 @@
             border: 1px solid #d8e3ee !important;
             color: #10243d !important;
             box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+        
         }
 
         .btn-primary:hover,
@@ -1115,6 +1116,18 @@
                 width: 100%;
             }
 
+            .referral-pane .referral-type-field {
+                margin-bottom: 1rem !important;
+            }
+
+            .referral-pane .referral-type-select {
+                width: 100%;
+                max-width: 100%;
+                min-height: 46px;
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+
             .profile-action-bar>* {
                 width: 100%;
             }
@@ -1183,6 +1196,29 @@
                 width: 100%;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
+            }
+            #printReferralPesoButton,
+            #printReferralOtherCityButton {
+                font-size: 0.74rem;
+                line-height: 1.15;
+                
+            }
+
+            .js-peso-extra-print-button {
+                font-size: 0.78rem;
+                line-height: 1.15;
+                padding-left: 0.85rem !important;
+                padding-right: 0.85rem !important;
+            }
+
+            #printReferralPesoButton:not(:disabled):hover,
+            #printReferralOtherCityButton:not(:disabled):hover,
+            .js-peso-extra-print-button:not(:disabled):hover {
+                background: #d1d5db !important;
+                border-color: #9ca3af !important;
+                color: #10243d !important;
+                transform: translateY(-1px);
+                box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
             }
         }
     </style>
@@ -2088,14 +2124,15 @@
 
                             </div>
 
-                            <div class="col-12 col-md-4 mb-3">
+                            <div class="col-12 col-md-2 mb-3 referral-type-field">
                                 <label class="form-label">Referral Letter Type</label>
-                                <select name="referral_type" id="referralTypeSelect" class="form-select">
+                                <select name="referral_type" id="referralTypeSelect"
+                                    class="form-select referral-type-select">
                                     <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
                                         Referral Within Imus
                                     </option>
                                     <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
-                                        Referral Outside Imus (Other City Government)
+                                        Referral Outside Imus
                                     </option>
                                 </select>
                             </div>
@@ -2114,12 +2151,6 @@
                                                 style="text-align: center"
                                                 value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
                                                 placeholder="Auto generate when complete" readonly>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label">O.R CR<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_or_no" class="form-control"
-                                                value="{{ old('ref_or_no', $referral->ref_or_no ?? '') }}">
                                         </div>
 
                                         <div class="col-md-2">
@@ -2146,7 +2177,7 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-2">
+                                        <div class="col-md-4">
                                             <label class="form-label">Hired Company<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_hired_company" class="form-control"
@@ -2160,14 +2191,14 @@
                                             <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
                                                 id="printReferralPesoButton" class="btn btn-outline-primary px-4"
                                                 target="_blank">
-                                                Print Employer Detail
+                                                View Employer Detail 1
                                             </a>
                                         </div>
                                     @else
                                         <div class="mt-3">
                                             <button type="button" id="printReferralPesoButton"
-                                                class="btn btn-outline-secondary px-4" disabled>
-                                                <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                class="btn btn-outline-secondary px-4" disabled> 
+                                                <i class="fas fa-print me-1"></i> View Employer Detail 1
                                             </button>
                                         </div>
                                     @endif
@@ -2195,14 +2226,14 @@
                                                             name="referral_details[{{ $extraIndex }}][ref_employer_name]"
                                                             value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-2">
                                                         <label class="form-label">Employer Position</label>
                                                         <input type="text" class="form-control"
                                                             oninput="this.value = this.value.toUpperCase()"
                                                             name="referral_details[{{ $extraIndex }}][ref_position]"
                                                             value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-2">
                                                         <label class="form-label">City Address</label>
                                                         <select class="form-select js-peso-ref-place-select"
                                                             name="referral_details[{{ $extraIndex }}][ref_place]"
@@ -2210,7 +2241,7 @@
                                                             <option value="">Select City Address</option>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-2">
+                                                    <div class="col-md-4">
                                                         <label class="form-label">Hired Company</label>
                                                         <input type="text" class="form-control"
                                                             oninput="this.value = this.value.toUpperCase()"
@@ -2221,13 +2252,15 @@
                                                 <div class="mt-3 d-flex flex-wrap gap-2">
                                                     @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
                                                         <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
-                                                            class="btn btn-outline-primary px-4" target="_blank">
-                                                            <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button" target="_blank">
+                                                            <i class="fas fa-print me-1"></i> View Employer Detail
                                                             {{ $extraIndex + 2 }}
                                                         </a>
                                                     @else
-                                                        <button type="button" class="btn btn-outline-primary px-4" disabled>
-                                                            <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button"
+                                                            disabled>
+                                                            <i class="fas fa-print me-1"></i> View Employer Detail
                                                             {{ $extraIndex + 2 }}
                                                         </button>
                                                     @endif
@@ -2270,20 +2303,20 @@
                                                         oninput="this.value = this.value.toUpperCase()"
                                                         name="referral_details[__INDEX__][ref_employer_name]">
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label class="form-label">Employer Position</label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
                                                         name="referral_details[__INDEX__][ref_position]">
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label class="form-label">City Address</label>
                                                     <select class="form-select js-peso-ref-place-select"
                                                         name="referral_details[__INDEX__][ref_place]">
                                                         <option value="">Select City Address</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-2">
+                                                <div class="col-md-4">
                                                     <label class="form-label">Hired Company</label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
@@ -2291,9 +2324,11 @@
                                                 </div>
                                             </div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
-                                                <button type="button" class="btn btn-outline-primary px-4" disabled
+                                                <button type="button"
+                                                    class="btn btn-outline-primary px-4 js-peso-extra-print-button"
+                                                    disabled
                                                     title="Complete the employer detail fields first">
-                                                    <i class="fas fa-print me-1"></i> Print Employer Detail
+                                                    <i class="fas fa-print me-1"></i> View Employer Detail
                                                 </button>
                                                 <button type="button"
                                                     class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
@@ -2315,13 +2350,7 @@
                                                 value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
                                                 placeholder="Auto generate when complete" readonly>
                                         </div>
-                                        <div class="col-md-2">
-                                            <label class="form-label">O.R No.<span class="required-mark">*</span></label>
-                                            <input type="text" name="ref_peso_or_no" class="form-control"
-                                                value="{{ old('ref_peso_or_no', $referral->ref_peso_or_no ?? '') }}">
-                                        </div>
-
-                                        <div class="col-md-2">
+                                        <div class="col-md-3">
                                             <label class="form-label">Mayor's Name<span
                                                     class="required-mark">*</span></label>
                                             <select name="ref_recipient" id="refRecipientSelect" class="form-select">
@@ -2344,7 +2373,7 @@
                                             </select>
                                         </div>
 
-                                        <div class="col-md-2">
+                                        <div class="col-md-3">
                                             <label class="form-label">City Address<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_company_address" id="refCompanyAddressInput"
@@ -2356,16 +2385,16 @@
                                             <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
                                                 id="printReferralOtherCityButton" class="btn btn-outline-primary"
                                                 target="_blank">
-                                                Print Referral Outside Imus
+                                                View Referral Letter
                                             </a>
                                         @elseif(!auth()->user()->hasPermission('generate_referral'))
                                             <button type="button" class="btn btn-secondary px-4 ms-2" disabled>
-                                                No permission to generate referral letter
+                                                No permission to view referral letter
                                             </button>
                                         @else
                                             <button type="button" id="printReferralOtherCityButton"
                                                 class="btn btn-outline-secondary px-4 ms-2" disabled>
-                                                <i class="fas fa-print me-1"></i> Print Referral Outside Imus
+                                                <i class="fas fa-print me-1"></i> View Referral Letter
                                             </button>
                                         @endif
                                     </div>
