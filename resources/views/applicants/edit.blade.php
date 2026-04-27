@@ -15,11 +15,11 @@
                     title: 'Applicant Successfully Created',
                     html: `
 
-                                                                                                                                                                            <div style="font-size:14px;">
-                                                                                                                                                                                <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                                                                                <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                                                                            </div>
-                                                                                                                                                                            `,
+                                                                                                                                                                                    <div style="font-size:14px;">
+                                                                                                                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                                                                                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                                                                                                                                                    </div>
+                                                                                                                                                                                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -2351,24 +2351,20 @@
                                                     oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
                                                     placeholder="Search City Address">
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="row g-3">
-                                                    <div class="col-6">
-                                                        <label class="form-label">Province<span
-                                                                class="required-mark">*</span></label>
-                                                        <input type="text" class="form-control js-peso-ref-province-input"
-                                                            name="referral_details[__INDEX__][ref_province]"
-                                                            oninput="this.value = this.value.toUpperCase()"
-                                                            placeholder="Enter Province">
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <label class="form-label">Hired Company<span
-                                                                class="required-mark">*</span></label>
-                                                        <input type="text" class="form-control"
-                                                            oninput="this.value = this.value.toUpperCase()"
-                                                            name="referral_details[__INDEX__][ref_hired_company]">
-                                                    </div>
-                                                </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Province<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" class="form-control js-peso-ref-province-input"
+                                                    name="referral_details[__INDEX__][ref_province]"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    placeholder="Enter Province">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">Hired Company<span
+                                                        class="required-mark">*</span></label>
+                                                <input type="text" class="form-control"
+                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    name="referral_details[__INDEX__][ref_hired_company]">
                                             </div>
                                         </div>
                                         <div class="mt-3 d-flex flex-wrap gap-2">
