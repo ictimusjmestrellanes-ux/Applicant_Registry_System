@@ -56,6 +56,18 @@ class ApplicantController extends Controller
         $perPageInput = strtolower((string) $request->query('per_page', '10'));
         $allowedPerPage = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
+        $sortBy = $request->query('sort_by', 'id');
+        $sortOrder = strtolower((string) $request->query('sort_order', 'desc'));
+        $allowedSortFields = ['id', 'first_name', 'last_name', 'created_at', 'contact_no', 'city'];
+
+        if (! in_array($sortBy, $allowedSortFields, true)) {
+            $sortBy = 'id';
+        }
+
+        if (! in_array($sortOrder, ['asc', 'desc'], true)) {
+            $sortOrder = 'desc';
+        }
+
         $query = $this->buildApplicantSearchQuery($filters)
             ->with(['permit', 'clearance', 'referral']);
 
@@ -71,7 +83,7 @@ class ApplicantController extends Controller
         }
 
         $applicants = $query
-            ->orderBy('id', 'desc')
+            ->orderBy($sortBy, $sortOrder)
             ->paginate($perPage)
             ->withQueryString();
 
@@ -86,7 +98,9 @@ class ApplicantController extends Controller
             'genderOptions',
             'civilStatusOptions',
             'cityOptions',
-            'barangayOptions'
+            'barangayOptions',
+            'sortBy',
+            'sortOrder'
         ));
     }
 

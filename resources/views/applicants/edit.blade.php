@@ -1969,7 +1969,7 @@
                             @if(auth()->user()->hasPermission('generate_clearance') && $clearance && $clearance->isComplete())
                                 <a href="{{ route('clearances.printLetter', $applicant->id) }}" target="_blank"
                                     class="btn btn-success px-4 shadow-sm">
-                                    <i class="fa-solid fa-print me-2"></i>Print Clearance Letter
+                                    <i class="fa-solid fa-print me-2"></i>View Clearance Letter
                                 </a>
                             @else
                                 @php
@@ -1980,7 +1980,7 @@
 
                                 <span class="d-inline-block" data-bs-toggle="tooltip" title="{{ $reason }}">
                                     <button class="btn btn-outline-secondary px-4" disabled>
-                                        <i class="fa-solid fa-print me-2 text-muted"></i>Print Clearance Letter
+                                        <i class="fa-solid fa-print me-2 text-muted"></i>View Clearance Letter
                                     </button>
                                 </span>
                             @endif
@@ -2182,10 +2182,8 @@
                                                 <label class="form-label"> City Address<span
                                                         class="required-mark">*</span></label>
                                                 <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
-                                                    list="refPlaceOptions"
-                                                    value="{{ old('ref_place', $referral->ref_place ?? '') }}"
-                                                    oninput="this.value = this.value.toUpperCase()"
-                                                    placeholder="Search City Address">
+                                                    list="refPlaceOptions" value="{{ old('ref_place', $referral->ref_place ?? '') }}"
+                                                    oninput="this.value = this.value.toUpperCase()" placeholder="Search City Address">
                                                 <datalist id="refPlaceOptions"></datalist>
                                             </div>
                                             <div class="col-md-2">

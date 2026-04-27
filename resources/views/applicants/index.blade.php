@@ -33,9 +33,22 @@
             fn($applicant) => $applicant->isPermitComplete() && $applicant->isClearanceComplete() && $applicant->isReferralComplete()
         )->count();
         $filterPanelOpen = $hasActiveFilters;
+        $sortBy = $sortBy ?? 'id';
+        $sortOrder = $sortOrder ?? 'desc';
+        
+        $sortHelper = function($field, $label) use ($sortBy, $sortOrder, $filters) {
+            $nextOrder = ($sortBy === $field && $sortOrder === 'asc') ? 'desc' : 'asc';
+            $icon = ($sortBy === $field) ? ($sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-sort';
+            $queryParams = array_filter($filters, fn($value) => trim((string) $value) !== '');
+            $queryParams['sort_by'] = $field;
+            $queryParams['sort_order'] = $nextOrder;
+            return [
+                'url' => route('applicants.index', $queryParams),
+                'icon' => $icon,
+                'label' => $label
+            ];
+        };
     @endphp
-
-    <div class="applicant-index-page container-fluid ">
 
         <section class="filter-card mb-4">
             <div class="section-head">
@@ -261,14 +274,44 @@
                 <table class="table applicants-table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="text-center">ID</th>
-                            <th>Applicant</th>
-                            <th>Contact</th>
-                            <th>Location</th>
+                            @php $sort = $sortHelper('id', 'ID'); @endphp
+                            <th class="text-center">
+                                <a href="{{ $sort['url'] }}" class="sort-header">
+                                    {{ $sort['label'] }}
+                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                                </a>
+                            </th>
+                            @php $sort = $sortHelper('first_name', 'Applicant'); @endphp
+                            <th>
+                                <a href="{{ $sort['url'] }}" class="sort-header">
+                                    {{ $sort['label'] }}
+                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                                </a>
+                            </th>
+                            @php $sort = $sortHelper('contact_no', 'Contact'); @endphp
+                            <th>
+                                <a href="{{ $sort['url'] }}" class="sort-header">
+                                    {{ $sort['label'] }}
+                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                                </a>
+                            </th>
+                            @php $sort = $sortHelper('city', 'Location'); @endphp
+                            <th>
+                                <a href="{{ $sort['url'] }}" class="sort-header">
+                                    {{ $sort['label'] }}
+                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                                </a>
+                            </th>
                             <th>Permit</th>
                             <th>Clearance</th>
                             <th>Referral</th>
-                            <th class="text-center">Created</th>
+                            @php $sort = $sortHelper('created_at', 'Created'); @endphp
+                            <th class="text-center">
+                                <a href="{{ $sort['url'] }}" class="sort-header">
+                                    {{ $sort['label'] }}
+                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                                </a>
+                            </th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -1391,4 +1434,37 @@
             });
         });
     </script>
+
+    <style>
+        .sort-header {
+            color: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            padding: 0.25rem 0;
+            transition: color 0.2s ease;
+        }
+
+        .sort-header:hover {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .sort-header i {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        .sort-header:hover i {
+            opacity: 1;
+        }
+
+        thead .sort-header i.bi-sort-up::before,
+        thead .sort-header i.bi-sort-down::before {
+            opacity: 1;
+            color: #0d6efd;
+        }
+    </style>
 @endsection
