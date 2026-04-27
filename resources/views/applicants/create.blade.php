@@ -428,20 +428,16 @@
                                     <select name="gender" class="form-select" required>
                                         <option value="">Select Sex</option>
                                         <option value="MALE" {{ old('gender') === 'MALE' ? 'selected' : '' }}>MALE</option>
-                                        <option value="FEMALE" {{ old('gender') === 'FEMALE' ? 'selected' : '' }}>FEMALE
-                                        </option>
+                                        <option value="FEMALE" {{ old('gender') === 'FEMALE' ? 'selected' : '' }}>FEMALE</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Civil Status <span class="required-mark">*</span></label>
                                     <select name="civil_status" class="form-select" required>
                                         <option value="">Select Status</option>
-                                        <option value="Single" {{ old('civil_status') === 'Single' ? 'selected' : '' }}>Single
-                                        </option>
-                                        <option value="Married" {{ old('civil_status') === 'Married' ? 'selected' : '' }}>
-                                            Married</option>
-                                        <option value="Widowed" {{ old('civil_status') === 'Widowed' ? 'selected' : '' }}>
-                                            Widowed</option>
+                                        <option value="SINGLE" {{ old('civil_status') === 'SINGLE' ? 'selected' : '' }}>SINGLE</option>
+                                        <option value="MARRIED" {{ old('civil_status') === 'MARRIED' ? 'selected' : '' }}>MARRIED</option>
+                                        <option value="WIDOWED" {{ old('civil_status') === 'WIDOWED' ? 'selected' : '' }}>WIDOWED</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1" style="text-align: center">
