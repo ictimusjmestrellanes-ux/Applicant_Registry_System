@@ -71,6 +71,7 @@ class ApplicantController extends Controller
         }
 
         $applicants = $query
+            ->orderBy('id', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
