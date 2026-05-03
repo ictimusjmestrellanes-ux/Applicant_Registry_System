@@ -1,94 +1,40 @@
 trigger:
 - main
 
+pool:
+  vmImage: 'ubuntu-latest'
+
 variables:
-  azureSubscription: '6fe734cc-3f4f-4a31-80ba-59dab1195e36'
-  webAppName: 'app-reg-sys'
-  vmImageName: 'ubuntu-latest'
-  environmentName: 'app-reg-sys'
-  rootFolder: $(System.DefaultWorkingDirectory)
+  phpVersion: '8.3'
 
-stages:
-- stage: Build
-  displayName: Build stage
-  jobs:
-  - job: BuildJob
-    pool:
-      vmImage: $(vmImageName)
+steps:
 
-    steps:
-    - script: |
-        set -e
+- script: |
+    sudo add-apt-repository ppa:ondrej/php -y
+    sudo apt-get update
+    sudo apt-get install php8.3 php8.3-cli php8.3-mbstring php8.3-xml php8.3-bcmath php8.3-curl php8.3-zip php8.3-pgsql php8.3-intl unzip -y
+    php -v
+  displayName: 'Install PHP 8.3'
 
-        echo "Before install:"
-        php -v || true
+- script: |
+    composer install --no-dev --prefer-dist --optimize-autoloader --no-scripts
+  displayName: 'Install Composer Dependencies'
 
-        sudo apt-get update
-        sudo apt-get install -y software-properties-common ca-certificates lsb-release apt-transport-https
-        sudo add-apt-repository ppa:ondrej/php -y
-        sudo apt-get update
+- script: |
+    cp .env.example .env
 
-        sudo apt-get install -y \
-          php8.4 \
-          php8.4-cli \
-          php8.4-common \
-          php8.4-curl \
-          php8.4-mbstring \
-          php8.4-xml \
-          php8.4-bcmath \
-          php8.4-zip \
-          php8.4-intl \
-          php8.4-mysql \
-          php8.4-sqlite3
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ventrack.zip'
+    replaceExistingArchive: true
 
-        sudo update-alternatives --set php /usr/bin/php8.4
-        sudo update-alternatives --set phar /usr/bin/phar8.4 || true
-        sudo update-alternatives --set phar.phar /usr/bin/phar.phar8.4 || true
-        sudo update-alternatives --set phpdbg /usr/bin/phpdbg8.4 || true
-        sudo update-alternatives --set php-cgi /usr/bin/php-cgi8.4 || true
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'VENTRACK-AZURE-CONNECTION'
+    appName: 'ventrack'
+    package: '$(Build.ArtifactStagingDirectory)/ventrack.zip'
 
-        php -v
-        composer --version
-      workingDirectory: $(rootFolder)
-      displayName: 'Install and use PHP 8.4'
 
-    - script: |
-        set -e
-        composer validate --no-check-publish
-        composer install --no-interaction --prefer-dist --optimize-autoloader
-      workingDirectory: $(rootFolder)
-      displayName: 'Composer install'
-
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(rootFolder)'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
-
-    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      displayName: 'Upload package'
-      artifact: drop
-
-- stage: Deploy
-  displayName: 'Deploy Web App'
-  dependsOn: Build
-  condition: succeeded()
-  jobs:
-  - deployment: DeploymentJob
-    pool:
-      vmImage: $(vmImageName)
-    environment: $(environmentName)
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: AzureWebApp@1
-            displayName: 'Deploy Azure Web App : app-reg-sys'
-            inputs:
-              azureSubscription: $(azureSubscription)
-              appName: $(webAppName)
-              appType: webAppLinux
-              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
