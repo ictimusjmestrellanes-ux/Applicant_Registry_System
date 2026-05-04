@@ -4,17 +4,7 @@ trigger:
 variables:
   azureSubscription: '6fe734cc-3f4f-4a31-80ba-59dab1195e36'
   webAppName: 'app-reg-sys'
-
-  # Pin the image to avoid surprise changes from ubuntu-latest.
-  vmImageName: 'ubuntu-24.04'
-
-  # PHP priority order.
-  phpPreferredVersions: '8.5 8.4 8.3'
-  phpMinimumVersion: '8.3.0'
-
-  # Set to false if you want to completely avoid PPA/external installs.
-  useExternalPhpInstaller: 'true'
-
+  vmImageName: 'ubuntu-latest'
   environmentName: 'app-reg-sys'
   rootFolder: $(System.DefaultWorkingDirectory)
 
@@ -23,164 +13,62 @@ stages:
   displayName: Build stage
   jobs:
   - job: BuildJob
-    displayName: Build Laravel app
     pool:
       vmImage: $(vmImageName)
 
     steps:
     - script: |
-        set -Eeuo pipefail
+        set -e
 
-        PREFERRED_VERSIONS=($(phpPreferredVersions))
-        MINIMUM_VERSION="$(phpMinimumVersion)"
-        USE_EXTERNAL="$(useExternalPhpInstaller)"
-        SELECTED_PHP_VERSION=""
+        echo "Before install:"
+        php -v || true
 
-        echo "Preferred PHP versions: ${PREFERRED_VERSIONS[*]}"
-        echo "Minimum PHP version: ${MINIMUM_VERSION}"
-        echo "Use external PHP installer: ${USE_EXTERNAL}"
+        sudo apt-get update
+        sudo apt-get install -y software-properties-common ca-certificates lsb-release apt-transport-https
+        sudo add-apt-repository ppa:ondrej/php -y
+        sudo apt-get update
 
-        set_php_alternatives() {
-          local version="$1"
+        sudo apt-get install -y \
+          php8.4 \
+          php8.4-cli \
+          php8.4-common \
+          php8.4-curl \
+          php8.4-mbstring \
+          php8.4-xml \
+          php8.4-bcmath \
+          php8.4-zip \
+          php8.4-intl \
+          php8.4-mysql \
+          php8.4-sqlite3
 
-          echo "Configuring PHP ${version}..."
+        sudo update-alternatives --set php /usr/bin/php8.4
+        sudo update-alternatives --set phar /usr/bin/phar8.4 || true
+        sudo update-alternatives --set phar.phar /usr/bin/phar.phar8.4 || true
+        sudo update-alternatives --set phpdbg /usr/bin/phpdbg8.4 || true
+        sudo update-alternatives --set php-cgi /usr/bin/php-cgi8.4 || true
 
-          # Required binaries are updated only if they exist.
-          # Some hosted images may not include every PHP companion binary.
-          for binary in php phar phpdbg php-cgi phar.phar; do
-            local path="/usr/bin/${binary}${version}"
-
-            if [ -x "$path" ]; then
-              sudo update-alternatives --set "$binary" "$path"
-            else
-              echo "Skipping ${binary}: ${path} not found."
-            fi
-          done
-
-          php -v
-
-          # Validate exact selected PHP major.minor.
-          php -r "exit((PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION) === '${version}' ? 0 : 1);"
-
-          # Validate minimum supported PHP version.
-          php -r "exit(version_compare(PHP_VERSION, '${MINIMUM_VERSION}', '>=') ? 0 : 1);"
-
-          SELECTED_PHP_VERSION="$version"
-          echo "Selected PHP version: ${SELECTED_PHP_VERSION}"
-          echo "##vso[task.setvariable variable=selectedPhpVersion]${SELECTED_PHP_VERSION}"
-
-          return 0
-        }
-
-        install_external_php() {
-          local version="$1"
-
-          if [ "$USE_EXTERNAL" != "true" ]; then
-            echo "External PHP installer is disabled."
-            return 1
-          fi
-
-          echo "Trying external install for PHP ${version}..."
-
-          # Ondrej PPA is external. If this fails, the script must continue
-          # and use the next hosted PHP fallback.
-          sudo apt-get update -y
-          sudo apt-get install -y software-properties-common ca-certificates lsb-release apt-transport-https
-          sudo add-apt-repository ppa:ondrej/php -y
-          sudo apt-get update -y
-
-          sudo apt-get install -y \
-            "php${version}" \
-            "php${version}-cli" \
-            "php${version}-common" \
-            "php${version}-mbstring" \
-            "php${version}-xml" \
-            "php${version}-curl" \
-            "php${version}-zip" \
-            "php${version}-mysql" \
-            "php${version}-bcmath" \
-            "php${version}-intl"
-
-          return 0
-        }
-
-        for version in "${PREFERRED_VERSIONS[@]}"; do
-          echo "----------------------------------------"
-          echo "Trying PHP ${version}"
-
-          if [ -x "/usr/bin/php${version}" ]; then
-            echo "Hosted PHP ${version} found."
-            if set_php_alternatives "$version"; then
-              break
-            fi
-          else
-            echo "Hosted PHP ${version} not found."
-          fi
-
-          if install_external_php "$version"; then
-            if [ -x "/usr/bin/php${version}" ] && set_php_alternatives "$version"; then
-              break
-            fi
-          else
-            echo "External install failed or unavailable for PHP ${version}. Falling back..."
-          fi
-        done
-
-        if [ -z "$SELECTED_PHP_VERSION" ]; then
-          echo "No compatible PHP version found. Tried: ${PREFERRED_VERSIONS[*]}"
-          exit 1
-        fi
-
-        echo "Final PHP version:"
         php -v
-
-        echo "Composer version:"
         composer --version
       workingDirectory: $(rootFolder)
-      displayName: 'Select PHP 8.5 / 8.4 / 8.3 with fallback'
+      displayName: 'Install and use PHP 8.4'
 
     - script: |
-        set -Eeuo pipefail
-
+        set -e
         composer validate --no-check-publish
-        composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
-
-        # Verifies installed packages are compatible with the selected PHP runtime.
-        composer check-platform-reqs --no-dev
+        composer install --no-interaction --prefer-dist --optimize-autoloader
       workingDirectory: $(rootFolder)
-      displayName: 'Composer install using PHP $(selectedPhpVersion)'
-
-    - task: CopyFiles@2
-      displayName: 'Stage deploy files'
-      inputs:
-        SourceFolder: '$(rootFolder)'
-        Contents: |
-          app/**
-          bootstrap/app.php
-          bootstrap/providers.php
-          config/**
-          database/**
-          public/**
-          resources/views/**
-          routes/**
-          storage/app/public/**
-          artisan
-          composer.json
-          composer.lock
-          vendor/**
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/app'
-        CleanTargetFolder: true
+      displayName: 'Composer install'
 
     - task: ArchiveFiles@2
       displayName: 'Archive files'
       inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/app'
+        rootFolderOrFile: '$(rootFolder)'
         includeRootFolder: false
         archiveType: zip
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
         replaceExistingArchive: true
 
-    - upload: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       displayName: 'Upload package'
       artifact: drop
 
@@ -189,20 +77,18 @@ stages:
   dependsOn: Build
   condition: succeeded()
   jobs:
-  - job: DeploymentJob
-    displayName: Deploy to Azure App Service
+  - deployment: DeploymentJob
     pool:
       vmImage: $(vmImageName)
-
-    steps:
-    - download: current
-      artifact: drop
-      displayName: 'Download package'
-
-    - task: AzureWebApp@1
-      displayName: 'Deploy Azure Web App : app-reg-sys'
-      inputs:
-        azureSubscription: $(azureSubscription)
-        appName: $(webAppName)
-        appType: webAppLinux
-        package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+    environment: $(environmentName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            displayName: 'Deploy Azure Web App : app-reg-sys'
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appName: $(webAppName)
+              appType: webAppLinux
+              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
