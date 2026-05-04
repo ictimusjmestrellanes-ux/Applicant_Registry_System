@@ -5,7 +5,7 @@ variables:
   azureSubscription: '6fe734cc-3f4f-4a31-80ba-59dab1195e36'
   webAppName: 'app-reg-sys'
   vmImageName: 'ubuntu-latest'
-  phpVersion: '8.4'
+  phpVersion: '8.3'
   environmentName: 'app-reg-sys'
   rootFolder: $(System.DefaultWorkingDirectory)
 
@@ -20,32 +20,17 @@ stages:
     steps:
     - script: |
         set -e
-        # Add the PPA for newer PHP versions not in the default Ubuntu repos
-        sudo add-apt-repository ppa:ondrej/php -y
-        sudo apt-get update
 
-        # Install PHP 8.4 and required extensions
-        sudo apt-get install -y \
-          php$(phpVersion) \
-          php$(phpVersion)-cli \
-          php$(phpVersion)-common \
-          php$(phpVersion)-curl \
-          php$(phpVersion)-mbstring \
-          php$(phpVersion)-xml \
-          php$(phpVersion)-bcmath \
-          php$(phpVersion)-zip \
-          php$(phpVersion)-intl \
-          php$(phpVersion)-mysql \
-          php$(phpVersion)-sqlite3
-
-        # Set the environment to use the specific PHP version
         sudo update-alternatives --set php /usr/bin/php$(phpVersion)
         sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
-        
+        sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
+        sudo update-alternatives --set php-cgi /usr/bin/php-cgi$(phpVersion)
+        sudo update-alternatives --set phar.phar /usr/bin/phar.phar$(phpVersion)
         php -v
+        php -r "exit(version_compare(PHP_VERSION, '8.3.0', '>=') ? 0 : 1);"
         composer --version
       workingDirectory: $(rootFolder)
-      displayName: 'Install and Use PHP $(phpVersion)'
+      displayName: 'Use PHP version $(phpVersion)'
 
     - script: |
         set -e
