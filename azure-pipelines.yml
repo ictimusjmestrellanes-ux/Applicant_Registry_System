@@ -6,7 +6,7 @@ variables:
   webAppName: 'app-reg-sys'
   vmImageName: 'ubuntu-latest'
   environmentName: 'app-reg-sys'
-  rootFolder: $(System.DefaultWorkingDirectory)
+  rootFolder: '$(System.DefaultWorkingDirectory)'
 
 stages:
 - stage: Build
@@ -17,55 +17,151 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - checkout: self
+
     - script: |
         set -e
 
+        echo "Current PHP version, if available:"
         php -v || true
 
-        if ! command -v php8.4 >/dev/null 2>&1; then
-          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30
-          sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https
+        REQUIRED_EXTENSIONS=(
+          cli
+          common
+          curl
+          mbstring
+          xml
+          bcmath
+          zip
+          intl
+          mysql
+          sqlite3
+        )
+
+        php_exists() {
+          command -v "php$1" >/dev/null 2>&1
+        }
+
+        use_php_version() {
+          local version="$1"
+
+          echo "Trying to use PHP ${version}..."
+
+          if ! php_exists "$version"; then
+            echo "PHP ${version} is not installed."
+            return 1
+          fi
+
+          sudo update-alternatives --set php "/usr/bin/php${version}" || return 1
+          sudo update-alternatives --set phar "/usr/bin/phar${version}" || true
+          sudo update-alternatives --set phar.phar "/usr/bin/phar.phar${version}" || true
+          sudo update-alternatives --set phpdbg "/usr/bin/phpdbg${version}" || true
+          sudo update-alternatives --set php-cgi "/usr/bin/php-cgi${version}" || true
+
+          php -v
+
+          php -r "exit(version_compare(PHP_VERSION, '${version}.0', '>=') ? 0 : 1);" || return 1
+
+          echo "Using PHP ${version} successfully."
+          return 0
+        }
+
+        install_php_from_ondrej() {
+          local version="$1"
+
+          echo "Attempting to install PHP ${version} from Ondrej PPA..."
+
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30 || return 1
+          sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https || return 1
 
           curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xB8DC7E53946656EFBCE4C1DD71DAEAAB4AD4CAB6" \
             | gpg --dearmor \
-            | sudo tee /usr/share/keyrings/ondrej-php.gpg >/dev/null
+            | sudo tee /usr/share/keyrings/ondrej-php.gpg >/dev/null || return 1
 
           echo "deb [signed-by=/usr/share/keyrings/ondrej-php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu $(lsb_release -sc) main" \
-            | sudo tee /etc/apt/sources.list.d/ondrej-php.list >/dev/null
+            | sudo tee /etc/apt/sources.list.d/ondrej-php.list >/dev/null || return 1
 
-          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30
-          sudo apt-get install -y \
-            php8.4 \
-            php8.4-cli \
-            php8.4-common \
-            php8.4-curl \
-            php8.4-mbstring \
-            php8.4-xml \
-            php8.4-bcmath \
-            php8.4-zip \
-            php8.4-intl \
-            php8.4-mysql \
-            php8.4-sqlite3
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30 || return 1
+
+          local packages=()
+
+          for extension in "${REQUIRED_EXTENSIONS[@]}"; do
+            packages+=("php${version}-${extension}")
+          done
+
+          # Main PHP package.
+          packages=("php${version}" "${packages[@]}")
+
+          sudo apt-get install -y "${packages[@]}" || return 1
+
+          return 0
+        }
+
+        SELECTED_PHP=""
+
+        # 1. Prefer PHP 8.5 if already available.
+        if use_php_version "8.5"; then
+          SELECTED_PHP="8.5"
+
+        # 2. Try installing PHP 8.5.
+        elif install_php_from_ondrej "8.5" && use_php_version "8.5"; then
+          SELECTED_PHP="8.5"
+
+        # 3. Fallback to PHP 8.4 if already available.
+        elif use_php_version "8.4"; then
+          SELECTED_PHP="8.4"
+
+        # 4. Try installing PHP 8.4.
+        elif install_php_from_ondrej "8.4" && use_php_version "8.4"; then
+          SELECTED_PHP="8.4"
+
+        # 5. Final safe fallback to PHP 8.3.
+        elif use_php_version "8.3"; then
+          SELECTED_PHP="8.3"
+
+        else
+          echo "No supported PHP version found. Tried 8.5, 8.4, and 8.3."
+          exit 1
         fi
 
-        sudo update-alternatives --set php /usr/bin/php8.4
-        sudo update-alternatives --set phar /usr/bin/phar8.4 || true
-        sudo update-alternatives --set phar.phar /usr/bin/phar.phar8.4 || true
-        sudo update-alternatives --set phpdbg /usr/bin/phpdbg8.4 || true
-        sudo update-alternatives --set php-cgi /usr/bin/php-cgi8.4 || true
+        echo "Final selected PHP version: ${SELECTED_PHP}"
 
         php -v
-        php -r "exit(version_compare(PHP_VERSION, '8.4.0', '>=') ? 0 : 1);"
         composer --version
       workingDirectory: $(rootFolder)
-      displayName: 'Install and use PHP 8.4'
+      displayName: 'Use PHP 8.5 with fallback to 8.4 / 8.3'
 
     - script: |
         set -e
+
         composer validate --no-check-publish
-        composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+        composer install \
+          --no-interaction \
+          --prefer-dist \
+          --optimize-autoloader \
+          --no-dev
       workingDirectory: $(rootFolder)
       displayName: 'Composer install'
+
+    - script: |
+        set -e
+
+        mkdir -p storage/app/public
+        mkdir -p storage/framework/cache
+        mkdir -p storage/framework/sessions
+        mkdir -p storage/framework/views
+        mkdir -p storage/logs
+        mkdir -p bootstrap/cache
+
+        touch storage/app/public/.gitkeep
+        touch storage/framework/cache/.gitkeep
+        touch storage/framework/sessions/.gitkeep
+        touch storage/framework/views/.gitkeep
+        touch storage/logs/.gitkeep
+        touch bootstrap/cache/.gitkeep
+      workingDirectory: $(rootFolder)
+      displayName: 'Prepare Laravel writable folders'
 
     - task: CopyFiles@2
       displayName: 'Stage deploy files'
@@ -73,14 +169,13 @@ stages:
         SourceFolder: '$(rootFolder)'
         Contents: |
           app/**
-          bootstrap/app.php
-          bootstrap/providers.php
+          bootstrap/**
           config/**
           database/**
           public/**
-          resources/views/**
+          resources/**
           routes/**
-          storage/app/public/**
+          storage/**
           artisan
           composer.json
           composer.lock
@@ -94,10 +189,10 @@ stages:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/app'
         includeRootFolder: false
         archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
         replaceExistingArchive: true
 
-    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+    - upload: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
       displayName: 'Upload package'
       artifact: drop
 
@@ -109,11 +204,15 @@ stages:
   - job: DeploymentJob
     pool:
       vmImage: $(vmImageName)
+
     steps:
+    - download: current
+      artifact: drop
+
     - task: AzureWebApp@1
       displayName: 'Deploy Azure Web App : app-reg-sys'
       inputs:
-        azureSubscription: $(azureSubscription)
-        appName: $(webAppName)
+        azureSubscription: '$(azureSubscription)'
+        appName: '$(webAppName)'
         appType: webAppLinux
-        package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+        package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
