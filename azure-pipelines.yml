@@ -4,164 +4,151 @@ trigger:
 variables:
   azureSubscription: '6fe734cc-3f4f-4a31-80ba-59dab1195e36'
   webAppName: 'app-reg-sys'
-  vmImageName: 'ubuntu-latest'
+
+  # Pin the image to avoid surprise changes from ubuntu-latest.
+  vmImageName: 'ubuntu-24.04'
+
+  # PHP priority order.
+  phpPreferredVersions: '8.5 8.4 8.3'
+  phpMinimumVersion: '8.3.0'
+
+  # Set to false if you want to completely avoid PPA/external installs.
+  useExternalPhpInstaller: 'true'
+
   environmentName: 'app-reg-sys'
-  rootFolder: '$(System.DefaultWorkingDirectory)'
+  rootFolder: $(System.DefaultWorkingDirectory)
 
 stages:
 - stage: Build
   displayName: Build stage
   jobs:
   - job: BuildJob
+    displayName: Build Laravel app
     pool:
       vmImage: $(vmImageName)
 
     steps:
-    - checkout: self
-
     - script: |
-        set -e
+        set -Eeuo pipefail
 
-        echo "Current PHP version, if available:"
-        php -v || true
+        PREFERRED_VERSIONS=($(phpPreferredVersions))
+        MINIMUM_VERSION="$(phpMinimumVersion)"
+        USE_EXTERNAL="$(useExternalPhpInstaller)"
+        SELECTED_PHP_VERSION=""
 
-        REQUIRED_EXTENSIONS=(
-          cli
-          common
-          curl
-          mbstring
-          xml
-          bcmath
-          zip
-          intl
-          mysql
-          sqlite3
-        )
+        echo "Preferred PHP versions: ${PREFERRED_VERSIONS[*]}"
+        echo "Minimum PHP version: ${MINIMUM_VERSION}"
+        echo "Use external PHP installer: ${USE_EXTERNAL}"
 
-        php_exists() {
-          command -v "php$1" >/dev/null 2>&1
-        }
-
-        use_php_version() {
+        set_php_alternatives() {
           local version="$1"
 
-          echo "Trying to use PHP ${version}..."
+          echo "Configuring PHP ${version}..."
 
-          if ! php_exists "$version"; then
-            echo "PHP ${version} is not installed."
-            return 1
-          fi
+          # Required binaries are updated only if they exist.
+          # Some hosted images may not include every PHP companion binary.
+          for binary in php phar phpdbg php-cgi phar.phar; do
+            local path="/usr/bin/${binary}${version}"
 
-          sudo update-alternatives --set php "/usr/bin/php${version}" || return 1
-          sudo update-alternatives --set phar "/usr/bin/phar${version}" || true
-          sudo update-alternatives --set phar.phar "/usr/bin/phar.phar${version}" || true
-          sudo update-alternatives --set phpdbg "/usr/bin/phpdbg${version}" || true
-          sudo update-alternatives --set php-cgi "/usr/bin/php-cgi${version}" || true
+            if [ -x "$path" ]; then
+              sudo update-alternatives --set "$binary" "$path"
+            else
+              echo "Skipping ${binary}: ${path} not found."
+            fi
+          done
 
           php -v
 
-          php -r "exit(version_compare(PHP_VERSION, '${version}.0', '>=') ? 0 : 1);" || return 1
+          # Validate exact selected PHP major.minor.
+          php -r "exit((PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION) === '${version}' ? 0 : 1);"
 
-          echo "Using PHP ${version} successfully."
+          # Validate minimum supported PHP version.
+          php -r "exit(version_compare(PHP_VERSION, '${MINIMUM_VERSION}', '>=') ? 0 : 1);"
+
+          SELECTED_PHP_VERSION="$version"
+          echo "Selected PHP version: ${SELECTED_PHP_VERSION}"
+          echo "##vso[task.setvariable variable=selectedPhpVersion]${SELECTED_PHP_VERSION}"
+
           return 0
         }
 
-        install_php_from_ondrej() {
+        install_external_php() {
           local version="$1"
 
-          echo "Attempting to install PHP ${version} from Ondrej PPA..."
+          if [ "$USE_EXTERNAL" != "true" ]; then
+            echo "External PHP installer is disabled."
+            return 1
+          fi
 
-          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30 || return 1
-          sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https || return 1
+          echo "Trying external install for PHP ${version}..."
 
-          curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xB8DC7E53946656EFBCE4C1DD71DAEAAB4AD4CAB6" \
-            | gpg --dearmor \
-            | sudo tee /usr/share/keyrings/ondrej-php.gpg >/dev/null || return 1
+          # Ondrej PPA is external. If this fails, the script must continue
+          # and use the next hosted PHP fallback.
+          sudo apt-get update -y
+          sudo apt-get install -y software-properties-common ca-certificates lsb-release apt-transport-https
+          sudo add-apt-repository ppa:ondrej/php -y
+          sudo apt-get update -y
 
-          echo "deb [signed-by=/usr/share/keyrings/ondrej-php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu $(lsb_release -sc) main" \
-            | sudo tee /etc/apt/sources.list.d/ondrej-php.list >/dev/null || return 1
-
-          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout=30 || return 1
-
-          local packages=()
-
-          for extension in "${REQUIRED_EXTENSIONS[@]}"; do
-            packages+=("php${version}-${extension}")
-          done
-
-          # Main PHP package.
-          packages=("php${version}" "${packages[@]}")
-
-          sudo apt-get install -y "${packages[@]}" || return 1
+          sudo apt-get install -y \
+            "php${version}" \
+            "php${version}-cli" \
+            "php${version}-common" \
+            "php${version}-mbstring" \
+            "php${version}-xml" \
+            "php${version}-curl" \
+            "php${version}-zip" \
+            "php${version}-mysql" \
+            "php${version}-bcmath" \
+            "php${version}-intl"
 
           return 0
         }
 
-        SELECTED_PHP=""
+        for version in "${PREFERRED_VERSIONS[@]}"; do
+          echo "----------------------------------------"
+          echo "Trying PHP ${version}"
 
-        # 1. Prefer PHP 8.5 if already available.
-        if use_php_version "8.5"; then
-          SELECTED_PHP="8.5"
+          if [ -x "/usr/bin/php${version}" ]; then
+            echo "Hosted PHP ${version} found."
+            if set_php_alternatives "$version"; then
+              break
+            fi
+          else
+            echo "Hosted PHP ${version} not found."
+          fi
 
-        # 2. Try installing PHP 8.5.
-        elif install_php_from_ondrej "8.5" && use_php_version "8.5"; then
-          SELECTED_PHP="8.5"
+          if install_external_php "$version"; then
+            if [ -x "/usr/bin/php${version}" ] && set_php_alternatives "$version"; then
+              break
+            fi
+          else
+            echo "External install failed or unavailable for PHP ${version}. Falling back..."
+          fi
+        done
 
-        # 3. Fallback to PHP 8.4 if already available.
-        elif use_php_version "8.4"; then
-          SELECTED_PHP="8.4"
-
-        # 4. Try installing PHP 8.4.
-        elif install_php_from_ondrej "8.4" && use_php_version "8.4"; then
-          SELECTED_PHP="8.4"
-
-        # 5. Final safe fallback to PHP 8.3.
-        elif use_php_version "8.3"; then
-          SELECTED_PHP="8.3"
-
-        else
-          echo "No supported PHP version found. Tried 8.5, 8.4, and 8.3."
+        if [ -z "$SELECTED_PHP_VERSION" ]; then
+          echo "No compatible PHP version found. Tried: ${PREFERRED_VERSIONS[*]}"
           exit 1
         fi
 
-        echo "Final selected PHP version: ${SELECTED_PHP}"
-
+        echo "Final PHP version:"
         php -v
+
+        echo "Composer version:"
         composer --version
       workingDirectory: $(rootFolder)
-      displayName: 'Use PHP 8.5 with fallback to 8.4 / 8.3'
+      displayName: 'Select PHP 8.5 / 8.4 / 8.3 with fallback'
 
     - script: |
-        set -e
+        set -Eeuo pipefail
 
         composer validate --no-check-publish
+        composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-        composer install \
-          --no-interaction \
-          --prefer-dist \
-          --optimize-autoloader \
-          --no-dev
+        # Verifies installed packages are compatible with the selected PHP runtime.
+        composer check-platform-reqs --no-dev
       workingDirectory: $(rootFolder)
-      displayName: 'Composer install'
-
-    - script: |
-        set -e
-
-        mkdir -p storage/app/public
-        mkdir -p storage/framework/cache
-        mkdir -p storage/framework/sessions
-        mkdir -p storage/framework/views
-        mkdir -p storage/logs
-        mkdir -p bootstrap/cache
-
-        touch storage/app/public/.gitkeep
-        touch storage/framework/cache/.gitkeep
-        touch storage/framework/sessions/.gitkeep
-        touch storage/framework/views/.gitkeep
-        touch storage/logs/.gitkeep
-        touch bootstrap/cache/.gitkeep
-      workingDirectory: $(rootFolder)
-      displayName: 'Prepare Laravel writable folders'
+      displayName: 'Composer install using PHP $(selectedPhpVersion)'
 
     - task: CopyFiles@2
       displayName: 'Stage deploy files'
@@ -169,13 +156,14 @@ stages:
         SourceFolder: '$(rootFolder)'
         Contents: |
           app/**
-          bootstrap/**
+          bootstrap/app.php
+          bootstrap/providers.php
           config/**
           database/**
           public/**
-          resources/**
+          resources/views/**
           routes/**
-          storage/**
+          storage/app/public/**
           artisan
           composer.json
           composer.lock
@@ -202,17 +190,19 @@ stages:
   condition: succeeded()
   jobs:
   - job: DeploymentJob
+    displayName: Deploy to Azure App Service
     pool:
       vmImage: $(vmImageName)
 
     steps:
     - download: current
       artifact: drop
+      displayName: 'Download package'
 
     - task: AzureWebApp@1
       displayName: 'Deploy Azure Web App : app-reg-sys'
       inputs:
-        azureSubscription: '$(azureSubscription)'
-        appName: '$(webAppName)'
+        azureSubscription: $(azureSubscription)
+        appName: $(webAppName)
         appType: webAppLinux
         package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
