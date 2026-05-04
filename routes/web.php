@@ -8,10 +8,16 @@ use App\Http\Controllers\PermitController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\UserController;
 
-// Redirect root to login page
+// Public applicant intake entry point
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect()->route('apply');
 });
+
+Route::get('/apply', [ApplicantController::class, 'publicCreate'])->name('apply');
+Route::post('/apply', [ApplicantController::class, 'publicStore'])->name('apply.store');
+Route::get('/apply/success', function () {
+    return redirect()->route('apply');
+})->name('apply.success');
 
 // Login/Logout routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

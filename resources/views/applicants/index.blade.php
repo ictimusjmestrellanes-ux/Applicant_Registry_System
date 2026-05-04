@@ -10,6 +10,7 @@
         $selectedCivilStatus = $filters['civil_status'] ?? '';
         $selectedCity = $filters['city'] ?? '';
         $selectedBarangay = $filters['barangay'] ?? '';
+        $selectedTransactionType = $filters['transaction_type'] ?? '';
         $dateFrom = $filters['date_from'] ?? '';
         $dateTo = $filters['date_to'] ?? '';
         $perPage = (string) request('per_page', '10');
@@ -23,6 +24,7 @@
             $selectedCivilStatus,
             $selectedCity,
             $selectedBarangay,
+            $selectedTransactionType,
             $dateFrom,
             $dateTo,
         ])->contains(fn($value) => trim((string) $value) !== '');
@@ -54,7 +56,7 @@
             <div class="section-head">
                 <div>
                     <h5 class="section-title mb-1">Filter Applicants</h5>
-                    <p class="section-copy mb-0">Narrow records by keyword, profile details, location, and created date range.</p>
+                    <p class="section-copy mb-0">Narrow records by keyword, profile details, transaction type, location, and created date range.</p>
                 </div>
                 <div class="section-head-actions">
                     <button type="button"
@@ -142,6 +144,26 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <label class="form-label field-label">Transaction Type</label>
+                            <div class="filter-input-shell">
+                                <select name="transaction_type" class="form-select index-select-control">
+                                    <option value="">All records</option>
+                                    <option value="permit" {{ $selectedTransactionType === 'permit' ? 'selected' : '' }}>
+                                        Mayor's Permit
+                                    </option>
+                                    <option value="clearance" {{ $selectedTransactionType === 'clearance' ? 'selected' : '' }}>
+                                        Mayor's Clearance
+                                    </option>
+                                    <option value="referral" {{ $selectedTransactionType === 'referral' ? 'selected' : '' }}>
+                                        Mayor's Referral
+                                    </option>
+                                    <option value="all" {{ $selectedTransactionType === 'all' ? 'selected' : '' }}>
+                                        Any transaction
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-12 col-md-6 col-xl-2">
                             <label class="form-label field-label">Date From</label>
                             <div class="filter-input-shell">
@@ -213,6 +235,20 @@
                                     <i class="bi bi-pin-map me-1"></i>Barangay: {{ $selectedBarangay }}
                                 </div>
                             @endif
+                            @if($selectedTransactionType !== '')
+                                <div class="search-chip">
+                                    <i class="bi bi-diagram-3 me-1"></i>Transaction:
+                                    @if($selectedTransactionType === 'permit')
+                                        Mayor's Permit
+                                    @elseif($selectedTransactionType === 'clearance')
+                                        Mayor's Clearance
+                                    @elseif($selectedTransactionType === 'referral')
+                                        Mayor's Referral
+                                    @else
+                                        Any transaction
+                                    @endif
+                                </div>
+                            @endif
                             @if($dateFrom !== '' || $dateTo !== '')
                                 <div class="search-chip">
                                     <i class="bi bi-calendar-range me-1"></i>Date:
@@ -239,6 +275,9 @@
                         @endif
                         @if($selectedBarangay !== '')
                             <input type="hidden" name="barangay" value="{{ $selectedBarangay }}">
+                        @endif
+                        @if($selectedTransactionType !== '')
+                            <input type="hidden" name="transaction_type" value="{{ $selectedTransactionType }}">
                         @endif
                         @if($dateFrom !== '')
                             <input type="hidden" name="date_from" value="{{ $dateFrom }}">

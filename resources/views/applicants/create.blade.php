@@ -3,13 +3,18 @@
 @section('title', 'Add Applicant')
 
 @section('content')
+    @php
+        $educationalAttainments = config('educational_attainments', []);
+        $selectedEducationalAttainment = old('educational_attainment');
+    @endphp
+
     <style>
         :root {
             --create-ink: #10243d;
             --create-slate: #5f7088;
             --create-line: #d9e4ef;
             --create-soft: #f5f8fc;
-            --create-panel: rgba(255, 255, 255, 0.84);
+            --create-panel: rgba(255, 255, 255, 0.88);
             --create-primary: #1d4ed8;
             --create-primary-soft: #dbeafe;
             --create-success: #059669;
@@ -18,51 +23,38 @@
             --create-warm-soft: #fef3c7;
         }
 
-        body {
-            background-color: #eef4f9;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         .applicant-create-page {
-            max-width: 1720px;
+            max-width: 1680px;
         }
 
         .create-hero {
             position: relative;
             overflow: hidden;
             padding: 28px 30px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.75);
-            background-color: #ffffff;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
             box-shadow: 0 18px 40px rgba(15, 34, 58, 0.08);
         }
 
         .create-hero::after {
             content: "";
             position: absolute;
-            right: -60px;
-            top: -60px;
-            width: 220px;
-            height: 220px;
+            right: -70px;
+            top: -70px;
+            width: 240px;
+            height: 240px;
             border-radius: 999px;
-            background: rgba(29, 78, 216, 0.07);
-        }
-
-        .page-title-wrap,
-        .quick-guide,
-        .form-shell {
-            position: relative;
-            z-index: 1;
+            background: rgba(29, 78, 216, 0.06);
         }
 
         .page-kicker,
-        .stat-label,
+        .section-title,
         .field-label {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.78rem;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
@@ -71,90 +63,62 @@
             margin-bottom: 10px;
             padding: 7px 12px;
             border-radius: 999px;
-            background-color: var(--create-primary-soft);
+            background: var(--create-primary-soft);
             color: var(--create-primary);
-        }
-            display: block;
-            margin-top: 6px;
-            font-size: 0.82rem;
+            font-size: 0.75rem;
         }
 
-        .quick-guide {
-            padding: 1.4rem;
-            height: 100%;
-            background-color: #ffffff;
-        }
-
-        .guide-title {
-            font-size: 0.96rem;
-            font-weight: 800;
+        .page-title {
+            margin: 0 0 10px;
             color: var(--create-ink);
-            margin-bottom: 0.8rem;
+            font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
         }
 
-        .guide-list {
-            display: grid;
-            gap: 0.75rem;
+        .page-copy {
+            max-width: 820px;
+            margin: 0;
+            color: var(--create-slate);
         }
 
-        .guide-item {
+        .hero-stats {
             display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            padding: 0.85rem 0.95rem;
-            border-radius: 16px;
-            background-color: #ffffff;
-            border: 1px solid #e2ebf4;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            justify-content: flex-end;
         }
 
-        .guide-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
+        .hero-chip {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 1rem;
+            gap: 0.45rem;
+            padding: 0.6rem 0.85rem;
+            border-radius: 999px;
+            border: 1px solid #dce6f0;
+            background: rgba(255, 255, 255, 0.95);
+            color: #4b5f7a;
+            font-size: 0.8rem;
+            font-weight: 700;
         }
 
-        .icon-blue {
-            background-color: rgba(59, 130, 246, 0.12);
-            color: #2563eb;
+        .form-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1.25rem;
+            margin-top: 1.25rem;
         }
 
-        .icon-emerald {
-            background-color: rgba(16, 185, 129, 0.12);
-            color: #059669;
-        }
-
-        .icon-amber {
-            background-color: rgba(245, 158, 11, 0.16);
-            color: #b45309;
+        .form-shell {
+            min-width: 0;
         }
 
         .form-shell {
             padding: 22px;
-        }
-
-        .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 18px;
-            padding: 0 2px;
-        }
-
-        .form-chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.45rem 0.8rem;
-            border-radius: 999px;
-            background-color: var(--create-success-soft);
-            color: var(--create-success);
-            font-size: 0.8rem;
-            font-weight: 700;
+            border-radius: 28px;
+            border: 1px solid #e5edf5;
+            background: var(--create-panel);
+            box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
         }
 
         .form-stack {
@@ -164,18 +128,16 @@
 
         .form-section {
             padding: 1.35rem;
+            border-radius: 22px;
+            border: 1px solid #e4edf7;
+            background: #ffffff;
         }
 
         .section-title {
             position: relative;
-            display: flex;
-            align-items: center;
-            gap: 10px;
             margin-bottom: 16px;
             color: var(--create-ink);
-            font-size: 0.96rem;
-            font-weight: 800;
-            letter-spacing: 0.01em;
+            font-size: 0.92rem;
         }
 
         .section-title::before {
@@ -183,7 +145,7 @@
             width: 10px;
             height: 10px;
             border-radius: 999px;
-            background-color: #10b981;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
             box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08);
         }
 
@@ -191,8 +153,6 @@
             margin-bottom: 7px;
             color: #44526f;
             font-size: 0.82rem;
-            font-weight: 700;
-            letter-spacing: 0.01em;
         }
 
         .form-control,
@@ -203,72 +163,25 @@
             padding: 10px 14px;
             font-size: 14px;
             background: #f8fbff;
-            transition: all .25s ease;
+            transition: all 0.25s ease;
         }
 
         .form-control:hover,
         .form-select:hover {
             border-color: #bfd0e6;
+            background: #ffffff;
         }
 
         .form-control:focus,
         .form-select:focus {
             border-color: #7aa2ff;
-            background: #fff;
+            background: #ffffff;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
         }
 
         .required-mark {
             color: #ef4444;
             margin-left: 3px;
-            font-weight: 800;
-        }
-
-        .aside-panel {
-            display: grid;
-            gap: 1rem;
-            align-content: start;
-        }
-
-        .aside-card {
-            padding: 1.2rem;
-            border-radius: 20px;
-            border: 1px solid #dfe9f3;
-            background-color: #fbfdff;
-        }
-
-        .aside-title {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--create-ink);
-            margin-bottom: 0.75rem;
-        }
-
-        .aside-list {
-            display: grid;
-            gap: 0.65rem;
-        }
-
-        .aside-item {
-            display: flex;
-            gap: 0.6rem;
-            align-items: flex-start;
-            color: var(--create-slate);
-            font-size: 0.88rem;
-        }
-
-        .aside-dot {
-            width: 8px;
-            height: 8px;
-            margin-top: 0.35rem;
-            border-radius: 999px;
-            background: #3b82f6;
-            flex-shrink: 0;
-        }
-
-        .sticky-card {
-            position: sticky;
-            top: 24px;
         }
 
         .form-footer {
@@ -276,8 +189,8 @@
             justify-content: flex-end;
             gap: 12px;
             padding-top: 20px;
-            border-top: 1px solid #e4edf7;
             margin-top: 20px;
+            border-top: 1px solid #e4edf7;
         }
 
         .btn-cancel,
@@ -299,52 +212,55 @@
         }
 
         .btn-save {
-            background-color: #1d4ed8;
+            background: #1d4ed8;
             border: none;
-            color: #fff;
+            color: #ffffff;
             box-shadow: 0 10px 22px rgba(29, 78, 216, 0.24);
         }
 
         .btn-save:hover {
             transform: translateY(-1px);
             box-shadow: 0 14px 28px rgba(29, 78, 216, 0.28);
-            color: #5b6b8b;
+            color: #ffffff;
+        }
+
+        .select2-container .select2-selection--single {
+            min-height: 48px;
+            border-radius: 14px;
+            border: 1px solid var(--create-line);
+            background: #f8fbff;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #212529;
+            line-height: 46px;
+            padding-left: 0;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px;
+            right: 10px;
         }
 
         @media (max-width: 1400px) {
             .form-layout {
                 grid-template-columns: 1fr;
             }
-
-            .sticky-card {
-                position: static;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 768px) {
-            .create-hero {
-                padding: 22px 20px;
-            }
-
-            .create-hero h2 {
-                font-size: 1.55rem;
-            }
-
+            .create-hero,
             .form-shell,
             .form-section {
                 padding: 18px;
             }
 
-            .form-header,
             .form-footer {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
 
             .btn-cancel,
@@ -355,7 +271,6 @@
     </style>
 
     <div class="container-fluid applicant-create-page py-4 px-md-4 px-xl-5">
-
         @if ($errors->any())
             <div class="alert alert-danger border-0 shadow-sm mb-4">
                 <ul class="mb-0">
@@ -366,62 +281,68 @@
             </div>
         @endif
 
-        <form action="{{ route('applicants.store') }}" method="POST">
-            @csrf
-
-            <div class="form-shell">
-                <div class="form-header">
-                    <div>
-                        <h5 class="fw-bold mb-1">Applicant Information Form</h5>
-                        <p class="form-note mb-0">Fill out the profile below. After saving, you’ll continue in the applicant
-                            workspace to manage requirements.</p>
-                    </div>
+        <div class="create-hero">
+            <div class="row g-3 align-items-start">
+                <div class="col-lg-8">
+                    <span class="page-kicker">Applicant Intake</span>
+                    <h1 class="page-title">Add a new applicant record</h1>
+                    <p class="page-copy">
+                        Use this form to register an applicant profile before moving on to permits, clearance, or referral processing.
+                    </p>
                 </div>
+                
+            </div>
+        </div>
 
-                <div class="form-layout">
+        <div class="form-layout">
+            <div class="form-shell">
+                <form action="{{ route('applicants.store') }}" method="POST">
+                    @csrf
+
                     <div class="form-stack">
                         <section class="form-section">
-                            <h6 class="section-title">Personal Information</h6>
+                            <h2 class="section-title">Personal Information</h2>
                             <div class="row g-4">
                                 <div class="col-md-2">
-                                    <label class="form-label">First Time Jobseeker <span
-                                            class="required-mark">*</span></label>
+                                    <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
                                     <select name="first_time_job_seeker" class="form-select" required>
                                         <option value="NO" {{ old('first_time_job_seeker', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
-                                        <option value="YES" {{ old('first_time_job_seeker', 'YES') === 'YES' ? 'selected' : '' }}>YES
-                                        </option>
+                                        <option value="YES" {{ old('first_time_job_seeker') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">First Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="first_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
-                                        value="{{ old('first_name') }}" placeholder="e.g. John" required>
+                                    <input type="text" name="first_name" class="form-control"
+                                        value="{{ old('first_name') }}" oninput="this.value = this.value.toUpperCase()"
+                                        placeholder="e.g. JOHN" required>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Middle Name</label>
-                                    <input type="text" name="middle_name" class="form-control" oninput="this.value = this.value.toUpperCase()"
-                                        value="{{ old('middle_name') }}" placeholder="Optional">
+                                    <input type="text" name="middle_name" class="form-control"
+                                        value="{{ old('middle_name') }}" oninput="this.value = this.value.toUpperCase()"
+                                        placeholder="Optional">
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Last Name <span class="required-mark">*</span></label>
-                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" oninput="this.value = this.value.toUpperCase()"
-                                        placeholder="e.g. Doe" required>
+                                    <input type="text" name="last_name" class="form-control"
+                                        value="{{ old('last_name') }}" oninput="this.value = this.value.toUpperCase()"
+                                        placeholder="e.g. DOE" required>
                                 </div>
                                 <div class="col-md-1">
                                     <label class="form-label">Suffix</label>
                                     <select name="suffix" class="form-select">
                                         <option value="">Optional</option>
-                                        <option value="JR." {{ old('suffix') === 'JR.' ? 'selected' : '' }}>JR.</option>
-                                        <option value="SR." {{ old('suffix') === 'SR.' ? 'selected' : '' }}>SR.</option>
-                                        <option value="II" {{ old('suffix') === 'II' ? 'selected' : '' }}>II</option>
-                                        <option value="III" {{ old('suffix') === 'III' ? 'selected' : '' }}>III</option>
-                                        <option value="IV" {{ old('suffix') === 'IV' ? 'selected' : '' }}>IV</option>
+                                        @foreach (['JR.', 'SR.', 'II', 'III', 'IV'] as $suffix)
+                                            <option value="{{ $suffix }}" {{ old('suffix') === $suffix ? 'selected' : '' }}>
+                                                {{ $suffix }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Age <span class="required-mark">*</span></label>
                                     <input type="number" name="age" class="form-control" value="{{ old('age') }}"
-                                        placeholder="e.g. 25" required>
+                                        placeholder="e.g. 25" min="1" required>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Sex <span class="required-mark">*</span></label>
@@ -440,15 +361,15 @@
                                         <option value="WIDOWED" {{ old('civil_status') === 'WIDOWED' ? 'selected' : '' }}>WIDOWED</option>
                                     </select>
                                 </div>
-                                <div class="col-md-1" style="text-align: center">
-                                    <label class="form-label">PWD?<span class="required-mark">*</span></label>
+                                <div class="col-md-1 text-center">
+                                    <label class="form-label">PWD<span class="required-mark">*</span></label>
                                     <select name="pwd" class="form-select" required>
                                         <option value="NO" {{ old('pwd', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
                                         <option value="YES" {{ old('pwd') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
-                                <div class="col-md-1" style="text-align: center">
-                                    <label class="form-label">4Ps?<span class="required-mark">*</span></label>
+                                <div class="col-md-1 text-center">
+                                    <label class="form-label">4Ps<span class="required-mark">*</span></label>
                                     <select name="four_ps" class="form-select" required>
                                         <option value="NO" {{ old('four_ps', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
                                         <option value="YES" {{ old('four_ps') === 'YES' ? 'selected' : '' }}>YES</option>
@@ -458,29 +379,28 @@
                         </section>
 
                         <section class="form-section">
-                            <h6 class="section-title">Contact & Location</h6>
+                            <h2 class="section-title">Contact & Location</h2>
                             <div class="row g-4">
                                 <div class="col-md-4">
                                     <label class="form-label">Contact Number <span class="required-mark">*</span></label>
-                                    <input type="tel" name="contact_no" class="form-control" value="{{ old('contact_no') }}"
-                                        placeholder="09123456789" pattern="[0-9]{11}" maxlength="11" inputmode="numeric"
-                                        required>
+                                    <input type="tel" name="contact_no" class="form-control"
+                                        value="{{ old('contact_no') }}" placeholder="09123456789"
+                                        pattern="[0-9]{11}" maxlength="11" inputmode="numeric" required>
                                 </div>
                                 <div class="col-md-8">
                                     <label class="form-label">Complete Address <span class="required-mark">*</span></label>
-                                    <input type="text" name="address_line" class="form-control" oninput="this.value = this.value.toUpperCase()"
-                                        value="{{ old('address_line') }}" placeholder="House No. / Street / Phase / Block"
-                                        required>
+                                    <input type="text" name="address_line" class="form-control"
+                                        value="{{ old('address_line') }}" oninput="this.value = this.value.toUpperCase()"
+                                        placeholder="House No. / Street / Phase / Block" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Province <span class="required-mark">*</span></label>
-                                    <select name="province" id="province" class="form-select" required> 
+                                    <select name="province" id="province" class="form-select" required>
                                         <option value="">Select Province</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">City / Municipality <span
-                                            class="required-mark">*</span></label>
+                                    <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
                                     <select name="city" id="city" class="form-select" required>
                                         <option value="">Select City</option>
                                     </select>
@@ -495,247 +415,255 @@
                         </section>
 
                         <section class="form-section">
-                            <h6 class="section-title">Education & Hiring</h6>
+                            <h2 class="section-title">Education & Hiring</h2>
                             <div class="row g-4">
                                 <div class="col-md-4">
-                                    <label class="form-label">Educational Attainment <span
-                                            class="required-mark">*</span></label>
-                                    <select name="educational_attainment" id="educationalAttainmentSelect"
-                                        class="form-select" required>
+                                    <label class="form-label">Educational Attainment <span class="required-mark">*</span></label>
+                                    <select name="educational_attainment" id="educationalAttainmentSelect" class="form-select" required>
                                         <option value="">Select educational attainment</option>
-                                        @foreach(config('educational_attainments', []) as $attainment)
-                                            <option value="{{ $attainment }}" {{ old('educational_attainment') === $attainment ? 'selected' : '' }}>
+                                        @foreach ($educationalAttainments as $attainment)
+                                            <option value="{{ $attainment }}" {{ $selectedEducationalAttainment === $attainment ? 'selected' : '' }}>
                                                 {{ $attainment }}
                                             </option>
                                         @endforeach
-                                        @if(old('educational_attainment') && !in_array(old('educational_attainment'), config('educational_attainments', []), true))
-                                            <option value="{{ old('educational_attainment') }}" selected>
-                                                {{ old('educational_attainment') }}
-                                            </option>
+                                        @if ($selectedEducationalAttainment && !in_array($selectedEducationalAttainment, $educationalAttainments, true))
+                                            <option value="{{ $selectedEducationalAttainment }}" selected>{{ $selectedEducationalAttainment }}</option>
                                         @endif
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
                                     <input type="text" name="hiring_company" class="form-control"
-                                        oninput="this.value = this.value.toUpperCase()" value="{{ old('hiring_company') }}"
+                                        value="{{ old('hiring_company') }}" oninput="this.value = this.value.toUpperCase()"
                                         placeholder="e.g. TECH CORP" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Position Hired <span class="required-mark">*</span></label>
-                                    <input type="text" name="position_hired" class="form-control" oninput="this.value = this.value.toUpperCase()"
-                                        value="{{ old('position_hired') }}" placeholder="e.g. Software Engineer" required>
+                                    <input type="text" name="position_hired" class="form-control"
+                                        value="{{ old('position_hired') }}" oninput="this.value = this.value.toUpperCase()"
+                                        placeholder="e.g. SOFTWARE ENGINEER" required>
                                 </div>
                             </div>
                         </section>
                     </div>
-                </div>
 
-                <div class="form-footer">
-                    <a href="{{ route('applicants.index') }}" class="btn btn-cancel">Cancel</a>
-                    <button type="submit" class="btn btn-save">
-                        <i class="bi bi-check-circle-fill me-2"></i>Save Applicant
-                    </button>
-                </div>
+                    <div class="form-footer">
+                        <a href="{{ route('applicants.index') }}" class="btn btn-cancel">Cancel</a>
+                        <button type="submit" class="btn btn-save">
+                            <i class="bi bi-check-circle-fill me-2"></i>Save Applicant
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+
+        </div>
     </div>
-@endsection
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const educationalAttainmentSelect = document.getElementById('educationalAttainmentSelect');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const educationalAttainmentSelect = document.getElementById('educationalAttainmentSelect');
 
-        if (!educationalAttainmentSelect || !window.jQuery || typeof window.jQuery.fn.select2 !== 'function') {
-            return;
-        }
-
-        window.jQuery(educationalAttainmentSelect).select2({
-            placeholder: 'Select educational attainment',
-            allowClear: true,
-            width: '100%',
-            dropdownAutoWidth: true,
-            minimumResultsForSearch: 0,
-            ajax: {
-                url: '{{ url('/api/educational-attainments') }}',
-                dataType: 'json',
-                delay: 250,
-                data: params => ({
-                    q: params.term || ''
-                }),
-                processResults: data => ({
-                    results: data.results || []
-                })
-            }
-        });
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const provinceSelect = document.getElementById('province');
-        const citySelect = document.getElementById('city');
-        const barangaySelect = document.getElementById('barangay');
-        const savedProvince = @json(old('province'));
-        const savedCity = @json(old('city'));
-        const savedBarangay = @json(old('barangay'));
-
-        if (!provinceSelect || !citySelect || !barangaySelect) return;
-
-        function loadProvinces() {
-            provinceSelect.innerHTML = '<option value="">Loading provinces...</option>';
-            fetch('https://psgc.gitlab.io/api/provinces/')
-                .then(res => res.json())
-                .then(data => {
-                    const provinces = Array.isArray(data) ? data : [];
-                    provinceSelect.innerHTML = '<option value="">Select Province</option>';
-                    window._provinceCodeMap = window._provinceCodeMap || {};
-
-                    provinces.sort((a, b) => {
-                        const an = (a.name || a.province || a.description || '').toString();
-                        const bn = (b.name || b.province || b.description || '').toString();
-                        return an.localeCompare(bn, undefined, { sensitivity: 'base' });
-                    });
-
-                    provinces.forEach(p => {
-                        const rawName = p.name || p.province || p.description || '';
-                        const name = String(rawName).toUpperCase();
-                        const code = p.code || '';
-                        const option = document.createElement('option');
-                        option.value = name;
-                        option.textContent = name;
-                        option.dataset.code = code;
-                        if (savedProvince && name === String(savedProvince).toUpperCase()) option.selected = true;
-                        provinceSelect.appendChild(option);
-                        if (name && code) window._provinceCodeMap[name] = code;
-                    });
-
-                    const selected = provinceSelect.options[provinceSelect.selectedIndex];
-                    if (selected) {
-                        const code = selected.dataset.code || window._provinceCodeMap[selected.value];
-                        if (code) loadCities(code);
+            if (educationalAttainmentSelect && window.jQuery && typeof window.jQuery.fn.select2 === 'function') {
+                window.jQuery(educationalAttainmentSelect).select2({
+                    placeholder: 'Select educational attainment',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownAutoWidth: true,
+                    minimumResultsForSearch: 0,
+                    ajax: {
+                        url: '{{ url('/api/educational-attainments') }}',
+                        dataType: 'json',
+                        delay: 250,
+                        data: params => ({
+                            q: params.term || ''
+                        }),
+                        processResults: data => ({
+                            results: data.results || []
+                        })
                     }
-                })
-                .catch(() => provinceSelect.innerHTML = '<option value="">Unable to load provinces</option>');
-        }
-
-        async function loadCities(provinceIdentifier) {
-            citySelect.innerHTML = '<option>Loading cities...</option>';
-            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-
-            let provinceCode = provinceIdentifier;
-            if (isNaN(Number(provinceCode))) provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode] ? window._provinceCodeMap[provinceCode] : provinceCode;
-
-            try {
-                const res = await fetch(`https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`);
-                if (!res.ok) throw new Error('no-cities');
-                const data = await res.json();
-                citySelect.innerHTML = '<option value="">Select City</option>';
-                data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                data.forEach(city => {
-                    const rawName = city.name || city.description || '';
-                    const cleaned = String(rawName).replace(/^\s*(city of|municipality of)\s+/i, '');
-                    let name = String(cleaned).toUpperCase().trim();
-                    const isCity = /city/i.test(rawName);
-                    if (isCity && !/\bCITY$/.test(name)) name = (name + ' CITY').trim();
-                    const option = document.createElement('option');
-                    option.value = name;
-                    option.textContent = name;
-                    option.dataset.code = city.code || '';
-                    if (savedCity && name === String(savedCity).toUpperCase()) option.selected = true;
-                    citySelect.appendChild(option);
                 });
-
-                // If provinceIdentifier corresponds to Batangas, append extra institutions/entries
-                (function appendBatangasExtras() {
-                    let provinceNameUpper = '';
-                    if (isNaN(Number(provinceIdentifier))) provinceNameUpper = String(provinceIdentifier).toUpperCase();
-                    else if (window._provinceCodeMap) {
-                        for (const k in window._provinceCodeMap) {
-                            if (window._provinceCodeMap[k] === provinceCode) { provinceNameUpper = k; break; }
-                        }
-                    }
-
-                    if (provinceNameUpper && provinceNameUpper.includes('BATANGAS')) {
-                        const extras = ['BATANGAS PROVINCE','BATANGAS STATE UNIVERSITY','UNIVERSITY OF BATANGAS-MAIN','RIZAL COLLEGE OF TAAL'];
-                        extras.forEach(raw => {
-                            const base = String(raw).replace(/^\s*(city of|municipality of)\s+/i, '').toUpperCase().trim();
-                            const isCityExtra = /city/i.test(raw);
-                            const name = (isCityExtra && !/\bCITY$/.test(base)) ? (base + ' CITY') : base;
-                            if (!Array.from(citySelect.options).some(o => o.value === name)) {
-                                const option = document.createElement('option');
-                                option.value = name;
-                                option.textContent = name;
-                                option.dataset.code = '';
-                                if (savedCity && name === String(savedCity).toUpperCase()) option.selected = true;
-                                citySelect.appendChild(option);
-                            }
-                        });
-                    }
-
-                    if (provinceNameUpper && provinceNameUpper.includes('CAVITE')) {
-                        const caviteExtras = [
-                            'ALFONSO','AMADEO','BACOOR CITY','CARMONA','CAVITE CITY','DASMARIÑAS CITY','GENERAL EMILIO AGUINALDO','GENERAL MARIANO ALVAREZ','CITY OF GENERAL TRIAS','IMUS CITY','INDANG','KAWIT','MAGALLANES','MARAGONDON','MENDEZ','NAIC','NOVELETA','ROSARIO','SILANG','TAGAYTAY CITY','TANZA','TERNATE','TRECE MARTIRES CITY','CAVITE PROVINCE'
-                        ];
-                        caviteExtras.forEach(raw => {
-                            const base = String(raw).replace(/^\s*(city of|municipality of)\s+/i, '').toUpperCase().trim();
-                            const isCityExtra = /city/i.test(raw);
-                            const name = (isCityExtra && !/\bCITY$/.test(base)) ? (base + ' CITY') : base;
-                            if (!Array.from(citySelect.options).some(o => o.value === name)) {
-                                const option = document.createElement('option');
-                                option.value = name;
-                                option.textContent = name;
-                                option.dataset.code = '';
-                                if (savedCity && name === String(savedCity).toUpperCase()) option.selected = true;
-                                citySelect.appendChild(option);
-                            }
-                        });
-                    }
-                })();
-
-                const selectedCity = citySelect.options[citySelect.selectedIndex];
-                if (selectedCity && selectedCity.dataset.code) loadBarangays(selectedCity.dataset.code);
-            } catch (e) {
-                citySelect.innerHTML = '<option value="">Unable to load cities</option>';
             }
-        }
+        });
+    </script>
 
-        function loadBarangays(cityCode) {
-            barangaySelect.innerHTML = '<option>Loading barangays...</option>';
-            if (!cityCode) return barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const provinceSelect = document.getElementById('province');
+            const citySelect = document.getElementById('city');
+            const barangaySelect = document.getElementById('barangay');
+            const savedProvince = @json(old('province'));
+            const savedCity = @json(old('city'));
+            const savedBarangay = @json(old('barangay'));
 
-            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(cityCode)}/barangays/`)
-                .then(res => res.json())
-                .then(data => {
-                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-                    data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-                    data.forEach(b => {
-                        const rawName = b.name || '';
-                        // remove occurrences like (POB.) or (Pob) that appear in some datasets
-                        const cleaned = String(rawName).replace(/\(\s*POB\.?\s*\)/ig, '').trim();
-                        const name = String(cleaned).toUpperCase();
-                        const option = document.createElement('option');
-                        option.value = name;
-                        option.textContent = name;
-                        if (savedBarangay && name === String(savedBarangay).toUpperCase()) option.selected = true;
-                        barangaySelect.appendChild(option);
+            if (!provinceSelect || !citySelect || !barangaySelect) return;
+
+            function normalizeName(value) {
+                return String(value || '').replace(/^\s*(city of|municipality of)\s+/i, '').trim().toUpperCase();
+            }
+
+            function loadProvinces() {
+                provinceSelect.innerHTML = '<option value="">Loading provinces...</option>';
+
+                fetch('https://psgc.gitlab.io/api/provinces/')
+                    .then(res => res.json())
+                    .then(data => {
+                        const provinces = Array.isArray(data) ? data : [];
+                        provinceSelect.innerHTML = '<option value="">Select Province</option>';
+                        window._provinceCodeMap = window._provinceCodeMap || {};
+
+                        provinces.sort((a, b) => {
+                            const an = (a.name || a.province || a.description || '').toString();
+                            const bn = (b.name || b.province || b.description || '').toString();
+                            return an.localeCompare(bn, undefined, { sensitivity: 'base' });
+                        });
+
+                        provinces.forEach(p => {
+                            const rawName = p.name || p.province || p.description || '';
+                            const name = String(rawName).toUpperCase();
+                            const code = p.code || '';
+
+                            const option = document.createElement('option');
+                            option.value = name;
+                            option.textContent = name;
+                            option.dataset.code = code;
+
+                            if (savedProvince && name === String(savedProvince).toUpperCase()) {
+                                option.selected = true;
+                            }
+
+                            provinceSelect.appendChild(option);
+
+                            if (name && code) {
+                                window._provinceCodeMap[name] = code;
+                            }
+                        });
+
+                        const selected = provinceSelect.options[provinceSelect.selectedIndex];
+                        if (selected) {
+                            const code = selected.dataset.code || window._provinceCodeMap[selected.value];
+                            if (code) {
+                                loadCities(code);
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        provinceSelect.innerHTML = '<option value="">Unable to load provinces</option>';
                     });
-                })
-                .catch(() => barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>');
-        }
+            }
 
-        provinceSelect.addEventListener('change', function () {
-            const selected = this.options[this.selectedIndex];
-            const code = selected?.dataset.code;
-            if (code) loadCities(code); else loadCities(selected?.value);
+            function loadCities(provinceIdentifier) {
+                citySelect.innerHTML = '<option value="">Loading cities...</option>';
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+
+                let provinceCode = provinceIdentifier;
+                if (isNaN(Number(provinceCode))) {
+                    provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode]
+                        ? window._provinceCodeMap[provinceCode]
+                        : provinceCode;
+                }
+
+                fetch(`https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`)
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error('no-cities');
+                        }
+
+                        return res.json();
+                    })
+                    .then(data => {
+                        citySelect.innerHTML = '<option value="">Select City</option>';
+                        const cities = Array.isArray(data) ? data : [];
+
+                        cities.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+
+                        cities.forEach(city => {
+                            const rawName = city.name || city.description || '';
+                            const cleaned = normalizeName(rawName);
+                            const isCity = /city/i.test(rawName);
+                            const name = isCity && !/\bCITY$/.test(cleaned) ? `${cleaned} CITY` : cleaned;
+
+                            const option = document.createElement('option');
+                            option.value = name;
+                            option.textContent = name;
+                            option.dataset.code = city.code || '';
+
+                            if (savedCity && name === String(savedCity).toUpperCase()) {
+                                option.selected = true;
+                            }
+
+                            citySelect.appendChild(option);
+                        });
+
+                        const selectedCity = citySelect.options[citySelect.selectedIndex];
+                        if (selectedCity && selectedCity.dataset.code) {
+                            loadBarangays(selectedCity.dataset.code);
+                        }
+                    })
+                    .catch(() => {
+                        citySelect.innerHTML = '<option value="">Unable to load cities</option>';
+                    });
+            }
+
+            function loadBarangays(cityCode) {
+                barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
+
+                if (!cityCode) {
+                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                    return;
+                }
+
+                fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(cityCode)}/barangays/`)
+                    .then(res => res.json())
+                    .then(data => {
+                        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                        const barangays = Array.isArray(data) ? data : [];
+
+                        barangays.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+
+                        barangays.forEach(barangay => {
+                            const rawName = barangay.name || '';
+                            const cleaned = String(rawName).replace(/\(\s*POB\.?\s*\)/ig, '').trim();
+                            const name = String(cleaned).toUpperCase();
+
+                            const option = document.createElement('option');
+                            option.value = name;
+                            option.textContent = name;
+
+                            if (savedBarangay && name === String(savedBarangay).toUpperCase()) {
+                                option.selected = true;
+                            }
+
+                            barangaySelect.appendChild(option);
+                        });
+                    })
+                    .catch(() => {
+                        barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
+                    });
+            }
+
+            provinceSelect.addEventListener('change', function () {
+                const selected = this.options[this.selectedIndex];
+                const code = selected?.dataset.code;
+
+                if (code) {
+                    loadCities(code);
+                } else if (selected?.value) {
+                    loadCities(selected.value);
+                }
+            });
+
+            citySelect.addEventListener('change', function () {
+                const selected = this.options[this.selectedIndex];
+                const code = selected?.dataset.code;
+
+                if (code) {
+                    loadBarangays(code);
+                } else {
+                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                }
+            });
+
+            loadProvinces();
         });
-
-        citySelect.addEventListener('change', function () {
-            const selected = this.options[this.selectedIndex];
-            const code = selected?.dataset.code;
-            if (code) loadBarangays(code); else loadBarangays(selected?.value);
-        });
-
-        loadProvinces();
-    });
-</script>
+    </script>
+@endsection

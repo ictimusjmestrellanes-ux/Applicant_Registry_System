@@ -8,6 +8,52 @@ use Illuminate\Http\Request;
 
 class ApplicantController extends Controller
 {
+    public function publicCreate()
+    {
+        return view('public.apply', [
+            'educationalAttainments' => config('educational_attainments', []),
+        ]);
+    }
+
+    public function publicStore(Request $request)
+    {
+        $validated = $request->validate([
+            'first_time_job_seeker' => ['required', 'in:YES,NO'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'suffix' => ['nullable', 'string', 'max:20'],
+            'age' => ['required', 'integer', 'min:1', 'max:120'],
+            'contact_no' => ['required', 'digits:11'],
+            'gender' => ['required', 'in:MALE,FEMALE'],
+            'civil_status' => ['required', 'in:SINGLE,MARRIED,WIDOWED'],
+            'pwd' => ['required', 'in:YES,NO'],
+            'four_ps' => ['required', 'in:YES,NO'],
+            'address_line' => ['required', 'string', 'max:255'],
+            'province' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'barangay' => ['required', 'string', 'max:255'],
+            'educational_attainment' => ['required', 'string', 'max:255'],
+            'hiring_company' => ['required', 'string', 'max:255'],
+            'position_hired' => ['required', 'string', 'max:255'],
+        ]);
+
+        $applicant = Applicant::create($validated);
+
+        ActivityLogger::log(
+            'applicant',
+            'created_public',
+            'Submitted a new public applicant intake form.',
+            $applicant,
+            ActivityLogger::diff([], $applicant->only($applicant->getFillable()))
+        );
+
+        return redirect()
+            ->route('apply')
+            ->with('success', 'Application submitted successfully.')
+            ->with('submitted_name', trim($applicant->first_name.' '.$applicant->last_name));
+    }
+
     public function create()
     {
         return view('applicants.create');
@@ -292,6 +338,7 @@ class ApplicantController extends Controller
     private function buildApplicantSearchQuery(array $filters)
     {
         $search = trim((string) ($filters['search'] ?? ''));
+        $transactionType = trim((string) ($filters['transaction_type'] ?? ''));
 
         return Applicant::query()
             ->when($search !== '', function ($query) use ($search) {
@@ -301,6 +348,19 @@ class ApplicantController extends Controller
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"]);
                 });
+            })
+            ->when($transactionType !== '', function ($query) use ($transactionType) {
+                return match ($transactionType) {
+                    'permit' => $query->whereHas('permit'),
+                    'clearance' => $query->whereHas('clearance'),
+                    'referral' => $query->whereHas('referral'),
+                    'all' => $query->where(function ($innerQuery) {
+                        $innerQuery->whereHas('permit')
+                            ->orWhereHas('clearance')
+                            ->orWhereHas('referral');
+                    }),
+                    default => $query,
+                };
             });
     }
 
@@ -319,6 +379,7 @@ class ApplicantController extends Controller
             'civil_status' => trim((string) $request->query('civil_status', '')),
             'city' => trim((string) $request->query('city', '')),
             'barangay' => trim((string) $request->query('barangay', '')),
+            'transaction_type' => trim((string) $request->query('transaction_type', '')),
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
         ];

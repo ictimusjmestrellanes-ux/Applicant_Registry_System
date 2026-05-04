@@ -1500,8 +1500,8 @@
                                 <div class="document-upload-card">
                                     <label class="form-label">Clearance Type (NBI or Police)<span
                                             class="required-mark">*</span></label>
-                                    <select name="clearance_type" id="clearance_type"
-                                        class="form-select form-select-sm mb-3">
+                                    <select name="clearance_type" id="clearance_type" 
+                                        class="form-select form-select-sm mb-3" required>
                                         <option value="">Select Type</option>
                                         <option value="nbi" {{ old('clearance_type', $permit->clearance_type ?? '') == 'nbi' ? 'selected' : '' }}>
                                             NBI Clearance
@@ -1514,7 +1514,7 @@
                                     <div class="gap-2" id="nbi_section" style="display:none">
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="nbi_input" name="permit_nbi_clearance" class="d-none"
-                                            onchange="showFileName(this, 'nbi_name')">
+                                            onchange="showFileName(this, 'nbi_name')" required>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="nbi_input" class="btn btn-outline-primary btn-sm">
@@ -1538,7 +1538,7 @@
 
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="police_input" name="permit_police_clearance" class="d-none"
-                                            onchange="showFileName(this, 'police_name')">
+                                            onchange="showFileName(this, 'police_name')" required>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="police_input" class="btn btn-outline-primary btn-sm">
@@ -1568,7 +1568,7 @@
                                     <label class="form-label">Health Card <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="health_card_input" name="health_card" style="display:none"
-                                            onchange="showFileName(this, 'health_card_name')">
+                                            onchange="showFileName(this, 'health_card_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('health_card_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1592,7 +1592,7 @@
                                     <label class="form-label">Cedula <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="cedula_input" name="cedula" style="display:none"
-                                            onchange="showFileName(this, 'cedula_name')">
+                                            onchange="showFileName(this, 'cedula_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('cedula_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1619,7 +1619,7 @@
                                     </label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="referral_input" name="referral_letter" style="display:none"
-                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }}>
+                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }} required>
 
                                         <button type="button" id="referral_upload_btn"
                                             class="btn btn-outline-primary btn-sm"
@@ -1673,27 +1673,27 @@
                             <div class="col-md-2">
                                 <label class="form-label">O.R No. <span class="required-mark">*</span></label>
                                 <input type="text" name="permit_or_no" value="{{ $permit->permit_or_no }}"
-                                    class="form-control">
+                                    class="form-control" required>
                             </div>
 
                             {{-- Community Tax No --}}
                             <div class="col-md-2">
                                 <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
                                 <input type="text" name="community_tax_no" class="form-control"
-                                    value="{{$permit->community_tax_no}}">
+                                    value="{{$permit->community_tax_no}}" requiredq>
                             </div>
 
                             {{-- Issued On --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="permit_issued_on" class="form-control"
-                                    value="{{$permit->permit_issued_on}}">
+                                    value="{{$permit->permit_issued_on}}" required>
                             </div>
 
                             {{-- Permit Issued At --}}
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
-                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select">
+                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
                                     <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
                                         {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
                                     </option>
@@ -1704,7 +1704,7 @@
                             <div class="col-md-2">
                                 <label class="form-label">Permit Date<span class="required-mark">*</span></label>
                                 <input type="date" id="permit_date" name="permit_date" class="form-control"
-                                    value="{{$permit->permit_date}}">
+                                    value="{{$permit->permit_date}}" required>
                             </div>
 
                             {{-- Expiration --}}
@@ -1719,13 +1719,13 @@
                                 <label class="form-label">Documentary Stamp Control No.<span
                                         class="required-mark">*</span></label>
                                 <input type="text" name="permit_doc_stamp_control_no" class="form-control"
-                                    value="{{$permit->permit_doc_stamp_control_no}}">
+                                    value="{{$permit->permit_doc_stamp_control_no}}" required>
                             </div>
                             {{-- Date of Payment --}}
                             <div class="col-md-2">
                                 <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                 <input type="date" name="permit_date_of_payment" class="form-control"
-                                    value="{{$permit->permit_date_of_payment}}">
+                                    value="{{$permit->permit_date_of_payment}}" required>
                             </div>
                         </div>
 
@@ -1790,7 +1790,7 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="prosecutor_input" name="prosecutor_clearance"
-                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')">
+                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('prosecutor_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1814,7 +1814,7 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="mtc_input" name="mtc_clearance" style="display:none"
-                                            onchange="showFileName(this, 'mtc_name')">
+                                            onchange="showFileName(this, 'mtc_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('mtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1838,7 +1838,7 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="rtc_input" name="rtc_clearance" style="display:none"
-                                            onchange="showFileName(this, 'rtc_name')">
+                                            onchange="showFileName(this, 'rtc_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('rtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1861,7 +1861,7 @@
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="c_nbi_input" name="nbi_clearance" style="display:none"
-                                            onchange="showFileName(this, 'c_nbi_name')">
+                                            onchange="showFileName(this, 'c_nbi_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('c_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1884,7 +1884,7 @@
                                     <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="brgy_input" name="barangay_clearance" style="display:none"
-                                            onchange="showFileName(this, 'brgy_name')">
+                                            onchange="showFileName(this, 'brgy_name')" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1919,21 +1919,21 @@
                             <div class="col-md-2">
                                 <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_or_no" class="form-control"
-                                    value="{{$clearance->clearance_or_no}}">
+                                    value="{{$clearance->clearance_or_no}}" required>
                             </div>
 
                             {{-- Hired Company --}}
                             <div class="col-md-2">
                                 <label class="form-label">Hired Company<span class="required-mark">*</span></label>
                                 <input type="text" name="clearance_hired_company" class="form-control"
-                                    value="{{$clearance->clearance_hired_company}}">
+                                    value="{{$clearance->clearance_hired_company}}" required>
                             </div>
 
                             {{-- Issued On --}}
                             <div class="col-md-2">
                                 <label class="form-label">Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="clearance_issued_on" class="form-control"
-                                    value="{{$clearance->clearance_issued_on}}">
+                                    value="{{$clearance->clearance_issued_on}}" required>
                             </div>
 
                             {{-- Documentary Stamp Control No --}}
@@ -1941,13 +1941,13 @@
                                 <label class="form-label">Documentary Stamp Control No.<span
                                         class="required-mark">*</span></label>
                                 <input type="text" name="clearance_doc_stamp_control_no" class="form-control"
-                                    value="{{$clearance->clearance_doc_stamp_control_no}}">
+                                    value="{{$clearance->clearance_doc_stamp_control_no}}" required>
                             </div>
                             {{-- Date of Payment --}}
                             <div class="col-md-2">
                                 <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                 <input type="date" name="clearance_date_of_payment" class="form-control"
-                                    value="{{$clearance->clearance_date_of_payment}}">
+                                    value="{{$clearance->clearance_date_of_payment}}" required>
                             </div>
                         </div>
 
@@ -2024,7 +2024,7 @@
                                 <label class="form-label">Resume / Bio-data<span class="required-mark">*</span></label>
                                 <div class="d-grid gap-2">
                                     <input type="file" id="resume_input" name="resume" style="display:none"
-                                        onchange="showFileName(this, 'resume_name')">
+                                        onchange="showFileName(this, 'resume_name')" required>
                                     <button type="button" class="btn btn-outline-primary btn-sm"
                                         onclick="document.getElementById('resume_input').click()">
                                         <i class="fas fa-upload me-1"></i> Upload File
@@ -2052,7 +2052,7 @@
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_brgy_input" name="ref_barangay_clearance"
                                             style="display:none"
-                                            onchange="handleReferralClearanceChange(this, 'ref_brgy_name', ['ref_police_input', 'ref_nbi_input'], ['ref_police_name', 'ref_nbi_name'])">
+                                            onchange="handleReferralClearanceChange(this, 'ref_brgy_name', ['ref_police_input', 'ref_nbi_input'], ['ref_police_name', 'ref_nbi_name'])" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2077,7 +2077,7 @@
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_police_input" name="ref_police_clearance"
                                             style="display:none"
-                                            onchange="handleReferralClearanceChange(this, 'ref_police_name', ['ref_brgy_input', 'ref_nbi_input'], ['ref_brgy_name', 'ref_nbi_name'])">
+                                            onchange="handleReferralClearanceChange(this, 'ref_police_name', ['ref_brgy_input', 'ref_nbi_input'], ['ref_brgy_name', 'ref_nbi_name'])" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_police_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2100,7 +2100,7 @@
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_nbi_input" name="ref_nbi_clearance" style="display:none"
-                                            onchange="handleReferralClearanceChange(this, 'ref_nbi_name', ['ref_brgy_input', 'ref_police_input'], ['ref_brgy_name', 'ref_police_name'])">
+                                            onchange="handleReferralClearanceChange(this, 'ref_nbi_name', ['ref_brgy_input', 'ref_police_input'], ['ref_brgy_name', 'ref_police_name'])" required>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2167,7 +2167,7 @@
                                                         class="required-mark">*</span></label>
                                                 <input type="text" name="ref_employer_name" class="form-control"
                                                     oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}">
+                                                    value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}" required>
                                             </div>
 
                                             <div class="col-md-2">
@@ -2175,7 +2175,7 @@
                                                         class="required-mark">*</span></label>
                                                 <input type="text" name="ref_position" class="form-control"
                                                     oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_position', $referral->ref_position ?? '') }}">
+                                                    value="{{ old('ref_position', $referral->ref_position ?? '') }}" required>
                                             </div>
 
                                             <div class="col-md-2">
@@ -2183,7 +2183,7 @@
                                                         class="required-mark">*</span></label>
                                                 <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
                                                     list="refPlaceOptions" value="{{ old('ref_place', $referral->ref_place ?? '') }}"
-                                                    oninput="this.value = this.value.toUpperCase()" placeholder="Search City Address">
+                                                    oninput="this.value = this.value.toUpperCase()" placeholder="Search City Address" required>
                                                 <datalist id="refPlaceOptions"></datalist>
                                             </div>
                                             <div class="col-md-2">
@@ -2191,14 +2191,14 @@
                                                 <input type="text" name="ref_province" id="refProvinceInput"
                                                     class="form-control" oninput="this.value = this.value.toUpperCase()"
                                                     value="{{ old('ref_province', $referral->ref_province ?? '') }}"
-                                                    placeholder="Enter Province">
+                                                    placeholder="Enter Province" required>
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label">Hired Company<span
                                                         class="required-mark">*</span></label>
                                                 <input type="text" name="ref_hired_company" class="form-control"
                                                     oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}">
+                                                    value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}" required>
                                             </div>
                                         </div>
                                         @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
@@ -2206,14 +2206,14 @@
                                                 <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
                                                     id="printReferralPesoButton" class="btn btn-outline-primary px-4"
                                                     target="_blank">
-                                                    View Employer Detail 1
+                                                    View Employer Letter Detail 1
                                                 </a>
                                             </div>
                                         @else
                                             <div class="mt-3">
                                                 <button type="button" id="printReferralPesoButton"
                                                     class="btn btn-outline-secondary justify-content-center px-4" disabled>
-                                                    <i class="fas fa-print me-1"></i> View Employer Detail 1
+                                                    <i class="fas fa-print me-1"></i> View Employer Letter Detail 1
                                                 </button>
                                             </div>
                                         @endif
@@ -2241,7 +2241,7 @@
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[{{ $extraIndex }}][ref_employer_name]"
+                                                        name="referral_details[{{ $extraIndex }}][ref_employer_name]" required
                                                         value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
                                                 </div>
                                                 <div class="col-md-2">
@@ -2249,14 +2249,14 @@
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[{{ $extraIndex }}][ref_position]"
+                                                        name="referral_details[{{ $extraIndex }}][ref_position]" required
                                                         value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">City Address<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control js-peso-ref-place-input"
-                                                        name="referral_details[{{ $extraIndex }}][ref_place]"
+                                                        name="referral_details[{{ $extraIndex }}][ref_place]" required
                                                         value="{{ old('referral_details.' . $extraIndex . '.ref_place', $extraDetail['ref_place'] ?? '') }}"
                                                         oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
                                                         placeholder="Search City Address">
@@ -2265,7 +2265,7 @@
                                                     <label class="form-label">Province<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control js-peso-ref-province-input"
-                                                        name="referral_details[{{ $extraIndex }}][ref_province]"
+                                                        name="referral_details[{{ $extraIndex }}][ref_province]" required
                                                         value="{{ old('referral_details.' . $extraIndex . '.ref_province', $extraDetail['ref_province'] ?? '') }}"
                                                         oninput="this.value = this.value.toUpperCase()"
                                                         placeholder="Enter Province">
@@ -2275,7 +2275,7 @@
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[{{ $extraIndex }}][ref_hired_company]"
+                                                        name="referral_details[{{ $extraIndex }}][ref_hired_company]" required
                                                         value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company', $extraDetail['ref_hired_company'] ?? '') }}">
                                                 </div>
                                             </div>
@@ -2284,13 +2284,13 @@
                                                     <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
                                                         class="btn btn-outline-primary px-4 js-peso-extra-print-button"
                                                         target="_blank">
-                                                        <i class="fas fa-print me-1"></i> View Employer Detail
+                                                        <i class="fas fa-print me-1"></i> View Employer Letter Detail
                                                         {{ $extraIndex + 2 }}
                                                     </a>
                                                 @else
                                                     <button type="button"
                                                         class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled>
-                                                        <i class="fas fa-print me-1"></i> View Employer Detail
+                                                        <i class="fas fa-print me-1"></i> View Employer Letter Detail
                                                         {{ $extraIndex + 2 }}
                                                     </button>
                                                 @endif
@@ -2331,14 +2331,14 @@
                                                 <label class="form-label">Employer Name<span
                                                         class="required-mark">*</span></label>
                                                 <input type="text" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    oninput="this.value = this.value.toUpperCase()" required
                                                     name="referral_details[__INDEX__][ref_employer_name]">
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label">Employer Position<span
                                                         class="required-mark">*</span></label>
                                                 <input type="text" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    oninput="this.value = this.value.toUpperCase()" required
                                                     name="referral_details[__INDEX__][ref_position]">
                                             </div>
                                             <div class="col-md-2">
@@ -2346,7 +2346,7 @@
                                                         class="required-mark">*</span></label>
                                                 <input type="text" class="form-control js-peso-ref-place-input"
                                                     name="referral_details[__INDEX__][ref_place]"
-                                                    oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
+                                                    oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions" required
                                                     placeholder="Search City Address">
                                             </div>
                                             <div class="col-md-2">
@@ -2354,14 +2354,14 @@
                                                         class="required-mark">*</span></label>
                                                 <input type="text" class="form-control js-peso-ref-province-input"
                                                     name="referral_details[__INDEX__][ref_province]"
-                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    oninput="this.value = this.value.toUpperCase()" required
                                                     placeholder="Enter Province">
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label">Hired Company<span
                                                         class="required-mark">*</span></label>
                                                 <input type="text" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()"
+                                                    oninput="this.value = this.value.toUpperCase()" required
                                                     name="referral_details[__INDEX__][ref_hired_company]">
                                             </div>
                                         </div>
@@ -2369,7 +2369,7 @@
                                             <button type="button"
                                                 class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled
                                                 title="Complete the employer detail fields first">
-                                                <i class="fas fa-print me-1"></i> View Employer Detail
+                                                <i class="fas fa-print me-1"></i> View Employer Letter Detail
                                             </button>
                                             <button type="button"
                                                 class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
@@ -2392,7 +2392,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Mayor's Name<span class="required-mark">*</span></label>
-                                        <select name="ref_recipient" id="refRecipientSelect" class="form-select">
+                                        <select name="ref_recipient" id="refRecipientSelect" class="form-select" required>
                                             <option value="">Select City Mayor</option>
                                             @foreach(config('philippine_mayors', []) as $mayor)
                                                 <option value="{{ $mayor['recipient'] }}"
@@ -2407,7 +2407,7 @@
                                     <div class="col-md-3">
                                         <label class="form-label">City Government<span
                                                 class="required-mark">*</span></label>
-                                        <select name="ref_city_gov" id="cityGovernment" class="form-select">
+                                        <select name="ref_city_gov" id="cityGovernment" class="form-select" required>
                                             <option value="">Select City Government</option>
                                         </select>
                                     </div>
@@ -2416,7 +2416,7 @@
                                         <label class="form-label">City Address<span class="required-mark">*</span></label>
                                         <input type="text" name="ref_company_address" id="refCompanyAddressInput"
                                             class="form-control" list="refCompanyAddressList" autocomplete="off"
-                                            value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}">
+                                            value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}" required>
                                     </div>
 
                                     <div class="col-12">
