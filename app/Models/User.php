@@ -16,6 +16,8 @@ class User extends Authenticatable
 
     public const ROLE_ADMIN = 'admin';
 
+    public const ROLE_STAFF = 'staff';
+
     public const ROLE_USER = 'user';
 
     /**
@@ -65,8 +67,9 @@ class User extends Authenticatable
     public static function roles(): array
     {
         return [
-            self::ROLE_ADMIN,
             self::ROLE_USER,
+            self::ROLE_STAFF,
+            self::ROLE_ADMIN,
         ];
     }
 
@@ -85,6 +88,25 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === self::ROLE_STAFF;
+    }
+
+    public function roleLabel(): string
+    {
+        return ucfirst((string) ($this->role ?: self::ROLE_USER));
+    }
+
+    public function roleBadgeClass(): string
+    {
+        return match ($this->role) {
+            self::ROLE_ADMIN => 'role-pill-admin',
+            self::ROLE_STAFF => 'role-pill-staff',
+            default => 'role-pill-user',
+        };
     }
 
     public function hasPermission(string $permission): bool

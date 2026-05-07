@@ -35,6 +35,28 @@ class UserFactory extends Factory
         ];
     }
 
+    public function admin(): static
+    {
+        return $this->state(fn () => [
+            'role' => \App\Models\User::ROLE_ADMIN,
+            'permissions' => array_keys(\App\Models\User::permissionOptions()),
+        ]);
+    }
+
+    public function staff(): static
+    {
+        return $this->state(fn () => [
+            'role' => \App\Models\User::ROLE_STAFF,
+        ]);
+    }
+
+    public function user(): static
+    {
+        return $this->state(fn () => [
+            'role' => \App\Models\User::ROLE_USER,
+        ]);
+    }
+
     /**
      * Indicate that the model's email address should be unverified.
      */

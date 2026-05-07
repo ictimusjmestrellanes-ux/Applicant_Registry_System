@@ -3,12 +3,6 @@
 @section('title', 'Users')
 
 @section('content')
-    @php
-        $adminCount = $users->getCollection()->filter(fn ($user) => $user->isAdmin())->count();
-        $staffCount = $users->getCollection()->count() - $adminCount;
-        $azureCount = $users->getCollection()->filter(fn ($user) => ($user->auth_provider ?? 'local') === 'azure')->count();
-    @endphp
-
     <style>
         :root {
             --users-ink: #10243d;
@@ -350,6 +344,11 @@
             color: var(--users-primary);
         }
 
+        .role-pill-staff {
+            background: var(--users-success-soft);
+            color: var(--users-success);
+        }
+
         .role-pill-user {
             background: #eef2f7;
             color: #475569;
@@ -675,8 +674,8 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="role-pill {{ $user->isAdmin() ? 'role-pill-admin' : 'role-pill-user' }}">
-                                                {{ ucfirst($user->role) }}
+                                            <span class="role-pill {{ $user->roleBadgeClass() }}">
+                                                {{ $user->roleLabel() }}
                                             </span>
                                         </td>
                                         <td>
@@ -697,7 +696,9 @@
                                         <td>
                                             <div class="provider-stack">
                                                 <div class="provider-main">{{ ucfirst($user->auth_provider ?? 'local') }}</div>
-                                                <div class="provider-meta">{{ $user->isAdmin() ? 'Administrator access' : 'Managed permission set' }}</div>
+                                                <div class="provider-meta">
+                                                    {{ $user->isAdmin() ? 'Administrator access' : ($user->isStaff() ? 'Staff access' : 'Managed permission set') }}
+                                                </div>
                                             </div>
                                         </td>
                                         <td class="text-center">
@@ -747,8 +748,8 @@
                                 <div class="mobile-user-row">
                                     <div class="mobile-user-label">Role</div>
                                     <div>
-                                        <span class="role-pill {{ $user->isAdmin() ? 'role-pill-admin' : 'role-pill-user' }}">
-                                            {{ ucfirst($user->role) }}
+                                        <span class="role-pill {{ $user->roleBadgeClass() }}">
+                                            {{ $user->roleLabel() }}
                                         </span>
                                     </div>
                                 </div>
@@ -773,7 +774,9 @@
                                 <div class="mobile-user-row">
                                     <div class="mobile-user-label">Provider</div>
                                     <div class="provider-main">{{ ucfirst($user->auth_provider ?? 'local') }}</div>
-                                    <div class="provider-meta">{{ $user->isAdmin() ? 'Administrator access' : 'Managed permission set' }}</div>
+                                    <div class="provider-meta">
+                                        {{ $user->isAdmin() ? 'Administrator access' : ($user->isStaff() ? 'Staff access' : 'Managed permission set') }}
+                                    </div>
                                 </div>
                             </div>
                         </article>

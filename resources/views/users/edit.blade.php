@@ -291,7 +291,7 @@
                 <div class="form-helper-grid">
                     <article class="helper-card">
                         <div class="helper-title">Role behavior</div>
-                        <p class="helper-copy">Selecting the admin role grants full permission coverage and disables the document permission checkboxes automatically.</p>
+                        <p class="helper-copy">Selecting the admin role grants full permission coverage and disables the document permission checkboxes automatically. Staff and user roles can be assigned individual document permissions.</p>
                     </article>
 
                     <article class="helper-card">
