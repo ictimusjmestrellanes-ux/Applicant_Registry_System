@@ -47,7 +47,8 @@ class ApplicantController extends Controller
 
         return redirect()
             ->route('applicants.edit', $applicant->id)
-            ->with('created_success', true);
+            ->with('created_success', true)
+            ->with('applicant_code', $applicant->applicant_code);
     }
 
     public function index(Request $request)

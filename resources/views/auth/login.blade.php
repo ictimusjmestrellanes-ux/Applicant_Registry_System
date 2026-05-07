@@ -48,6 +48,19 @@
             background-color: #f9fafb;
         }
 
+        .applicant-btn {
+            background-color: #1d4ed8;
+            border: 1px solid #1d4ed8;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .applicant-btn:hover {
+            background-color: #1e40af;
+            border-color: #1e40af;
+            color: #ffffff;
+        }
+
         .divider {
             display: flex;
             align-items: center;
@@ -117,6 +130,11 @@
                     </svg>
 
                     Sign in with Microsoft
+                </a>
+
+                <a href="{{ route('applicant.portal.login') }}"
+                    class="btn applicant-btn w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
+                    Applicant Login
                 </a>
 
                 <div class="text-center mt-4">

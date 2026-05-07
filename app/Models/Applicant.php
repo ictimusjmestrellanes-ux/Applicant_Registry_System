@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Hash;
 
 class Applicant extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        
         'first_name',
         'middle_name',
         'last_name',
@@ -30,6 +30,20 @@ class Applicant extends Model
         'position_hired',
         'first_time_job_seeker',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (Applicant $applicant) {
+            if (! empty($applicant->applicant_code)) {
+                return;
+            }
+
+            $applicant->forceFill([
+                'applicant_code' => sprintf('APL-%06d', $applicant->id),
+                'portal_password' => Hash::make(sprintf('APL-%06d', $applicant->id)),
+            ])->saveQuietly();
+        });
+    }
 
     public function permit()
     {

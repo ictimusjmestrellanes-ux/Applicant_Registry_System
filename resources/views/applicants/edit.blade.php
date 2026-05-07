@@ -14,12 +14,15 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-
-                                                                                                                                                                                    <div style="font-size:14px;">
-                                                                                                                                                                                        <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                                                                                                                                                                        <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                                                                                                                                                                    </div>
-                                                                                                                                                                                    `,
+                        <div style="font-size:14px;">
+                            <p class="mb-2">The applicant profile has been saved successfully.</p>
+                            @if (session('applicant_code'))
+                                <p class="mb-2"><strong>Applicant ID:</strong> {{ session('applicant_code') }}</p>
+                                <p class="mb-0 text-muted">Initial portal password: same as the applicant ID.</p>
+                            @endif
+                            <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                        </div>
+                    `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -1228,12 +1231,17 @@
     </style>
 
     <div class="container applicant-wrapper">
-        <div class="requirements-container">
+            <div class="requirements-container">
             <div class="content-intro">
                 <div>
                     <h5 class="fw-bold mb-1">Document Compliance</h5>
                     <p class="small">Manage permit, clearance, and referral requirements with a cleaner workflow.</p>
                 </div>
+                @if (!empty($applicant->applicant_code))
+                    <span class="badge rounded-pill text-bg-light border px-3 py-2">
+                        <i class="bi bi-upc-scan me-1"></i> Applicant ID: {{ $applicant->applicant_code }}
+                    </span>
+                @endif
             </div>
 
             <div class="tab-shell">
@@ -1490,6 +1498,10 @@
                         @php
                             $permit = optional($applicant->permit);
                             $isImusResident = stripos($applicant->city, 'IMUS CITY') !== false;
+                            $selectedClearanceType = old(
+                                'clearance_type',
+                                $permit->clearance_type ?? ($permit->permit_police_clearance ? 'police' : ($permit->permit_nbi_clearance ? 'nbi' : ''))
+                            );
                         @endphp
 
                         <h6 class="section-title text-primary">Mayor’s Permit to Work Requirements</h6>
@@ -1503,10 +1515,10 @@
                                     <select name="clearance_type" id="clearance_type" 
                                         class="form-select form-select-sm mb-3" required>
                                         <option value="">Select Type</option>
-                                        <option value="nbi" {{ old('clearance_type', $permit->clearance_type ?? '') == 'nbi' ? 'selected' : '' }}>
+                                        <option value="nbi" {{ $selectedClearanceType == 'nbi' ? 'selected' : '' }}>
                                             NBI Clearance
                                         </option>
-                                        <option value="police" {{ old('clearance_type', $permit->clearance_type ?? '') == 'police' ? 'selected' : '' }}>
+                                        <option value="police" {{ $selectedClearanceType == 'police' ? 'selected' : '' }}>
                                             Police Clearance
                                         </option>
                                     </select>
@@ -1514,7 +1526,8 @@
                                     <div class="gap-2" id="nbi_section" style="display:none">
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="nbi_input" name="permit_nbi_clearance" class="d-none"
-                                            onchange="showFileName(this, 'nbi_name')" required>
+                                            onchange="showFileName(this, 'nbi_name')"
+                                            {{ empty($permit->permit_nbi_clearance) ? 'required' : '' }}>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="nbi_input" class="btn btn-outline-primary btn-sm">
@@ -1538,7 +1551,8 @@
 
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="police_input" name="permit_police_clearance" class="d-none"
-                                            onchange="showFileName(this, 'police_name')" required>
+                                            onchange="showFileName(this, 'police_name')"
+                                            {{ empty($permit->permit_police_clearance) ? 'required' : '' }}>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="police_input" class="btn btn-outline-primary btn-sm">
@@ -1568,7 +1582,8 @@
                                     <label class="form-label">Health Card <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="health_card_input" name="health_card" style="display:none"
-                                            onchange="showFileName(this, 'health_card_name')" required>
+                                            onchange="showFileName(this, 'health_card_name')"
+                                            {{ empty($permit->health_card) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('health_card_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1592,7 +1607,8 @@
                                     <label class="form-label">Cedula <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="cedula_input" name="cedula" style="display:none"
-                                            onchange="showFileName(this, 'cedula_name')" required>
+                                            onchange="showFileName(this, 'cedula_name')"
+                                            {{ empty($permit->cedula) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('cedula_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1619,7 +1635,8 @@
                                     </label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="referral_input" name="referral_letter" style="display:none"
-                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }} required>
+                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }}
+                                            {{ $isImusResident || !empty($permit->referral_letter) ? '' : 'required' }}>
 
                                         <button type="button" id="referral_upload_btn"
                                             class="btn btn-outline-primary btn-sm"
@@ -3414,21 +3431,32 @@
         const dropdown = document.getElementById("clearance_type");
         const nbi = document.getElementById("nbi_section");
         const police = document.getElementById("police_section");
+        const nbiInput = document.getElementById("nbi_input");
+        const policeInput = document.getElementById("police_input");
+        const hasNbiFile = @json(!empty($permit->permit_nbi_clearance));
+        const hasPoliceFile = @json(!empty($permit->permit_police_clearance));
+        const selectedClearanceType = @json($selectedClearanceType);
 
         function toggleFields() {
-            const value = dropdown.value;
+            const value = dropdown.value || selectedClearanceType || (hasPoliceFile ? "police" : (hasNbiFile ? "nbi" : ""));
 
             if (value === "nbi") {
                 nbi.style.display = "grid";
                 police.style.display = "none";
+                if (nbiInput) nbiInput.required = !hasNbiFile;
+                if (policeInput) policeInput.required = false;
             }
             else if (value === "police") {
                 nbi.style.display = "none";
                 police.style.display = "grid";
+                if (nbiInput) nbiInput.required = false;
+                if (policeInput) policeInput.required = !hasPoliceFile;
             }
             else {
                 nbi.style.display = "none";
                 police.style.display = "none";
+                if (nbiInput) nbiInput.required = false;
+                if (policeInput) policeInput.required = false;
             }
         }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ApplicantController;
+use App\Http\Controllers\ApplicantPortalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClearanceController;
 use App\Http\Controllers\PermitController;
@@ -19,6 +20,18 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/auth/azure/redirect', [AuthController::class, 'redirectToAzure'])->name('login.azure.redirect');
 Route::get('/auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('login.azure.callback');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/applicant/login', [ApplicantPortalController::class, 'showLoginForm'])->name('applicant.portal.login');
+Route::post('/applicant/login', [ApplicantPortalController::class, 'login'])->name('applicant.portal.authenticate');
+Route::get('/applicant/register', [ApplicantPortalController::class, 'showRegisterForm'])->name('applicant.portal.register');
+Route::post('/applicant/register', [ApplicantPortalController::class, 'register'])->name('applicant.portal.register.store');
+Route::get('/applicant', [ApplicantPortalController::class, 'index'])->name('applicant.portal.index');
+Route::get('/applicant/personal-info', [ApplicantPortalController::class, 'personalInfo'])->name('applicant.portal.personal-info');
+Route::post('/applicant/personal-info', [ApplicantPortalController::class, 'savePersonalInfo'])->name('applicant.portal.personal-info.store');
+Route::get('/applicant/requirements', [ApplicantPortalController::class, 'requirements'])->name('applicant.portal.requirements');
+Route::post('/applicant/profile', [ApplicantPortalController::class, 'update'])->name('applicant.portal.update');
+Route::post('/applicant/requirements', [ApplicantPortalController::class, 'uploadRequirements'])->name('applicant.portal.requirements.store');
+Route::post('/applicant/logout', [ApplicantPortalController::class, 'logout'])->name('applicant.portal.logout');
 
 Route::middleware('auth')->group(function () {
 
