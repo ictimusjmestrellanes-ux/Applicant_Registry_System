@@ -48,19 +48,6 @@
             background-color: #f9fafb;
         }
 
-        .apply-btn {
-            background-color: #1d4ed8;
-            border: 1px solid #1d4ed8;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .apply-btn:hover {
-            background-color: #1e40af;
-            border-color: #1e40af;
-            color: #ffffff;
-        }
-
         .divider {
             display: flex;
             align-items: center;
@@ -130,11 +117,6 @@
                     </svg>
 
                     Sign in with Microsoft
-                </a>
-
-                <a href="{{ route('apply') }}"
-                    class="btn apply-btn w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
-                    Apply now
                 </a>
 
                 <div class="text-center mt-4">
