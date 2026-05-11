@@ -205,9 +205,6 @@
                         applicant workspace.</p>
                 </div>
                 <div class="section-head-actions">
-                    <a href="{{ route('applicants.create') }}" class="btn btn-primary index-btn-primary">
-                        <i class="bi bi-plus-lg me-2"></i>New Applicant
-                    </a>
                     @if($hasActiveFilters)
                         <div class="active-filter-list">
                             @if($searchTerm !== '')
