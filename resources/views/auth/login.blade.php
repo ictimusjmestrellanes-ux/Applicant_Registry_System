@@ -132,10 +132,11 @@
                     Sign in with Microsoft
                 </a>
 
-                <a href="{{ route('applicant.portal.login') }}"
-                    class="btn applicant-btn w-100 mt-3 d-flex align-items-center justify-content-center gap-2">
+                {{-- <a href="{{ route('applicant.portal.login') }}"
+                    class="btn applicant-btn w-100 mt-3 d-flex align-items-center justify-content-center gap-2"
+                    style="display: none;">
                     Applicant Login
-                </a>
+                </a> --}}
 
                 <div class="text-center mt-4">
                     <small class="text-muted">

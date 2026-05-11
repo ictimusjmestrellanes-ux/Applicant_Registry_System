@@ -3,6 +3,13 @@
 @section('title', 'Dashboard')
 
 @section('content')
+    @php
+        $totalApplicants = data_get($summary, 'totalApplicants', 0);
+        $newThisMonth = data_get($summary, 'newThisMonth', 0);
+        $totalClearances = data_get($summary, 'totalClearances', 0);
+        $totalReferrals = data_get($summary, 'totalReferrals', 0);
+    @endphp
+
     <div class="dashboard-page container-fluid px-md-4 px-xl-1">
         <section class="hero-panel mb-4">
             <div class="row g-4 align-items-center">
@@ -25,8 +32,8 @@
                     </div>
                     <div>
                         <div class="metric-label">Total Applicants</div>
-                        <div class="metric-value">{{ number_format($summary['totalApplicants']) }}</div>
-                        <div class="metric-note">{{ $summary['newThisMonth'] }} added this month</div>
+                        <div class="metric-value">{{ number_format($totalApplicants) }}</div>
+                        <div class="metric-note">{{ number_format($newThisMonth) }} added this month</div>
                     </div>
                 </div>
             </div>
@@ -50,7 +57,7 @@
                     </div>
                     <div>
                         <div class="metric-label">Total Clearance</div>
-                        <div class="metric-value">{{ number_format($summary['totalClearances']) }}</div>
+                        <div class="metric-value">{{ number_format($totalClearances) }}</div>
                         <div class="metric-note">Clearance with clearance records</div>
                     </div>
                 </div>
@@ -62,7 +69,7 @@
                     </div>
                     <div>
                         <div class="metric-label">Total Referral</div>
-                        <div class="metric-value">{{ number_format($summary['totalReferrals']) }}</div>
+                        <div class="metric-value">{{ number_format($totalReferrals) }}</div>
                         <div class="metric-note">Including extra employer details</div>
                     </div>
                 </div>
