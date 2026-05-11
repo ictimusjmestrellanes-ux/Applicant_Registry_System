@@ -33,7 +33,6 @@
                     <div>
                         <div class="metric-label">Total Applicants</div>
                         <div class="metric-value">{{ number_format($totalApplicants) }}</div>
-                        <div class="metric-note">{{ number_format($newThisMonth) }} added this month</div>
                     </div>
                 </div>
             </div>

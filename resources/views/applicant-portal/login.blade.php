@@ -130,13 +130,13 @@
                 <div class="mb-3">
                     <label class="form-label">Username</label>
                     <input type="text" name="applicant_code" class="form-control" value="{{ old('applicant_code') }}"
-                        placeholder="your.username" required>
+                        placeholder="Enter your username" required>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Password</label>
                     <input type="password" name="password" class="form-control" value="{{ old('password') }}"
-                        placeholder="Same as your applicant ID" required>
+                        placeholder="Enter your password" required>
                 </div>
 
                 <div class="d-flex flex-column flex-sm-row gap-3 align-items-stretch">

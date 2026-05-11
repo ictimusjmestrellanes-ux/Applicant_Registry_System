@@ -13,6 +13,7 @@ class DashboardController extends Controller
     {
         $menuItems = Config::get('menu');
         $applicants = Applicant::with(['permit', 'clearance', 'referral'])
+            ->withoutTrashed()
             ->latest()
             ->get();
         $chartYear = 2026;
@@ -21,6 +22,7 @@ class DashboardController extends Controller
                 return [
                     'label' => now()->setMonth($month)->format('M'),
                     'count' => Applicant::query()
+                        ->withoutTrashed()
                         ->whereYear('created_at', $chartYear)
                         ->whereMonth('created_at', $month)
                         ->count(),
@@ -89,10 +91,7 @@ class DashboardController extends Controller
             ->values();
 
         $totalApplicants = $applicants->count();
-        $newThisMonth = Applicant::query()
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
-            ->count();
+        $newThisMonth = $monthlyApplicants[now()->month - 1]['count'] ?? 0;
         $totalClearances = Applicant::query()
             ->whereHas('clearance', function ($query) {
                 $query->whereNotNull('clearance_peso_control_no');
