@@ -293,7 +293,13 @@ class ApplicantController extends Controller
     private function buildApplicantSearchQuery(array $filters)
     {
         $search = trim((string) ($filters['search'] ?? ''));
+        $gender = trim((string) ($filters['gender'] ?? ''));
+        $civilStatus = trim((string) ($filters['civil_status'] ?? ''));
+        $city = trim((string) ($filters['city'] ?? ''));
+        $barangay = trim((string) ($filters['barangay'] ?? ''));
         $transactionType = trim((string) ($filters['transaction_type'] ?? ''));
+        $dateFrom = trim((string) ($filters['date_from'] ?? ''));
+        $dateTo = trim((string) ($filters['date_to'] ?? ''));
 
         return Applicant::query()
             ->when($search !== '', function ($query) use ($search) {
@@ -303,6 +309,24 @@ class ApplicantController extends Controller
                         ->orWhere('last_name', 'like', "%{$search}%")
                         ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"]);
                 });
+            })
+            ->when($gender !== '', function ($query) use ($gender) {
+                $query->where('gender', $gender);
+            })
+            ->when($civilStatus !== '', function ($query) use ($civilStatus) {
+                $query->where('civil_status', $civilStatus);
+            })
+            ->when($city !== '', function ($query) use ($city) {
+                $query->where('city', $city);
+            })
+            ->when($barangay !== '', function ($query) use ($barangay) {
+                $query->where('barangay', $barangay);
+            })
+            ->when($dateFrom !== '', function ($query) use ($dateFrom) {
+                $query->whereDate('created_at', '>=', $dateFrom);
+            })
+            ->when($dateTo !== '', function ($query) use ($dateTo) {
+                $query->whereDate('created_at', '<=', $dateTo);
             })
             ->when($transactionType !== '', function ($query) use ($transactionType) {
                 return match ($transactionType) {

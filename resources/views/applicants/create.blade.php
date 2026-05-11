@@ -221,7 +221,7 @@
         .btn-save:hover {
             transform: translateY(-1px);
             box-shadow: 0 14px 28px rgba(29, 78, 216, 0.28);
-            color: #ffffff;
+            color: #2c3e50;
         }
 
         .select2-container .select2-selection--single {
