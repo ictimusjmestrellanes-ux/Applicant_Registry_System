@@ -64,14 +64,14 @@ class ReferralController extends Controller
             $filePath = $directory.'/'.$fileName;
 
             if ($referral->{$field}) {
-                Storage::disk('public')->delete($referral->{$field});
+                Storage::disk('azure')->delete($referral->{$field});
             }
 
-            if (Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
+            if (Storage::disk('azure')->exists($filePath)) {
+                Storage::disk('azure')->delete($filePath);
             }
 
-            $referral->{$field} = $file->storeAs($directory, $fileName, 'public');
+            $referral->{$field} = $file->storeAs($directory, $fileName, 'azure');
         }
 
         $clearanceFields = [
@@ -90,7 +90,7 @@ class ReferralController extends Controller
                 }
 
                 if (! empty($referral->{$field})) {
-                    Storage::disk('public')->delete($referral->{$field});
+                    Storage::disk('azure')->delete($referral->{$field});
                 }
 
                 $referral->{$field} = '';
@@ -157,7 +157,7 @@ class ReferralController extends Controller
 
                     if ($uploadedAttachment && method_exists($uploadedAttachment, 'getClientOriginalName')) {
                         if (! empty($attachmentPath)) {
-                            Storage::disk('public')->delete($attachmentPath);
+                            Storage::disk('azure')->delete($attachmentPath);
                         }
 
                         $originalName = pathinfo($uploadedAttachment->getClientOriginalName(), PATHINFO_FILENAME);

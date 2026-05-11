@@ -50,17 +50,17 @@ class ClearanceController extends Controller
             $filePath = 'clearances/prosecutor/'.$fileName;
 
             if ($clearance->prosecutor_clearance) {
-                Storage::disk('public')->delete($clearance->prosecutor_clearance);
+                Storage::disk('azure')->delete($clearance->prosecutor_clearance);
             }
 
-            if (Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
+            if (Storage::disk('azure')->exists($filePath)) {
+                Storage::disk('azure')->delete($filePath);
             }
 
             $clearance->prosecutor_clearance = $file->storeAs(
                 'clearances/prosecutor',
                 $fileName,
-                'public'
+                'azure'
             );
         }
 
@@ -73,17 +73,17 @@ class ClearanceController extends Controller
             $filePath = 'clearances/mtc/'.$fileName;
 
             if ($clearance->mtc_clearance) {
-                Storage::disk('public')->delete($clearance->mtc_clearance);
+                Storage::disk('azure')->delete($clearance->mtc_clearance);
             }
 
-            if (Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
+            if (Storage::disk('azure')->exists($filePath)) {
+                Storage::disk('azure')->delete($filePath);
             }
 
             $clearance->mtc_clearance = $file->storeAs(
                 'clearances/mtc',
                 $fileName,
-                'public'
+                'azure'
             );
         }
 
@@ -96,17 +96,17 @@ class ClearanceController extends Controller
             $filePath = 'clearances/rtc/'.$fileName;
 
             if ($clearance->rtc_clearance) {
-                Storage::disk('public')->delete($clearance->rtc_clearance);
+                Storage::disk('azure')->delete($clearance->rtc_clearance);
             }
 
-            if (Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
+            if (Storage::disk('azure')->exists($filePath)) {
+                Storage::disk('azure')->delete($filePath);
             }
 
             $clearance->rtc_clearance = $file->storeAs(
                 'clearances/rtc',
                 $fileName,
-                'public'
+                'azure'
             );
         }
 
@@ -119,17 +119,17 @@ class ClearanceController extends Controller
             $filePath = 'clearances/nbi/'.$fileName;
 
             if ($clearance->nbi_clearance) {
-                Storage::disk('public')->delete($clearance->nbi_clearance);
+                Storage::disk('azure')->delete($clearance->nbi_clearance);
             }
 
-            if (Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
+            if (Storage::disk('azure')->exists($filePath)) {
+                Storage::disk('azure')->delete($filePath);
             }
 
             $clearance->nbi_clearance = $file->storeAs(
                 'clearances/nbi',
                 $fileName,
-                'public'
+                'azure'
             );
         }
 
@@ -142,17 +142,17 @@ class ClearanceController extends Controller
             $filePath = 'clearances/barangay/'.$fileName;
 
             if ($clearance->barangay_clearance) {
-                Storage::disk('public')->delete($clearance->barangay_clearance);
+                Storage::disk('azure')->delete($clearance->barangay_clearance);
             }
 
-            if (Storage::disk('public')->exists($filePath)) {
-                Storage::disk('public')->delete($filePath);
+            if (Storage::disk('azure')->exists($filePath)) {
+                Storage::disk('azure')->delete($filePath);
             }
 
             $clearance->barangay_clearance = $file->storeAs(
                 'clearances/barangay',
                 $fileName,
-                'public'
+                'azure'
             );
         }
 
