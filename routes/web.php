@@ -87,3 +87,5 @@ Route::get('/applicants/{id}/print-clearance', [ClearanceController::class, 'pri
     
 Route::get('/applicants/{id}/print-referral', [ReferralController::class, 'printLetter'])->middleware(['auth', 'permission:generate_referral'])
     ->name('referrals.printLetter');
+Route::get('/storage/view/{filename}', [App\Http\Controllers\StorageController::class, 'viewfile'])->middleware('auth')
+    ->name('storage.view');

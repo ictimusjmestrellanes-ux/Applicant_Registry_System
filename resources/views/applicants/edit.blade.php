@@ -1972,7 +1972,7 @@
                             {{-- Update/Save Section --}}
                             @if(auth()->user()->hasPermission('update_clearance'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-check-circle me-2"></i>Save Clearance
+                                    <i class="fa-solid fa-certificate me-2"></i>Save Clearance
                                 </button>
                             @else
                                 <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
@@ -2069,7 +2069,7 @@
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_brgy_input" name="ref_barangay_clearance"
                                             style="display:none"
-                                            onchange="handleReferralClearanceChange(this, 'ref_brgy_name', ['ref_police_input', 'ref_nbi_input'], ['ref_police_name', 'ref_nbi_name'])" required>
+                                            onchange="handleReferralClearanceChange(this, 'ref_brgy_name', ['ref_police_input', 'ref_nbi_input'], ['ref_police_name', 'ref_nbi_name'])">
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2094,7 +2094,7 @@
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_police_input" name="ref_police_clearance"
                                             style="display:none"
-                                            onchange="handleReferralClearanceChange(this, 'ref_police_name', ['ref_brgy_input', 'ref_nbi_input'], ['ref_brgy_name', 'ref_nbi_name'])" required>
+                                            onchange="handleReferralClearanceChange(this, 'ref_police_name', ['ref_brgy_input', 'ref_nbi_input'], ['ref_brgy_name', 'ref_nbi_name'])">
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_police_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2117,7 +2117,7 @@
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="ref_nbi_input" name="ref_nbi_clearance" style="display:none"
-                                            onchange="handleReferralClearanceChange(this, 'ref_nbi_name', ['ref_brgy_input', 'ref_police_input'], ['ref_brgy_name', 'ref_police_name'])" required>
+                                            onchange="handleReferralClearanceChange(this, 'ref_nbi_name', ['ref_brgy_input', 'ref_police_input'], ['ref_brgy_name', 'ref_police_name'])">
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('ref_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2465,13 +2465,15 @@
 
                         <div class="referral-action-bar mt-4">
                             @if(auth()->user()->hasPermission('update_referral'))
-                                <button type="submit" class="btn btn-primary px-5">
-                                    Save Referral
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                    <i class="fa-solid fa-file-export me-2"></i>Save Referral
                                 </button>
                             @else
-                                <button type="button" class="btn btn-secondary px-5" disabled>
-                                    No permission to update referral
-                                </button>
+                                <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
+                                    <button type="button" class="btn btn-outline-secondary px-4" disabled>
+                                        Save Referral
+                                    </button>
+                                </span>
                             @endif
                         </div>
                     </form>
@@ -2575,8 +2577,37 @@
             referralTypeSelect.addEventListener("change", toggleReferralFields);
 
             if (referralForm) {
-                referralForm.addEventListener("submit", toggleReferralFields);
+                referralForm.addEventListener("submit", function(e) {
+                    toggleReferralFields();
+                    
+                    // Validate that at least one clearance file is selected or exists
+                    const resumeInput = document.getElementById('resume_input');
+                    const brgyInput = document.getElementById('ref_brgy_input');
+                    const policeInput = document.getElementById('ref_police_input');
+                    const nbiInput = document.getElementById('ref_nbi_input');
+                    
+                    const hasResumeFile = resumeInput && resumeInput.files.length > 0;
+                    const brgyName = document.getElementById('ref_brgy_name');
+                    const policeName = document.getElementById('ref_police_name');
+                    const nbiName = document.getElementById('ref_nbi_name');
+                    const hasExistingResume = brgyName && brgyName.textContent !== 'No file selected';
+                    const hasExistingBrgy = brgyName && brgyName.textContent !== 'No file selected';
+                    const hasExistingPolice = policeName && policeName.textContent !== 'No file selected';
+                    const hasExistingNbi = nbiName && nbiName.textContent !== 'No file selected';
+                    
+                    const hasResume = hasResumeFile || hasExistingResume;
+                    const hasClearance = (brgyInput?.files.length > 0) || (policeInput?.files.length > 0) || (nbiInput?.files.length > 0) || 
+                                        hasExistingBrgy || hasExistingPolice || hasExistingNbi;
+                    
+                    if (!hasClearance) {
+                        e.preventDefault();
+                        alert('Please upload at least one clearance document (Barangay/Police/NBI)');
+                        return false;
+                    }
+                });
             }
+
+
 
             if (addPesoDetailButton && pesoDetailTemplate && pesoExtraDetails) {
                 const addPesoDetail = () => {
