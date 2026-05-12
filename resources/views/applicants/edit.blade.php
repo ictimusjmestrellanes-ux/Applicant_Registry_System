@@ -1702,14 +1702,14 @@
 
                             {{-- Issued On --}}
                             <div class="col-md-2">
-                                <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
+                                <label class="form-label">Community Tax No. Issued On<span class="required-mark">*</span></label>
                                 <input type="date" name="permit_issued_on" class="form-control"
                                     value="{{$permit->permit_issued_on}}" required>
                             </div>
 
                             {{-- Permit Issued At --}}
                             <div class="col-md-2">
-                                <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
+                                <label class="form-label">Community Tax No. Issued At<span class="required-mark">*</span></label>
                                 <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
                                     <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
                                         {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
@@ -1719,14 +1719,14 @@
 
                             {{-- Permit Date --}}
                             <div class="col-md-2">
-                                <label class="form-label">Permit Date<span class="required-mark">*</span></label>
+                                <label class="form-label">Permit Issued Date<span class="required-mark">*</span></label>
                                 <input type="date" id="permit_date" name="permit_date" class="form-control"
                                     value="{{$permit->permit_date}}" required>
                             </div>
 
                             {{-- Expiration --}}
                             <div class="col-md-2">
-                                <label class="form-label">Expires On<span class="required-mark">*</span></label>
+                                <label class="form-label">Permit Expires On<span class="required-mark">*</span></label>
                                 <input type="date" id="expires_on" name="expires_on" class="form-control"
                                     value="{{$permit->expires_on}}" readonly>
                             </div>
