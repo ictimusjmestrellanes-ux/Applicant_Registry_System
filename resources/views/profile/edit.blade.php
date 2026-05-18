@@ -78,8 +78,48 @@
                     </div>
                 </div>
 
-                <div class="profile-actions">
-                    <button type="submit" class="btn btn-primary profile-save-btn">Save Profile</button>
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="profile-section">
+                            <h5 class="section-title mb-3">Change Password</h5>
+
+                            @if(($user->auth_provider ?? 'local') === 'azure')
+                                <div class="alert alert-info">Your account uses Microsoft sign-in. Password changes are managed by your Microsoft account.</div>
+                            @else
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Current Password</label>
+                                        <div class="input-group">
+                                            <input id="current_password" type="password" name="current_password" class="form-control">
+                                            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#current_password">Show</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">New Password</label>
+                                        <div class="input-group">
+                                            <input id="new_password" type="password" name="password" class="form-control">
+                                            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#new_password">Show</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Confirm New Password</label>
+                                        <div class="input-group">
+                                            <input id="confirm_password" type="password" name="password_confirmation" class="form-control">
+                                            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#confirm_password">Show</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end justify-content-end">
+                        <div class="profile-actions">
+                            <button type="submit" class="btn btn-primary profile-save-btn">Save Profile</button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -250,4 +290,21 @@
             }
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toggle-password').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var target = document.querySelector(this.getAttribute('data-target'));
+                    if (! target) return;
+                    if (target.type === 'password') {
+                        target.type = 'text';
+                        this.textContent = 'Hide';
+                    } else {
+                        target.type = 'password';
+                        this.textContent = 'Show';
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

@@ -8,6 +8,7 @@
         $newThisMonth = data_get($summary, 'newThisMonth', 0);
         $totalClearances = data_get($summary, 'totalClearances', 0);
         $totalReferrals = data_get($summary, 'totalReferrals', 0);
+        $timeGreeting = (now()->hour >= 0 && now()->hour <= 11) ? 'Good Morning' : ((now()->hour >= 12 && now()->hour <= 17) ? 'Good Afternoon' : 'Good Evening');
     @endphp
 
     <div class="dashboard-page container-fluid px-md-4 px-xl-1">
@@ -15,7 +16,7 @@
             <div class="row g-4 align-items-center">
                 <div class="col-lg-8">
                     <span class="eyebrow">Applicant Registry Overview</span>
-                    <h2 class="hero-title mb-2">Welcome back, {{ Auth::user()->name }}</h2>
+                    <h2 class="hero-title mb-2">{{ $timeGreeting }}, {{ Auth::user()->name }}</h2>
                     <p class="hero-copy mb-0">
                         Track applicant progress, monitor document completion, and jump straight into the tasks that need
                         attention today.
@@ -75,111 +76,113 @@
             </div>
         </section>
 
-        <section class="row g-4 mb-4">
-            <div class="col-12">
-                <div class="dashboard-card">
-                    <div class="section-header">
-                        <div>
-                            <h5 class="section-title mb-1">{{ now()->format('Y') }} Applicant Registrations Summary</h5>
+        @unless(auth()->user()?->role === 'user')
+            <section class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="dashboard-card">
+                        <div class="section-header">
+                            <div>
+                                <h5 class="section-title mb-1">{{ now()->format('Y') }} Applicant Registrations Summary</h5>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-canvas-wrap">
-                            <canvas id="monthlyApplicantsChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-canvas-wrap">
+                                <canvas id="monthlyApplicantsChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="row g-4 mb-4">
-            <div class="col-xl-4 col-md-6">
-                <div class="dashboard-card h-100">
-                    <div class="section-header">
-                        <div>
-                            <h5 class="section-title mb-1">Total of Male and Female Summary</h5>
+            <section class="row g-4 mb-4">
+                <div class="col-xl-4 col-md-6">
+                    <div class="dashboard-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <h5 class="section-title mb-1">Total of Male and Female Summary</h5>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                            <canvas id="sexPieChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-4 col-md-6">
-                <div class="dashboard-card h-100">
-                    <div class="section-header">
-                        <div>
-                            <h5 class="section-title mb-1">PWD Summary</h5>
-                            <p class="section-copy mb-0">Applicants marked as PWD:</p>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                            <canvas id="pwdPieChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                                <canvas id="sexPieChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-xl-4 col-md-12">
-                <div class="dashboard-card h-100">
-                    <div class="section-header">
-                        <div>
-                            <h5 class="section-title mb-1">4Ps Summary</h5>
-                            <p class="section-copy mb-0">Applicants marked as 4Ps:</p>
+                <div class="col-xl-4 col-md-6">
+                    <div class="dashboard-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <h5 class="section-title mb-1">PWD Summary</h5>
+                                <p class="section-copy mb-0">Applicants marked as PWD:</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                            <canvas id="fourPsPieChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="row g-4 mb-4">
-            <div class="col-xl-6">
-                <div class="dashboard-card h-100">
-                    <div class="section-header">
-                        <div>
-                            <h5 class="section-title mb-1">City Summary</h5>
-                            <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
-                        </div>
-                    </div>
-
-                    <div class="chart-card">
-                        <div class="chart-canvas-wrap">
-                            <canvas id="cityColumnChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                                <canvas id="pwdPieChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-xl-6">
-                <div class="dashboard-card h-100">
-                    <div class="section-header">
-                        <div>
-                            <h5 class="section-title mb-1">Province Summary</h5>
-                            <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
+                <div class="col-xl-4 col-md-12">
+                    <div class="dashboard-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <h5 class="section-title mb-1">4Ps Summary</h5>
+                                <p class="section-copy mb-0">Applicants marked as 4Ps:</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="chart-card">
-                        <div class="chart-canvas-wrap">
-                            <canvas id="provinceColumnChart"></canvas>
+                        <div class="chart-card">
+                            <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                                <canvas id="fourPsPieChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <section class="row g-4 mb-4">
+                <div class="col-xl-6">
+                    <div class="dashboard-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <h5 class="section-title mb-1">City Summary</h5>
+                                <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-canvas-wrap">
+                                <canvas id="cityColumnChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6">
+                    <div class="dashboard-card h-100">
+                        <div class="section-header">
+                            <div>
+                                <h5 class="section-title mb-1">Province Summary</h5>
+                                <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-canvas-wrap">
+                                <canvas id="provinceColumnChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endunless
     </div>
 
     <style>
@@ -592,6 +595,7 @@
         }
 
         @media (max-width: 991.98px) {
+
             .hero-panel,
             .dashboard-card {
                 padding: 1.25rem;

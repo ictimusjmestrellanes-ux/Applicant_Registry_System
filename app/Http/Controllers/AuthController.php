@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Support\ActivityLogger;
 use App\Models\User;
+use App\Models\Applicant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 
@@ -20,51 +23,347 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    // Show applicant-only login form
+    public function showApplicantLoginForm()
+    {
+        return view('auth.applicant-login');
+    }
+
+    // Show applicant registration form
+    public function showApplicantRegisterForm()
+    {
+        return view('auth.applicant-register');
+    }
+
+    // Handle applicant portal registration
+    public function registerApplicant(Request $request)
+    {
+        $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'suffix' => ['nullable', 'string', 'max:20'],
+            'username' => ['required', 'string', 'alpha_dash', 'min:3', 'max:50', Rule::unique('users', 'username')],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $username = Str::lower($data['username']);
+        $firstName = trim((string) $data['first_name']);
+        $middleName = trim((string) ($data['middle_name'] ?? '')) ?: null;
+        $lastName = trim((string) $data['last_name']);
+        $suffix = trim((string) ($data['suffix'] ?? '')) ?: null;
+
+        $applicant = DB::transaction(function () use ($data, $username, $firstName, $middleName, $lastName, $suffix) {
+            $applicant = Applicant::create([
+                'first_name' => Str::title(Str::lower($firstName)),
+                'middle_name' => $middleName ? Str::title(Str::lower($middleName)) : null,
+                'last_name' => Str::title(Str::lower($lastName)),
+                'suffix' => $suffix ? Str::upper($suffix) : null,
+                'age' => null,
+                'contact_no' => '',
+                'gender' => '',
+                'civil_status' => null,
+                'pwd' => '',
+                'four_ps' => '',
+                'address_line' => '',
+                'province' => '',
+                'city' => '',
+                'barangay' => '',
+                'educational_attainment' => null,
+                'hiring_company' => null,
+                'position_hired' => null,
+                'first_time_job_seeker' => null,
+            ]);
+
+            $user = User::create([
+                'name' => Str::upper(trim(implode(' ', array_filter([
+                    Str::title(Str::lower($firstName)),
+                    $middleName ? Str::title(Str::lower($middleName)) : null,
+                    Str::title(Str::lower($lastName)),
+                    $suffix ? Str::upper($suffix) : null,
+                ])))),
+                'username' => $username,
+                'email' => $username.'@applicant.local',
+                'password' => $data['password'],
+                'role' => User::ROLE_USER,
+                'permissions' => [],
+                'auth_provider' => 'local',
+                'approval_status' => User::APPROVAL_PENDING,
+                'applicant_id' => $applicant->id,
+            ]);
+
+            $applicant->forceFill([
+                'applicant_code' => $applicant->applicant_code,
+                'portal_password' => $applicant->portal_password,
+            ])->saveQuietly();
+
+            ActivityLogger::log(
+                'applicant',
+                'created',
+                'Applicant registered through the portal.',
+                $applicant,
+                ActivityLogger::diff([], $applicant->only($applicant->getFillable())),
+                $user
+            );
+
+            return $applicant;
+        });
+
+        return redirect()
+            ->route('applicant.login')
+            ->with('approval_notice', 'Your account is now pending admin approval. Please wait for an administrator to approve it before signing in.')
+            ->with('username', $username);
+    }
+
+    // Handle applicant portal login
+    public function loginApplicant(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
+
+        $identifier = trim((string) $credentials['username']);
+        $normalized = Str::lower($identifier);
+
+        $user = User::query()
+            ->whereNotNull('applicant_id')
+            ->where(function ($query) use ($identifier, $normalized) {
+                $query->where('username', $normalized)
+                    ->orWhere('username', $identifier)
+                    ->orWhere('email', $normalized);
+            })
+            ->first();
+
+        // Backward compatibility for older applicant-code-based accounts.
+        if (! $user) {
+            $candidates = [];
+            $raw = strtoupper($identifier);
+            $candidates[] = $raw;
+
+            if (preg_match('/^\d{1,6}$/', $identifier)) {
+                $num = (int) $identifier;
+                $candidates[] = sprintf('APL-%05d', $num);
+                $candidates[] = sprintf('APL-%06d', $num);
+            }
+
+            if (preg_match('/^APL-?0*(\d{1,})$/i', $identifier, $m)) {
+                $num = (int) $m[1];
+                $candidates[] = sprintf('APL-%05d', $num);
+                $candidates[] = sprintf('APL-%06d', $num);
+                $candidates[] = 'APL-' . $m[1];
+            }
+
+            $candidates = array_values(array_unique($candidates));
+
+            $applicant = Applicant::whereIn('applicant_code', $candidates)
+                ->orWhereRaw('LOWER(applicant_code) IN (' . implode(',', array_fill(0, count($candidates), '?')) . ')', array_map('strtolower', $candidates))
+                ->first();
+
+            if ($applicant) {
+                if (! Hash::check($credentials['password'], $applicant->portal_password)) {
+                    return back()->withErrors([
+                        'username' => 'The provided credentials do not match our records.',
+                    ])->onlyInput('username');
+                }
+
+                $user = User::where('applicant_id', $applicant->id)->first();
+
+                if (! $user) {
+                $user = User::create([
+                    'name' => Str::upper(trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name)),
+                    'username' => $normalized ?: Str::lower($applicant->applicant_code),
+                    'email' => strtolower($applicant->applicant_code) . '@applicant.local',
+                    'password' => $applicant->portal_password,
+                    'role' => User::ROLE_USER,
+                        'permissions' => [],
+                        'auth_provider' => 'local',
+                        'approval_status' => User::APPROVAL_APPROVED,
+                        'applicant_id' => $applicant->id,
+                    ]);
+                }
+            }
+        }
+
+        if (! $user) {
+            return back()->withErrors([
+                'username' => 'The provided credentials do not match our records.',
+            ])->onlyInput('username');
+        }
+
+        if (! Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'username' => 'The provided credentials do not match our records.',
+            ])->onlyInput('username');
+        }
+
+        if ($user->isAccountBlocked()) {
+            return back()
+                ->withErrors([
+                    'username' => $user->approvalStatusMessage(),
+                ])
+                ->with('approval_notice', $user->approvalStatusMessage())
+                ->onlyInput('username');
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        ActivityLogger::log(
+            'auth',
+            'login',
+            'Applicant logged in using username and password.',
+            null,
+            [
+                'provider' => [
+                    'before' => null,
+                    'after' => 'local',
+                ],
+            ],
+            $user
+        );
+
+        return redirect()->intended('dashboard');
+    }
+
     // Handle login post
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
-        $email = strtolower($credentials['email']);
+        $identifier = trim((string) $credentials['email']);
 
-        $existingUser = User::where('email', $email)->first();
+        // If identifier looks like an email use existing flow
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $email = strtolower($identifier);
 
-        if ($existingUser && $existingUser->auth_provider === 'azure') {
-            return back()->withErrors([
-                'email' => 'This account uses Microsoft sign-in. Please use "Sign in with Microsoft".',
-            ])->onlyInput('email');
-        }
+            $existingUser = User::where('email', $email)->first();
 
-        if (Auth::attempt([
-            'email' => $email,
-            'password' => $credentials['password'],
-            'auth_provider' => 'local',
-        ])) {
-            $request->session()->regenerate();
+            if ($existingUser && $existingUser->auth_provider === 'azure') {
+                return back()->withErrors([
+                    'email' => 'This account uses Microsoft sign-in. Please use "Sign in with Microsoft".',
+                ])->onlyInput('email');
+            }
 
-            ActivityLogger::log(
-                'auth',
-                'login',
-                'User logged in using email and password.',
-                null,
-                [
-                    'provider' => [
-                        'before' => null,
-                        'after' => 'local',
+            if (Auth::attempt([
+                'email' => $email,
+                'password' => $credentials['password'],
+                'auth_provider' => 'local',
+            ])) {
+                $authenticatedUser = Auth::user();
+
+                if ($authenticatedUser?->isAccountBlocked()) {
+                    $approvalMessage = $authenticatedUser->approvalStatusMessage();
+
+                    Auth::logout();
+
+                    return back()
+                        ->withErrors([
+                            'email' => $approvalMessage,
+                        ])
+                        ->with('approval_notice', $approvalMessage)
+                        ->onlyInput('email');
+                }
+
+                $request->session()->regenerate();
+
+                ActivityLogger::log(
+                    'auth',
+                    'login',
+                    'User logged in using email and password.',
+                    null,
+                    [
+                        'provider' => [
+                            'before' => null,
+                            'after' => 'local',
+                        ],
                     ],
-                ],
-                Auth::user()
-            );
+                    Auth::user()
+                );
 
-            return redirect()->intended('dashboard');
+                return redirect()->intended('dashboard');
+            }
+
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+        // Try several lookup variants to support legacy 6-digit codes and new 5-digit format
+        $candidates = [];
+        $raw = strtoupper($identifier);
+        $candidates[] = $raw;
+
+        // If user typed only digits, try APL- padded variants
+        if (preg_match('/^\d{1,6}$/', $identifier)) {
+            $num = (int) $identifier;
+            $candidates[] = sprintf('APL-%05d', $num);
+            $candidates[] = sprintf('APL-%06d', $num);
+        }
+
+        // If user typed APL-xxxxx (any digits), extract digits and try padded variants
+        if (preg_match('/^APL-?0*(\d{1,})$/i', $identifier, $m)) {
+            $num = (int) $m[1];
+            $candidates[] = sprintf('APL-%05d', $num);
+            $candidates[] = sprintf('APL-%06d', $num);
+            $candidates[] = 'APL-' . $m[1];
+        }
+
+        // Deduplicate and query (case-insensitive)
+        $candidates = array_values(array_unique($candidates));
+
+        $applicant = Applicant::whereIn('applicant_code', $candidates)
+            ->orWhereRaw('LOWER(applicant_code) IN (' . implode(',', array_fill(0, count($candidates), '?')) . ')', array_map('strtolower', $candidates))
+            ->first();
+
+        if (! $applicant) {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
+        }
+
+        if (! Hash::check($credentials['password'], $applicant->portal_password)) {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
+        }
+
+        // Find or create a corresponding User linked to this applicant
+        $user = User::where('applicant_id', $applicant->id)->first();
+
+        if (! $user) {
+            $user = User::create([
+                'name' => Str::upper(trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name)),
+                'email' => strtolower($applicant->applicant_code) . '@applicant.local',
+                'password' => $applicant->portal_password,
+                'role' => User::ROLE_USER,
+                'permissions' => [],
+                'auth_provider' => 'local',
+                'applicant_id' => $applicant->id,
+            ]);
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        ActivityLogger::log(
+            'auth',
+            'login',
+            'Applicant logged in using applicant code and portal password.',
+            null,
+            [
+                'provider' => [
+                    'before' => null,
+                    'after' => 'local',
+                ],
+            ],
+            $user
+        );
+
+        return redirect()->intended('dashboard');
     }
 
     public function redirectToAzure()
@@ -144,6 +443,12 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($user && $user->isAccountBlocked()) {
+            return redirect()->route('login')->withErrors([
+                'email' => $user->approvalStatusMessage(),
+            ])->with('approval_notice', $user->approvalStatusMessage());
+        }
+
         if (! $user) {
             $user = User::create([
                 'name' => $azureUser->getName() ?: Str::before($email, '@'),
@@ -152,6 +457,7 @@ class AuthController extends Controller
                 'role' => User::ROLE_USER,
                 'permissions' => [],
                 'auth_provider' => 'azure',
+                'approval_status' => User::APPROVAL_APPROVED,
                 'email_verified_at' => now(),
             ]);
         }
@@ -195,6 +501,16 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        // Applicant accounts should always go back to the applicant login page.
+        if ($user && $user->role === User::ROLE_USER) {
+            return redirect()->route('applicant.login');
+        }
+
+        // Staff and admin users go back to the main login page.
+        if ($user && in_array($user->role, [User::ROLE_STAFF, User::ROLE_ADMIN], true)) {
+            return redirect()->route('login');
+        }
 
         if ($user && $user->auth_provider === 'azure') {
             $tenant = trim((string) config('services.azure.tenant'));

@@ -4,16 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Models\MayorsPermit;
+use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class PermitController extends Controller
 {
     public function update(Request $request, $id)
     {
+        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
+        $approvalStatus = $isApplicantUser
+            ? MayorsPermit::APPROVAL_PENDING
+            : MayorsPermit::APPROVAL_APPROVED;
+
+        if ($request->user()?->role === User::ROLE_USER) {
+            abort_if((int) $request->user()->applicant_id !== (int) $id, 403, 'You can only update your own requirements.');
+        }
+
         $applicant = Applicant::findOrFail($id);
+        $isFirstTimeJobSeeker = strtoupper(trim((string) ($applicant->first_time_job_seeker ?? ''))) === 'YES';
 
         /*
         |--------------------------------------------------------------------------
@@ -184,17 +196,22 @@ class PermitController extends Controller
         | SAVE FORM DATA
         |--------------------------------------------------------------------------
         */
-        $permit->fill([
-            'permit_or_no' => $request->permit_or_no,
-            'community_tax_no' => $request->community_tax_no,
-            'permit_issued_on' => $request->permit_issued_on,
-            'permit_issued_at' => $request->permit_issued_at,
-            'permit_date' => $request->permit_date,
-            'expires_on' => $request->expires_on,
-            'permit_doc_stamp_control_no' => $request->permit_doc_stamp_control_no,
-            'permit_date_of_payment' => $request->permit_date_of_payment,
-            'clearance_type' => $request->clearance_type,
-        ]);
+        $permit->approval_status = $approvalStatus;
+        $permit->clearance_type = $request->clearance_type;
+
+        if (! $isApplicantUser) {
+            $permit->fill([
+                'permit_or_no' => $isFirstTimeJobSeeker ? 'RA11261' : $request->permit_or_no,
+                'community_tax_no' => $request->community_tax_no,
+                'permit_issued_on' => $request->permit_issued_on,
+                'permit_issued_at' => $request->permit_issued_at,
+                'permit_date' => $request->permit_date,
+                'expires_on' => $request->expires_on,
+                'permit_doc_stamp_control_no' => $isFirstTimeJobSeeker ? '-' : $request->permit_doc_stamp_control_no,
+                'permit_date_of_payment' => $request->permit_date_of_payment,
+            ]);
+            $permit->disapproval_reason = null;
+        }
 
         $permit->save();
 
@@ -205,7 +222,7 @@ class PermitController extends Controller
         */
         $permit->loadMissing('applicant');
 
-        if (empty($permit->peso_id_no) && $permit->isReadyForIdGeneration()) {
+        if (empty($permit->peso_id_no) && $permit->isApproved() && $permit->isReadyForIdGeneration()) {
             $permit->peso_id_no = MayorsPermit::generateNextPesoIdNo();
             $permit->save();
         }
@@ -227,6 +244,81 @@ class PermitController extends Controller
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#permit')
             ->with('success', 'Permit updated successfully.');
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $applicant = Applicant::findOrFail($id);
+        $permit = MayorsPermit::where('applicant_id', $applicant->id)->firstOrFail();
+        $before = $permit->only($permit->getFillable());
+
+        $permit->approval_status = MayorsPermit::APPROVAL_APPROVED;
+        $permit->disapproval_reason = null;
+        $permit->save();
+
+        $permit->loadMissing('applicant');
+
+        if (empty($permit->peso_id_no) && $permit->isApproved() && $permit->isReadyForIdGeneration()) {
+            $permit->peso_id_no = MayorsPermit::generateNextPesoIdNo();
+            $permit->save();
+        }
+
+        $after = $permit->fresh()->only($permit->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        ActivityLogger::log(
+            'permit',
+            'approved',
+            'Approved the mayor\'s permit requirements.',
+            $applicant,
+            $changes,
+            $request->user()
+        );
+
+        return redirect()
+            ->to(route('applicants.edit', $applicant->id).'#permit')
+            ->with('success', 'Permit approved successfully.');
+    }
+
+    public function disapprove(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'disapproval_reason' => ['required', 'string', 'max:2000'],
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('disapprove_requirement', 'permit')
+                ->with('disapprove_requirement_id', (int) $id);
+        }
+
+        $validated = $validator->validated();
+
+        $applicant = Applicant::findOrFail($id);
+        $permit = MayorsPermit::where('applicant_id', $applicant->id)->firstOrFail();
+        $before = $permit->only($permit->getFillable());
+
+        $permit->approval_status = MayorsPermit::APPROVAL_DISAPPROVED;
+        $permit->disapproval_reason = $validated['disapproval_reason'];
+        $permit->save();
+
+        $after = $permit->fresh()->only($permit->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        ActivityLogger::log(
+            'permit',
+            'disapproved',
+            'Disapproved the mayor\'s permit requirements.',
+            $applicant,
+            $changes,
+            $request->user()
+        );
+
+        return redirect()
+            ->to(route('applicants.edit', $applicant->id).'#permit')
+            ->with('success', 'Permit disapproved successfully.');
     }
 
     public function printId($id)

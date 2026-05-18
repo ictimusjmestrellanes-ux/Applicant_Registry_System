@@ -28,6 +28,8 @@
         <ul class="nav nav-pills flex-column gap-2">
             @foreach ($menuItems as $item)
                 @continue(($item['admin_only'] ?? false) && !auth()->user()?->isAdmin())
+                @continue(isset($item['visible_roles']) && !in_array(auth()->user()?->role, $item['visible_roles'], true))
+                @continue(isset($item['visible_permissions']) && !collect($item['visible_permissions'])->contains(fn ($permission) => auth()->user()?->hasPermission($permission)))
 
                 @php
                     $routeName = $item['route'] ?? null;
@@ -64,7 +66,10 @@
                         <div class="collapse {{ $isActive ? 'show' : '' }}"
                             id="menu-{{ \Illuminate\Support\Str::slug($item['label']) }}">
                             <ul class="nav flex-column sidebar-submenu">
-                                @foreach ($item['children'] as $child)
+                @foreach ($item['children'] as $child)
+                                    @continue(isset($child['visible_roles']) && !in_array(auth()->user()?->role, $child['visible_roles'], true))
+                                    @continue(($child['admin_only'] ?? false) && !auth()->user()?->isAdmin())
+                                    @continue(isset($child['visible_permissions']) && !collect($child['visible_permissions'])->contains(fn ($permission) => auth()->user()?->hasPermission($permission)))
                                     <li>
                                         <a href="{{ route($child['route']) }}"
                                             class="sidebar-child-link {{ request()->routeIs($child['route'] . '*') ? 'active-child' : '' }}">

@@ -11,8 +11,16 @@ class MayorsReferral extends Model
 
     public const TYPE_OTHER_CITY_GOVERNMENT = 'other_city_government';
 
+    public const APPROVAL_PENDING = 'pending';
+
+    public const APPROVAL_APPROVED = 'approved';
+
+    public const APPROVAL_DISAPPROVED = 'disapproved';
+
     protected $fillable = [
         'applicant_id',
+        'approval_status',
+        'disapproval_reason',
         'referral_type',
         'resume',
         'biodata',
@@ -150,7 +158,36 @@ class MayorsReferral extends Model
 
     public function canPrint(): bool
     {
-        return $this->isComplete();
+        return $this->isApproved() && $this->isComplete();
+    }
+
+    public function isApproved(): bool
+    {
+        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;
+    }
+
+    public function approvalStatusLabel(): string
+    {
+        return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));
+    }
+
+    public function approvalStatusClass(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'text-bg-warning',
+            self::APPROVAL_APPROVED => 'text-bg-success',
+            self::APPROVAL_DISAPPROVED => 'text-bg-danger',
+            default => 'text-bg-success',
+        };
+    }
+
+    public function approvalStatusMessage(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'Awaiting admin or staff approval.',
+            self::APPROVAL_DISAPPROVED => 'Disapproved by admin or staff.',
+            default => 'Approved by admin or staff.',
+        };
     }
 
     public function applicant()
@@ -169,6 +206,10 @@ class MayorsReferral extends Model
             || ! empty($this->ref_police_clearance)
             || ! empty($this->ref_nbi_clearance);
 
-        return $hasProfile && $hasClearance && $this->hasRequiredDetails() && $this->hasCompletePesoExtraDetails();
+        return $this->isApproved()
+            && $hasProfile
+            && $hasClearance
+            && $this->hasRequiredDetails()
+            && $this->hasCompletePesoExtraDetails();
     }
 }

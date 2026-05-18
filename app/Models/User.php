@@ -20,6 +20,12 @@ class User extends Authenticatable
 
     public const ROLE_USER = 'user';
 
+    public const APPROVAL_PENDING = 'pending';
+
+    public const APPROVAL_APPROVED = 'approved';
+
+    public const APPROVAL_DISAPPROVED = 'disapproved';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -27,12 +33,17 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'role',
         'permissions',
         'auth_provider',
+        'approval_status',
+        'disapproval_reason',
+        'disapproval_notes',
         'profile_image',
+        'applicant_id',
     ];
 
     /**
@@ -64,6 +75,11 @@ class User extends Authenticatable
         return $this->hasMany(ActivityLog::class, 'causer_id');
     }
 
+    public function applicant()
+    {
+        return $this->belongsTo(Applicant::class);
+    }
+
     public static function roles(): array
     {
         return [
@@ -73,9 +89,20 @@ class User extends Authenticatable
         ];
     }
 
+    public static function approvalStatuses(): array
+    {
+        return [
+            self::APPROVAL_PENDING,
+            self::APPROVAL_APPROVED,
+            self::APPROVAL_DISAPPROVED,
+        ];
+    }
+
     public static function permissionOptions(): array
     {
         return [
+            'approve_applicant' => 'Approve Applicant Accounts',
+            'approve_document' => 'Approve Submitted Documents',
             'update_permit' => "Update Mayor's Permit to Work",
             'generate_permit' => "Generate Mayor's Permit to Work ID",
             'update_clearance' => "Update Mayor's Clearance",
@@ -109,6 +136,60 @@ class User extends Authenticatable
         };
     }
 
+    public function isPendingApproval(): bool
+    {
+        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_PENDING;
+    }
+
+    public function isDisapproved(): bool
+    {
+        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_DISAPPROVED;
+    }
+
+    public function isAccountBlocked(): bool
+    {
+        return in_array(
+            $this->approval_status ?? self::APPROVAL_APPROVED,
+            [self::APPROVAL_PENDING, self::APPROVAL_DISAPPROVED],
+            true
+        );
+    }
+
+    public function approvalStatusLabel(): string
+    {
+        return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));
+    }
+
+    public function approvalStatusBadgeClass(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'approval-pill-pending',
+            self::APPROVAL_APPROVED => 'approval-pill-approved',
+            self::APPROVAL_DISAPPROVED => 'approval-pill-disapproved',
+            default => 'approval-pill-approved',
+        };
+    }
+
+    public function approvalStatusMessage(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'Your account is pending admin approval. Please wait for the administrator to approve it before signing in.',
+            self::APPROVAL_DISAPPROVED => $this->approvalDisapprovedMessage(),
+            default => 'Your account is pending admin approval. Please wait for the administrator to approve it before signing in.',
+        };
+    }
+
+    public function approvalDisapprovedMessage(): string
+    {
+        $reason = trim((string) ($this->disapproval_reason ?? ''));
+
+        if ($reason !== '') {
+            return 'Your account was disapproved by an administrator. Reason: ' . $reason;
+        }
+
+        return 'Your account was disapproved by an administrator. Please contact the office for assistance.';
+    }
+
     public function hasPermission(string $permission): bool
     {
         if ($this->isAdmin()) {
@@ -124,9 +205,10 @@ class User extends Authenticatable
             return null;
         }
 
-        $publicStoragePath = public_path('storage/' . ltrim($this->profile_image, '/'));
-
-        if (! File::exists($publicStoragePath)) {
+        // Prefer checking the storage disk directly instead of relying on a public
+        // symlink to `public/storage`. This ensures the existence check works
+        // in environments where `php artisan storage:link` hasn't been run.
+        if (! Storage::disk('public')->exists($this->profile_image)) {
             return null;
         }
 

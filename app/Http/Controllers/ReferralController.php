@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Models\MayorsReferral;
+use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Config;
@@ -11,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ReferralController extends Controller
@@ -36,6 +38,10 @@ class ReferralController extends Controller
 
     public function update(Request $request, $id)
     {
+        if ($request->user()?->role === User::ROLE_USER) {
+            abort_if((int) $request->user()->applicant_id !== (int) $id, 403, 'You can only update your own requirements.');
+        }
+
         $applicant = Applicant::findOrFail($id);
         $referralType = $request->input('referral_type');
         $referral = MayorsReferral::firstOrNew([
@@ -43,6 +49,10 @@ class ReferralController extends Controller
         ]);
         $wasRecentlyCreated = ! $referral->exists;
         $before = $referral->exists ? $referral->only($referral->getFillable()) : [];
+        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
+        $approvalStatus = $isApplicantUser
+            ? MayorsReferral::APPROVAL_PENDING
+            : MayorsReferral::APPROVAL_APPROVED;
         $fullName = Str::lower(Str::slug($applicant->last_name, '_'));
 
         $fileFields = [
@@ -116,10 +126,11 @@ class ReferralController extends Controller
         };
 
         $referralData = [
-            'referral_type' => $referralType,
+            'approval_status' => $approvalStatus,
+            'referral_type' => $referral->referral_type ?: ($referralType ?: MayorsReferral::TYPE_PESO_OFFICE),
         ];
 
-        if ($referralType === MayorsReferral::TYPE_PESO_OFFICE) {
+        if (! $isApplicantUser && $referralType === MayorsReferral::TYPE_PESO_OFFICE) {
             $existingDetails = array_values(array_slice($referral->referral_details ?? [], 1));
             $submittedDetails = array_values($request->input('referral_details', []));
             $submittedFiles = array_values($request->file('referral_details', []));
@@ -200,13 +211,17 @@ class ReferralController extends Controller
                 ...$primaryDetails,
                 'referral_details' => array_values(array_merge([$primaryDetails], $supplementaryDetails)),
             ]);
-        } elseif ($referralType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT) {
+        } elseif (! $isApplicantUser && $referralType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT) {
             $referralData = array_merge($referralData, [
                 'ref_ocrl' => $request->ref_ocrl,
                 'ref_recipient' => $request->ref_recipient,
                 'ref_company_address' => $request->ref_company_address,
                 'ref_city_gov' => $request->ref_city_gov,
             ]);
+        }
+
+        if (! $isApplicantUser) {
+            $referralData['disapproval_reason'] = null;
         }
 
         $referral->fill($referralData);
@@ -247,6 +262,92 @@ class ReferralController extends Controller
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#referral')
             ->with('success', 'Referral updated successfully.');
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $applicant = Applicant::findOrFail($id);
+        $referral = MayorsReferral::where('applicant_id', $applicant->id)->firstOrFail();
+        $before = $referral->only($referral->getFillable());
+
+        $referral->approval_status = MayorsReferral::APPROVAL_APPROVED;
+        $referral->disapproval_reason = null;
+        $referral->save();
+
+        if (
+            $referral->referral_type === MayorsReferral::TYPE_PESO_OFFICE &&
+            empty($referral->ref_imus_ocrl) &&
+            $referral->canPrint()
+        ) {
+            $referral->ref_imus_ocrl = MayorsReferral::generateNextImusOcrl();
+            $referral->save();
+        }
+
+        if (
+            $referral->referral_type === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT &&
+            empty($referral->ref_ocrl) &&
+            $referral->canPrint()
+        ) {
+            $referral->ref_ocrl = MayorsReferral::generateNextOcrl();
+            $referral->save();
+        }
+
+        $after = $referral->fresh()->only($referral->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        ActivityLogger::log(
+            'referral',
+            'approved',
+            'Approved the mayor\'s referral requirements.',
+            $applicant,
+            $changes,
+            $request->user()
+        );
+
+        return redirect()
+            ->to(route('applicants.edit', $applicant->id).'#referral')
+            ->with('success', 'Referral approved successfully.');
+    }
+
+    public function disapprove(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'disapproval_reason' => ['required', 'string', 'max:2000'],
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('disapprove_requirement', 'referral')
+                ->with('disapprove_requirement_id', (int) $id);
+        }
+
+        $validated = $validator->validated();
+
+        $applicant = Applicant::findOrFail($id);
+        $referral = MayorsReferral::where('applicant_id', $applicant->id)->firstOrFail();
+        $before = $referral->only($referral->getFillable());
+
+        $referral->approval_status = MayorsReferral::APPROVAL_DISAPPROVED;
+        $referral->disapproval_reason = $validated['disapproval_reason'];
+        $referral->save();
+
+        $after = $referral->fresh()->only($referral->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        ActivityLogger::log(
+            'referral',
+            'disapproved',
+            'Disapproved the mayor\'s referral requirements.',
+            $applicant,
+            $changes,
+            $request->user()
+        );
+
+        return redirect()
+            ->to(route('applicants.edit', $applicant->id).'#referral')
+            ->with('success', 'Referral disapproved successfully.');
     }
 
     private function searchPhilippineMayors(string $search, string $cityGovernment = ''): Collection

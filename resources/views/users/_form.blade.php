@@ -65,6 +65,10 @@
             </div>
         @endforeach
     </div>
+
+    <div id="permissionsEmptyState" class="mt-3 alert alert-light border mb-0 d-none">
+        <strong>User role</strong> does not receive document permissions.
+    </div>
 </div>
 
 <div class="d-flex gap-2 mt-4 pt-3 border-top">
@@ -116,20 +120,28 @@
     document.addEventListener('DOMContentLoaded', function () {
         const roleSelect = document.getElementById('role');
         const permissionsPanel = document.getElementById('permissionsPanel');
+        const permissionsEmptyState = document.getElementById('permissionsEmptyState');
         const permissionCheckboxes = document.querySelectorAll('.permission-checkbox');
 
         function syncPermissionsState() {
             const isAdmin = roleSelect.value === 'admin';
+            const isUser = roleSelect.value === 'user';
 
             permissionCheckboxes.forEach((checkbox) => {
-                checkbox.disabled = isAdmin;
+                checkbox.disabled = isAdmin || isUser;
 
                 if (isAdmin) {
                     checkbox.checked = true;
+                } else if (isUser) {
+                    checkbox.checked = false;
                 }
             });
 
+            permissionsPanel.classList.toggle('d-none', isUser);
             permissionsPanel.style.opacity = isAdmin ? '0.65' : '1';
+            if (permissionsEmptyState) {
+                permissionsEmptyState.classList.toggle('d-none', !isUser);
+            }
         }
 
         syncPermissionsState();

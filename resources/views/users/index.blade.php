@@ -257,6 +257,7 @@
             transform: translateY(-1px);
             box-shadow: 0 14px 28px rgba(29, 78, 216, 0.28);
             color: #ffffff;
+            background: var(--users-slate);
         }
 
         .users-table-wrap {
@@ -352,6 +353,49 @@
         .role-pill-user {
             background: #eef2f7;
             color: #475569;
+        }
+
+        .approval-pill-pending {
+            background: var(--users-warm-soft);
+            color: var(--users-warm);
+        }
+
+        .approval-pill-approved {
+            background: var(--users-success-soft);
+            color: var(--users-success);
+        }
+
+        .approval-pill-disapproved {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .approval-pill-pending,
+        .approval-pill-approved,
+        .approval-pill-disapproved {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+        }
+
+        .approval-pill-pending:hover,
+        .approval-pill-approved:hover,
+        .approval-pill-disapproved:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+        }
+
+        .approval-pill-pending:hover {
+            background: #fde68a;
+            color: #92400e;
+        }
+
+        .approval-pill-approved:hover {
+            background: #bbf7d0;
+            color: #047857;
+        }
+
+        .approval-pill-disapproved:hover {
+            background: #5a5a5a;
+            color: #991b1b;
         }
 
         .permission-pills {
@@ -654,6 +698,7 @@
                                 <tr>
                                     <th>User</th>
                                     <th>Role</th>
+                                    <th>Status</th>
                                     <th>Permissions</th>
                                     <th>Provider</th>
                                     <th class="text-center">Action</th>
@@ -676,6 +721,11 @@
                                         <td>
                                             <span class="role-pill {{ $user->roleBadgeClass() }}">
                                                 {{ $user->roleLabel() }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="role-pill {{ $user->approvalStatusBadgeClass() }}">
+                                                {{ $user->approvalStatusLabel() }}
                                             </span>
                                         </td>
                                         <td>
@@ -702,14 +752,18 @@
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
+                                            <div class="d-inline-flex justify-content-center gap-2 flex-wrap">
+                                                @if(auth()->user()?->isAdmin())
+                                                    <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <div class="empty-state">
                                                 <div class="empty-icon">
                                                     <i class="bi bi-people"></i>
@@ -739,9 +793,13 @@
                                     </div>
                                 </div>
 
-                                <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
+                                <div class="d-flex gap-2 flex-wrap justify-content-end">
+                                    @if(auth()->user()?->isAdmin())
+                                        <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
 
                             <div class="mobile-user-grid">
@@ -750,6 +808,15 @@
                                     <div>
                                         <span class="role-pill {{ $user->roleBadgeClass() }}">
                                             {{ $user->roleLabel() }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="mobile-user-row">
+                                    <div class="mobile-user-label">Status</div>
+                                    <div>
+                                        <span class="role-pill {{ $user->approvalStatusBadgeClass() }}">
+                                            {{ $user->approvalStatusLabel() }}
                                         </span>
                                     </div>
                                 </div>

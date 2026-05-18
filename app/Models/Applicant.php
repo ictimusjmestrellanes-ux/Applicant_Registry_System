@@ -39,8 +39,8 @@ class Applicant extends Model
             }
 
             $applicant->forceFill([
-                'applicant_code' => sprintf('APL-%06d', $applicant->id),
-                'portal_password' => Hash::make(sprintf('APL-%06d', $applicant->id)),
+                'applicant_code' => sprintf('APL-%05d', $applicant->id),
+                'portal_password' => Hash::make(sprintf('APL-%05d', $applicant->id)),
             ])->saveQuietly();
         });
     }

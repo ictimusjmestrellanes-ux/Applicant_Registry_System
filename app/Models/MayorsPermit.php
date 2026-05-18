@@ -6,9 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class MayorsPermit extends Model
 {
+    public const APPROVAL_PENDING = 'pending';
+
+    public const APPROVAL_APPROVED = 'approved';
+
+    public const APPROVAL_DISAPPROVED = 'disapproved';
+
     protected $fillable = [
 
         'applicant_id',
+        'approval_status',
+        'disapproval_reason',
 
         'health_card',
         'permit_nbi_clearance',
@@ -30,6 +38,8 @@ class MayorsPermit extends Model
 
         'permit_doc_stamp_control_no',
         'permit_date_of_payment',
+        'penalty_applied',
+        'penalty_applied_at',
 
     ];
 
@@ -88,9 +98,39 @@ class MayorsPermit extends Model
             ! empty($this->permit_doc_stamp_control_no);
     }
 
+    public function isApproved(): bool
+    {
+        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;
+    }
+
+    public function approvalStatusLabel(): string
+    {
+        return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));
+    }
+
+    public function approvalStatusClass(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'text-bg-warning',
+            self::APPROVAL_APPROVED => 'text-bg-success',
+            self::APPROVAL_DISAPPROVED => 'text-bg-danger',
+            default => 'text-bg-success',
+        };
+    }
+
+    public function approvalStatusMessage(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'Awaiting admin or staff approval.',
+            self::APPROVAL_DISAPPROVED => 'Disapproved by admin or staff.',
+            default => 'Approved by admin or staff.',
+        };
+    }
+
     public function isComplete()
     {
         return
+            $this->isApproved() &&
             $this->isReadyForIdGeneration() &&
             ! empty($this->peso_id_no) &&
             ! empty($this->permit_date_of_payment);

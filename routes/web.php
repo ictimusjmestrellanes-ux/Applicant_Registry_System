@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ApplicantController;
-use App\Http\Controllers\ApplicantPortalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClearanceController;
 use App\Http\Controllers\PermitController;
@@ -17,21 +16,16 @@ Route::get('/', function () {
 // Login/Logout routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+// Applicant-specific login (uses applicant code / portal password)
+Route::get('/applicant/login', [AuthController::class, 'showApplicantLoginForm'])->name('applicant.login');
+Route::post('/applicant/login', [AuthController::class, 'loginApplicant'])->name('applicant.login.post');
+Route::get('/applicant/register', [AuthController::class, 'showApplicantRegisterForm'])->name('applicant.register');
+Route::post('/applicant/register', [AuthController::class, 'registerApplicant'])->name('applicant.register.post');
 Route::get('/auth/azure/redirect', [AuthController::class, 'redirectToAzure'])->name('login.azure.redirect');
 Route::get('/auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('login.azure.callback');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/applicant/login', [ApplicantPortalController::class, 'showLoginForm'])->name('applicant.portal.login');
-Route::post('/applicant/login', [ApplicantPortalController::class, 'login'])->name('applicant.portal.authenticate');
-Route::get('/applicant/register', [ApplicantPortalController::class, 'showRegisterForm'])->name('applicant.portal.register');
-Route::post('/applicant/register', [ApplicantPortalController::class, 'register'])->name('applicant.portal.register.store');
-Route::get('/applicant', [ApplicantPortalController::class, 'index'])->name('applicant.portal.index');
-Route::get('/applicant/personal-info', [ApplicantPortalController::class, 'personalInfo'])->name('applicant.portal.personal-info');
-Route::post('/applicant/personal-info', [ApplicantPortalController::class, 'savePersonalInfo'])->name('applicant.portal.personal-info.store');
-Route::get('/applicant/requirements', [ApplicantPortalController::class, 'requirements'])->name('applicant.portal.requirements');
-Route::post('/applicant/profile', [ApplicantPortalController::class, 'update'])->name('applicant.portal.update');
-Route::post('/applicant/requirements', [ApplicantPortalController::class, 'uploadRequirements'])->name('applicant.portal.requirements.store');
-Route::post('/applicant/logout', [ApplicantPortalController::class, 'logout'])->name('applicant.portal.logout');
+// Applicant portal routes removed
 
 Route::middleware('auth')->group(function () {
 
@@ -39,8 +33,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
+    Route::get('/approvals', [UserController::class, 'approvalIndex'])
+        ->middleware(['auth', 'permission:approve_applicant'])
+        ->name('approvals.index');
+
+    Route::get('/users', [UserController::class, 'index'])
+        ->middleware(['auth', 'permission:approve_applicant'])
+        ->name('users.index');
+
     Route::middleware('admin')->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     });
@@ -64,6 +65,14 @@ Route::get('applicants/export', [ApplicantController::class, 'export'])->middlew
 Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->middleware('auth')
     ->name('applicants.restore');
 
+Route::put('/users/{user}/approve', [UserController::class, 'approveApplicant'])
+    ->middleware(['auth', 'permission:approve_applicant'])
+    ->name('users.approve');
+
+Route::put('/users/{user}/disapprove', [UserController::class, 'disapproveApplicant'])
+    ->middleware(['auth', 'permission:approve_applicant'])
+    ->name('users.disapprove');
+
 Route::get('/applicants/{applicant}/view-file/{field}',
     [ApplicantController::class, 'viewFile']
 )->middleware('auth')->name('applicants.view-file');
@@ -72,10 +81,22 @@ Route::get('/applicants/{applicant}/view-file/{field}',
 Route::resource('applicants', ApplicantController::class)->middleware('auth');
 Route::put('/permits/{id}', [PermitController::class, 'update'])->middleware(['auth', 'permission:update_permit'])
     ->name('permits.update');
+Route::put('/permits/{id}/approve', [PermitController::class, 'approve'])->middleware(['auth', 'permission:approve_document'])
+    ->name('permits.approve');
+Route::put('/permits/{id}/disapprove', [PermitController::class, 'disapprove'])->middleware(['auth', 'permission:approve_document'])
+    ->name('permits.disapprove');
 Route::put('/clearances/{id}', [ClearanceController::class, 'update'])->middleware(['auth', 'permission:update_clearance'])
     ->name('clearances.update');
+Route::put('/clearances/{id}/approve', [ClearanceController::class, 'approve'])->middleware(['auth', 'permission:approve_document'])
+    ->name('clearances.approve');
+Route::put('/clearances/{id}/disapprove', [ClearanceController::class, 'disapprove'])->middleware(['auth', 'permission:approve_document'])
+    ->name('clearances.disapprove');
 Route::put('/referrals/{id}', [ReferralController::class, 'update'])->middleware(['auth', 'permission:update_referral'])
     ->name('referrals.update');
+Route::put('/referrals/{id}/approve', [ReferralController::class, 'approve'])->middleware(['auth', 'permission:approve_document'])
+    ->name('referrals.approve');
+Route::put('/referrals/{id}/disapprove', [ReferralController::class, 'disapprove'])->middleware(['auth', 'permission:approve_document'])
+    ->name('referrals.disapprove');
 Route::get('/api/referrals/recipients', [ReferralController::class, 'searchRecipients'])->middleware('auth')
     ->name('referrals.recipients.search');
 
@@ -87,5 +108,7 @@ Route::get('/applicants/{id}/print-clearance', [ClearanceController::class, 'pri
     
 Route::get('/applicants/{id}/print-referral', [ReferralController::class, 'printLetter'])->middleware(['auth', 'permission:generate_referral'])
     ->name('referrals.printLetter');
-Route::get('/storage/view/{filename}', [App\Http\Controllers\StorageController::class, 'viewfile'])->middleware('auth')
+Route::get('/storage/view/{filename}', [App\Http\Controllers\StorageController::class, 'viewfile'])
+    ->middleware('auth')
+    ->where('filename', '.*')
     ->name('storage.view');

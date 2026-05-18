@@ -14,15 +14,15 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-                        <div style="font-size:14px;">
-                            <p class="mb-2">The applicant profile has been saved successfully.</p>
-                            @if (session('applicant_code'))
-                                <p class="mb-2"><strong>Applicant ID:</strong> {{ session('applicant_code') }}</p>
-                                <p class="mb-0 text-muted">Initial portal password: same as the applicant ID.</p>
-                            @endif
-                            <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                        </div>
-                    `,
+                                <div style="font-size:14px;">
+                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                    @if (session('applicant_code'))
+                                        <p class="mb-2"><strong>Applicant ID:</strong> {{ session('applicant_code') }}</p>
+                                        <p class="mb-0 text-muted">Initial portal password: same as the applicant ID.</p>
+                                    @endif
+                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                </div>
+                            `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -60,6 +60,10 @@
 
     @php
         $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
+        $isApplicantUser = auth()->check() && auth()->user()?->role === \App\Models\User::ROLE_USER;
+        $isFirstTimeJobSeeker = strtoupper(trim((string) ($applicant->first_time_job_seeker ?? ''))) === 'YES';
+        $disapproveRequirement = session('disapprove_requirement');
+        $disapproveRequirementId = session('disapprove_requirement_id');
 
         $permit = optional($applicant->permit);
         $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
@@ -464,6 +468,20 @@
             background: #ffffff;
             border: 1px solid #e4edf7;
             box-shadow: 0 22px 46px rgba(15, 34, 58, 0.08);
+        }
+
+        .modal {
+            z-index: 2050;
+        }
+
+        .modal-backdrop {
+            z-index: 2040;
+        }
+
+        .modal-dialog,
+        .modal-content,
+        .modal-body {
+            pointer-events: auto;
         }
 
         .form-card {
@@ -1231,7 +1249,7 @@
     </style>
 
     <div class="container applicant-wrapper">
-            <div class="requirements-container">
+        <div class="requirements-container">
             <div class="content-intro">
                 <div>
                     <h5 class="fw-bold mb-1">Document Compliance</h5>
@@ -1504,7 +1522,23 @@
                             );
                         @endphp
 
-                        <h6 class="section-title text-primary">Mayor’s Permit to Work Requirements</h6>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                            <h6 class="section-title text-primary mb-4">Mayor’s Permit to Work Requirements</h6>
+                            @if($applicant->permit)
+                                <div class="d-flex flex-column align-items-end gap-1">
+                                    <span class="badge rounded-pill {{ $permit->approvalStatusClass() }}">
+                                        {{ $permit->approvalStatusLabel() }}
+                                    </span>
+                                    @if($permit->approval_status === \App\Models\MayorsPermit::APPROVAL_DISAPPROVED && trim((string) ($permit->disapproval_reason ?? '')) !== '')
+                                        <small class="text-danger text-end">
+                                            Reason: {{ $permit->disapproval_reason }}
+                                        </small>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="badge rounded-pill text-bg-secondary">Not submitted</span>
+                            @endif
+                        </div>
 
                         <div class="row g-3 permit-upload-row">
                             {{-- 1. NBI / Police Clearance --}}
@@ -1512,7 +1546,7 @@
                                 <div class="document-upload-card">
                                     <label class="form-label">Clearance Type (NBI or Police)<span
                                             class="required-mark">*</span></label>
-                                    <select name="clearance_type" id="clearance_type" 
+                                    <select name="clearance_type" id="clearance_type"
                                         class="form-select form-select-sm mb-3" required>
                                         <option value="">Select Type</option>
                                         <option value="nbi" {{ $selectedClearanceType == 'nbi' ? 'selected' : '' }}>
@@ -1526,8 +1560,7 @@
                                     <div class="gap-2" id="nbi_section" style="display:none">
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="nbi_input" name="permit_nbi_clearance" class="d-none"
-                                            onchange="showFileName(this, 'nbi_name')"
-                                            {{ empty($permit->permit_nbi_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'nbi_name')" {{ empty($permit->permit_nbi_clearance) ? 'required' : '' }}>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="nbi_input" class="btn btn-outline-primary btn-sm">
@@ -1539,7 +1572,7 @@
                                         </small>
 
                                         @if(!empty($permit->permit_nbi_clearance))
-                                            <a href="{{ asset('storage/' . $permit->permit_nbi_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_nbi_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1551,8 +1584,7 @@
 
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="police_input" name="permit_police_clearance" class="d-none"
-                                            onchange="showFileName(this, 'police_name')"
-                                            {{ empty($permit->permit_police_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'police_name')" {{ empty($permit->permit_police_clearance) ? 'required' : '' }}>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="police_input" class="btn btn-outline-primary btn-sm">
@@ -1566,7 +1598,7 @@
 
                                         <!-- VIEW FILE -->
                                         @if(!empty($permit->permit_police_clearance))
-                                            <a href="{{ asset('storage/' . $permit->permit_police_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_police_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1582,8 +1614,7 @@
                                     <label class="form-label">Health Card <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="health_card_input" name="health_card" style="display:none"
-                                            onchange="showFileName(this, 'health_card_name')"
-                                            {{ empty($permit->health_card) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'health_card_name')" {{ empty($permit->health_card) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('health_card_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1592,7 +1623,7 @@
                                             {{ !empty($permit->health_card) ? basename($permit->health_card) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->health_card))
-                                            <a href="{{ asset('storage/' . $permit->health_card) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $permit->health_card]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1607,8 +1638,7 @@
                                     <label class="form-label">Cedula <span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="cedula_input" name="cedula" style="display:none"
-                                            onchange="showFileName(this, 'cedula_name')"
-                                            {{ empty($permit->cedula) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'cedula_name')" {{ empty($permit->cedula) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('cedula_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1617,7 +1647,7 @@
                                             {{ !empty($permit->cedula) ? basename($permit->cedula) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->cedula))
-                                            <a href="{{ asset('storage/' . $permit->cedula) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $permit->cedula]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1635,8 +1665,7 @@
                                     </label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="referral_input" name="referral_letter" style="display:none"
-                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }}
-                                            {{ $isImusResident || !empty($permit->referral_letter) ? '' : 'required' }}>
+                                            onchange="showFileName(this, 'referral_name')" {{ $isImusResident ? 'disabled' : '' }} {{ $isImusResident || !empty($permit->referral_letter) ? '' : 'required' }}>
 
                                         <button type="button" id="referral_upload_btn"
                                             class="btn btn-outline-primary btn-sm"
@@ -1648,7 +1677,7 @@
                                             {{ !empty($permit->referral_letter) ? basename($permit->referral_letter) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->referral_letter))
-                                            <a id="referral_view_link" href="{{ asset('storage/' . $permit->referral_letter) }}"
+                                            <a id="referral_view_link" href="{{ route('storage.view', ['filename' => $permit->referral_letter]) }}"
                                                 target="_blank"
                                                 class="btn btn-light btn-sm text-primary border {{ $isImusResident ? 'd-none' : '' }}">
                                                 <i class="fas fa-eye me-1"></i> View Current
@@ -1671,84 +1700,94 @@
                                 </div>
                             </div>
                         </div>
+                        @unless($isApplicantUser)
+                            <h6 class="section-title text-primary mt-4">Permit to Work ID Details</h6>
 
+                            <div class="row g-3 mt-3">
 
-                        <h6 class="section-title text-primary mt-4">Permit to Work ID Details</h6>
+                                {{-- Peso ID No --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Peso ID No. (Auto Generate)<span
+                                            class="required-mark">*</span></label>
+                                    <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
+                                        value="{{ $permit->peso_id_no ?? '' }}" placeholder="Auto generate when complete"
+                                        disabled>
+                                </div>
 
-                        <div class="row g-3 mt-3">
+                                {{-- OR NUMBER --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">O.R No. <span class="required-mark">*</span></label>
+                                    <input type="text" name="permit_or_no"
+                                        value="{{ old('permit_or_no', $isFirstTimeJobSeeker ? 'RA11261' : $permit->permit_or_no) }}"
+                                        class="form-control" {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
+                                    @if($isFirstTimeJobSeeker)
+                                        <small class="text-muted">Auto-filled for first time job seekers.</small>
+                                    @endif
+                                </div>
 
-                            {{-- Peso ID No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Peso ID No. (Auto Generate)<span
-                                        class="required-mark">*</span></label>
-                                <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
-                                    value="{{ $permit->peso_id_no ?? '' }}" placeholder="Auto generate when complete"
-                                    disabled>
+                                {{-- Community Tax No --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
+                                    <input type="text" name="community_tax_no" class="form-control"
+                                        value="{{$permit->community_tax_no}}" required>
+                                </div>
+
+                                {{-- Issued On --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Community Tax No. Issued On<span
+                                            class="required-mark">*</span></label>
+                                    <input type="date" name="permit_issued_on" class="form-control"
+                                        value="{{$permit->permit_issued_on}}" required>
+                                </div>
+
+                                {{-- Permit Issued At --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
+                                    <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select"
+                                        required>
+                                        <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
+                                            {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                {{-- Permit Date --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Permit Date Release<span class="required-mark">*</span></label>
+                                    <input type="date" id="permit_date" name="permit_date" class="form-control"
+                                        value="{{$permit->permit_date}}" required>
+                                </div>
+
+                                {{-- Expiration --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Permit Expires On<span class="required-mark">*</span></label>
+                                    <input type="date" id="expires_on" name="expires_on" class="form-control"
+                                        value="{{$permit->expires_on}}" readonly>
+                                </div>
+
+                                {{-- Documentary Stamp --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Documentary Stamp Control No.<span
+                                            class="required-mark">*</span></label>
+                                    <input type="text" name="permit_doc_stamp_control_no" class="form-control"
+                                        value="{{ old('permit_doc_stamp_control_no', $isFirstTimeJobSeeker ? '-' : $permit->permit_doc_stamp_control_no) }}"
+                                        {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
+                                    @if($isFirstTimeJobSeeker)
+                                        <small class="text-muted">Auto-filled for first time job seekers.</small>
+                                    @endif
+                                </div>
+                                {{-- Date of Payment --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
+                                    <input type="date" name="permit_date_of_payment" class="form-control"
+                                        value="{{$permit->permit_date_of_payment}}" required>
+                                </div>
                             </div>
-
-                            {{-- OR NUMBER --}}
-                            <div class="col-md-2">
-                                <label class="form-label">O.R No. <span class="required-mark">*</span></label>
-                                <input type="text" name="permit_or_no" value="{{ $permit->permit_or_no }}"
-                                    class="form-control" required>
-                            </div>
-
-                            {{-- Community Tax No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
-                                <input type="text" name="community_tax_no" class="form-control"
-                                    value="{{$permit->community_tax_no}}" requiredq>
-                            </div>
-
-                            {{-- Issued On --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
-                                <input type="date" name="permit_issued_on" class="form-control"
-                                    value="{{$permit->permit_issued_on}}" required>
-                            </div>
-
-                            {{-- Permit Issued At --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
-                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
-                                    <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
-                                        {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            {{-- Permit Date --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Permit Date<span class="required-mark">*</span></label>
-                                <input type="date" id="permit_date" name="permit_date" class="form-control"
-                                    value="{{$permit->permit_date}}" required>
-                            </div>
-
-                            {{-- Expiration --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Expires On<span class="required-mark">*</span></label>
-                                <input type="date" id="expires_on" name="expires_on" class="form-control"
-                                    value="{{$permit->expires_on}}" readonly>
-                            </div>
-
-                            {{-- Documentary Stamp --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Documentary Stamp Control No.<span
-                                        class="required-mark">*</span></label>
-                                <input type="text" name="permit_doc_stamp_control_no" class="form-control"
-                                    value="{{$permit->permit_doc_stamp_control_no}}" required>
-                            </div>
-                            {{-- Date of Payment --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
-                                <input type="date" name="permit_date_of_payment" class="form-control"
-                                    value="{{$permit->permit_date_of_payment}}" required>
-                            </div>
-                        </div>
+                        @endunless
 
                         <div class="permit-action-bar mt-4">
                             {{-- Action: Save/Update --}}
-                            @if(auth()->user()->hasPermission('update_permit'))
+                            @if($isApplicantUser || auth()->user()->hasPermission('update_permit'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
                                     <i class="fa-solid fa-floppy-disk me-2"></i>Save Permit
                                 </button>
@@ -1761,27 +1800,55 @@
                                 </span>
                             @endif
 
-                            {{-- Action: Print/Generate --}}
-                            @if(auth()->user()->hasPermission('generate_permit') && $permit && $permit->isComplete())
-                                <a href="{{ route('permits.printId', $applicant->id) }}" target="_blank"
-                                    class="btn btn-success px-4 shadow-sm">
-                                    <i class="fa-solid fa-id-card me-2"></i>Print Permit ID
-                                </a>
-                            @else
-                                @php
-                                    // Logic para sa error message
-                                    $reason = !auth()->user()->hasPermission('generate_permit')
-                                        ? 'No permission to generate ID'
-                                        : 'Complete all requirements first';
-                                @endphp
-
-                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="{{ $reason }}">
-                                    <button class="btn btn-outline-secondary px-4" disabled>
-                                        <i class="fa-solid fa-id-card me-2 text-muted"></i>View Permit to Work ID
+                            @unless($isApplicantUser)
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && ! $permit->isApproved())
+                                    <button type="submit" form="permit-approve-form-{{ $applicant->id }}"
+                                        class="btn btn-success px-4 shadow-sm" formnovalidate>
+                                            <i class="fa-solid fa-circle-check me-2"></i>Approve Permit Requirements
                                     </button>
-                                </span>
-                            @endif
+                                @endif
+                            @endunless
+
+                            @unless($isApplicantUser)
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && auth()->user()->role !== \App\Models\User::ROLE_STAFF)
+                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#disapprovePermitModal-{{ $applicant->id }}">
+                                        <i class="fa-solid fa-circle-xmark me-2"></i>
+                                        {{ $permit->approval_status === \App\Models\MayorsPermit::APPROVAL_DISAPPROVED ? 'Update Reason' : 'Disapprove Permit Requirements' }}
+                                    </button>
+                                @endif
+                            @endunless
+
+                            @unless($isApplicantUser)
+                                {{-- Action: Print/Generate --}}
+                                @if(auth()->user()->hasPermission('generate_permit') && $permit && $permit->isComplete())
+                                    <a href="{{ route('permits.printId', $applicant->id) }}" target="_blank"
+                                        class="btn btn-success px-4 shadow-sm">
+                                        <i class="fa-solid fa-id-card me-2"></i>View Permit to Work ID
+                                    </a>
+                                @else
+                                    @php
+                                        // Logic para sa error message
+                                        $reason = !auth()->user()->hasPermission('generate_permit')
+                                            ? 'No permission to generate ID'
+                                            : (($permit && ! $permit->isApproved())
+                                                ? 'Awaiting admin or staff approval'
+                                                : 'Complete all requirements first');
+                                    @endphp
+
+                                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="{{ $reason }}">
+                                        <button class="btn btn-outline-secondary px-4" disabled>
+                                            <i class="fa-solid fa-id-card me-2 text-muted"></i>View Permit to Work ID
+                                        </button>
+                                    </span>
+                                @endif
+                            @endunless
                         </div>
+                    </form>
+                    <form id="permit-approve-form-{{ $applicant->id }}" action="{{ route('permits.approve', $applicant->id) }}" method="POST" class="d-none">
+                        @csrf
+                        @method('PUT')
                     </form>
                 </div>
 
@@ -1797,7 +1864,23 @@
 
                         @php $clearance = optional($applicant->clearance); @endphp
 
-                        <h6 class="section-title text-primary">Mayor's Clearance Requirements</h6>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                            <h6 class="section-title text-primary mb-4">Mayor's Clearance Requirements</h6>
+                            @if($applicant->clearance)
+                                <div class="d-flex flex-column align-items-end gap-1">
+                                    <span class="badge rounded-pill {{ $clearance->approvalStatusClass() }}">
+                                        {{ $clearance->approvalStatusLabel() }}
+                                    </span>
+                                    @if($clearance->approval_status === \App\Models\MayorsClearance::APPROVAL_DISAPPROVED && trim((string) ($clearance->disapproval_reason ?? '')) !== '')
+                                        <small class="text-danger text-end">
+                                            Reason: {{ $clearance->disapproval_reason }}
+                                        </small>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="badge rounded-pill text-bg-secondary">Not submitted</span>
+                            @endif
+                        </div>
 
                         <div class="clearance-upload-row">
 
@@ -1816,7 +1899,7 @@
                                             {{ !empty($clearance->prosecutor_clearance) ? basename($clearance->prosecutor_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->prosecutor_clearance))
-                                            <a href="{{ asset('storage/' . $clearance->prosecutor_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->prosecutor_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1840,7 +1923,7 @@
                                             {{ !empty($clearance->mtc_clearance) ? basename($clearance->mtc_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->mtc_clearance))
-                                            <a href="{{ asset('storage/' . $clearance->mtc_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->mtc_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1864,7 +1947,7 @@
                                             {{ !empty($clearance->rtc_clearance) ? basename($clearance->rtc_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->rtc_clearance))
-                                            <a href="{{ asset('storage/' . $clearance->rtc_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->rtc_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1887,7 +1970,7 @@
                                             {{ !empty($clearance->nbi_clearance) ? basename($clearance->nbi_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->nbi_clearance))
-                                            <a href="{{ asset('storage/' . $clearance->nbi_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->nbi_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1910,7 +1993,7 @@
                                             {{ !empty($clearance->barangay_clearance) ? basename($clearance->barangay_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->barangay_clearance))
-                                            <a href="{{ asset('storage/' . $clearance->barangay_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->barangay_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -1921,56 +2004,58 @@
 
                         </div>
 
-                        <h6 class="section-title text-primary mb-0 mt-4">Mayor’s Clearance Letter Details</h6>
-                        <div class="row g-3 mt-3">
-                            {{-- PESO Control No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Peso Control No. (Auto Generate)<span
-                                        class="required-mark">*</span></label>
-                                <input type="text" name="clearance_peso_control_no" class="form-control"
-                                    style="text-align: center" value="{{ $clearance->clearance_peso_control_no }}"
-                                    placeholder="Auto generate when complete" readonly>
-                            </div>
+                        @unless($isApplicantUser)
+                            <h6 class="section-title text-primary mb-0 mt-4">Mayor’s Clearance Letter Details</h6>
+                            <div class="row g-3 mt-3">
+                                {{-- PESO Control No --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Peso Control No. (Auto Generate)<span
+                                            class="required-mark">*</span></label>
+                                    <input type="text" name="clearance_peso_control_no" class="form-control"
+                                        style="text-align: center" value="{{ $clearance->clearance_peso_control_no }}"
+                                        placeholder="Auto generate when complete" readonly>
+                                </div>
 
-                            {{-- Official Receipt No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
-                                <input type="text" name="clearance_or_no" class="form-control"
-                                    value="{{$clearance->clearance_or_no}}" required>
-                            </div>
+                                {{-- Official Receipt No --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
+                                    <input type="text" name="clearance_or_no" class="form-control"
+                                        value="{{$clearance->clearance_or_no}}" required>
+                                </div>
 
-                            {{-- Hired Company --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Hired Company<span class="required-mark">*</span></label>
-                                <input type="text" name="clearance_hired_company" class="form-control"
-                                    value="{{$clearance->clearance_hired_company}}" required>
-                            </div>
+                                {{-- Hired Company --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Hired Company<span class="required-mark">*</span></label>
+                                    <input type="text" name="clearance_hired_company" class="form-control"
+                                        value="{{$clearance->clearance_hired_company}}" required>
+                                </div>
 
-                            {{-- Issued On --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Issued On<span class="required-mark">*</span></label>
-                                <input type="date" name="clearance_issued_on" class="form-control"
-                                    value="{{$clearance->clearance_issued_on}}" required>
-                            </div>
+                                {{-- Issued On --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Issued On<span class="required-mark">*</span></label>
+                                    <input type="date" name="clearance_issued_on" class="form-control"
+                                        value="{{$clearance->clearance_issued_on}}" required>
+                                </div>
 
-                            {{-- Documentary Stamp Control No --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Documentary Stamp Control No.<span
-                                        class="required-mark">*</span></label>
-                                <input type="text" name="clearance_doc_stamp_control_no" class="form-control"
-                                    value="{{$clearance->clearance_doc_stamp_control_no}}" required>
+                                {{-- Documentary Stamp Control No --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Documentary Stamp Control No.<span
+                                            class="required-mark">*</span></label>
+                                    <input type="text" name="clearance_doc_stamp_control_no" class="form-control"
+                                        value="{{$clearance->clearance_doc_stamp_control_no}}" required>
+                                </div>
+                                {{-- Date of Payment --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
+                                    <input type="date" name="clearance_date_of_payment" class="form-control"
+                                        value="{{$clearance->clearance_date_of_payment}}" required>
+                                </div>
                             </div>
-                            {{-- Date of Payment --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
-                                <input type="date" name="clearance_date_of_payment" class="form-control"
-                                    value="{{$clearance->clearance_date_of_payment}}" required>
-                            </div>
-                        </div>
+                        @endunless
 
                         <div class="clearance-action-bar mt-4">
                             {{-- Update/Save Section --}}
-                            @if(auth()->user()->hasPermission('update_clearance'))
+                            @if($isApplicantUser || auth()->user()->hasPermission('update_clearance'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
                                     <i class="fa-solid fa-certificate me-2"></i>Save Clearance
                                 </button>
@@ -1982,29 +2067,32 @@
                                 </span>
                             @endif
 
-                            {{-- Print Section --}}
-                            @if(auth()->user()->hasPermission('generate_clearance') && $clearance && $clearance->isComplete())
-                                <a href="{{ route('clearances.printLetter', $applicant->id) }}" target="_blank"
-                                    class="btn btn-success px-4 shadow-sm">
-                                    <i class="fa-solid fa-print me-2"></i>View Clearance Letter
-                                </a>
-                            @else
-                                @php
-                                    $reason = !auth()->user()->hasPermission('generate_clearance')
-                                        ? 'No permission to generate letter'
-                                        : 'Requirements incomplete';
-                                @endphp
+                            @unless($isApplicantUser)
+                                {{-- Print Section --}}
+                                @if(auth()->user()->hasPermission('generate_clearance') && $clearance && $clearance->isComplete())
+                                    <a href="{{ route('clearances.printLetter', $applicant->id) }}" target="_blank"
+                                        class="btn btn-success px-4 shadow-sm">
+                                        <i class="fa-solid fa-print me-2"></i>View Clearance Letter
+                                    </a>
+                                @else
+                                    @php
+                                        $reason = !auth()->user()->hasPermission('generate_clearance')
+                                            ? 'No permission to generate letter'
+                                            : (($clearance && ! $clearance->isApproved())
+                                                ? 'Awaiting admin or staff approval'
+                                                : 'Requirements incomplete');
+                                    @endphp
 
-                                <span class="d-inline-block" data-bs-toggle="tooltip" title="{{ $reason }}">
-                                    <button class="btn btn-outline-secondary px-4" disabled>
-                                        <i class="fa-solid fa-print me-2 text-muted"></i>View Clearance Letter
-                                    </button>
-                                </span>
-                            @endif
+                                    <span class="d-inline-block" data-bs-toggle="tooltip" title="{{ $reason }}">
+                                        <button class="btn btn-outline-secondary px-4" disabled>
+                                            <i class="fa-solid fa-print me-2 text-muted"></i>View Clearance Letter
+                                        </button>
+                                    </span>
+                                @endif
+                            @endunless
                         </div>
 
                     </form>
-
                 </div>
 
                 <!-- ===================================================== -->
@@ -2034,7 +2122,23 @@
                             }
                         @endphp
 
-                        <h6 class="section-title text-primary">Mayor's Referral Requirements</h6>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                            <h6 class="section-title text-primary mb-4">Mayor's Referral Requirements</h6>
+                            @if($applicant->referral)
+                                <div class="d-flex flex-column align-items-end gap-1">
+                                    <span class="badge rounded-pill {{ $referral->approvalStatusClass() }}">
+                                        {{ $referral->approvalStatusLabel() }}
+                                    </span>
+                                    @if($referral->approval_status === \App\Models\MayorsReferral::APPROVAL_DISAPPROVED && trim((string) ($referral->disapproval_reason ?? '')) !== '')
+                                        <small class="text-danger text-end">
+                                            Reason: {{ $referral->disapproval_reason }}
+                                        </small>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="badge rounded-pill text-bg-secondary">Not submitted</span>
+                            @endif
+                        </div>
 
                         <div class="mb-3">
                             <div class="document-upload-card-resume">
@@ -2050,7 +2154,7 @@
                                         {{ !empty($referral->resume) ? basename($referral->resume) : 'No file selected' }}
                                     </small>
                                     @if(!empty($referral->resume))
-                                        <a href="{{ asset('storage/' . $referral->resume) }}" target="_blank"
+                                        <a href="{{ route('storage.view', ['filename' => $referral->resume]) }}" target="_blank"
                                             class="btn btn-light btn-sm text-primary border">
                                             <i class="fas fa-eye me-1"></i> View Current
                                         </a>
@@ -2058,8 +2162,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <h4 class="section-title-c text-primary">Choose at least one of the following:</h4>
                         <div class="referral-upload-row pb-2">
 
@@ -2078,7 +2180,7 @@
                                             {{ !empty($referral->ref_barangay_clearance) ? basename($referral->ref_barangay_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($referral->ref_barangay_clearance))
-                                            <a href="{{ asset('storage/' . $referral->ref_barangay_clearance) }}"
+                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_barangay_clearance]) }}"
                                                 target="_blank" class="btn btn-light btn-sm text-primary border"
                                                 id="ref_brgy_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
@@ -2103,7 +2205,7 @@
                                             {{ !empty($referral->ref_police_clearance) ? basename($referral->ref_police_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($referral->ref_police_clearance))
-                                            <a href="{{ asset('storage/' . $referral->ref_police_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_police_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border" id="ref_police_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -2126,7 +2228,7 @@
                                             {{ !empty($referral->ref_nbi_clearance) ? basename($referral->ref_nbi_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($referral->ref_nbi_clearance))
-                                            <a href="{{ asset('storage/' . $referral->ref_nbi_clearance) }}" target="_blank"
+                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_nbi_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border" id="ref_nbi_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
@@ -2137,334 +2239,350 @@
 
                         </div>
 
-                        <div class="mt-2">
-                            <div class="referral-details-head mb-3">
-                                <div>
-                                    <h6 class="section-title text-primary mb-1">Mayor's Referral Letter Details</h6>
-                                    <p class="section-copy mb-0">Choose the referral type, then fill in the matching
-                                        letter details below.</p>
-                                </div>
-
-
-                            </div>
-
-                            <div class="col-12 col-md-2 mb-3 referral-type-field">
-                                <label class="form-label">Referral Letter Type</label>
-                                <select name="referral_type" id="referralTypeSelect"
-                                    class="form-select referral-type-select">
-                                    <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
-                                        Referral Within Imus
-                                    </option>
-                                    <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
-                                        Referral Outside Imus
-                                    </option>
-                                </select>
-                            </div>
-
-
-                            <div id="pesoOfficeFields" data-referral-group="peso"
-                                class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
-                                <div class="js-peso-extra-details mt-4 d-grid gap-3">
-                                    <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
-                                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                            <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
-                                        </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-2">
-                                                <label class="form-label">Peso OCRL (Auto Generate)<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" name="ref_imus_ocrl" class="form-control"
-                                                    style="text-align: center"
-                                                    value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
-                                                    placeholder="Auto generate when complete" readonly>
-                                            </div>
-
-                                            <div class="col-md-2">
-                                                <label class="form-label">Employer Name<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" name="ref_employer_name" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}" required>
-                                            </div>
-
-                                            <div class="col-md-2">
-                                                <label class="form-label">Employer Position<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" name="ref_position" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_position', $referral->ref_position ?? '') }}" required>
-                                            </div>
-
-                                            <div class="col-md-2">
-                                                <label class="form-label"> City Address<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
-                                                    list="refPlaceOptions" value="{{ old('ref_place', $referral->ref_place ?? '') }}"
-                                                    oninput="this.value = this.value.toUpperCase()" placeholder="Search City Address" required>
-                                                <datalist id="refPlaceOptions"></datalist>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">Province</label>
-                                                <input type="text" name="ref_province" id="refProvinceInput"
-                                                    class="form-control" oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_province', $referral->ref_province ?? '') }}"
-                                                    placeholder="Enter Province" required>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">Hired Company<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" name="ref_hired_company" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()"
-                                                    value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}" required>
-                                            </div>
-                                        </div>
-                                        @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                            <div class="mt-3">
-                                                <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
-                                                    id="printReferralPesoButton" class="btn btn-outline-primary px-4"
-                                                    target="_blank">
-                                                    View Employer Letter Detail 1
-                                                </a>
-                                            </div>
-                                        @else
-                                            <div class="mt-3">
-                                                <button type="button" id="printReferralPesoButton"
-                                                    class="btn btn-outline-secondary justify-content-center px-4" disabled>
-                                                    <i class="fas fa-print me-1"></i> View Employer Letter Detail 1
-                                                </button>
-                                            </div>
-                                        @endif
+                        @unless($isApplicantUser)
+                            <div class="mt-2">
+                                <div class="referral-details-head mb-3">
+                                    <div>
+                                        <h6 class="section-title text-primary mb-1">Mayor's Referral Letter Details</h6>
+                                        <p class="section-copy mb-0">Choose the referral type, then fill in the matching
+                                            letter details below.</p>
                                     </div>
+
+
                                 </div>
 
-                                <div class="js-peso-extra-details mt-4 d-grid gap-3">
-                                    @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
+                                <div class="col-12 col-md-2 mb-3 referral-type-field">
+                                    <label class="form-label">Referral Letter Type</label>
+                                    <select name="referral_type" id="referralTypeSelect"
+                                        class="form-select referral-type-select">
+                                        <option value="{{ \App\Models\MayorsReferral::TYPE_PESO_OFFICE }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? 'selected' : '' }}>
+                                            Referral Within Imus
+                                        </option>
+                                        <option value="{{ \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT }}" {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? 'selected' : '' }}>
+                                            Referral Outside Imus
+                                        </option>
+                                    </select>
+                                </div>
+
+
+                                <div id="pesoOfficeFields" data-referral-group="peso"
+                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}">
+                                    <div class="js-peso-extra-details mt-4 d-grid gap-3">
                                         <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
                                             <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                                <span class="badge bg-primary-subtle text-primary">Employer Detail
-                                                    {{ $extraIndex + 2 }}</span>
+                                                <span class="badge bg-primary-subtle text-primary">Employer Detail 1</span>
+                                            </div>
+                                            <div class="row g-3">
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Peso OCRL (Auto Generate)<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" name="ref_imus_ocrl" class="form-control"
+                                                        style="text-align: center"
+                                                        value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
+                                                        placeholder="Auto generate when complete" readonly>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Employer Name<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" name="ref_employer_name" class="form-control"
+                                                        oninput="this.value = this.value.toUpperCase()"
+                                                        value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}"
+                                                        required>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Employer Position<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" name="ref_position" class="form-control"
+                                                        oninput="this.value = this.value.toUpperCase()"
+                                                        value="{{ old('ref_position', $referral->ref_position ?? '') }}"
+                                                        required>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label class="form-label"> City Address<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" name="ref_place" id="refPlaceInput" class="form-control"
+                                                        list="refPlaceOptions"
+                                                        value="{{ old('ref_place', $referral->ref_place ?? '') }}"
+                                                        oninput="this.value = this.value.toUpperCase()"
+                                                        placeholder="Search City Address" required>
+                                                    <datalist id="refPlaceOptions"></datalist>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Province</label>
+                                                    <input type="text" name="ref_province" id="refProvinceInput"
+                                                        class="form-control" oninput="this.value = this.value.toUpperCase()"
+                                                        value="{{ old('ref_province', $referral->ref_province ?? '') }}"
+                                                        placeholder="Enter Province" required>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Hired Company<span
+                                                            class="required-mark">*</span></label>
+                                                    <input type="text" name="ref_hired_company" class="form-control"
+                                                        oninput="this.value = this.value.toUpperCase()"
+                                                        value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}"
+                                                        required>
+                                                </div>
+                                            </div>
+                                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                                <div class="mt-3">
+                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
+                                                        id="printReferralPesoButton" class="btn btn-outline-primary px-4"
+                                                        target="_blank">
+                                                        View Employer Letter Detail 1
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <div class="mt-3">
+                                                    <button type="button" id="printReferralPesoButton"
+                                                        class="btn btn-outline-secondary justify-content-center px-4" disabled
+                                                        title="{{ !auth()->user()->hasPermission('generate_referral') ? 'No permission to generate letter' : (($referral && ! $referral->isApproved()) ? 'Awaiting admin or staff approval' : 'Complete all requirements first') }}">
+                                                        <i class="fas fa-print me-1"></i> View Employer Letter Detail 1
+                                                    </button>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="js-peso-extra-details mt-4 d-grid gap-3">
+                                        @foreach($pesoReferralDetails as $extraIndex => $extraDetail)
+                                            <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                                    <span class="badge bg-primary-subtle text-primary">Employer Detail
+                                                        {{ $extraIndex + 2 }}</span>
+                                                </div>
+                                                <div class="row g-3">
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Peso OCRL (Auto Generated)<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control" style="text-align: center"
+                                                            name="referral_details[{{ $extraIndex }}][ref_imus_ocrl]"
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_imus_ocrl', $extraDetail['ref_imus_ocrl'] ?? '') }}"
+                                                            placeholder="Auto generate when saved" readonly>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Employer Name<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            oninput="this.value = this.value.toUpperCase()"
+                                                            name="referral_details[{{ $extraIndex }}][ref_employer_name]" required
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Employer Position<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            oninput="this.value = this.value.toUpperCase()"
+                                                            name="referral_details[{{ $extraIndex }}][ref_position]" required
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">City Address<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control js-peso-ref-place-input"
+                                                            name="referral_details[{{ $extraIndex }}][ref_place]" required
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_place', $extraDetail['ref_place'] ?? '') }}"
+                                                            oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
+                                                            placeholder="Search City Address">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Province<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control js-peso-ref-province-input"
+                                                            name="referral_details[{{ $extraIndex }}][ref_province]" required
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_province', $extraDetail['ref_province'] ?? '') }}"
+                                                            oninput="this.value = this.value.toUpperCase()"
+                                                            placeholder="Enter Province">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Hired Company<span
+                                                                class="required-mark">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            oninput="this.value = this.value.toUpperCase()"
+                                                            name="referral_details[{{ $extraIndex }}][ref_hired_company]" required
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company', $extraDetail['ref_hired_company'] ?? '') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3 d-flex flex-wrap gap-2">
+                                                    @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
+                                                        <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
+                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button"
+                                                            target="_blank">
+                                                            <i class="fas fa-print me-1"></i> View Employer Letter Detail
+                                                            {{ $extraIndex + 2 }}
+                                                        </a>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled>
+                                                            <i class="fas fa-print me-1"></i> View Employer Letter Detail
+                                                            {{ $extraIndex + 2 }}
+                                                        </button>
+                                                    @endif
+                                                    <button type="button"
+                                                        class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
+                                                        <i class="fas fa-trash-alt me-1"></i>Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <div class="mt-3 d-flex justify-content-end">
+                                        <button type="button" id="addPesoDetailButton"
+                                            class="btn btn-outline-primary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center text-primary {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
+                                            style="width: 40px; height: 40px;" aria-label="Add More Employer Details"
+                                            title="Add More Employer Details">
+                                            <i class="bi bi-plus-lg" style="font-size: 1.25rem; line-height: 1;"></i>
+                                        </button>
+                                    </div>
+
+                                    <template id="pesoDetailTemplate">
+                                        <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
+                                            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                                                <span class="badge bg-primary-subtle text-primary">Employer
+                                                    Detail </span>
+
                                             </div>
                                             <div class="row g-3">
                                                 <div class="col-md-2">
                                                     <label class="form-label">Peso OCRL (Auto Generated)<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control" style="text-align: center"
-                                                        name="referral_details[{{ $extraIndex }}][ref_imus_ocrl]"
-                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_imus_ocrl', $extraDetail['ref_imus_ocrl'] ?? '') }}"
+                                                        name="referral_details[__INDEX__][ref_imus_ocrl]"
                                                         placeholder="Auto generate when saved" readonly>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Employer Name<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
-                                                        oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[{{ $extraIndex }}][ref_employer_name]" required
-                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
+                                                        oninput="this.value = this.value.toUpperCase()" required
+                                                        name="referral_details[__INDEX__][ref_employer_name]">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Employer Position<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
-                                                        oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[{{ $extraIndex }}][ref_position]" required
-                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
+                                                        oninput="this.value = this.value.toUpperCase()" required
+                                                        name="referral_details[__INDEX__][ref_position]">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">City Address<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control js-peso-ref-place-input"
-                                                        name="referral_details[{{ $extraIndex }}][ref_place]" required
-                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_place', $extraDetail['ref_place'] ?? '') }}"
+                                                        name="referral_details[__INDEX__][ref_place]"
                                                         oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
-                                                        placeholder="Search City Address">
+                                                        required placeholder="Search City Address">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Province<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control js-peso-ref-province-input"
-                                                        name="referral_details[{{ $extraIndex }}][ref_province]" required
-                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_province', $extraDetail['ref_province'] ?? '') }}"
-                                                        oninput="this.value = this.value.toUpperCase()"
+                                                        name="referral_details[__INDEX__][ref_province]"
+                                                        oninput="this.value = this.value.toUpperCase()" required
                                                         placeholder="Enter Province">
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Hired Company<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" class="form-control"
-                                                        oninput="this.value = this.value.toUpperCase()"
-                                                        name="referral_details[{{ $extraIndex }}][ref_hired_company]" required
-                                                        value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company', $extraDetail['ref_hired_company'] ?? '') }}">
+                                                        oninput="this.value = this.value.toUpperCase()" required
+                                                        name="referral_details[__INDEX__][ref_hired_company]">
                                                 </div>
                                             </div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
-                                                @if($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
-                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
-                                                        class="btn btn-outline-primary px-4 js-peso-extra-print-button"
-                                                        target="_blank">
-                                                        <i class="fas fa-print me-1"></i> View Employer Letter Detail
-                                                        {{ $extraIndex + 2 }}
-                                                    </a>
-                                                @else
-                                                    <button type="button"
-                                                        class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled>
-                                                        <i class="fas fa-print me-1"></i> View Employer Letter Detail
-                                                        {{ $extraIndex + 2 }}
-                                                    </button>
-                                                @endif
+                                                <button type="button"
+                                                    class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled
+                                                    title="{{ $referral && ! $referral->isApproved() ? 'Awaiting admin or staff approval' : 'Complete the employer detail fields first' }}">
+                                                    <i class="fas fa-print me-1"></i> View Employer Letter Detail
+                                                </button>
                                                 <button type="button"
                                                     class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
                                                     <i class="fas fa-trash-alt me-1"></i>Remove
                                                 </button>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    </template>
                                 </div>
 
-                                <div class="mt-3 d-flex justify-content-end">
-                                    <button type="button" id="addPesoDetailButton"
-                                        class="btn btn-outline-primary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center text-primary {{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_PESO_OFFICE ? '' : 'd-none' }}"
-                                        style="width: 40px; height: 40px;" aria-label="Add More Employer Details"
-                                        title="Add More Employer Details">
-                                        <i class="bi bi-plus-lg" style="font-size: 1.25rem; line-height: 1;"></i>
-                                    </button>
-                                </div>
-
-                                <template id="pesoDetailTemplate">
-                                    <div class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
-                                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                                            <span class="badge bg-primary-subtle text-primary">Employer
-                                                Detail </span>
-
+                                <div id="otherCityFields" data-referral-group="other-city"
+                                    class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Peso Imus OCRL (Auto Generate)<span
+                                                    class="required-mark">*</span></label>
+                                            <input type="text" name="ref_ocrl" class="form-control" style="text-align: center"
+                                                value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
+                                                placeholder="Auto generate when complete" readonly>
                                         </div>
-                                        <div class="row g-3">
-                                            <div class="col-md-2">
-                                                <label class="form-label">Peso OCRL (Auto Generated)<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" class="form-control" style="text-align: center"
-                                                    name="referral_details[__INDEX__][ref_imus_ocrl]"
-                                                    placeholder="Auto generate when saved" readonly>
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">Employer Name<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()" required
-                                                    name="referral_details[__INDEX__][ref_employer_name]">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">Employer Position<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()" required
-                                                    name="referral_details[__INDEX__][ref_position]">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">City Address<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" class="form-control js-peso-ref-place-input"
-                                                    name="referral_details[__INDEX__][ref_place]"
-                                                    oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions" required
-                                                    placeholder="Search City Address">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">Province<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" class="form-control js-peso-ref-province-input"
-                                                    name="referral_details[__INDEX__][ref_province]"
-                                                    oninput="this.value = this.value.toUpperCase()" required
-                                                    placeholder="Enter Province">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <label class="form-label">Hired Company<span
-                                                        class="required-mark">*</span></label>
-                                                <input type="text" class="form-control"
-                                                    oninput="this.value = this.value.toUpperCase()" required
-                                                    name="referral_details[__INDEX__][ref_hired_company]">
-                                            </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Mayor's Name<span class="required-mark">*</span></label>
+                                            <select name="ref_recipient" id="refRecipientSelect" class="form-select" required>
+                                                <option value="">Select City Mayor</option>
+                                                @foreach(config('philippine_mayors', []) as $mayor)
+                                                    <option value="{{ $mayor['recipient'] }}"
+                                                        data-city-government="{{ $mayor['city_government'] }}"
+                                                        data-company-address="{{ $mayor['company_address'] }}" {{ old('ref_recipient', $referral->ref_recipient ?? '') === $mayor['recipient'] ? 'selected' : '' }}>
+                                                        {{ $mayor['recipient'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
-                                        <div class="mt-3 d-flex flex-wrap gap-2">
-                                            <button type="button"
-                                                class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled
-                                                title="Complete the employer detail fields first">
-                                                <i class="fas fa-print me-1"></i> View Employer Letter Detail
-                                            </button>
-                                            <button type="button"
-                                                class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
-                                                <i class="fas fa-trash-alt me-1"></i>Remove
-                                            </button>
+
+                                        <div class="col-md-3">
+                                            <label class="form-label">City Government<span
+                                                    class="required-mark">*</span></label>
+                                            <select name="ref_city_gov" id="cityGovernment" class="form-select" required>
+                                                <option value="">Select City Government</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                </template>
-                            </div>
 
-                            <div id="otherCityFields" data-referral-group="other-city"
-                                class="{{ $selectedReferralType === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? '' : 'd-none' }}">
-                                <div class="row g-3">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Peso Imus OCRL (Auto Generate)<span
-                                                class="required-mark">*</span></label>
-                                        <input type="text" name="ref_ocrl" class="form-control" style="text-align: center"
-                                            value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
-                                            placeholder="Auto generate when complete" readonly>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Mayor's Name<span class="required-mark">*</span></label>
-                                        <select name="ref_recipient" id="refRecipientSelect" class="form-select" required>
-                                            <option value="">Select City Mayor</option>
-                                            @foreach(config('philippine_mayors', []) as $mayor)
-                                                <option value="{{ $mayor['recipient'] }}"
-                                                    data-city-government="{{ $mayor['city_government'] }}"
-                                                    data-company-address="{{ $mayor['company_address'] }}" {{ old('ref_recipient', $referral->ref_recipient ?? '') === $mayor['recipient'] ? 'selected' : '' }}>
-                                                    {{ $mayor['recipient'] }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">City Address<span class="required-mark">*</span></label>
+                                            <input type="text" name="ref_company_address" id="refCompanyAddressInput"
+                                                class="form-control" list="refCompanyAddressList" autocomplete="off"
+                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}"
+                                                required>
+                                        </div>
 
-                                    <div class="col-md-3">
-                                        <label class="form-label">City Government<span
-                                                class="required-mark">*</span></label>
-                                        <select name="ref_city_gov" id="cityGovernment" class="form-select" required>
-                                            <option value="">Select City Government</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">City Address<span class="required-mark">*</span></label>
-                                        <input type="text" name="ref_company_address" id="refCompanyAddressInput"
-                                            class="form-control" list="refCompanyAddressList" autocomplete="off"
-                                            value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}" required>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="d-flex flex-wrap gap-2 mt-3">
+                                        <div class="col-12">
+                                            <div class="d-flex flex-wrap gap-2 mt-3">
                                             @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
                                                 <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
                                                     id="printReferralOtherCityButton" class="btn btn-outline-primary px-4"
                                                     target="_blank">
-                                                    <i class="fas fa-print me-1"></i> View Referral Letter
+                                                        <i class="fas fa-print me-1"></i> View Referral Letter
                                                 </a>
-                                            @elseif(!auth()->user()->hasPermission('generate_referral'))
-                                                <button type="button" class="btn btn-outline-secondary px-4" disabled
-                                                    title="No permission to view referral letter">
-                                                    <i class="fas fa-print me-1"></i> No Permission
-                                                </button>
-                                            @else
-                                                <button type="button" id="printReferralOtherCityButton"
-                                                    class="btn btn-outline-secondary px-4" disabled
-                                                    title="Complete all requirements first">
-                                                    <i class="fas fa-print me-1"></i> View Referral Letter
-                                                </button>
-                                            @endif
+                                                @elseif(!auth()->user()->hasPermission('generate_referral'))
+                                                    <button type="button" class="btn btn-outline-secondary px-4" disabled
+                                                        title="No permission to view referral letter">
+                                                        <i class="fas fa-print me-1"></i> No Permission
+                                                    </button>
+                                                @else
+                                                    @php
+                                                        $referralReason = !auth()->user()->hasPermission('generate_referral')
+                                                            ? 'No permission to generate letter'
+                                                            : (($referral && ! $referral->isApproved())
+                                                                ? 'Awaiting admin or staff approval'
+                                                                : 'Complete all requirements first');
+                                                    @endphp
+                                                    <button type="button" id="printReferralOtherCityButton"
+                                                        class="btn btn-outline-secondary px-4" disabled
+                                                        title="{{ $referralReason }}">
+                                                        <i class="fas fa-print me-1"></i> View Referral Letter
+                                                    </button>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        </div>
+                            </div>
+                        @endunless
 
                         <div class="referral-action-bar mt-4">
-                            @if(auth()->user()->hasPermission('update_referral'))
+                            @if($isApplicantUser || auth()->user()->hasPermission('update_referral'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
                                     <i class="fa-solid fa-file-export me-2"></i>Save Referral
                                 </button>
@@ -2475,9 +2593,50 @@
                                     </button>
                                 </span>
                             @endif
+
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="disapprovePermitModal-{{ $applicant->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form action="{{ route('permits.disapprove', $applicant->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title mb-1">Disapprove Permit</h5>
+                            <div class="text-muted small">{{ $applicant->full_name ?? $fullName }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Please provide the reason for disapproving this requirement.</p>
+                        @if($errors->any())
+                            <div class="alert alert-danger border-0">
+                                <ul class="mb-0 small">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
+                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason', $permit->disapproval_reason ?? '') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-circle-xmark me-1"></i>Confirm Disapprove
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -2577,15 +2736,15 @@
             referralTypeSelect.addEventListener("change", toggleReferralFields);
 
             if (referralForm) {
-                referralForm.addEventListener("submit", function(e) {
+                referralForm.addEventListener("submit", function (e) {
                     toggleReferralFields();
-                    
+
                     // Validate that at least one clearance file is selected or exists
                     const resumeInput = document.getElementById('resume_input');
                     const brgyInput = document.getElementById('ref_brgy_input');
                     const policeInput = document.getElementById('ref_police_input');
                     const nbiInput = document.getElementById('ref_nbi_input');
-                    
+
                     const hasResumeFile = resumeInput && resumeInput.files.length > 0;
                     const brgyName = document.getElementById('ref_brgy_name');
                     const policeName = document.getElementById('ref_police_name');
@@ -2594,11 +2753,11 @@
                     const hasExistingBrgy = brgyName && brgyName.textContent !== 'No file selected';
                     const hasExistingPolice = policeName && policeName.textContent !== 'No file selected';
                     const hasExistingNbi = nbiName && nbiName.textContent !== 'No file selected';
-                    
+
                     const hasResume = hasResumeFile || hasExistingResume;
-                    const hasClearance = (brgyInput?.files.length > 0) || (policeInput?.files.length > 0) || (nbiInput?.files.length > 0) || 
-                                        hasExistingBrgy || hasExistingPolice || hasExistingNbi;
-                    
+                    const hasClearance = (brgyInput?.files.length > 0) || (policeInput?.files.length > 0) || (nbiInput?.files.length > 0) ||
+                        hasExistingBrgy || hasExistingPolice || hasExistingNbi;
+
                     if (!hasClearance) {
                         e.preventDefault();
                         alert('Please upload at least one clearance document (Barangay/Police/NBI)');
@@ -3568,3 +3727,16 @@
         });
     });
 </script>
+
+@if($disapproveRequirement && $disapproveRequirementId)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalId = @json('disapprove'.ucfirst($disapproveRequirement).'Modal-'.$disapproveRequirementId);
+            const modalEl = document.getElementById(modalId);
+
+            if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+                window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            }
+        });
+    </script>
+@endif

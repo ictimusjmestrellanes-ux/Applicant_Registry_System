@@ -6,8 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class MayorsClearance extends Model
 {
+    public const APPROVAL_PENDING = 'pending';
+
+    public const APPROVAL_APPROVED = 'approved';
+
+    public const APPROVAL_DISAPPROVED = 'disapproved';
+
     protected $fillable = [
         'applicant_id',
+        'approval_status',
+        'disapproval_reason',
         'prosecutor_clearance',
         'mtc_clearance',
         'rtc_clearance',
@@ -28,9 +36,20 @@ class MayorsClearance extends Model
         return $this->belongsTo(Applicant::class);
     }
 
+    public function isApproved(): bool
+    {
+        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;
+    }
+
+    public function approvalStatusLabel(): string
+    {
+        return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));
+    }
+
     public function isComplete()
     {
         return
+            $this->isApproved() &&
             // REQUIREMENTS
             ! empty($this->prosecutor_clearance) &&
             ! empty($this->mtc_clearance) &&
@@ -59,5 +78,24 @@ class MayorsClearance extends Model
             ! empty($this->clearance_doc_stamp_control_no) &&
             ! empty($this->clearance_date_of_payment) &&
             ! empty($this->clearance_hired_company);
+    }
+
+    public function approvalStatusClass(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'text-bg-warning',
+            self::APPROVAL_APPROVED => 'text-bg-success',
+            self::APPROVAL_DISAPPROVED => 'text-bg-danger',
+            default => 'text-bg-success',
+        };
+    }
+
+    public function approvalStatusMessage(): string
+    {
+        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
+            self::APPROVAL_PENDING => 'Awaiting admin or staff approval.',
+            self::APPROVAL_DISAPPROVED => 'Disapproved by admin or staff.',
+            default => 'Approved by admin or staff.',
+        };
     }
 }

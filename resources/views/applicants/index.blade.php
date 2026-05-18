@@ -354,6 +354,7 @@
                     <tbody>
                         @forelse($applicants as $applicant)
                             @php
+                                $applicantCode = sprintf('APL-%05d', $applicant->id);
                                 $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
                                 $permit = optional($applicant->permit);
                                 $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
@@ -390,11 +391,13 @@
                                 $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
                                 $referralPercent = ($referralUploaded / 2) * 100;
                                 $completedStages = collect([$permitPercent == 100, $clearancePercent == 100, $referralPercent == 100])->filter()->count();
+                                $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
                             @endphp
-                            <tr>
+                                <tr>
                                 <td class="text-center table-id">#{{ $applicant->id }}</td>
                                 <td>
                                     <div class="applicant-name">{{ $fullName }}</div>
+                                    <div class="applicant-code">#{{ $applicantCode }}</div>
                                 </td>
                                 <td>
                                     <div class="contact-line"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
@@ -446,13 +449,15 @@
                                     <div class="action-stack">
                                         <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
                                             title="View Applicant"><i class="bi bi-eye-fill"></i></a>
-                                        <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
-                                            onsubmit="return confirm('Are you sure you want to archive this applicant?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
-                                                    class="bi bi-archive-fill"></i></button>
-                                        </form>
+                                        @if(! $isApplicantUser)
+                                            <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
+                                                onsubmit="return confirm('Are you sure you want to archive this applicant?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
+                                                        class="bi bi-archive-fill"></i></button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -474,7 +479,9 @@
             <div class="mobile-records d-lg-none">
                 @forelse($applicants as $applicant)
                     @php
+                        $applicantCode = sprintf('APL-%05d', $applicant->id);
                         $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
+                        $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
                         $permit = optional($applicant->permit);
                         $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
                         $hasPermitClearance =
@@ -514,6 +521,7 @@
                         <div class="mobile-record-head">
                             <div>
                                 <div class="applicant-name">{{ $fullName }}</div>
+                                <div class="applicant-code">#{{ $applicantCode }}</div>
                                 <div class="applicant-meta">#{{ $applicant->id }} •
                                     {{ $applicant->created_at->format('M d, Y') }}
                                 </div>
@@ -521,13 +529,15 @@
                             <div class="mobile-actions">
                                 <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
                                     title="View Applicant"><i class="bi bi-eye-fill"></i></a>
-                                <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
-                                    onsubmit="return confirm('Are you sure you want to archive this applicant?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
-                                            class="bi bi-archive-fill"></i></button>
-                                </form>
+                                @if(! $isApplicantUser)
+                                    <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
+                                        onsubmit="return confirm('Are you sure you want to archive this applicant?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
+                                                class="bi bi-archive-fill"></i></button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                         <div class="mini-pill-row mb-3">
@@ -765,6 +775,12 @@
         .section-title {
             color: #0f172a;
             font-weight: 800;
+        }
+
+        .applicant-code{
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 0.15rem;
         }
 
         .view-pill small {

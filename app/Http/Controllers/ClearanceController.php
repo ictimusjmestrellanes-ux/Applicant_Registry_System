@@ -4,15 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Models\MayorsClearance;
+use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ClearanceController extends Controller
 {
     public function update(Request $request, $id)
     {
+        if ($request->user()?->role === User::ROLE_USER) {
+            abort_if((int) $request->user()->applicant_id !== (int) $id, 403, 'You can only update your own requirements.');
+        }
+
         $applicant = Applicant::findOrFail($id);
 
         /*
@@ -26,6 +32,10 @@ class ClearanceController extends Controller
         ]);
         $wasRecentlyCreated = ! $clearance->exists;
         $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
+        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
+        $approvalStatus = $isApplicantUser
+            ? MayorsClearance::APPROVAL_PENDING
+            : MayorsClearance::APPROVAL_APPROVED;
 
         /*
         |--------------------------------------------------------------------------
@@ -156,16 +166,19 @@ class ClearanceController extends Controller
             );
         }
 
-        $clearance->clearance_or_no = $request->clearance_or_no;
-        $clearance->clearance_issued_on = $request->clearance_issued_on;
+        if (! $isApplicantUser) {
+            $clearance->clearance_or_no = $request->clearance_or_no;
+            $clearance->clearance_issued_on = $request->clearance_issued_on;
 
-        $clearance->clearance_peso_control_no = $request->filled('clearance_peso_control_no')
-            ? $request->clearance_peso_control_no
-            : $clearance->clearance_peso_control_no;
-        $clearance->clearance_doc_stamp_control_no = $request->clearance_doc_stamp_control_no;
-        $clearance->clearance_date_of_payment = $request->clearance_date_of_payment;
+            $clearance->clearance_peso_control_no = $request->filled('clearance_peso_control_no')
+                ? $request->clearance_peso_control_no
+                : $clearance->clearance_peso_control_no;
+            $clearance->clearance_doc_stamp_control_no = $request->clearance_doc_stamp_control_no;
+            $clearance->clearance_date_of_payment = $request->clearance_date_of_payment;
 
-        $clearance->clearance_hired_company = $request->clearance_hired_company;
+            $clearance->clearance_hired_company = $request->clearance_hired_company;
+            $clearance->disapproval_reason = null;
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -173,9 +186,10 @@ class ClearanceController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        $clearance->approval_status = $approvalStatus;
         $clearance->save();
 
-        if (empty($clearance->clearance_peso_control_no) && $clearance->isReadyForControlNumber()) {
+        if (empty($clearance->clearance_peso_control_no) && $clearance->isApproved() && $clearance->isReadyForControlNumber()) {
             $year = date('Y');
 
             $latest = MayorsClearance::whereYear('created_at', $year)
@@ -209,6 +223,90 @@ class ClearanceController extends Controller
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#clearance')
             ->with('success', 'Clearance updated successfully.');
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $applicant = Applicant::findOrFail($id);
+        $clearance = MayorsClearance::where('applicant_id', $applicant->id)->firstOrFail();
+        $before = $clearance->only($clearance->getFillable());
+
+        $clearance->approval_status = MayorsClearance::APPROVAL_APPROVED;
+        $clearance->disapproval_reason = null;
+        $clearance->save();
+
+        if (empty($clearance->clearance_peso_control_no) && $clearance->isApproved() && $clearance->isReadyForControlNumber()) {
+            $year = date('Y');
+
+            $latest = MayorsClearance::whereYear('created_at', $year)
+                ->whereNotNull('clearance_peso_control_no')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $nextNumber = $latest
+                ? ((int) substr($latest->clearance_peso_control_no, -4)) + 1
+                : 1;
+
+            $clearance->clearance_peso_control_no = $year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $clearance->save();
+        }
+
+        $after = $clearance->fresh()->only($clearance->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        ActivityLogger::log(
+            'clearance',
+            'approved',
+            'Approved the mayor\'s clearance requirements.',
+            $applicant,
+            $changes,
+            $request->user()
+        );
+
+        return redirect()
+            ->to(route('applicants.edit', $applicant->id).'#clearance')
+            ->with('success', 'Clearance approved successfully.');
+    }
+
+    public function disapprove(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'disapproval_reason' => ['required', 'string', 'max:2000'],
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('disapprove_requirement', 'clearance')
+                ->with('disapprove_requirement_id', (int) $id);
+        }
+
+        $validated = $validator->validated();
+
+        $applicant = Applicant::findOrFail($id);
+        $clearance = MayorsClearance::where('applicant_id', $applicant->id)->firstOrFail();
+        $before = $clearance->only($clearance->getFillable());
+
+        $clearance->approval_status = MayorsClearance::APPROVAL_DISAPPROVED;
+        $clearance->disapproval_reason = $validated['disapproval_reason'];
+        $clearance->save();
+
+        $after = $clearance->fresh()->only($clearance->getFillable());
+        $changes = ActivityLogger::diff($before, $after);
+
+        ActivityLogger::log(
+            'clearance',
+            'disapproved',
+            'Disapproved the mayor\'s clearance requirements.',
+            $applicant,
+            $changes,
+            $request->user()
+        );
+
+        return redirect()
+            ->to(route('applicants.edit', $applicant->id).'#clearance')
+            ->with('success', 'Clearance disapproved successfully.');
     }
 
     public function printLetter($id)

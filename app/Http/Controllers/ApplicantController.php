@@ -72,6 +72,18 @@ class ApplicantController extends Controller
         $query = $this->buildApplicantSearchQuery($filters)
             ->with(['permit', 'clearance', 'referral']);
 
+        // If the authenticated user is an applicant account (role = 'user'),
+        // show only the applicant record linked to that user.
+        if (auth()->check() && auth()->user()->role === 'user') {
+            $applicantId = auth()->user()->applicant_id;
+            if ($applicantId) {
+                $query->where('id', $applicantId);
+            } else {
+                // If no linked applicant, return empty result set.
+                $query->whereRaw('0 = 1');
+            }
+        }
+
         if ($perPageInput === 'all') {
             $total = (clone $query)->count();
             $perPage = max($total, 1);
@@ -212,6 +224,8 @@ class ApplicantController extends Controller
 
     public function destroy($id)
     {
+        abort_if(auth()->user()?->role === 'user', 403, 'Only administrators can archive applicants.');
+
         $applicant = Applicant::findOrFail($id);
         $applicantName = trim($applicant->first_name.' '.$applicant->last_name);
 
@@ -241,6 +255,8 @@ class ApplicantController extends Controller
 
     public function archive(Request $request)
     {
+        abort_if(auth()->user()?->role === 'user', 403, 'Only administrators can access the archive.');
+
         $search = trim((string) $request->search);
 
         $applicants = Applicant::onlyTrashed()
@@ -264,6 +280,8 @@ class ApplicantController extends Controller
 
     public function restore($id)
     {
+        abort_if(auth()->user()?->role === 'user', 403, 'Only administrators can restore applicants.');
+
         $applicant = Applicant::withTrashed()->findOrFail($id);
         $applicantName = trim($applicant->first_name.' '.$applicant->last_name);
         $applicant->restore();
