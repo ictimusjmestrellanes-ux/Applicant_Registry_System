@@ -120,9 +120,10 @@
                     Sign in with Microsoft
                 </a>
 
+
                 <div class="text-center mt-4">
                     <small class="text-muted">
-                        © 2026 City Government. All rights reserved.
+                        Ⓒ 2026 City Government. All rights reserved.
                     </small>
                 </div>
 

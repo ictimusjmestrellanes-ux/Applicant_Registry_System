@@ -18,11 +18,13 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 // Applicant-specific login (uses applicant code / portal password)
 Route::get('/applicant/login', [AuthController::class, 'showApplicantLoginForm'])->name('applicant.login');
-Route::post('/applicant/login', [AuthController::class, 'loginApplicant'])->name('applicant.login.post');
-Route::get('/applicant/register', [AuthController::class, 'showApplicantRegisterForm'])->name('applicant.register');
-Route::post('/applicant/register', [AuthController::class, 'registerApplicant'])->name('applicant.register.post');
+// Route::post('/applicant/login', [AuthController::class, 'loginApplicant'])->name('applicant.login.post');
+// Route::get('/applicant/register', [AuthController::class, 'showApplicantRegisterForm'])->name('applicant.register');
+// Route::post('/applicant/register', [AuthController::class, 'registerApplicant'])->name('applicant.register.post');
 Route::get('/auth/azure/redirect', [AuthController::class, 'redirectToAzure'])->name('login.azure.redirect');
 Route::get('/auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('login.azure.callback');
+Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('login.google.redirect');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('login.google.callback');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Applicant portal routes removed

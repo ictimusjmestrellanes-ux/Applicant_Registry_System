@@ -46,8 +46,8 @@
 
         .id-sheet {
             position: relative;
-            width: 6in;
-            height: 4in;
+            width: 158mm;
+            height: 105mm;
             margin: 28px auto 0;
             background-image: url('{{ asset('images/permit_ID1.png') }}');
             background-repeat: no-repeat;
@@ -86,17 +86,18 @@
 
         .peso-id {
             left: 23.5%;
-            top: 191.39px;
+            top: 197.7px;
             width: 25.8%;
             font-size: 9px;
             position: absolute;
+            font-weight: 800;
         }
 
         .front-name {
             left: 15.6%;
-            top: 56.6%;
+            top: 55.7%;
             width: 32%;
-            font-size: 8pt;
+            font-size: 11pt;
         }
 
         .employer {

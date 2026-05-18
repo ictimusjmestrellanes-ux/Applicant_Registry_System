@@ -88,7 +88,7 @@ class AuthController extends Controller
                 'role' => User::ROLE_USER,
                 'permissions' => [],
                 'auth_provider' => 'local',
-                'approval_status' => User::APPROVAL_PENDING,
+                'approval_status' => User::APPROVAL_APPROVED,
                 'applicant_id' => $applicant->id,
             ]);
 
@@ -111,7 +111,7 @@ class AuthController extends Controller
 
         return redirect()
             ->route('applicant.login')
-            ->with('approval_notice', 'Your account is now pending admin approval. Please wait for an administrator to approve it before signing in.')
+            ->with('success', 'Your applicant account is ready. You can sign in with Google anytime.')
             ->with('username', $username);
     }
 
@@ -191,13 +191,18 @@ class AuthController extends Controller
             ])->onlyInput('username');
         }
 
+        if ($user->role === User::ROLE_USER && $user->approval_status === User::APPROVAL_PENDING) {
+            $user->approval_status = User::APPROVAL_APPROVED;
+            $user->saveQuietly();
+        }
+
         if (! Hash::check($credentials['password'], $user->password)) {
             return back()->withErrors([
                 'username' => 'The provided credentials do not match our records.',
             ])->onlyInput('username');
         }
 
-        if ($user->isAccountBlocked()) {
+        if ($user->approval_status === User::APPROVAL_DISAPPROVED) {
             return back()
                 ->withErrors([
                     'username' => $user->approvalStatusMessage(),
@@ -254,6 +259,11 @@ class AuthController extends Controller
                 'auth_provider' => 'local',
             ])) {
                 $authenticatedUser = Auth::user();
+
+                if ($authenticatedUser?->role === User::ROLE_USER && $authenticatedUser->approval_status === User::APPROVAL_PENDING) {
+                    $authenticatedUser->approval_status = User::APPROVAL_APPROVED;
+                    $authenticatedUser->saveQuietly();
+                }
 
                 if ($authenticatedUser?->isAccountBlocked()) {
                     $approvalMessage = $authenticatedUser->approvalStatusMessage();
@@ -377,6 +387,17 @@ class AuthController extends Controller
         return Socialite::driver('azure')->redirect();
     }
 
+    public function redirectToGoogle()
+    {
+        if (trim((string) config('services.google.client_id')) === '' || trim((string) config('services.google.client_secret')) === '' || trim((string) config('services.google.redirect')) === '') {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Google OAuth is not configured.',
+            ]);
+        }
+
+        return Socialite::driver('google')->redirect();
+    }
+
     public function handleAzureCallback(Request $request)
     {
         if (trim((string) config('services.azure.tenant')) === '') {
@@ -443,7 +464,12 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user && $user->isAccountBlocked()) {
+        if ($user && $user->role === User::ROLE_USER && $user->approval_status === User::APPROVAL_PENDING) {
+            $user->approval_status = User::APPROVAL_APPROVED;
+            $user->saveQuietly();
+        }
+
+        if ($user && $user->approval_status === User::APPROVAL_DISAPPROVED) {
             return redirect()->route('login')->withErrors([
                 'email' => $user->approvalStatusMessage(),
             ])->with('approval_notice', $user->approvalStatusMessage());
@@ -482,6 +508,98 @@ class AuthController extends Controller
         return redirect()->intended('dashboard');
     }
 
+    public function handleGoogleCallback(Request $request)
+    {
+        if (trim((string) config('services.google.client_id')) === '' || trim((string) config('services.google.client_secret')) === '' || trim((string) config('services.google.redirect')) === '') {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Google OAuth is not configured.',
+            ]);
+        }
+
+        try {
+            try {
+                $googleUser = Socialite::driver('google')->user();
+            } catch (InvalidStateException $e) {
+                // Local/dev environments sometimes hit state mismatch on callback.
+                $googleUser = Socialite::driver('google')->stateless()->user();
+            }
+        } catch (\Throwable $e) {
+            Log::error('Google SSO callback failed.', [
+                'exception_class' => $e::class,
+                'exception_message' => $e->getMessage(),
+            ]);
+
+            $message = 'Google login failed. Please check Google credentials and redirect URI, then try again.';
+
+            if (config('app.debug')) {
+                $message .= ' [' . class_basename($e) . '] ' . Str::limit($e->getMessage(), 180);
+            }
+
+            return redirect()->route('login')->withErrors([
+                'email' => $message,
+            ]);
+        }
+
+        $email = strtolower((string) $googleUser->getEmail());
+
+        if ($email === '') {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Google account email was not provided.',
+            ]);
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if ($user && $user->auth_provider !== 'google') {
+            return redirect()->route('login')->withErrors([
+                'email' => 'This email is registered for local login. Please sign in using email and password.',
+            ]);
+        }
+
+        if ($user && $user->role === User::ROLE_USER && $user->approval_status === User::APPROVAL_PENDING) {
+            $user->approval_status = User::APPROVAL_APPROVED;
+            $user->saveQuietly();
+        }
+
+        if ($user && $user->approval_status === User::APPROVAL_DISAPPROVED) {
+            return redirect()->route('login')->withErrors([
+                'email' => $user->approvalStatusMessage(),
+            ])->with('approval_notice', $user->approvalStatusMessage());
+        }
+
+        if (! $user) {
+            $user = User::create([
+                'name' => $googleUser->getName() ?: Str::before($email, '@'),
+                'email' => $email,
+                'password' => Hash::make(Str::random(40)),
+                'role' => User::ROLE_USER,
+                'permissions' => [],
+                'auth_provider' => 'google',
+                'approval_status' => User::APPROVAL_APPROVED,
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        ActivityLogger::log(
+            'auth',
+            'login',
+            'User logged in using Google.',
+            null,
+            [
+                'provider' => [
+                    'before' => null,
+                    'after' => 'google',
+                ],
+            ],
+            $user
+        );
+
+        return redirect()->intended('dashboard');
+    }
+
     // Logout user
     public function logout(Request $request)
     {
@@ -502,14 +620,8 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Applicant accounts should always go back to the applicant login page.
-        if ($user && $user->role === User::ROLE_USER) {
-            return redirect()->route('applicant.login');
-        }
-
-        // Staff and admin users go back to the main login page.
-        if ($user && in_array($user->role, [User::ROLE_STAFF, User::ROLE_ADMIN], true)) {
-            return redirect()->route('login');
+        if ($user && $user->auth_provider === 'google') {
+            return redirect('/login');
         }
 
         if ($user && $user->auth_provider === 'azure') {
@@ -525,6 +637,6 @@ class AuthController extends Controller
             return redirect()->away($logoutUrl);
         }
 
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }

@@ -79,6 +79,7 @@ class PermitController extends Controller
         // NBI / POLICE (DROPDOWN LOGIC)
         // =========================
         if ($request->clearance_type === 'nbi') {
+            $azure = Storage::disk('azure');
 
             // delete police if exists
             if ($permit->permit_police_clearance) {
@@ -87,7 +88,6 @@ class PermitController extends Controller
             }
 
             if ($request->hasFile('permit_nbi_clearance')) {
-                $azure = Storage::disk('azure');
                 $file = $request->file('permit_nbi_clearance');
                 $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 $extension = $file->getClientOriginalExtension();
@@ -109,6 +109,7 @@ class PermitController extends Controller
         }
 
         if ($request->clearance_type === 'police') {
+            $azure = Storage::disk('azure');
 
             // delete nbi if exists
             if ($permit->permit_nbi_clearance) {
@@ -117,7 +118,6 @@ class PermitController extends Controller
             }
 
             if ($request->hasFile('permit_police_clearance')) {
-                $azure = Storage::disk('azure');
                 $file = $request->file('permit_police_clearance');
                 $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
                 $extension = $file->getClientOriginalExtension();
