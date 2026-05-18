@@ -26,7 +26,6 @@ class PermitController extends Controller
 
         $applicant = Applicant::findOrFail($id);
         $isFirstTimeJobSeeker = strtoupper(trim((string) ($applicant->first_time_job_seeker ?? ''))) === 'YES';
-        $azure = Storage::disk('azure');
 
         /*
         |--------------------------------------------------------------------------
@@ -56,6 +55,7 @@ class PermitController extends Controller
         // HEALTH CARD
         // =========================
         if ($request->hasFile('health_card')) {
+            $azure = Storage::disk('azure');
             $file = $request->file('health_card');
             $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
@@ -79,6 +79,7 @@ class PermitController extends Controller
         // NBI / POLICE (DROPDOWN LOGIC)
         // =========================
         if ($request->clearance_type === 'nbi') {
+            $azure = Storage::disk('azure');
 
             // delete police if exists
             if ($permit->permit_police_clearance) {
@@ -108,6 +109,7 @@ class PermitController extends Controller
         }
 
         if ($request->clearance_type === 'police') {
+            $azure = Storage::disk('azure');
 
             // delete nbi if exists
             if ($permit->permit_nbi_clearance) {
@@ -140,6 +142,7 @@ class PermitController extends Controller
         // CEDULA
         // =========================
         if ($request->hasFile('cedula')) {
+            $azure = Storage::disk('azure');
             $file = $request->file('cedula');
             $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
@@ -163,6 +166,7 @@ class PermitController extends Controller
         // REFERRAL LETTER
         // =========================
         if ($request->hasFile('referral_letter')) {
+            $azure = Storage::disk('azure');
             $file = $request->file('referral_letter');
             $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
