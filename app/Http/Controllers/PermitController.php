@@ -26,6 +26,7 @@ class PermitController extends Controller
 
         $applicant = Applicant::findOrFail($id);
         $isFirstTimeJobSeeker = strtoupper(trim((string) ($applicant->first_time_job_seeker ?? ''))) === 'YES';
+        $azure = Storage::disk('azure');
 
         /*
         |--------------------------------------------------------------------------
@@ -62,12 +63,10 @@ class PermitController extends Controller
             $filePath = 'permits/health_cards/'.$fileName;
 
             if ($permit->health_card) {
-                Storage::disk('azure')->delete($permit->health_card);
+                $azure->delete($permit->health_card);
             }
 
-            if (Storage::disk('azure')->exists($filePath)) {
-                Storage::disk('azure')->delete($filePath);
-            }
+            $azure->delete($filePath);
 
             $permit->health_card = $file->storeAs(
                 'permits/health_cards',
@@ -83,7 +82,7 @@ class PermitController extends Controller
 
             // delete police if exists
             if ($permit->permit_police_clearance) {
-                Storage::disk('azure')->delete($permit->permit_police_clearance);
+                $azure->delete($permit->permit_police_clearance);
                 $permit->permit_police_clearance = null;
             }
 
@@ -95,12 +94,10 @@ class PermitController extends Controller
                 $filePath = 'permits/permit_nbi_clearance/'.$fileName;
 
                 if ($permit->permit_nbi_clearance) {
-                    Storage::disk('azure')->delete($permit->permit_nbi_clearance);
+                    $azure->delete($permit->permit_nbi_clearance);
                 }
 
-                if (Storage::disk('azure')->exists($filePath)) {
-                    Storage::disk('azure')->delete($filePath);
-                }
+                $azure->delete($filePath);
 
                 $permit->permit_nbi_clearance = $file->storeAs(
                     'permits/permit_nbi_clearance',
@@ -114,7 +111,7 @@ class PermitController extends Controller
 
             // delete nbi if exists
             if ($permit->permit_nbi_clearance) {
-                Storage::disk('azure')->delete($permit->permit_nbi_clearance);
+                $azure->delete($permit->permit_nbi_clearance);
                 $permit->permit_nbi_clearance = null;
             }
 
@@ -126,12 +123,10 @@ class PermitController extends Controller
                 $filePath = 'permits/permit_police_clearance/'.$fileName;
 
                 if ($permit->permit_police_clearance) {
-                    Storage::disk('azure')->delete($permit->permit_police_clearance);
+                    $azure->delete($permit->permit_police_clearance);
                 }
 
-                if (Storage::disk('azure')->exists($filePath)) {
-                    Storage::disk('azure')->delete($filePath);
-                }
+                $azure->delete($filePath);
 
                 $permit->permit_police_clearance = $file->storeAs(
                     'permits/permit_police_clearance',
@@ -152,12 +147,10 @@ class PermitController extends Controller
             $filePath = 'permits/cedulas/'.$fileName;
 
             if ($permit->cedula) {
-                Storage::disk('azure')->delete($permit->cedula);
+                $azure->delete($permit->cedula);
             }
 
-            if (Storage::disk('azure')->exists($filePath)) {
-                Storage::disk('azure')->delete($filePath);
-            }
+            $azure->delete($filePath);
 
             $permit->cedula = $file->storeAs(
                 'permits/cedulas',
@@ -177,12 +170,10 @@ class PermitController extends Controller
             $filePath = 'permits/referral_letters/'.$fileName;
 
             if ($permit->referral_letter) {
-                Storage::disk('azure')->delete($permit->referral_letter);
+                $azure->delete($permit->referral_letter);
             }
 
-            if (Storage::disk('azure')->exists($filePath)) {
-                Storage::disk('azure')->delete($filePath);
-            }
+            $azure->delete($filePath);
 
             $permit->referral_letter = $file->storeAs(
                 'permits/referral_letters',
@@ -214,14 +205,13 @@ class PermitController extends Controller
         }
 
         $permit->save();
+        $permit->setRelation('applicant', $applicant);
 
         /*
         |--------------------------------------------------------------------------
         | AUTO GENERATE PESO ID ONLY WHEN PERMIT IS READY
         |--------------------------------------------------------------------------
         */
-        $permit->loadMissing('applicant');
-
         if (empty($permit->peso_id_no) && $permit->isApproved() && $permit->isReadyForIdGeneration()) {
             $permit->peso_id_no = MayorsPermit::generateNextPesoIdNo();
             $permit->save();
