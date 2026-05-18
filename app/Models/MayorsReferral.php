@@ -51,15 +51,22 @@ class MayorsReferral extends Model
         $year ??= (int) Carbon::now()->format('Y');
         $prefix = $year.'-';
 
-        $latestForYear = static::query()
+        $latestNumber = static::query()
             ->where($column, 'like', $prefix.'%')
-            ->orderByDesc($column)
-            ->value($column);
+            ->pluck($column)
+            ->map(function ($value) use ($year) {
+                if (! preg_match('/^'.preg_quote((string) $year, '/')."-(\d{5})$/", (string) $value, $matches)) {
+                    return 0;
+                }
 
-        $nextNumber = 1;
+                return (int) $matches[1];
+            })
+            ->max() ?: 0;
 
-        if ($latestForYear && preg_match('/^\d{4}-(\d{5})$/', $latestForYear, $matches)) {
-            $nextNumber = ((int) $matches[1]) + 1;
+        $nextNumber = $latestNumber + 1;
+
+        if ($nextNumber > 99999) {
+            $nextNumber = 1;
         }
 
         return sprintf('%d-%05d', $year, $nextNumber);

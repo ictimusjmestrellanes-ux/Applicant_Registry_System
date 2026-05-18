@@ -35,12 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 
-    Route::get('/approvals', [UserController::class, 'approvalIndex'])
-        ->middleware(['auth', 'permission:approve_applicant'])
-        ->name('approvals.index');
-
     Route::get('/users', [UserController::class, 'index'])
-        ->middleware(['auth', 'permission:approve_applicant'])
+        ->middleware(['auth'])
         ->name('users.index');
 
     Route::middleware('admin')->group(function () {
@@ -66,14 +62,6 @@ Route::get('applicants/export', [ApplicantController::class, 'export'])->middlew
 
 Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->middleware('auth')
     ->name('applicants.restore');
-
-Route::put('/users/{user}/approve', [UserController::class, 'approveApplicant'])
-    ->middleware(['auth', 'permission:approve_applicant'])
-    ->name('users.approve');
-
-Route::put('/users/{user}/disapprove', [UserController::class, 'disapproveApplicant'])
-    ->middleware(['auth', 'permission:approve_applicant'])
-    ->name('users.disapprove');
 
 Route::get('/applicants/{applicant}/view-file/{field}',
     [ApplicantController::class, 'viewFile']

@@ -54,20 +54,32 @@ class MayorsPermit extends Model
         return $this->belongsTo(Applicant::class);
     }
 
+    private static function pesoIdPrefix(int $year): string
+    {
+        return $year.'-';
+    }
+
     public static function generateNextPesoIdNo(?int $year = null): string
     {
         $year = $year ?? (int) now()->format('Y');
-        $prefix = $year.'-';
+        $prefix = static::pesoIdPrefix($year);
 
-        $latest = static::query()
+        $latestNumber = static::query()
             ->where('peso_id_no', 'like', $prefix.'%')
-            ->orderByDesc('peso_id_no')
-            ->value('peso_id_no');
+            ->pluck('peso_id_no')
+            ->map(function ($pesoIdNo) use ($year) {
+                if (! preg_match('/^'.preg_quote((string) $year, '/')."-(\d{5})$/", (string) $pesoIdNo, $matches)) {
+                    return 0;
+                }
 
-        $nextNumber = 1;
+                return (int) $matches[1];
+            })
+            ->max() ?: 0;
 
-        if ($latest && preg_match('/^\d{4}-(\d{5})$/', $latest, $matches)) {
-            $nextNumber = ((int) $matches[1]) + 1;
+        $nextNumber = $latestNumber + 1;
+
+        if ($nextNumber > 99999) {
+            $nextNumber = 1;
         }
 
         return $prefix.str_pad((string) $nextNumber, 5, '0', STR_PAD_LEFT);
@@ -101,6 +113,15 @@ class MayorsPermit extends Model
     public function isApproved(): bool
     {
         return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;
+    }
+
+    public function hasSubmittedFiles(): bool
+    {
+        return ! empty($this->health_card)
+            || ! empty($this->permit_nbi_clearance)
+            || ! empty($this->permit_police_clearance)
+            || ! empty($this->cedula)
+            || ! empty($this->referral_letter);
     }
 
     public function approvalStatusLabel(): string

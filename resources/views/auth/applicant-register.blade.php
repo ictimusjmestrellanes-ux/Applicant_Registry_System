@@ -41,14 +41,14 @@
         <div class="register-card w-100">
             <div class="panel">
                 <div class="mb-4">
-                    <h2 class="fw-bold">Applicant Registration Disabled</h2>
+                    <h2 class="fw-bold">Applicant Registration Closed</h2>
                     <p class="text-muted mb-0">
-                        The applicant register flow is currently commented out. Please use Google sign-in from the login page instead.
+                        New applicant access is now handled through Google sign-in. You no longer need to wait for approval after registration.
                     </p>
                 </div>
 
                 <div class="alert alert-info border-0 shadow-sm">
-                    Google sign-in remains active for applicant access.
+                    Sign in with Google to access the applicant portal.
                 </div>
 
                 <a href="{{ route('login') }}" class="btn btn-primary px-4">

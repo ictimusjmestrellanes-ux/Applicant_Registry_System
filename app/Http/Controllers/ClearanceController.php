@@ -15,8 +15,16 @@ class ClearanceController extends Controller
 {
     public function update(Request $request, $id)
     {
-        if ($request->user()?->role === User::ROLE_USER) {
-            abort_if((int) $request->user()->applicant_id !== (int) $id, 403, 'You can only update your own requirements.');
+        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
+        $linkedApplicant = $isApplicantUser ? $request->user()?->linkedApplicant() : null;
+        $resolvedApplicantId = $isApplicantUser
+            ? (int) ($linkedApplicant?->id ?? 0)
+            : (int) $id;
+
+        abort_if($isApplicantUser && $resolvedApplicantId <= 0, 403, 'Your account is not linked to an applicant record.');
+
+        if ($isApplicantUser) {
+            $id = $resolvedApplicantId;
         }
 
         $applicant = Applicant::findOrFail($id);
@@ -32,7 +40,6 @@ class ClearanceController extends Controller
         ]);
         $wasRecentlyCreated = ! $clearance->exists;
         $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
-        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
         $approvalStatus = $isApplicantUser
             ? MayorsClearance::APPROVAL_PENDING
             : MayorsClearance::APPROVAL_APPROVED;
@@ -190,18 +197,7 @@ class ClearanceController extends Controller
         $clearance->save();
 
         if (empty($clearance->clearance_peso_control_no) && $clearance->isApproved() && $clearance->isReadyForControlNumber()) {
-            $year = date('Y');
-
-            $latest = MayorsClearance::whereYear('created_at', $year)
-                ->whereNotNull('clearance_peso_control_no')
-                ->orderBy('id', 'desc')
-                ->first();
-
-            $nextNumber = $latest
-                ? ((int) substr($latest->clearance_peso_control_no, -4)) + 1
-                : 1;
-
-            $clearance->clearance_peso_control_no = $year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $clearance->clearance_peso_control_no = MayorsClearance::generateNextPesoControlNo();
 
             $clearance->save(); // SAVE AGAIN with generated ID
         }
@@ -236,18 +232,7 @@ class ClearanceController extends Controller
         $clearance->save();
 
         if (empty($clearance->clearance_peso_control_no) && $clearance->isApproved() && $clearance->isReadyForControlNumber()) {
-            $year = date('Y');
-
-            $latest = MayorsClearance::whereYear('created_at', $year)
-                ->whereNotNull('clearance_peso_control_no')
-                ->orderBy('id', 'desc')
-                ->first();
-
-            $nextNumber = $latest
-                ? ((int) substr($latest->clearance_peso_control_no, -4)) + 1
-                : 1;
-
-            $clearance->clearance_peso_control_no = $year.'-'.str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $clearance->clearance_peso_control_no = MayorsClearance::generateNextPesoControlNo();
             $clearance->save();
         }
 

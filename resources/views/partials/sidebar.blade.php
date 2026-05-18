@@ -108,7 +108,16 @@
                 aria-expanded="false"
             >
                 @if($sidebarProfileImageUrl)
-                    <img src="{{ $sidebarProfileImageUrl }}" alt="{{ auth()->user()->name }}" class="avatar-image me-2">
+                    <img
+                        src="{{ $sidebarProfileImageUrl }}"
+                        alt="{{ auth()->user()->name }}"
+                        class="avatar-image me-2"
+                        referrerpolicy="no-referrer"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    >
+                    <div class="avatar-circle me-2" style="display:none;">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                    </div>
                 @else
                     <div class="avatar-circle me-2">
                         {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}

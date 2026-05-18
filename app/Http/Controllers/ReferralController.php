@@ -38,8 +38,16 @@ class ReferralController extends Controller
 
     public function update(Request $request, $id)
     {
-        if ($request->user()?->role === User::ROLE_USER) {
-            abort_if((int) $request->user()->applicant_id !== (int) $id, 403, 'You can only update your own requirements.');
+        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
+        $linkedApplicant = $isApplicantUser ? $request->user()?->linkedApplicant() : null;
+        $resolvedApplicantId = $isApplicantUser
+            ? (int) ($linkedApplicant?->id ?? 0)
+            : (int) $id;
+
+        abort_if($isApplicantUser && $resolvedApplicantId <= 0, 403, 'Your account is not linked to an applicant record.');
+
+        if ($isApplicantUser) {
+            $id = $resolvedApplicantId;
         }
 
         $applicant = Applicant::findOrFail($id);
@@ -49,7 +57,6 @@ class ReferralController extends Controller
         ]);
         $wasRecentlyCreated = ! $referral->exists;
         $before = $referral->exists ? $referral->only($referral->getFillable()) : [];
-        $isApplicantUser = $request->user()?->role === User::ROLE_USER;
         $approvalStatus = $isApplicantUser
             ? MayorsReferral::APPROVAL_PENDING
             : MayorsReferral::APPROVAL_APPROVED;

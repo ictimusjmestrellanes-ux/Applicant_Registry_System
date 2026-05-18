@@ -4,60 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Support\ActivityLogger;
+use App\Models\Applicant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function approvalIndex(Request $request)
-    {
-        $status = trim((string) $request->query('status', 'pending'));
-        $search = trim((string) $request->query('search', ''));
-
-        $allowedStatuses = array_merge(['all'], User::approvalStatuses());
-        if (! in_array($status, $allowedStatuses, true)) {
-            $status = 'pending';
-        }
-
-        $query = User::query()
-            ->whereNotNull('applicant_id')
-            ->when($status !== 'all', function ($innerQuery) use ($status) {
-                $innerQuery->where('approval_status', $status);
-            })
-            ->when($search !== '', function ($innerQuery) use ($search) {
-                $innerQuery->where(function ($nested) use ($search) {
-                    $nested->where('name', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            });
-
-        $users = $query->latest()->paginate(12)->withQueryString();
-
-        $statusCounts = collect(User::approvalStatuses())
-            ->mapWithKeys(fn (string $approvalStatus) => [
-                $approvalStatus => User::query()
-                    ->whereNotNull('applicant_id')
-                    ->where('approval_status', $approvalStatus)
-                    ->count(),
-            ])
-            ->all();
-
-        $statusCounts['all'] = User::query()
-            ->whereNotNull('applicant_id')
-            ->count();
-
-        return view('approvals.index', [
-            'users' => $users,
-            'search' => $search,
-            'status' => $status,
-            'statusCounts' => $statusCounts,
-        ]);
-    }
-
     public function index(Request $request)
     {
         $search = trim((string) $request->search);
@@ -79,90 +36,6 @@ class UserController extends Controller
             'search' => $search,
             'permissionOptions' => User::permissionOptions(),
         ]);
-    }
-
-    public function approveApplicant(Request $request, User $user)
-    {
-        abort_if($user->role !== User::ROLE_USER, 422, 'Only applicant accounts can be approved.');
-
-        $before = [
-            'approval_status' => $user->approval_status,
-            'disapproval_reason' => $user->disapproval_reason,
-            'disapproval_notes' => $user->disapproval_notes,
-        ];
-
-        $user->approval_status = User::APPROVAL_APPROVED;
-        $user->disapproval_reason = null;
-        $user->disapproval_notes = null;
-        $user->save();
-
-        $after = [
-            'approval_status' => $user->approval_status,
-            'disapproval_reason' => $user->disapproval_reason,
-            'disapproval_notes' => $user->disapproval_notes,
-        ];
-
-        ActivityLogger::log(
-            'user',
-            'approved',
-            'Approved an applicant account.',
-            $user->applicant,
-            ActivityLogger::diff($before, $after),
-            $request->user()
-        );
-
-        return redirect()
-            ->route('approvals.index')
-            ->with('success', 'Applicant account approved successfully.');
-    }
-
-    public function disapproveApplicant(Request $request, User $user)
-    {
-        abort_if($user->role !== User::ROLE_USER, 422, 'Only applicant accounts can be disapproved.');
-
-        $validator = Validator::make($request->all(), [
-            'disapproval_reason' => ['required', 'string', 'max:2000'],
-            'disapproval_notes' => ['nullable', 'string', 'max:5000'],
-        ]);
-
-        if ($validator->fails()) {
-            return back()
-                ->withErrors($validator)
-                ->withInput()
-                ->with('disapprove_user_id', $user->id);
-        }
-
-        $validated = $validator->validated();
-
-        $before = [
-            'approval_status' => $user->approval_status,
-            'disapproval_reason' => $user->disapproval_reason,
-            'disapproval_notes' => $user->disapproval_notes,
-        ];
-
-        $user->approval_status = User::APPROVAL_DISAPPROVED;
-        $user->disapproval_reason = $validated['disapproval_reason'];
-        $user->disapproval_notes = $validated['disapproval_notes'] ?? null;
-        $user->save();
-
-        $after = [
-            'approval_status' => $user->approval_status,
-            'disapproval_reason' => $user->disapproval_reason,
-            'disapproval_notes' => $user->disapproval_notes,
-        ];
-
-        ActivityLogger::log(
-            'user',
-            'disapproved',
-            'Disapproved an applicant account.',
-            $user->applicant,
-            ActivityLogger::diff($before, $after),
-            $request->user()
-        );
-
-        return redirect()
-            ->route('approvals.index')
-            ->with('success', 'Applicant account disapproved successfully.');
     }
 
     public function edit(User $user)
@@ -200,7 +73,7 @@ class UserController extends Controller
         $user->name = $validated['name'];
 
         if ($request->hasFile('profile_image')) {
-            if ($user->profile_image) {
+            if ($user->profile_image && ! filter_var($user->profile_image, FILTER_VALIDATE_URL)) {
                 Storage::disk('public')->delete($user->profile_image);
             }
 
@@ -300,7 +173,43 @@ class UserController extends Controller
             $user->password = Hash::make($validated['password']);
         }
 
-        $user->save();
+        DB::transaction(function () use ($user, $validated) {
+            $user->save();
+
+            if ($user->role !== User::ROLE_USER || ! empty($user->applicant_id)) {
+                return;
+            }
+
+            $parsedName = preg_split('/\s+/', trim((string) $user->name), 3, PREG_SPLIT_NO_EMPTY) ?: [];
+
+            $firstName = $parsedName[0] ?? Str::before(trim((string) $user->name), ' ');
+            $lastName = $parsedName[2] ?? ($parsedName[1] ?? $firstName);
+
+            $applicant = Applicant::create([
+                'first_name' => Str::title(Str::lower(trim((string) $firstName ?: $user->name))),
+                'middle_name' => null,
+                'last_name' => Str::title(Str::lower(trim((string) $lastName ?: $user->name))),
+                'suffix' => null,
+                'age' => null,
+                'contact_no' => '',
+                'gender' => '',
+                'civil_status' => null,
+                'pwd' => '',
+                'four_ps' => '',
+                'address_line' => '',
+                'province' => '',
+                'city' => '',
+                'barangay' => '',
+                'educational_attainment' => null,
+                'hiring_company' => null,
+                'position_hired' => null,
+                'first_time_job_seeker' => null,
+            ]);
+
+            $user->forceFill([
+                'applicant_id' => $applicant->id,
+            ])->saveQuietly();
+        });
 
         $after = [
             'name' => $user->name,

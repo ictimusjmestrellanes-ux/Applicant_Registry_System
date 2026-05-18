@@ -48,7 +48,7 @@ class ApplicantController extends Controller
         return redirect()
             ->route('applicants.edit', $applicant->id)
             ->with('created_success', true)
-            ->with('applicant_code', $applicant->applicant_code);
+            ->with('applicant_id', $applicant->id);
     }
 
     public function index(Request $request)
@@ -75,7 +75,7 @@ class ApplicantController extends Controller
         // If the authenticated user is an applicant account (role = 'user'),
         // show only the applicant record linked to that user.
         if (auth()->check() && auth()->user()->role === 'user') {
-            $applicantId = auth()->user()->applicant_id;
+            $applicantId = auth()->user()->linkedApplicant()?->id;
             if ($applicantId) {
                 $query->where('id', $applicantId);
             } else {

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Hash;
 
 class Applicant extends Model
 {
@@ -34,14 +33,11 @@ class Applicant extends Model
     protected static function booted(): void
     {
         static::created(function (Applicant $applicant) {
-            if (! empty($applicant->applicant_code)) {
-                return;
+            if (empty($applicant->portal_password)) {
+                $applicant->forceFill([
+                    'portal_password' => null,
+                ])->saveQuietly();
             }
-
-            $applicant->forceFill([
-                'applicant_code' => sprintf('APL-%05d', $applicant->id),
-                'portal_password' => Hash::make(sprintf('APL-%05d', $applicant->id)),
-            ])->saveQuietly();
         });
     }
 

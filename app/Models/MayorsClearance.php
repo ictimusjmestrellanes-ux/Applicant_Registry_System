@@ -36,6 +36,32 @@ class MayorsClearance extends Model
         return $this->belongsTo(Applicant::class);
     }
 
+    public static function generateNextPesoControlNo(?int $year = null): string
+    {
+        $year = $year ?? (int) now()->format('Y');
+        $prefix = $year.'-';
+
+        $latestNumber = static::query()
+            ->where('clearance_peso_control_no', 'like', $prefix.'%')
+            ->pluck('clearance_peso_control_no')
+            ->map(function ($controlNo) use ($year) {
+                if (! preg_match('/^'.preg_quote((string) $year, '/')."-(\d{4})$/", (string) $controlNo, $matches)) {
+                    return 0;
+                }
+
+                return (int) $matches[1];
+            })
+            ->max() ?: 0;
+
+        $nextNumber = $latestNumber + 1;
+
+        if ($nextNumber > 9999) {
+            $nextNumber = 1;
+        }
+
+        return $prefix.str_pad((string) $nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
     public function isApproved(): bool
     {
         return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;

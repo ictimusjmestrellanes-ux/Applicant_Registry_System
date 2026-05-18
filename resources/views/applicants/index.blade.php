@@ -354,7 +354,6 @@
                     <tbody>
                         @forelse($applicants as $applicant)
                             @php
-                                $applicantCode = sprintf('APL-%05d', $applicant->id);
                                 $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
                                 $permit = optional($applicant->permit);
                                 $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
@@ -397,7 +396,6 @@
                                 <td class="text-center table-id">#{{ $applicant->id }}</td>
                                 <td>
                                     <div class="applicant-name">{{ $fullName }}</div>
-                                    <div class="applicant-code">#{{ $applicantCode }}</div>
                                 </td>
                                 <td>
                                     <div class="contact-line"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
@@ -479,7 +477,6 @@
             <div class="mobile-records d-lg-none">
                 @forelse($applicants as $applicant)
                     @php
-                        $applicantCode = sprintf('APL-%05d', $applicant->id);
                         $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
                         $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
                         $permit = optional($applicant->permit);
@@ -521,7 +518,7 @@
                         <div class="mobile-record-head">
                             <div>
                                 <div class="applicant-name">{{ $fullName }}</div>
-                                <div class="applicant-code">#{{ $applicantCode }}</div>
+                                <div class="applicant-code">Record #{{ $applicant->id }}</div>
                                 <div class="applicant-meta">#{{ $applicant->id }} •
                                     {{ $applicant->created_at->format('M d, Y') }}
                                 </div>

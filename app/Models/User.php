@@ -80,6 +80,19 @@ class User extends Authenticatable
         return $this->belongsTo(Applicant::class);
     }
 
+    public function linkedApplicant(): ?Applicant
+    {
+        if ($this->relationLoaded('applicant') && $this->getRelation('applicant')) {
+            return $this->getRelation('applicant');
+        }
+
+        if (! empty($this->applicant_id)) {
+            return $this->applicant;
+        }
+
+        return null;
+    }
+
     public static function roles(): array
     {
         return [
@@ -101,14 +114,13 @@ class User extends Authenticatable
     public static function permissionOptions(): array
     {
         return [
-            'approve_applicant' => 'Approve Applicant Accounts',
-            'approve_document' => 'Approve Submitted Documents',
             'update_permit' => "Update Mayor's Permit to Work",
             'generate_permit' => "Generate Mayor's Permit to Work ID",
             'update_clearance' => "Update Mayor's Clearance",
             'generate_clearance' => "Generate Mayor's Clearance Letter",
             'update_referral' => "Update Mayor's Referral",
             'generate_referral' => "Generate Mayor's Referral Letter",
+            'approve_document' => 'Approve Submitted Documents',
         ];
     }
 
@@ -203,6 +215,10 @@ class User extends Authenticatable
     {
         if (! $this->profile_image) {
             return null;
+        }
+
+        if (filter_var($this->profile_image, FILTER_VALIDATE_URL)) {
+            return $this->profile_image;
         }
 
         // Prefer checking the storage disk directly instead of relying on a public

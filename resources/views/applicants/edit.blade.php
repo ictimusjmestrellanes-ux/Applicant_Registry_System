@@ -16,9 +16,8 @@
                     html: `
                                 <div style="font-size:14px;">
                                     <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                    @if (session('applicant_code'))
-                                        <p class="mb-2"><strong>Applicant ID:</strong> {{ session('applicant_code') }}</p>
-                                        <p class="mb-0 text-muted">Initial portal password: same as the applicant ID.</p>
+                                    @if (session('applicant_id'))
+                                        <p class="mb-2"><strong>Record ID:</strong> #{{ session('applicant_id') }}</p>
                                     @endif
                                     <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
                                 </div>
@@ -1255,11 +1254,9 @@
                     <h5 class="fw-bold mb-1">Document Compliance</h5>
                     <p class="small">Manage permit, clearance, and referral requirements with a cleaner workflow.</p>
                 </div>
-                @if (!empty($applicant->applicant_code))
-                    <span class="badge rounded-pill text-bg-light border px-3 py-2">
-                        <i class="bi bi-upc-scan me-1"></i> Applicant ID: {{ $applicant->applicant_code }}
-                    </span>
-                @endif
+                <span class="badge rounded-pill text-bg-light border px-3 py-2">
+                    <i class="bi bi-upc-scan me-1"></i> Record ID: #{{ $applicant->id }}
+                </span>
             </div>
 
             <div class="tab-shell">
@@ -1743,9 +1740,10 @@
                             <div class="col-md-2">
                                 <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
                                 <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
-                                    <option value="{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}" selected>
-                                        {{ old('permit_issued_at', $permit->permit_issued_at ?? 'Select City Government') }}
-                                    </option>
+                                    @php
+                                        $permitIssuedAtValue = strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? '')));
+                                    @endphp
+                                    <option value="">Select City</option>
                                 </select>
                             </div>
 
@@ -1787,7 +1785,7 @@
                             {{-- Action: Save/Update --}}
                             @if($isApplicantUser || auth()->user()->hasPermission('update_permit'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-floppy-disk me-2"></i>Save Permit
+                                    <i class="fa-solid fa-floppy-disk me-2"></i>{{ $isApplicantUser ? 'Submit Upload File' : 'Save Permit' }}
                                 </button>
                             @else
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -1799,7 +1797,7 @@
                             @endif
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $permit && ! $permit->isApproved())
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles() && ! $permit->isApproved())
                                     <button type="submit" form="permit-approve-form-{{ $applicant->id }}"
                                         class="btn btn-success px-4 shadow-sm" formnovalidate>
                                             <i class="fa-solid fa-circle-check me-2"></i>Approve Permit Requirements
@@ -1808,7 +1806,7 @@
                             @endunless
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $permit && auth()->user()->role !== \App\Models\User::ROLE_STAFF)
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles())
                                     <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#disapprovePermitModal-{{ $applicant->id }}">
@@ -2809,18 +2807,14 @@
         const refProvinceInput = document.getElementById("refProvinceInput");
         const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
         const refCompanyAddressList = document.getElementById("refCompanyAddressList");
-        const selectedPermitIssuedAt = `{{ old('permit_issued_at', $permit->permit_issued_at ?? '') }}`;
+        const selectedPermitIssuedAt = `{{ strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? ''))) }}`;
+        const calabarzonProvinceNames = new Set(["CAVITE", "LAGUNA", "BATANGAS", "RIZAL", "QUEZON"]);
         const selectedCityGovernment = `{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}`;
         const selectedRefRecipient = `{{ old('ref_recipient', $referral->ref_recipient ?? '') }}`;
         const selectedRefPlace = `{{ old('ref_place', $referral->ref_place ?? '') }}`;
         const selectedRefCompanyAddress = `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
         const referralRecipientSearchUrl = `{{ route('referrals.recipients.search') }}`;
         const configuredMayors = @json(config('philippine_mayors', []));
-        const permitIssuedAtAllowedRegions = new Set([
-            "040000000", // CALABARZON
-            "130000000", // NCR
-        ]);
-
         const appendOptionIfMissing = (select, value, label, dataAttributes = {}) => {
             if (!select || !value) {
                 return;
@@ -2993,12 +2987,6 @@
                 return cityDataPromise;
             };
         })();
-
-        const isAllowedPermitIssuedAtCity = city => {
-            const regionCode = city?.regionCode || city?.region_code || "";
-
-            return permitIssuedAtAllowedRegions.has(regionCode);
-        };
 
         const setRecipientDetails = (cityGovernment, companyAddress) => {
             if (cityDropdown && cityGovernment) {
@@ -3223,38 +3211,53 @@
 
         const populatePsgcCityData = () => {
             Promise.all([ensurePsgcCityData(), ensurePsgcProvinceData()]).then(([cities, provinces]) => {
-                const allowedPermitCities = cities
-                    .filter(isAllowedPermitIssuedAtCity)
-                    .sort((a, b) => a.name.localeCompare(b.name));
-
                 if (permitIssuedAtDropdown) {
-                    const currentValue = permitIssuedAtDropdown.value || selectedPermitIssuedAt || "";
+                    const currentValue = (permitIssuedAtDropdown.value || selectedPermitIssuedAt || "").toUpperCase();
+                    const calabarzonCities = (Array.isArray(cities) ? cities : [])
+                        .filter(city => {
+                            const rawName = String(city.name || city.description || "");
+                            const cleanedName = rawName.toUpperCase().trim();
+                            const provinceCode = city.provinceCode || city.province_code || city.province?.code || city.province?.provinceCode || "";
+                            const provinceName = String(
+                                city.province?.name ||
+                                city.province?.description ||
+                                (typeof city.province === "string" ? city.province : "") ||
+                                provinces.find(province => String(province.code || "") === String(provinceCode))?.name ||
+                                provinces.find(province => String(province.code || "") === String(provinceCode))?.province ||
+                                provinces.find(province => String(province.code || "") === String(provinceCode))?.description ||
+                                ""
+                            ).toUpperCase().trim();
+
+                            return /CITY/i.test(rawName) && calabarzonProvinceNames.has(provinceName) && cleanedName;
+                        })
+                        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" }));
 
                     permitIssuedAtDropdown.innerHTML = "";
 
                     const placeholderOption = document.createElement("option");
                     placeholderOption.value = "";
-                    placeholderOption.text = "Select City Government";
+                    placeholderOption.text = "Select City";
                     placeholderOption.selected = currentValue === "";
                     permitIssuedAtDropdown.appendChild(placeholderOption);
 
-                    allowedPermitCities.forEach(city => {
+                    calabarzonCities.forEach(city => {
+                        const rawName = String(city.name || city.description || "");
+                        const cleaned = rawName.replace(/^City of\s+/i, "").replace(/^City\s+/i, "").replace(/\s+City$/i, "").trim();
+                        const name = `CITY OF ${String(cleaned).toUpperCase()}`.trim();
+
                         const option = document.createElement("option");
-                        option.value = city.name;
-                        option.text = city.name;
-                        option.selected = city.name === currentValue;
+                        option.value = name;
+                        option.text = name;
+                        option.selected = name === currentValue;
                         permitIssuedAtDropdown.appendChild(option);
                     });
 
-                    if (
-                        currentValue &&
-                        !allowedPermitCities.some(city => city.name === currentValue)
-                    ) {
-                        const currentOption = document.createElement("option");
-                        currentOption.value = currentValue;
-                        currentOption.text = currentValue;
-                        currentOption.selected = true;
-                        permitIssuedAtDropdown.appendChild(currentOption);
+                    if (currentValue !== "" && !calabarzonCities.some(city => {
+                        const rawName = String(city.name || city.description || "");
+                        const cleaned = rawName.replace(/^City of\s+/i, "").replace(/^City\s+/i, "").replace(/\s+City$/i, "").trim();
+                        return `CITY OF ${String(cleaned).toUpperCase()}` === currentValue;
+                    })) {
+                        permitIssuedAtDropdown.value = "";
                     }
                 }
 

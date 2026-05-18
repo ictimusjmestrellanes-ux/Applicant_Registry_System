@@ -9,14 +9,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('applicants', function (Blueprint $table) {
-            $table->string('portal_password')->nullable()->after('id');
+            if (Schema::hasColumn('applicants', 'applicant_code')) {
+                $table->dropUnique('applicants_applicant_code_unique');
+                $table->dropColumn('applicant_code');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('applicants', function (Blueprint $table) {
-            $table->dropColumn('portal_password');
+            if (! Schema::hasColumn('applicants', 'applicant_code')) {
+                $table->string('applicant_code')->nullable()->unique()->after('id');
+            }
         });
     }
 };

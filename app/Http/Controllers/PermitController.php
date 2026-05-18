@@ -16,12 +16,18 @@ class PermitController extends Controller
     public function update(Request $request, $id)
     {
         $isApplicantUser = $request->user()?->role === User::ROLE_USER;
+        $linkedApplicant = $isApplicantUser ? $request->user()?->linkedApplicant() : null;
+        $resolvedApplicantId = $isApplicantUser
+            ? (int) ($linkedApplicant?->id ?? 0)
+            : (int) $id;
+
+        abort_if($isApplicantUser && $resolvedApplicantId <= 0, 403, 'Your account is not linked to an applicant record.');
         $approvalStatus = $isApplicantUser
             ? MayorsPermit::APPROVAL_PENDING
             : MayorsPermit::APPROVAL_APPROVED;
 
-        if ($request->user()?->role === User::ROLE_USER) {
-            abort_if((int) $request->user()->applicant_id !== (int) $id, 403, 'You can only update your own requirements.');
+        if ($isApplicantUser) {
+            $id = $resolvedApplicantId;
         }
 
         $applicant = Applicant::findOrFail($id);
@@ -199,7 +205,7 @@ class PermitController extends Controller
                 'permit_or_no' => $isFirstTimeJobSeeker ? 'RA11261' : $request->permit_or_no,
                 'community_tax_no' => $request->community_tax_no,
                 'permit_issued_on' => $request->permit_issued_on,
-                'permit_issued_at' => $request->permit_issued_at,
+                'permit_issued_at' => strtoupper(trim((string) $request->permit_issued_at)),
                 'permit_date' => $request->permit_date,
                 'expires_on' => $request->expires_on,
                 'permit_doc_stamp_control_no' => $isFirstTimeJobSeeker ? '-' : $request->permit_doc_stamp_control_no,

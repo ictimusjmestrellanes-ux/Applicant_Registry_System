@@ -18,17 +18,7 @@ return [
             ['label' => 'Archived Applicants', 'route' => 'applicants.archive', 'visible_roles' => ['admin', 'staff']],
         ],
     ],
-
-    [
-        'label' => 'Approvals',
-        'icon' => 'bi bi-patch-check',
-        'route' => 'approvals.index',
-        'children' => [
-            ['label' => 'Approval List', 'route' => 'approvals.index'],
-        ],
-        'visible_permissions' => ['approve_applicant'],
-    ],
-
+    
     [
         'label' => 'Users',
         'icon' => 'bi bi-people',
