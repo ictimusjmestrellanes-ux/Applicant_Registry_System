@@ -5,6 +5,7 @@
 @section('content')
     @php
         $visibleApplicants = $applicants->getCollection();
+        $currentApplicant = $visibleApplicants->first();
         $searchTerm = $filters['search'] ?? '';
         $selectedGender = $filters['gender'] ?? '';
         $selectedCivilStatus = $filters['civil_status'] ?? '';
@@ -37,6 +38,7 @@
         $filterPanelOpen = $hasActiveFilters;
         $sortBy = $sortBy ?? 'id';
         $sortOrder = $sortOrder ?? 'desc';
+        $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
         
         $sortHelper = function($field, $label) use ($sortBy, $sortOrder, $filters) {
             $nextOrder = ($sortBy === $field && $sortOrder === 'asc') ? 'desc' : 'asc';
@@ -52,6 +54,7 @@
         };
     @endphp
 
+    @if(! $isApplicantUser)
         <section class="filter-card mb-4">
             <div class="section-head">
                 <div>
@@ -189,6 +192,7 @@
                 </form>
             </div>
         </section>
+    @endif
 
         @if(session('success'))
             <div class="alert alert-success success-banner border-0 shadow-sm d-flex align-items-center mb-4" role="alert">

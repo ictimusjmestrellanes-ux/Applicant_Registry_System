@@ -84,30 +84,15 @@ class UserController extends Controller
 
         // Handle password change if requested
         if (! empty($validated['password'])) {
-            // Ensure current password matches for local accounts. If user's account is linked to an applicant,
-            // validate against the applicant portal password to avoid issues with double-hashed values.
             $current = $validated['current_password'] ?? '';
 
-            if ($user->applicant_id) {
-                $applicant = \App\Models\Applicant::find($user->applicant_id);
-                if (! $applicant || ! Hash::check($current, $applicant->portal_password)) {
-                    return back()->withErrors(['current_password' => 'Your current password is incorrect.'])->withInput();
-                }
-            } else {
-                if (($user->auth_provider ?? 'local') !== 'azure' && ! Hash::check($current, $user->password)) {
-                    return back()->withErrors(['current_password' => 'Your current password is incorrect.'])->withInput();
-                }
+            if (($user->auth_provider ?? 'local') !== 'azure' && ! Hash::check($current, $user->password)) {
+                return back()->withErrors(['current_password' => 'Your current password is incorrect.'])->withInput();
             }
 
             // Set the new password on the User model (the cast will hash it)
             $user->password = $validated['password'];
             $user->save();
-
-            // If linked to applicant, update applicant portal password (store hashed)
-            if (isset($applicant) && $applicant) {
-                $applicant->portal_password = Hash::make($validated['password']);
-                $applicant->save();
-            }
 
             ActivityLogger::log(
                 'auth',
@@ -176,7 +161,17 @@ class UserController extends Controller
         DB::transaction(function () use ($user, $validated) {
             $user->save();
 
-            if ($user->role !== User::ROLE_USER || ! empty($user->applicant_id)) {
+            if ($user->role !== User::ROLE_USER) {
+                if (! empty($user->applicant_id)) {
+                    $user->forceFill([
+                        'applicant_id' => null,
+                    ])->saveQuietly();
+                }
+
+                return;
+            }
+
+            if (! empty($user->applicant_id)) {
                 return;
             }
 
@@ -234,5 +229,37 @@ class UserController extends Controller
         return redirect()
             ->route('users.index')
             ->with('success', 'User updated successfully.');
+    }
+
+    public function destroy(Request $request, User $user)
+    {
+        abort_if(! $request->user()?->isAdmin(), 403, 'Only administrators can delete users.');
+        abort_if((int) $request->user()->id === (int) $user->id, 403, 'You cannot delete your own account.');
+
+        $before = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ];
+
+        $userName = $user->name;
+        $user->delete();
+
+        ActivityLogger::log(
+            'user',
+            'deleted',
+            'Deleted a user account.',
+            null,
+            ActivityLogger::diff($before, [
+                'name' => $userName,
+                'email' => $user->email,
+                'role' => $user->role,
+            ]),
+            $request->user()
+        );
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User deleted successfully.');
     }
 }

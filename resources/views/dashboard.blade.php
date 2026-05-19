@@ -8,6 +8,14 @@
         $newThisMonth = data_get($summary, 'newThisMonth', 0);
         $totalClearances = data_get($summary, 'totalClearances', 0);
         $totalReferrals = data_get($summary, 'totalReferrals', 0);
+        $maleCount = data_get($genderBreakdown->firstWhere('label', 'MALE'), 'count', 0);
+        $femaleCount = data_get($genderBreakdown->firstWhere('label', 'FEMALE'), 'count', 0);
+        $pwdYesCount = data_get($pwdBreakdown->firstWhere('label', 'YES'), 'count', 0);
+        $pwdNoCount = data_get($pwdBreakdown->firstWhere('label', 'NO'), 'count', 0);
+        $fourPsYesCount = data_get($fourPsBreakdown->firstWhere('label', 'YES'), 'count', 0);
+        $fourPsNoCount = data_get($fourPsBreakdown->firstWhere('label', 'NO'), 'count', 0);
+        $yearlyApplicantTrendLabels = $trendMonths ?? [];
+        $yearlyApplicantTrendDatasets = $yearlyApplicantTrendDatasets ?? [];
         $timeGreeting = (now()->hour >= 0 && now()->hour <= 11) ? 'Good Morning' : ((now()->hour >= 12 && now()->hour <= 17) ? 'Good Afternoon' : 'Good Evening');
     @endphp
 
@@ -45,7 +53,6 @@
                     <div>
                         <div class="metric-label">Total Permit</div>
                         <div class="metric-value">{{ data_get($completion, 'permit.count', 0) }}</div>
-                        <div class="metric-note">Applicants who have completed</div>
                     </div>
                 </div>
             </div>
@@ -58,7 +65,6 @@
                     <div>
                         <div class="metric-label">Total Clearance</div>
                         <div class="metric-value">{{ number_format($totalClearances) }}</div>
-                        <div class="metric-note">Clearance with clearance records</div>
                     </div>
                 </div>
             </div>
@@ -70,7 +76,6 @@
                     <div>
                         <div class="metric-label">Total Referral</div>
                         <div class="metric-value">{{ number_format($totalReferrals) }}</div>
-                        <div class="metric-note">Including extra employer details</div>
                     </div>
                 </div>
             </div>
@@ -82,65 +87,74 @@
                     <div class="dashboard-card">
                         <div class="section-header">
                             <div>
-                                <h5 class="section-title mb-1">{{ now()->format('Y') }} Applicant Registrations Summary</h5>
+                                <h5 class="section-title mb-1">Applicant Registrations by Year</h5>
+                                <p class="section-copy mb-0">Monthly registrations for every recorded year.</p>
+                            </div>
+                            <div class="year-filter-wrap">
+                                <label for="trendYearFilter" class="visually-hidden">Filter by year</label>
+                                <select id="trendYearFilter" class="form-select form-select-sm year-filter">
+                                    <option value="all">All years</option>
+                                    @foreach($trendYears as $trendYear)
+                                        <option value="{{ $trendYear }}">{{ $trendYear }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
                         <div class="chart-card">
-                            <div class="chart-canvas-wrap">
+                            <div class="chart-canvas-wrap chart-canvas-wrap--line">
                                 <canvas id="monthlyApplicantsChart"></canvas>
                             </div>
                         </div>
                     </div>
-                </div>
             </section>
 
             <section class="row g-4 mb-4">
-                <div class="col-xl-4 col-md-6">
+                <div class="col-xl-4">
                     <div class="dashboard-card h-100">
                         <div class="section-header">
                             <div>
-                                <h5 class="section-title mb-1">Total of Male and Female Summary</h5>
+                                <h5 class="section-title mb-1">Male and Female Summary</h5>
+                                <p class="section-copy mb-0">Polar area view of applicant gender breakdown.</p>
                             </div>
                         </div>
 
                         <div class="chart-card">
                             <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                                <canvas id="sexPieChart"></canvas>
+                                <canvas id="sexPolarChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-xl-4 col-md-6">
+                <div class="col-xl-4">
                     <div class="dashboard-card h-100">
                         <div class="section-header">
                             <div>
                                 <h5 class="section-title mb-1">PWD Summary</h5>
-                                <p class="section-copy mb-0">Applicants marked as PWD:</p>
+                                <p class="section-copy mb-0">Polar area view of applicant PWD participation.</p>
                             </div>
                         </div>
 
                         <div class="chart-card">
                             <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                                <canvas id="pwdPieChart"></canvas>
+                                <canvas id="pwdPolarChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-4 col-md-12">
+                <div class="col-4">
                     <div class="dashboard-card h-100">
                         <div class="section-header">
                             <div>
                                 <h5 class="section-title mb-1">4Ps Summary</h5>
-                                <p class="section-copy mb-0">Applicants marked as 4Ps:</p>
+                                <p class="section-copy mb-0">Applicants marked as 4Ps.</p>
                             </div>
                         </div>
 
                         <div class="chart-card">
                             <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                                <canvas id="fourPsPieChart"></canvas>
+                                <canvas id="fourPsPolarChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -331,6 +345,18 @@
             color: #0f172a;
         }
 
+        .year-filter-wrap {
+            min-width: 150px;
+        }
+
+        .year-filter {
+            min-width: 150px;
+            border-radius: 12px;
+            border-color: #dbe6f2;
+            color: #334155;
+            box-shadow: none;
+        }
+
         .progress-list {
             display: flex;
             flex-direction: column;
@@ -474,6 +500,10 @@
             position: relative;
             height: 360px;
             width: 100%;
+        }
+
+        .chart-canvas-wrap--line {
+            height: 380px;
         }
 
         .chart-canvas-wrap--pie {
@@ -647,17 +677,35 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const monthlyLabels = @json($monthlyApplicants->pluck('label')->values());
-            const monthlyData = @json($monthlyApplicants->pluck('count')->values());
+            const yearlyTrendLabels = @json($yearlyApplicantTrendLabels);
+            const yearlyTrendDatasets = @json($yearlyApplicantTrendDatasets);
+            const trendYearFilter = document.getElementById('trendYearFilter');
+            const chartMaxForDatasets = (datasets) => Math.max(...datasets.flatMap((dataset) => dataset.data), 0) + 2;
+            const getDatasetsForYear = (year) => {
+                if (year === 'all') {
+                    return yearlyTrendDatasets;
+                }
 
-            const sexLabels = @json($genderBreakdown->pluck('label')->values());
-            const sexData = @json($genderBreakdown->pluck('count')->values());
+                return yearlyTrendDatasets.filter((dataset) => dataset.label === year);
+            };
+            const initialTrendDatasets = getDatasetsForYear(trendYearFilter?.value ?? 'all');
+            const yearlyTrendMax = chartMaxForDatasets(initialTrendDatasets);
 
-            const pwdLabels = @json($pwdBreakdown->pluck('label')->values());
-            const pwdData = @json($pwdBreakdown->pluck('count')->values());
+            const sexLabels = ['Male', 'Female'];
+            const sexData = [
+                @json((int) $maleCount),
+                @json((int) $femaleCount),
+            ];
 
-            const fourPsLabels = @json($fourPsBreakdown->pluck('label')->values());
-            const fourPsData = @json($fourPsBreakdown->pluck('count')->values());
+            const pwdData = [
+                @json((int) $pwdYesCount),
+                @json((int) $pwdNoCount),
+            ];
+
+            const fourPsData = [
+                @json((int) $fourPsYesCount),
+                @json((int) $fourPsNoCount),
+            ];
 
             const cityLabels = @json($cityBreakdown->pluck('label')->values());
             const cityData = @json($cityBreakdown->pluck('count')->values());
@@ -665,43 +713,56 @@
             const provinceLabels = @json($provinceBreakdown->pluck('label')->values());
             const provinceData = @json($provinceBreakdown->pluck('count')->values());
 
-            const pieOptions = {
+            const lineOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
                     legend: {
-                        position: 'bottom',
+                        position: 'top',
                         labels: {
                             usePointStyle: true,
-                            padding: 18,
+                            padding: 16,
                         },
                     },
-                },
-            };
-
-            const columnOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
+                    tooltip: {
+                        padding: 12,
+                        displayColors: true,
                     },
                 },
                 scales: {
                     x: {
-                        ticks: {
-                            maxRotation: 45,
-                            minRotation: 25,
-                        },
                         grid: {
-                            display: false,
+                            display: true,
+                            color: 'rgba(148, 163, 184, 0.18)',
+                        },
+                        ticks: {
+                            color: '#475569',
                         },
                     },
                     y: {
                         beginAtZero: true,
+                        suggestedMax: yearlyTrendMax,
                         ticks: {
                             precision: 0,
+                            color: '#475569',
                         },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.18)',
+                        },
+                    },
+                },
+                elements: {
+                    line: {
+                        tension: 0.35,
+                        borderWidth: 3,
+                    },
+                    point: {
+                        radius: 3,
+                        hoverRadius: 6,
                     },
                 },
             };
@@ -716,88 +777,243 @@
                 new Chart(canvas, config);
             };
 
-            createChart('monthlyApplicantsChart', {
-                type: 'bar',
-                data: {
-                    labels: monthlyLabels,
-                    datasets: [{
-                        data: monthlyData,
-                        backgroundColor: '#2563eb',
-                        borderRadius: 8,
-                        maxBarThickness: 42,
-                    }],
-                },
-                options: columnOptions,
-            });
+            const monthlyCanvas = document.getElementById('monthlyApplicantsChart');
 
-            createChart('sexPieChart', {
-                type: 'pie',
+            if (monthlyCanvas) {
+                const monthlyApplicantsChart = new Chart(monthlyCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: yearlyTrendLabels,
+                        datasets: initialTrendDatasets,
+                    },
+                    options: {
+                        ...lineOptions,
+                        scales: {
+                            ...lineOptions.scales,
+                            y: {
+                                ...lineOptions.scales.y,
+                                suggestedMax: yearlyTrendMax,
+                            },
+                        },
+                    },
+                });
+
+                if (trendYearFilter) {
+                    trendYearFilter.addEventListener('change', function () {
+                        const selectedYear = this.value;
+                        const datasets = getDatasetsForYear(selectedYear);
+
+                        monthlyApplicantsChart.data.datasets = datasets;
+                        monthlyApplicantsChart.options.scales.y.suggestedMax = chartMaxForDatasets(datasets);
+                        monthlyApplicantsChart.update();
+                    });
+                }
+            }
+
+            createChart('sexPolarChart', {
+                type: 'polarArea',
                 data: {
                     labels: sexLabels,
                     datasets: [{
                         data: sexData,
-                        backgroundColor: ['#2563eb', '#ec4899'],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.72)',
+                            'rgba(244, 114, 182, 0.72)',
+                        ],
                         borderColor: '#ffffff',
-                        borderWidth: 3,
+                        borderWidth: 2,
                     }],
                 },
-                options: pieOptions,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 18,
+                            },
+                        },
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                backdropColor: 'transparent',
+                                color: '#64748b',
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.18)',
+                            },
+                            angleLines: {
+                                color: 'rgba(148, 163, 184, 0.18)',
+                            },
+                            pointLabels: {
+                                color: '#334155',
+                                font: {
+                                    size: 13,
+                                    weight: '600',
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
-            createChart('pwdPieChart', {
-                type: 'pie',
+            createChart('pwdPolarChart', {
+                type: 'polarArea',
                 data: {
-                    labels: pwdLabels,
+                    labels: ['PWD YES', 'PWD NO'],
                     datasets: [{
                         data: pwdData,
-                        backgroundColor: ['#10b981', '#f59e0b'],
+                        backgroundColor: [
+                            'rgba(245, 158, 11, 0.82)',
+                            'rgba(245, 158, 11, 0.34)',
+                        ],
                         borderColor: '#ffffff',
-                        borderWidth: 3,
+                        borderWidth: 2,
                     }],
                 },
-                options: pieOptions,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 18,
+                            },
+                        },
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                backdropColor: 'transparent',
+                                color: '#64748b',
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.18)',
+                            },
+                            angleLines: {
+                                color: 'rgba(148, 163, 184, 0.18)',
+                            },
+                            pointLabels: {
+                                color: '#334155',
+                                font: {
+                                    size: 13,
+                                    weight: '600',
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
-            createChart('fourPsPieChart', {
-                type: 'pie',
+            createChart('fourPsPolarChart', {
+                type: 'polarArea',
                 data: {
-                    labels: fourPsLabels,
+                    labels: ['4Ps YES', '4Ps NO'],
                     datasets: [{
                         data: fourPsData,
-                        backgroundColor: ['#8b5cf6', '#f43f5e'],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.82)',
+                            'rgba(16, 185, 129, 0.34)',
+                        ],
                         borderColor: '#ffffff',
-                        borderWidth: 3,
+                        borderWidth: 2,
                     }],
                 },
-                options: pieOptions,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 18,
+                            },
+                        },
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                backdropColor: 'transparent',
+                                color: '#64748b',
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.18)',
+                            },
+                            angleLines: {
+                                color: 'rgba(148, 163, 184, 0.18)',
+                            },
+                            pointLabels: {
+                                color: '#334155',
+                                font: {
+                                    size: 13,
+                                    weight: '600',
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             createChart('cityColumnChart', {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: cityLabels,
                     datasets: [{
                         data: cityData,
-                        backgroundColor: '#7c3aed',
-                        borderRadius: 8,
-                        maxBarThickness: 42,
+                        label: 'City Count',
+                        borderColor: '#7c3aed',
+                        backgroundColor: 'rgba(124, 58, 237, 0.14)',
+                        pointBackgroundColor: '#7c3aed',
+                        pointBorderColor: '#ffffff',
+                        fill: false,
                     }],
                 },
-                options: columnOptions,
+                options: {
+                    ...lineOptions,
+                    plugins: {
+                        ...lineOptions.plugins,
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
             });
 
             createChart('provinceColumnChart', {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: provinceLabels,
                     datasets: [{
                         data: provinceData,
-                        backgroundColor: '#475569',
-                        borderRadius: 8,
-                        maxBarThickness: 42,
+                        label: 'Province Count',
+                        borderColor: '#475569',
+                        backgroundColor: 'rgba(71, 85, 105, 0.14)',
+                        pointBackgroundColor: '#475569',
+                        pointBorderColor: '#ffffff',
+                        fill: false,
                     }],
                 },
-                options: columnOptions,
+                options: {
+                    ...lineOptions,
+                    plugins: {
+                        ...lineOptions.plugins,
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
             });
         });
     </script>

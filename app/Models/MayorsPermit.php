@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class MayorsPermit extends Model
@@ -52,6 +53,26 @@ class MayorsPermit extends Model
     public function applicant()
     {
         return $this->belongsTo(Applicant::class);
+    }
+
+    public function renewalDueDate(): ?Carbon
+    {
+        if (! empty($this->expires_on)) {
+            return Carbon::parse($this->expires_on)->startOfDay();
+        }
+
+        if (! empty($this->permit_date)) {
+            return Carbon::parse($this->permit_date)->addMonthsNoOverflow(6)->startOfDay();
+        }
+
+        return null;
+    }
+
+    public function isRenewalDue(): bool
+    {
+        $renewalDueDate = $this->renewalDueDate();
+
+        return $renewalDueDate ? now()->startOfDay()->greaterThanOrEqualTo($renewalDueDate) : false;
     }
 
     private static function pesoIdPrefix(int $year): string

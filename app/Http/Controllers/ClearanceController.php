@@ -216,6 +216,12 @@ class ClearanceController extends Controller
             );
         }
 
+        if ($isApplicantUser) {
+            return redirect()
+                ->to(route('applicants.index').'#clearance-compliance')
+                ->with('success', 'Clearance updated successfully.');
+        }
+
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#clearance')
             ->with('success', 'Clearance updated successfully.');

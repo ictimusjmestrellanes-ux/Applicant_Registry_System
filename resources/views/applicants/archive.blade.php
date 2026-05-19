@@ -617,14 +617,16 @@
                                             <div class="archive-time">{{ $applicant->deleted_at?->format('h:i A') ?? '' }}</div>
                                         </td>
                                         <td class="text-end">
-                                            <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}"
-                                                class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-restore"
-                                                    onclick="return confirm('Restore this applicant to the active list?')">
-                                                    <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
-                                                </button>
-                                            </form>
+                                            @if(auth()->user()?->hasPermission('restore_archive_applicants') || auth()->user()?->isAdmin())
+                                                <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}"
+                                                    class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-restore"
+                                                        onclick="return confirm('Restore this applicant to the active list?')">
+                                                        <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -684,13 +686,15 @@
                                 </div>
 
                                 <div class="mobile-archive-row">
-                                    <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}">
-                                        @csrf
-                                        <button type="submit" class="btn btn-restore w-100"
-                                            onclick="return confirm('Restore this applicant to the active list?')">
-                                            <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
-                                        </button>
-                                    </form>
+                                    @if(auth()->user()?->hasPermission('restore_archive_applicants') || auth()->user()?->isAdmin())
+                                        <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}">
+                                            @csrf
+                                            <button type="submit" class="btn btn-restore w-100"
+                                                onclick="return confirm('Restore this applicant to the active list?')">
+                                                <i class="bi bi-arrow-counterclockwise me-2"></i>Restore
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </article>

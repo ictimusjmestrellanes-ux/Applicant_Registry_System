@@ -20,12 +20,6 @@ class User extends Authenticatable
 
     public const ROLE_USER = 'user';
 
-    public const APPROVAL_PENDING = 'pending';
-
-    public const APPROVAL_APPROVED = 'approved';
-
-    public const APPROVAL_DISAPPROVED = 'disapproved';
-
     /**
      * The attributes that are mass assignable.
      *
@@ -39,9 +33,6 @@ class User extends Authenticatable
         'role',
         'permissions',
         'auth_provider',
-        'approval_status',
-        'disapproval_reason',
-        'disapproval_notes',
         'profile_image',
         'applicant_id',
     ];
@@ -102,15 +93,6 @@ class User extends Authenticatable
         ];
     }
 
-    public static function approvalStatuses(): array
-    {
-        return [
-            self::APPROVAL_PENDING,
-            self::APPROVAL_APPROVED,
-            self::APPROVAL_DISAPPROVED,
-        ];
-    }
-
     public static function permissionOptions(): array
     {
         return [
@@ -121,6 +103,8 @@ class User extends Authenticatable
             'update_referral' => "Update Mayor's Referral",
             'generate_referral' => "Generate Mayor's Referral Letter",
             'approve_document' => 'Approve Submitted Documents',
+            'view_archive_applicants' => 'View Archived Applicants',
+            'restore_archive_applicants' => 'Restore Archived Applicants',
         ];
     }
 
@@ -146,60 +130,6 @@ class User extends Authenticatable
             self::ROLE_STAFF => 'role-pill-staff',
             default => 'role-pill-user',
         };
-    }
-
-    public function isPendingApproval(): bool
-    {
-        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_PENDING;
-    }
-
-    public function isDisapproved(): bool
-    {
-        return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_DISAPPROVED;
-    }
-
-    public function isAccountBlocked(): bool
-    {
-        return in_array(
-            $this->approval_status ?? self::APPROVAL_APPROVED,
-            [self::APPROVAL_PENDING, self::APPROVAL_DISAPPROVED],
-            true
-        );
-    }
-
-    public function approvalStatusLabel(): string
-    {
-        return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));
-    }
-
-    public function approvalStatusBadgeClass(): string
-    {
-        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
-            self::APPROVAL_PENDING => 'approval-pill-pending',
-            self::APPROVAL_APPROVED => 'approval-pill-approved',
-            self::APPROVAL_DISAPPROVED => 'approval-pill-disapproved',
-            default => 'approval-pill-approved',
-        };
-    }
-
-    public function approvalStatusMessage(): string
-    {
-        return match ($this->approval_status ?? self::APPROVAL_APPROVED) {
-            self::APPROVAL_PENDING => 'Your account is pending admin approval. Please wait for the administrator to approve it before signing in.',
-            self::APPROVAL_DISAPPROVED => $this->approvalDisapprovedMessage(),
-            default => 'Your account is pending admin approval. Please wait for the administrator to approve it before signing in.',
-        };
-    }
-
-    public function approvalDisapprovedMessage(): string
-    {
-        $reason = trim((string) ($this->disapproval_reason ?? ''));
-
-        if ($reason !== '') {
-            return 'Your account was disapproved by an administrator. Reason: ' . $reason;
-        }
-
-        return 'Your account was disapproved by an administrator. Please contact the office for assistance.';
     }
 
     public function hasPermission(string $permission): bool

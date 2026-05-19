@@ -266,6 +266,12 @@ class ReferralController extends Controller
             );
         }
 
+        if ($isApplicantUser) {
+            return redirect()
+                ->to(route('applicants.index').'#referral-compliance')
+                ->with('success', 'Referral updated successfully.');
+        }
+
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#referral')
             ->with('success', 'Referral updated successfully.');

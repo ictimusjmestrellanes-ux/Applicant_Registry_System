@@ -52,7 +52,6 @@ class AuthController extends Controller
             'hiring_company' => null,
             'position_hired' => null,
             'first_time_job_seeker' => null,
-            'portal_password' => $user->password,
         ]);
 
         $user->forceFill([
@@ -165,6 +164,7 @@ class AuthController extends Controller
                 'hiring_company' => null,
                 'position_hired' => null,
                 'first_time_job_seeker' => null,
+                'profile_completed' => false,
             ]);
 
             $user = User::create([
@@ -180,13 +180,8 @@ class AuthController extends Controller
                 'role' => User::ROLE_USER,
                 'permissions' => [],
                 'auth_provider' => 'local',
-                'approval_status' => User::APPROVAL_APPROVED,
                 'applicant_id' => $applicant->id,
             ]);
-
-            $applicant->forceFill([
-                'portal_password' => $user->password,
-            ])->saveQuietly();
 
             ActivityLogger::log(
                 'applicant',
@@ -233,20 +228,6 @@ class AuthController extends Controller
 
         $this->ensureApplicantRecord($user);
 
-        if ($user->role === User::ROLE_USER && $user->approval_status === User::APPROVAL_PENDING) {
-            $user->approval_status = User::APPROVAL_APPROVED;
-            $user->saveQuietly();
-        }
-
-        if ($user->approval_status === User::APPROVAL_DISAPPROVED) {
-            return back()
-                ->withErrors([
-                    'username' => $user->approvalStatusMessage(),
-                ])
-                ->with('approval_notice', $user->approvalStatusMessage())
-                ->onlyInput('username');
-        }
-
         Auth::login($user);
         $request->session()->regenerate();
 
@@ -264,7 +245,7 @@ class AuthController extends Controller
             $user
         );
 
-        return redirect()->intended('dashboard');
+        return redirect()->route('dashboard');
     }
 
     // Handle login post
@@ -296,26 +277,8 @@ class AuthController extends Controller
             ])) {
                 $authenticatedUser = Auth::user();
 
-                if ($authenticatedUser?->role === User::ROLE_USER && $authenticatedUser->approval_status === User::APPROVAL_PENDING) {
-                    $authenticatedUser->approval_status = User::APPROVAL_APPROVED;
-                    $authenticatedUser->saveQuietly();
-                }
-
                 if ($authenticatedUser?->role === User::ROLE_USER) {
                     $this->ensureApplicantRecord($authenticatedUser);
-                }
-
-                if ($authenticatedUser?->isAccountBlocked()) {
-                    $approvalMessage = $authenticatedUser->approvalStatusMessage();
-
-                    Auth::logout();
-
-                    return back()
-                        ->withErrors([
-                            'email' => $approvalMessage,
-                        ])
-                        ->with('approval_notice', $approvalMessage)
-                        ->onlyInput('email');
                 }
 
                 $request->session()->regenerate();
@@ -334,7 +297,7 @@ class AuthController extends Controller
                     Auth::user()
                 );
 
-                return redirect()->intended('dashboard');
+                return redirect()->route('dashboard');
             }
 
             return back()->withErrors([
@@ -435,17 +398,6 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user && $user->role === User::ROLE_USER && $user->approval_status === User::APPROVAL_PENDING) {
-            $user->approval_status = User::APPROVAL_APPROVED;
-            $user->saveQuietly();
-        }
-
-        if ($user && $user->approval_status === User::APPROVAL_DISAPPROVED) {
-            return redirect()->route('login')->withErrors([
-                'email' => $user->approvalStatusMessage(),
-            ])->with('approval_notice', $user->approvalStatusMessage());
-        }
-
         if (! $user) {
             $user = User::create([
                 'name' => $azureUser->getName() ?: Str::before($email, '@'),
@@ -454,7 +406,6 @@ class AuthController extends Controller
                 'role' => User::ROLE_USER,
                 'permissions' => [],
                 'auth_provider' => 'azure',
-                'approval_status' => User::APPROVAL_APPROVED,
                 'email_verified_at' => now(),
             ]);
         }
@@ -482,7 +433,7 @@ class AuthController extends Controller
             $user
         );
 
-        return redirect()->intended('dashboard');
+        return redirect()->route('dashboard');
     }
 
     public function handleGoogleCallback(Request $request)
@@ -533,17 +484,6 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($user && $user->role === User::ROLE_USER && $user->approval_status === User::APPROVAL_PENDING) {
-            $user->approval_status = User::APPROVAL_APPROVED;
-            $user->saveQuietly();
-        }
-
-        if ($user && $user->approval_status === User::APPROVAL_DISAPPROVED) {
-            return redirect()->route('login')->withErrors([
-                'email' => $user->approvalStatusMessage(),
-            ])->with('approval_notice', $user->approvalStatusMessage());
-        }
-
         if (! $user) {
             $user = User::create([
                 'name' => $googleUser->getName() ?: Str::before($email, '@'),
@@ -552,7 +492,6 @@ class AuthController extends Controller
                 'role' => User::ROLE_USER,
                 'permissions' => [],
                 'auth_provider' => 'google',
-                'approval_status' => User::APPROVAL_APPROVED,
                 'email_verified_at' => now(),
             ]);
         }
@@ -580,7 +519,7 @@ class AuthController extends Controller
             $user
         );
 
-        return redirect()->intended('dashboard');
+        return redirect()->route('dashboard');
     }
 
     // Logout user

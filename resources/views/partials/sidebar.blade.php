@@ -34,6 +34,16 @@
                 @php
                     $routeName = $item['route'] ?? null;
                     $isActive = false;
+                    $isApplicantPersonalInfo = false;
+                    $itemLabel = $item['label'] ?? '';
+                    $itemHref = $routeName && $routeName !== '#' ? route($routeName) : '#';
+                    $linkedApplicantId = auth()->user()?->linkedApplicant()?->id;
+
+                    if (($routeName ?? null) === 'applicants.index' && auth()->user()?->role === 'user') {
+                        $itemLabel = 'Personal info';
+                        $itemHref = $linkedApplicantId ? route('applicants.edit', $linkedApplicantId) : '#';
+                        $isApplicantPersonalInfo = request()->routeIs('applicants.edit');
+                    }
 
                     if ($routeName && $routeName !== '#') {
                         $isActive = request()->routeIs($routeName . '*');
@@ -47,6 +57,10 @@
                             }
                         }
                     }
+
+                    if ($isApplicantPersonalInfo) {
+                        $isActive = true;
+                    }
                 @endphp
 
                 @if (!empty($item['children']))
@@ -58,7 +72,7 @@
                                 <span class="sidebar-icon">
                                     <i class="{{ $item['icon'] }}"></i>
                                 </span>
-                                <span>{{ $item['label'] }}</span>
+                                <span>{{ $itemLabel }}</span>
                             </span>
                             <i class="bi bi-chevron-right chevron-icon"></i>
                         </a>
@@ -70,10 +84,20 @@
                                     @continue(isset($child['visible_roles']) && !in_array(auth()->user()?->role, $child['visible_roles'], true))
                                     @continue(($child['admin_only'] ?? false) && !auth()->user()?->isAdmin())
                                     @continue(isset($child['visible_permissions']) && !collect($child['visible_permissions'])->contains(fn ($permission) => auth()->user()?->hasPermission($permission)))
+                                    @php
+                                        $childLabel = $child['label'] ?? '';
+                                        $childHref = route($child['route']);
+
+                                        if (($child['route'] ?? null) === 'applicants.index' && auth()->user()?->role === 'user') {
+                                            $linkedApplicantId = auth()->user()?->linkedApplicant()?->id;
+                                            $childLabel = 'Personal Information';
+                                            $childHref = $linkedApplicantId ? route('applicants.edit', $linkedApplicantId) : '#';
+                                        }
+                                    @endphp
                                     <li>
-                                        <a href="{{ route($child['route']) }}"
-                                            class="sidebar-child-link {{ request()->routeIs($child['route'] . '*') ? 'active-child' : '' }}">
-                                            {{ $child['label'] }}
+                                        <a href="{{ $childHref }}"
+                                            class="sidebar-child-link {{ request()->routeIs($child['route'] . '*') || (auth()->user()?->role === 'user' && $child['route'] === 'applicants.index' && request()->routeIs('applicants.edit')) ? 'active-child' : '' }}">
+                                            {{ $childLabel }}
                                         </a>
                                     </li>
                                 @endforeach
@@ -82,12 +106,12 @@
                     </li>
                 @else
                     <li class="nav-item">
-                        <a href="{{ $routeName !== '#' ? route($routeName) : '#' }}"
+                        <a href="{{ $itemHref }}"
                             class="nav-link sidebar-link d-flex align-items-center {{ $isActive ? 'active' : '' }}">
                             <span class="sidebar-icon">
                                 <i class="{{ $item['icon'] }}"></i>
                             </span>
-                            <span>{{ $item['label'] }}</span>
+                            <span>{{ $itemLabel }}</span>
                         </a>
                     </li>
                 @endif

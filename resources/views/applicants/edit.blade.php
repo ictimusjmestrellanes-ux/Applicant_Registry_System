@@ -1,8 +1,62 @@
 @extends('layouts.app')
 
-@section('title', 'Update Applicant')
+@php
+    $pageTitle = (auth()->check() && auth()->user()?->role === \App\Models\User::ROLE_USER)
+        ? 'Update Profile Information'
+        : 'Update Applicant';
+@endphp
+
+@section('title', $pageTitle)
 
 @section('content')
+
+    @php
+        $timeGreeting = (now()->hour >= 0 && now()->hour <= 11) ? 'Good Morning' : ((now()->hour >= 12 && now()->hour <= 17) ? 'Good Afternoon' : 'Good Evening');
+    @endphp
+
+    <style>
+        .hero-panel {
+            background: white;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(1.9rem, 3vw, 2.75rem);
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .hero-copy {
+            color: #64748b;
+        }
+    </style>
+
+    <section class="hero-panel mb-4">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-8">
+                <h2 class="hero-title mb-2">{{ $timeGreeting }}, {{ Auth::user()->name }}</h2>
+                <p class="hero-copy mb-0">
+                    Update your profile details, complete your requirements, and keep your applicant records up to date.
+                </p>
+            </div>
+        </div>
+    </section>
 
     @if(session('created_success'))
 
@@ -64,7 +118,9 @@
         $disapproveRequirement = session('disapprove_requirement');
         $disapproveRequirementId = session('disapprove_requirement_id');
 
-        $permit = optional($applicant->permit);
+        $permitModel = $applicant->permit;
+        $permit = optional($permitModel);
+        $isPermitRenewalDue = $permitModel ? $permitModel->isRenewalDue() : false;
         $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
         $hasPermitClearance =
             ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
@@ -1297,7 +1353,6 @@
                             </span>
                         </button>
                     </li>
-
                 </ul>
             </div>
 
@@ -1468,12 +1523,14 @@
                                         <label class="form-label">Hiring Company <span
                                                 class="required-mark">*</span></label>
                                         <input type="text" name="hiring_company" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
                                             value="{{ $applicant->hiring_company }}" placeholder="e.g. Tech Corp" required>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Position Hired <span
                                                 class="required-mark">*</span></label>
                                         <input type="text" name="position_hired" class="form-control"
+                                            oninput="this.value = this.value.toUpperCase()"
                                             value="{{ $applicant->position_hired }}" placeholder="e.g. Software Engineer"
                                             required>
                                     </div>
@@ -1485,12 +1542,14 @@
 
                                 <button type="submit" class="btn btn-success px-5 py-2">
                                     <i class="fa-solid fa-check me-2"></i>
-                                    Update Applicant Profile
+                                    {{ auth()->user()?->role === 'user' ? 'Update Profile Info' : 'Update Applicant Profile' }}
                                 </button>
 
-                                <a href="{{ route('applicants.index') }}" class="btn btn-light border px-4 py-2">
-                                    Cancel
-                                </a>
+                                @unless(auth()->user()?->role === 'user')
+                                    <a href="{{ route('applicants.index') }}" class="btn btn-light border px-4 py-2">
+                                        Cancel
+                                    </a>
+                                @endunless
 
                             </div>
                         </form>
@@ -1537,6 +1596,13 @@
                             @endif
                         </div>
 
+                        @if($isPermitRenewalDue)
+                            <div class="alert alert-warning border-0 shadow-sm mb-3">
+                                <strong>Renewal due:</strong> this permit has reached its 6-month renewal cycle.
+                                The current upload set is refreshed when renewal is due, and new files are required before saving.
+                            </div>
+                        @endif
+
                         <div class="row g-3 permit-upload-row">
                             {{-- 1. NBI / Police Clearance --}}
                             <div class="col-md-3 permit-upload-col">
@@ -1557,7 +1623,7 @@
                                     <div class="gap-2" id="nbi_section" style="display:none">
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="nbi_input" name="permit_nbi_clearance" class="d-none"
-                                            onchange="showFileName(this, 'nbi_name')" {{ empty($permit->permit_nbi_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'nbi_name')" {{ empty($permit->permit_nbi_clearance) || $isPermitRenewalDue ? 'required' : '' }}>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="nbi_input" class="btn btn-outline-primary btn-sm">
@@ -1565,10 +1631,10 @@
                                         </label>
 
                                         <small id="nbi_name" class="file-name-text">
-                                            {{ !empty($permit->permit_nbi_clearance) ? basename($permit->permit_nbi_clearance) : 'No file selected' }}
+                                            {{ $isPermitRenewalDue ? 'Renewal due - upload a new file' : (!empty($permit->permit_nbi_clearance) ? basename($permit->permit_nbi_clearance) : 'No file selected') }}
                                         </small>
 
-                                        @if(!empty($permit->permit_nbi_clearance))
+                                        @if(!empty($permit->permit_nbi_clearance) && ! $isPermitRenewalDue)
                                             <a href="{{ route('storage.view', ['filename' => $permit->permit_nbi_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
@@ -1581,7 +1647,7 @@
 
                                         <!-- FILE INPUT (HIDDEN BUT CLICKABLE VIA LABEL) -->
                                         <input type="file" id="police_input" name="permit_police_clearance" class="d-none"
-                                            onchange="showFileName(this, 'police_name')" {{ empty($permit->permit_police_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'police_name')" {{ empty($permit->permit_police_clearance) || $isPermitRenewalDue ? 'required' : '' }}>
 
                                         <!-- USE LABEL INSTEAD OF BUTTON -->
                                         <label for="police_input" class="btn btn-outline-primary btn-sm">
@@ -1590,11 +1656,11 @@
 
                                         <!-- FILE NAME -->
                                         <small id="police_name" class="file-name-text">
-                                            {{ !empty($permit->permit_police_clearance) ? basename($permit->permit_police_clearance) : 'No file selected' }}
+                                            {{ $isPermitRenewalDue ? 'Renewal due - upload a new file' : (!empty($permit->permit_police_clearance) ? basename($permit->permit_police_clearance) : 'No file selected') }}
                                         </small>
 
                                         <!-- VIEW FILE -->
-                                        @if(!empty($permit->permit_police_clearance))
+                                        @if(!empty($permit->permit_police_clearance) && ! $isPermitRenewalDue)
                                             <a href="{{ route('storage.view', ['filename' => $permit->permit_police_clearance]) }}" target="_blank"
                                                 class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
@@ -2652,46 +2718,21 @@
         const referralForm = referralTypeSelect ? referralTypeSelect.closest("form") : null;
         let nextPesoDetailIndex = pesoExtraDetails ? pesoExtraDetails.querySelectorAll(".js-peso-extra-detail").length : 0;
 
-        const activateReferralTabFromHash = () => {
-            if (window.location.hash !== "#referral") {
+        const activateTabFromHash = (hash) => {
+            if (window.location.hash !== hash) {
                 return;
             }
 
-            const referralTabTrigger = document.querySelector('[data-bs-target="#referral"]');
+            const tabTrigger = document.querySelector(`[data-bs-target="${hash}"]`);
 
-            if (referralTabTrigger && window.bootstrap && window.bootstrap.Tab) {
-                window.bootstrap.Tab.getOrCreateInstance(referralTabTrigger).show();
+            if (tabTrigger && window.bootstrap && window.bootstrap.Tab) {
+                window.bootstrap.Tab.getOrCreateInstance(tabTrigger).show();
             }
         };
 
-        const activateClearanceTabFromHash = () => {
-            if (window.location.hash !== "#clearance") {
-                return;
-            }
-
-            const clearanceTabTrigger = document.querySelector('[data-bs-target="#clearance"]');
-
-            if (clearanceTabTrigger && window.bootstrap && window.bootstrap.Tab) {
-                window.bootstrap.Tab.getOrCreateInstance(clearanceTabTrigger).show();
-            }
-        };
-
-        const activatePermitTabFromHash = () => {
-            if (window.location.hash !== "#permit") {
-                return;
-            }
-
-            const permitTabTrigger = document.querySelector('[data-bs-target="#permit"]');
-
-            if (permitTabTrigger && window.bootstrap && window.bootstrap.Tab) {
-                window.bootstrap.Tab.getOrCreateInstance(permitTabTrigger).show();
-            }
-        };
-
-        activateReferralTabFromHash();
-        activateClearanceTabFromHash();
-        activatePermitTabFromHash();
-
+        activateTabFromHash("#referral");
+        activateTabFromHash("#clearance");
+        activateTabFromHash("#permit");
         if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
             const setGroupDisabledState = (container, shouldDisable) => {
                 container.querySelectorAll("input, select, textarea").forEach(field => {
@@ -3597,21 +3638,25 @@
         const permitDate = document.getElementById("permit_date");
         const expiresOn = document.getElementById("expires_on");
 
-        permitDate.addEventListener("change", function () {
+        const updateExpiryToMonthEnd = function () {
+            if (!permitDate || !expiresOn || !permitDate.value) {
+                return;
+            }
 
-            if (!this.value) return;
-
-            let date = new Date(this.value);
-
-            // Add 6 months
-            date.setMonth(date.getMonth() + 6);
-
-            // Fix date format (YYYY-MM-DD)
-            let formatted = date.toISOString().split('T')[0];
+            const selectedDate = new Date(`${permitDate.value}T00:00:00`);
+            const expiryBase = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 6, 1);
+            const monthEnd = new Date(expiryBase.getFullYear(), expiryBase.getMonth() + 1, 0);
+            const formatted = [
+                monthEnd.getFullYear(),
+                String(monthEnd.getMonth() + 1).padStart(2, '0'),
+                String(monthEnd.getDate()).padStart(2, '0'),
+            ].join('-');
 
             expiresOn.value = formatted;
+        };
 
-        });
+        permitDate?.addEventListener("change", updateExpiryToMonthEnd);
+        updateExpiryToMonthEnd();
 
     });
 </script>
@@ -3627,6 +3672,7 @@
         const hasNbiFile = @json(!empty($permit->permit_nbi_clearance));
         const hasPoliceFile = @json(!empty($permit->permit_police_clearance));
         const selectedClearanceType = @json($selectedClearanceType);
+        const isPermitRenewalDue = @json($isPermitRenewalDue);
 
         function toggleFields() {
             const value = dropdown.value || selectedClearanceType || (hasPoliceFile ? "police" : (hasNbiFile ? "nbi" : ""));
@@ -3634,14 +3680,14 @@
             if (value === "nbi") {
                 nbi.style.display = "grid";
                 police.style.display = "none";
-                if (nbiInput) nbiInput.required = !hasNbiFile;
+                if (nbiInput) nbiInput.required = !hasNbiFile || isPermitRenewalDue;
                 if (policeInput) policeInput.required = false;
             }
             else if (value === "police") {
                 nbi.style.display = "none";
                 police.style.display = "grid";
                 if (nbiInput) nbiInput.required = false;
-                if (policeInput) policeInput.required = !hasPoliceFile;
+                if (policeInput) policeInput.required = !hasPoliceFile || isPermitRenewalDue;
             }
             else {
                 nbi.style.display = "none";

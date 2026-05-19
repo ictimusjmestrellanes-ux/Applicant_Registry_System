@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applicant;
+use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 
@@ -35,6 +36,9 @@ class ApplicantController extends Controller
         ]);
 
         $applicant = Applicant::create($request->all());
+        $applicant->forceFill([
+            'profile_completed' => true,
+        ])->saveQuietly();
 
         ActivityLogger::log(
             'applicant',
@@ -163,6 +167,12 @@ class ApplicantController extends Controller
 
     public function edit($id)
     {
+        if (auth()->check() && auth()->user()->role === 'user') {
+            $linkedApplicantId = auth()->user()?->linkedApplicant()?->id;
+
+            abort_if((int) $id !== (int) $linkedApplicantId, 403, 'You can only view your own applicant record.');
+        }
+
         $applicant = Applicant::with(['permit', 'clearance', 'referral'])->findOrFail($id);
         $activityLogs = $applicant->activityLogs()
             ->with('causer')
@@ -203,6 +213,9 @@ class ApplicantController extends Controller
             'position_hired' => $request->position_hired,
             'first_time_job_seeker' => $request->first_time_job_seeker,
         ]);
+        $applicant->forceFill([
+            'profile_completed' => true,
+        ])->saveQuietly();
 
         $changes = ActivityLogger::diff($before, $applicant->fresh()->only($applicant->getFillable()));
 
@@ -255,7 +268,7 @@ class ApplicantController extends Controller
 
     public function archive(Request $request)
     {
-        abort_if(auth()->user()?->role === 'user', 403, 'Only administrators can access the archive.');
+        abort_if(! auth()->user()?->hasPermission('view_archive_applicants') && ! auth()->user()?->isAdmin(), 403, 'You do not have permission to view archived applicants.');
 
         $search = trim((string) $request->search);
 
@@ -280,7 +293,7 @@ class ApplicantController extends Controller
 
     public function restore($id)
     {
-        abort_if(auth()->user()?->role === 'user', 403, 'Only administrators can restore applicants.');
+        abort_if(! auth()->user()?->hasPermission('restore_archive_applicants') && ! auth()->user()?->isAdmin(), 403, 'You do not have permission to restore archived applicants.');
 
         $applicant = Applicant::withTrashed()->findOrFail($id);
         $applicantName = trim($applicant->first_name.' '.$applicant->last_name);
@@ -320,6 +333,7 @@ class ApplicantController extends Controller
         $dateTo = trim((string) ($filters['date_to'] ?? ''));
 
         return Applicant::query()
+            ->where('profile_completed', true)
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery->where('first_name', 'like', "%{$search}%")

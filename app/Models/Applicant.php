@@ -28,18 +28,8 @@ class Applicant extends Model
         'hiring_company',
         'position_hired',
         'first_time_job_seeker',
+        'profile_completed',
     ];
-
-    protected static function booted(): void
-    {
-        static::created(function (Applicant $applicant) {
-            if (empty($applicant->portal_password)) {
-                $applicant->forceFill([
-                    'portal_password' => null,
-                ])->saveQuietly();
-            }
-        });
-    }
 
     public function permit()
     {

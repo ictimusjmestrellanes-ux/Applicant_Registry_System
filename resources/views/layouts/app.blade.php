@@ -94,12 +94,9 @@
 
 <body>
     <div id="sidebar-overlay"></div>
-    
-    <button id="sidebarToggle" class="btn-toggle-sidebar d-lg-none" type="button" aria-label="Toggle sidebar">
-        <i class="bi bi-list"></i>
-    </button>
 
     @include('partials.sidebar')
+    @include('partials.navbar')
 
     <div class="main-content">
         <div class="content">

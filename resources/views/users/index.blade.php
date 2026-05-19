@@ -260,6 +260,22 @@
             background: var(--users-slate);
         }
 
+        .btn-delete-user {
+            border-radius: 14px;
+            padding: 10px 18px;
+            font-weight: 700;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            background: #fff5f5;
+            transition: all 0.2s ease;
+        }
+
+        .btn-delete-user:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+            transform: translateY(-1px);
+        }
+
         .users-table-wrap {
             overflow: hidden;
             border-radius: 20px;
@@ -698,7 +714,6 @@
                                 <tr>
                                     <th>User</th>
                                     <th>Role</th>
-                                    <th>Status</th>
                                     <th>Permissions</th>
                                     <th>Provider</th>
                                     <th class="text-center">Action</th>
@@ -721,11 +736,6 @@
                                         <td>
                                             <span class="role-pill {{ $user->roleBadgeClass() }}">
                                                 {{ $user->roleLabel() }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="role-pill {{ $user->approvalStatusBadgeClass() }}">
-                                                {{ $user->approvalStatusLabel() }}
                                             </span>
                                         </td>
                                         <td>
@@ -757,13 +767,23 @@
                                                     <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </a>
+                                                    @unless(auth()->user()?->id === $user->id)
+                                                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline"
+                                                            onsubmit="return confirm('Delete this user account? This cannot be undone.');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-delete-user" title="Delete user">
+                                                                <i class="bi bi-trash3"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endunless
                                                 @endif
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6">
+                                        <td colspan="5">
                                             <div class="empty-state">
                                                 <div class="empty-icon">
                                                     <i class="bi bi-people"></i>
@@ -798,6 +818,16 @@
                                         <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
+                                        @unless(auth()->user()?->id === $user->id)
+                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline"
+                                                onsubmit="return confirm('Delete this user account? This cannot be undone.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-delete-user" title="Delete user">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </form>
+                                        @endunless
                                     @endif
                                 </div>
                             </div>
@@ -808,15 +838,6 @@
                                     <div>
                                         <span class="role-pill {{ $user->roleBadgeClass() }}">
                                             {{ $user->roleLabel() }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="mobile-user-row">
-                                    <div class="mobile-user-label">Status</div>
-                                    <div>
-                                        <span class="role-pill {{ $user->approvalStatusBadgeClass() }}">
-                                            {{ $user->approvalStatusLabel() }}
                                         </span>
                                     </div>
                                 </div>

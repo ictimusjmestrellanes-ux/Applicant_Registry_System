@@ -43,6 +43,25 @@ class PermitController extends Controller
         ]);
         $wasRecentlyCreated = ! $permit->exists;
         $before = $permit->exists ? $permit->only($permit->getFillable()) : [];
+        $renewalDueDate = $permit->exists ? $permit->renewalDueDate() : null;
+        $isRenewalDue = $permit->exists && $permit->isRenewalDue();
+
+        if ($isRenewalDue) {
+            $approvalStatus = MayorsPermit::APPROVAL_PENDING;
+        }
+
+        if ($isRenewalDue && $renewalDueDate) {
+            $permit->forceFill([
+                'health_card' => null,
+                'permit_nbi_clearance' => null,
+                'permit_police_clearance' => null,
+                'cedula' => null,
+                'referral_letter' => null,
+                'clearance_type' => null,
+                'approval_status' => MayorsPermit::APPROVAL_PENDING,
+                'disapproval_reason' => null,
+            ]);
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -239,6 +258,12 @@ class PermitController extends Controller
                 $changes,
                 $request->user()
             );
+        }
+
+        if ($isApplicantUser) {
+            return redirect()
+                ->to(route('applicants.index').'#permit-compliance')
+                ->with('success', 'Permit updated successfully.');
         }
 
         return redirect()

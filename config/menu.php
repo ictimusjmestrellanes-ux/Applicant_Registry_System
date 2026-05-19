@@ -12,13 +12,20 @@ return [
         'label' => 'Applicants',
         'icon' => 'bi bi-person-plus',
         'route' => '#',
+        'visible_roles' => ['admin', 'staff'],
         'children' => [
-            ['label' => 'Add Applicant', 'route' => 'applicants.create'],
+            ['label' => 'Add Applicant', 'route' => 'applicants.create', 'visible_roles' => ['admin', 'staff']],
             ['label' => 'List of Applicants', 'route' => 'applicants.index'],
-            ['label' => 'Archived Applicants', 'route' => 'applicants.archive', 'visible_roles' => ['admin', 'staff']],
         ],
     ],
-    
+
+    [
+        'label' => 'Archive Applicants',
+        'icon' => 'bi bi-archive',
+        'route' => 'applicants.archive',
+        'visible_permissions' => ['view_archive_applicants'],
+    ],
+
     [
         'label' => 'Users',
         'icon' => 'bi bi-people',

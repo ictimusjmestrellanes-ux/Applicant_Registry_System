@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
 
     Route::get('/reports', function () {
@@ -54,13 +55,13 @@ Route::middleware('auth')->group(function () {
     // ✅ MOVE THESE ABOVE RESOURCE
 });
 
-Route::get('applicants/archive', [ApplicantController::class, 'archive'])->middleware('auth')
+Route::get('applicants/archive', [ApplicantController::class, 'archive'])->middleware(['auth', 'permission:view_archive_applicants'])
     ->name('applicants.archive');
 
 Route::get('applicants/export', [ApplicantController::class, 'export'])->middleware('auth')
     ->name('applicants.export');
 
-Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->middleware('auth')
+Route::post('applicants/restore/{id}', [ApplicantController::class, 'restore'])->middleware(['auth', 'permission:restore_archive_applicants'])
     ->name('applicants.restore');
 
 Route::get('/applicants/{applicant}/view-file/{field}',

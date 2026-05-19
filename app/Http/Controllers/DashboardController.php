@@ -5,29 +5,75 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Applicant;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+
+        if ($user?->role === User::ROLE_USER) {
+            $applicant = $user->linkedApplicant();
+
+            abort_if(! $applicant, 403, 'Your account is not linked to an applicant record.');
+
+            $applicant->loadMissing(['permit', 'clearance', 'referral']);
+
+            return view('applicants.edit', compact('applicant'));
+        }
+
         $menuItems = Config::get('menu');
         $applicants = Applicant::with(['permit', 'clearance', 'referral'])
             ->withoutTrashed()
             ->latest()
             ->get();
-        $chartYear = 2026;
-        $monthlyApplicants = collect(range(1, 12))
-            ->map(function (int $month) use ($chartYear) {
-                return [
-                    'label' => now()->setMonth($month)->format('M'),
-                    'count' => Applicant::query()
-                        ->withoutTrashed()
-                        ->whereYear('created_at', $chartYear)
-                        ->whereMonth('created_at', $month)
-                        ->count(),
-                ];
-            });
+        $yearlyApplicantTrends = Applicant::query()
+            ->withoutTrashed()
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as total')
+            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->orderByRaw('YEAR(created_at), MONTH(created_at)')
+            ->get();
+
+        $trendMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $trendYears = $yearlyApplicantTrends
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->unique()
+            ->values();
+
+        $trendPalette = [
+            ['border' => '#ff5c7a', 'background' => 'rgba(255, 92, 122, 0.14)'],
+            ['border' => '#3b82f6', 'background' => 'rgba(59, 130, 246, 0.14)'],
+            ['border' => '#16a34a', 'background' => 'rgba(22, 163, 74, 0.14)'],
+            ['border' => '#7c3aed', 'background' => 'rgba(124, 58, 237, 0.14)'],
+            ['border' => '#ea580c', 'background' => 'rgba(234, 88, 12, 0.14)'],
+            ['border' => '#0f766e', 'background' => 'rgba(15, 118, 110, 0.14)'],
+        ];
+
+        $yearlyApplicantTrendDatasets = $trendYears->map(function (int $year, int $index) use ($yearlyApplicantTrends, $trendPalette) {
+            $palette = $trendPalette[$index % count($trendPalette)];
+            $yearRows = $yearlyApplicantTrends
+                ->where('year', $year)
+                ->keyBy('month');
+
+            $data = collect(range(1, 12))
+                ->map(function (int $month) use ($yearRows) {
+                    return (int) ($yearRows->get($month)?->total ?? 0);
+                })
+                ->values();
+
+            return [
+                'label' => (string) $year,
+                'data' => $data,
+                'borderColor' => $palette['border'],
+                'backgroundColor' => $palette['background'],
+                'pointBackgroundColor' => $palette['border'],
+                'pointBorderColor' => '#ffffff',
+                'fill' => false,
+            ];
+        })->values();
 
         $normalizeValue = static function ($value, string $fallback = 'UNSPECIFIED') {
             $value = is_string($value) ? trim($value) : '';
@@ -91,7 +137,11 @@ class DashboardController extends Controller
             ->values();
 
         $totalApplicants = $applicants->count();
-        $newThisMonth = $monthlyApplicants[now()->month - 1]['count'] ?? 0;
+        $newThisMonth = Applicant::query()
+            ->withoutTrashed()
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
         $totalClearances = Applicant::query()
             ->whereHas('clearance', function ($query) {
                 $query->whereNotNull('clearance_peso_control_no');
@@ -156,7 +206,13 @@ class DashboardController extends Controller
             ->latest()
             ->take(6)
             ->get();
-        $maxMonthlyApplicants = max($monthlyApplicants->max('count') ?? 0, 1);
+        $maxMonthlyApplicants = max(
+            $yearlyApplicantTrendDatasets
+                ->pluck('data')
+                ->flatten()
+                ->max() ?? 0,
+            1
+        );
         $maxGenderApplicants = max($genderBreakdown->max('count') ?? 0, 1);
         $maxCityApplicants = max($cityBreakdown->max('count') ?? 0, 1);
         $maxProvinceApplicants = max($provinceBreakdown->max('count') ?? 0, 1);
@@ -167,8 +223,9 @@ class DashboardController extends Controller
             'menuItems',
             'summary',
             'completion',
-            'chartYear',
-            'monthlyApplicants',
+            'trendMonths',
+            'trendYears',
+            'yearlyApplicantTrendDatasets',
             'maxMonthlyApplicants',
             'genderBreakdown',
             'maxGenderApplicants',
