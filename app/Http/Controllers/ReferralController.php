@@ -6,6 +6,7 @@ use App\Models\Applicant;
 use App\Models\MayorsReferral;
 use App\Models\User;
 use App\Notifications\ApplicantDocumentApprovedNotification;
+use App\Notifications\ApplicantDocumentDisapprovedNotification;
 use App\Notifications\ApplicantFileSubmittedNotification;
 use App\Support\ActivityLogger;
 use Illuminate\Http\JsonResponse;
@@ -62,7 +63,9 @@ class ReferralController extends Controller
         $before = $referral->exists ? $referral->only($referral->getFillable()) : [];
         $approvalStatus = $isApplicantUser
             ? MayorsReferral::APPROVAL_PENDING
-            : MayorsReferral::APPROVAL_APPROVED;
+            : ($request->user()?->hasPermission('auto_approve_uploaded_files')
+                ? MayorsReferral::APPROVAL_APPROVED
+                : MayorsReferral::APPROVAL_PENDING);
         $fullName = Str::lower(Str::slug($applicant->last_name, '_'));
 
         $fileFields = [
@@ -301,7 +304,7 @@ class ReferralController extends Controller
 
         if ($isApplicantUser) {
             return redirect()
-                ->to(route('applicants.index').'#referral-compliance')
+                ->route('dashboard')
                 ->with('success', 'Referral updated successfully.');
         }
 
@@ -375,8 +378,6 @@ class ReferralController extends Controller
 
     public function disapprove(Request $request, $id)
     {
-        abort_if($request->user()?->isAdmin(), 403, 'Admins cannot disapprove referral requirements.');
-
         $validator = Validator::make($request->all(), [
             'disapproval_reason' => ['required', 'string', 'max:2000'],
         ]);
@@ -410,6 +411,25 @@ class ReferralController extends Controller
             $changes,
             $request->user()
         );
+
+        $applicantUser = User::query()->where('applicant_id', $applicant->id)->first();
+
+        if ($applicantUser) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            $applicantUser->notify(new ApplicantDocumentDisapprovedNotification(
+                $applicantName !== '' ? $applicantName : 'Your application',
+                $applicant->id,
+                "Mayor's Referral",
+                $validated['disapproval_reason'],
+                route('applicants.edit', $applicant->id).'#referral'
+            ));
+        }
 
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#referral')

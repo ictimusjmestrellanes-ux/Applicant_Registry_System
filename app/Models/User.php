@@ -103,6 +103,7 @@ class User extends Authenticatable
             'update_referral' => "Update Mayor's Referral",
             'generate_referral' => "Generate Mayor's Referral Letter",
             'approve_document' => 'Approve Submitted Documents',
+            'auto_approve_uploaded_files' => 'Auto-Approve Uploaded Files',
             'view_archive_applicants' => 'View Archived Applicants',
             'restore_archive_applicants' => 'Restore Archived Applicants',
         ];

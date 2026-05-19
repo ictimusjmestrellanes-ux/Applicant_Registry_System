@@ -6,6 +6,7 @@ use App\Models\Applicant;
 use App\Models\MayorsClearance;
 use App\Models\User;
 use App\Notifications\ApplicantDocumentApprovedNotification;
+use App\Notifications\ApplicantDocumentDisapprovedNotification;
 use App\Notifications\ApplicantFileSubmittedNotification;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
@@ -45,7 +46,9 @@ class ClearanceController extends Controller
         $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
         $approvalStatus = $isApplicantUser
             ? MayorsClearance::APPROVAL_PENDING
-            : MayorsClearance::APPROVAL_APPROVED;
+            : ($request->user()?->hasPermission('auto_approve_uploaded_files')
+                ? MayorsClearance::APPROVAL_APPROVED
+                : MayorsClearance::APPROVAL_PENDING);
 
         /*
         |--------------------------------------------------------------------------
@@ -252,7 +255,7 @@ class ClearanceController extends Controller
 
         if ($isApplicantUser) {
             return redirect()
-                ->to(route('applicants.index').'#clearance-compliance')
+                ->route('dashboard')
                 ->with('success', 'Clearance updated successfully.');
         }
 
@@ -313,8 +316,6 @@ class ClearanceController extends Controller
 
     public function disapprove(Request $request, $id)
     {
-        abort_if($request->user()?->isAdmin(), 403, 'Admins cannot disapprove clearance requirements.');
-
         $validator = Validator::make($request->all(), [
             'disapproval_reason' => ['required', 'string', 'max:2000'],
         ]);
@@ -348,6 +349,25 @@ class ClearanceController extends Controller
             $changes,
             $request->user()
         );
+
+        $applicantUser = User::query()->where('applicant_id', $applicant->id)->first();
+
+        if ($applicantUser) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            $applicantUser->notify(new ApplicantDocumentDisapprovedNotification(
+                $applicantName !== '' ? $applicantName : 'Your application',
+                $applicant->id,
+                "Mayor's Clearance",
+                $validated['disapproval_reason'],
+                route('applicants.edit', $applicant->id).'#clearance'
+            ));
+        }
 
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#clearance')

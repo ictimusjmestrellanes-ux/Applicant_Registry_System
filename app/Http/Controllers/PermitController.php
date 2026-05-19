@@ -6,6 +6,7 @@ use App\Models\Applicant;
 use App\Models\MayorsPermit;
 use App\Models\User;
 use App\Notifications\ApplicantDocumentApprovedNotification;
+use App\Notifications\ApplicantDocumentDisapprovedNotification;
 use App\Notifications\ApplicantFileSubmittedNotification;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
@@ -27,7 +28,9 @@ class PermitController extends Controller
         abort_if($isApplicantUser && $resolvedApplicantId <= 0, 403, 'Your account is not linked to an applicant record.');
         $approvalStatus = $isApplicantUser
             ? MayorsPermit::APPROVAL_PENDING
-            : MayorsPermit::APPROVAL_APPROVED;
+            : ($request->user()?->hasPermission('auto_approve_uploaded_files')
+                ? MayorsPermit::APPROVAL_APPROVED
+                : MayorsPermit::APPROVAL_PENDING);
 
         if ($isApplicantUser) {
             $id = $resolvedApplicantId;
@@ -394,6 +397,25 @@ class PermitController extends Controller
             $changes,
             $request->user()
         );
+
+        $applicantUser = User::query()->where('applicant_id', $applicant->id)->first();
+
+        if ($applicantUser) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            $applicantUser->notify(new ApplicantDocumentDisapprovedNotification(
+                $applicantName !== '' ? $applicantName : 'Your application',
+                $applicant->id,
+                "Mayor's Permit to Work",
+                $validated['disapproval_reason'],
+                route('applicants.edit', $applicant->id).'#permit'
+            ));
+        }
 
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#permit')

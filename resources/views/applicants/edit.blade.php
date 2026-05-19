@@ -1953,7 +1953,8 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="prosecutor_input" name="prosecutor_clearance"
-                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')" required>
+                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')"
+                                            {{ empty($clearance->prosecutor_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('prosecutor_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1977,7 +1978,8 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="mtc_input" name="mtc_clearance" style="display:none"
-                                            onchange="showFileName(this, 'mtc_name')" required>
+                                            onchange="showFileName(this, 'mtc_name')"
+                                            {{ empty($clearance->mtc_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('mtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2001,7 +2003,8 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="rtc_input" name="rtc_clearance" style="display:none"
-                                            onchange="showFileName(this, 'rtc_name')" required>
+                                            onchange="showFileName(this, 'rtc_name')"
+                                            {{ empty($clearance->rtc_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('rtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2024,7 +2027,8 @@
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="c_nbi_input" name="nbi_clearance" style="display:none"
-                                            onchange="showFileName(this, 'c_nbi_name')" required>
+                                            onchange="showFileName(this, 'c_nbi_name')"
+                                            {{ empty($clearance->nbi_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('c_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2047,7 +2051,8 @@
                                     <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="brgy_input" name="barangay_clearance" style="display:none"
-                                            onchange="showFileName(this, 'brgy_name')" required>
+                                            onchange="showFileName(this, 'brgy_name')"
+                                            {{ empty($clearance->barangay_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2120,7 +2125,7 @@
                             {{-- Update/Save Section --}}
                             @if($isApplicantUser || auth()->user()->hasPermission('update_clearance'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-certificate me-2"></i>Save Clearance
+                                    <i class="fa-solid fa-certificate me-2"></i>{{ $isApplicantUser ? 'Submit Upload File' : 'Save Clearance' }}
                                 </button>
                             @else
                                 <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
@@ -2129,6 +2134,32 @@
                                     </button>
                                 </span>
                             @endif
+
+                            @unless($isApplicantUser)
+                                @if(auth()->user()->hasPermission('approve_document') && $clearance && ! $clearance->isApproved() && $clearance->approval_status !== \App\Models\MayorsClearance::APPROVAL_DISAPPROVED)
+                                    <button type="submit" form="clearance-approve-form-{{ $applicant->id }}"
+                                        class="btn btn-success px-4 shadow-sm" formnovalidate>
+                                        <i class="fa-solid fa-circle-check me-2"></i>Approve Clearance Requirements
+                                    </button>
+                                @endif
+                            @endunless
+
+                            @unless($isApplicantUser)
+                                @if(auth()->user()->hasPermission('approve_document') && $clearance && (
+                                    !empty($clearance->prosecutor_clearance) ||
+                                    !empty($clearance->mtc_clearance) ||
+                                    !empty($clearance->rtc_clearance) ||
+                                    !empty($clearance->nbi_clearance) ||
+                                    !empty($clearance->barangay_clearance)
+                                ))
+                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#disapproveClearanceModal-{{ $applicant->id }}">
+                                        <i class="fa-solid fa-circle-xmark me-2"></i>
+                                        {{ $clearance->approval_status === \App\Models\MayorsClearance::APPROVAL_DISAPPROVED ? 'Update Reason' : 'Disapprove Clearance Requirements' }}
+                                    </button>
+                                @endif
+                            @endunless
 
                             @unless($isApplicantUser)
                                 {{-- Print Section --}}
@@ -2205,10 +2236,11 @@
 
                         <div class="mb-3">
                             <div class="document-upload-card-resume">
-                                <label class="form-label">Resume / Bio-data<span class="required-mark">*</span></label>
-                                <div class="d-grid gap-2">
-                                    <input type="file" id="resume_input" name="resume" style="display:none"
-                                        onchange="showFileName(this, 'resume_name')" required>
+                                    <label class="form-label">Resume / Bio-data<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" id="resume_input" name="resume" style="display:none"
+                                        onchange="showFileName(this, 'resume_name')"
+                                        {{ empty($referral->resume) ? 'required' : '' }}>
                                     <button type="button" class="btn btn-outline-primary btn-sm"
                                         onclick="document.getElementById('resume_input').click()">
                                         <i class="fas fa-upload me-1"></i> Upload File
@@ -2389,23 +2421,28 @@
                                                         required>
                                                 </div>
                                             </div>
-                                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                                <div class="mt-3">
+                                            @php
+                                                $pesoReferralReason = !auth()->user()->hasPermission('generate_referral')
+                                                    ? 'No permission to generate letter'
+                                                    : (($referral && ! $referral->canPrint())
+                                                        ? 'Awaiting admin or staff approval'
+                                                        : null);
+                                            @endphp
+                                            <div class="mt-3">
+                                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
                                                     <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
                                                         id="printReferralPesoButton" class="btn btn-outline-primary px-4"
                                                         target="_blank">
                                                         View Employer Letter Detail 1
                                                     </a>
-                                                </div>
-                                            @else
-                                                <div class="mt-3">
+                                                @else
                                                     <button type="button" id="printReferralPesoButton"
-                                                        class="btn btn-outline-secondary justify-content-center px-4" disabled
-                                                        title="{{ !auth()->user()->hasPermission('generate_referral') ? 'No permission to generate letter' : (($referral && ! $referral->isApproved()) ? 'Awaiting admin or staff approval' : 'Complete all requirements first') }}">
+                                                        class="btn btn-outline-secondary justify-content-center px-4"
+                                                        disabled title="{{ $pesoReferralReason ?? 'Complete all requirements first' }}">
                                                         <i class="fas fa-print me-1"></i> View Employer Letter Detail 1
                                                     </button>
-                                                </div>
-                                            @endif
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
 
@@ -2611,31 +2648,26 @@
 
                                         <div class="col-12">
                                             <div class="d-flex flex-wrap gap-2 mt-3">
+                                            @php
+                                                $referralReason = !auth()->user()->hasPermission('generate_referral')
+                                                    ? 'No permission to generate letter'
+                                                    : (($referral && ! $referral->canPrint())
+                                                        ? 'Awaiting admin or staff approval'
+                                                        : null);
+                                            @endphp
                                             @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
                                                 <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
                                                     id="printReferralOtherCityButton" class="btn btn-outline-primary px-4"
                                                     target="_blank">
                                                         <i class="fas fa-print me-1"></i> View Referral Letter
                                                 </a>
-                                                @elseif(!auth()->user()->hasPermission('generate_referral'))
-                                                    <button type="button" class="btn btn-outline-secondary px-4" disabled
-                                                        title="No permission to view referral letter">
-                                                        <i class="fas fa-print me-1"></i> No Permission
-                                                    </button>
-                                                @else
-                                                    @php
-                                                        $referralReason = !auth()->user()->hasPermission('generate_referral')
-                                                            ? 'No permission to generate letter'
-                                                            : (($referral && ! $referral->isApproved())
-                                                                ? 'Awaiting admin or staff approval'
-                                                                : 'Complete all requirements first');
-                                                    @endphp
-                                                    <button type="button" id="printReferralOtherCityButton"
-                                                        class="btn btn-outline-secondary px-4" disabled
-                                                        title="{{ $referralReason }}">
-                                                        <i class="fas fa-print me-1"></i> View Referral Letter
-                                                    </button>
-                                                @endif
+                                            @else
+                                                <button type="button" id="printReferralOtherCityButton"
+                                                    class="btn btn-outline-secondary px-4" disabled
+                                                    title="{{ $referralReason ?? 'Complete all requirements first' }}">
+                                                    <i class="fas fa-print me-1"></i> View Referral Letter
+                                                </button>
+                                            @endif
                                             </div>
                                         </div>
                                     </div>
@@ -2647,7 +2679,7 @@
                         <div class="referral-action-bar mt-4">
                             @if($isApplicantUser || auth()->user()->hasPermission('update_referral'))
                                 <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-file-export me-2"></i>Save Referral
+                                    <i class="fa-solid fa-file-export me-2"></i>{{ $isApplicantUser ? 'Submit Upload File' : 'Save Referral' }}
                                 </button>
                             @else
                                 <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
@@ -2656,6 +2688,54 @@
                                     </button>
                                 </span>
                             @endif
+
+                            @unless($isApplicantUser)
+                                @if(auth()->user()->hasPermission('approve_document') && $referral && ! $referral->isApproved() && $referral->approval_status !== \App\Models\MayorsReferral::APPROVAL_DISAPPROVED)
+                                    <button type="submit" form="referral-approve-form-{{ $applicant->id }}"
+                                        class="btn btn-success px-4 shadow-sm" formnovalidate>
+                                        <i class="fa-solid fa-circle-check me-2"></i>Approve Referral Requirements
+                                    </button>
+                                @endif
+                            @endunless
+
+                            @unless($isApplicantUser)
+                                @if(auth()->user()->hasPermission('approve_document') && $referral && (
+                                    !empty($referral->resume) ||
+                                    !empty($referral->biodata) ||
+                                    !empty($referral->ref_barangay_clearance) ||
+                                    !empty($referral->ref_police_clearance) ||
+                                    !empty($referral->ref_nbi_clearance)
+                                ))
+                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#disapproveReferralModal-{{ $applicant->id }}">
+                                        <i class="fa-solid fa-circle-xmark me-2"></i>
+                                        {{ $referral->approval_status === \App\Models\MayorsReferral::APPROVAL_DISAPPROVED ? 'Update Reason' : 'Disapprove Referral Requirements' }}
+                                    </button>
+                                @endif
+
+                                @php
+                                    $referralLetterReason = !auth()->user()->hasPermission('generate_referral')
+                                        ? 'No permission to view referral letter'
+                                        : (($referral && ! $referral->canPrint())
+                                            ? 'Awaiting admin or staff approval'
+                                            : 'Complete all requirements first');
+                                @endphp
+
+                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => $referral->referral_type === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT : \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
+                                        id="printReferralActionButton" class="btn btn-outline-primary px-4"
+                                        target="_blank">
+                                        <i class="fas fa-print me-1"></i> View Referral Letter
+                                    </a>
+                                @else
+                                    <button type="button" id="printReferralActionButton"
+                                        class="btn btn-outline-secondary px-4" disabled
+                                        title="{{ $referralLetterReason }}">
+                                        <i class="fas fa-print me-1"></i> View Referral Letter
+                                    </button>
+                                @endif
+                            @endunless
 
                         </div>
                     </form>
@@ -2691,6 +2771,96 @@
                         <div class="mb-0">
                             <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
                             <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason', $permit->disapproval_reason ?? '') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-circle-xmark me-1"></i>Confirm Disapprove
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <form id="clearance-approve-form-{{ $applicant->id }}" action="{{ route('clearances.approve', $applicant->id) }}" method="POST" class="d-none">
+        @csrf
+        @method('PUT')
+    </form>
+
+    <div class="modal fade" id="disapproveClearanceModal-{{ $applicant->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form action="{{ route('clearances.disapprove', $applicant->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title mb-1">Disapprove Clearance</h5>
+                            <div class="text-muted small">{{ auth()->user()->name ?? $fullName }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Please provide the reason for disapproving this requirement.</p>
+                        @if($errors->any())
+                            <div class="alert alert-danger border-0">
+                                <ul class="mb-0 small">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
+                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fa-solid fa-circle-xmark me-1"></i>Confirm Disapprove
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <form id="referral-approve-form-{{ $applicant->id }}" action="{{ route('referrals.approve', $applicant->id) }}" method="POST" class="d-none">
+        @csrf
+        @method('PUT')
+    </form>
+
+    <div class="modal fade" id="disapproveReferralModal-{{ $applicant->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form action="{{ route('referrals.disapprove', $applicant->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title mb-1">Disapprove Referral</h5>
+                            <div class="text-muted small">{{ auth()->user()->name ?? $fullName }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Please provide the reason for disapproving this requirement.</p>
+                        @if($errors->any())
+                            <div class="alert alert-danger border-0">
+                                <ul class="mb-0 small">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
+                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason') }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
