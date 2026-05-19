@@ -47,16 +47,18 @@
         }
     </style>
 
-    <section class="hero-panel mb-4">
-        <div class="row g-4 align-items-center">
-            <div class="col-lg-8">
-                <h2 class="hero-title mb-2">{{ $timeGreeting }}, {{ Auth::user()->name }}</h2>
-                <p class="hero-copy mb-0">
-                    Update your profile details, complete your requirements, and keep your applicant records up to date.
-                </p>
+    @if(auth()->check() && auth()->user()?->role === \App\Models\User::ROLE_USER)
+        <section class="hero-panel mb-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="hero-title mb-2">{{ $timeGreeting }}, {{ Auth::user()->name }}</h2>
+                    <p class="hero-copy mb-0">
+                        Update your profile details, complete your requirements, and keep your applicant records up to date.
+                    </p>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     @if(session('created_success'))
 
