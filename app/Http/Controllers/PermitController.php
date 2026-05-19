@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Models\MayorsPermit;
 use App\Models\User;
+use App\Notifications\ApplicantDocumentApprovedNotification;
+use App\Notifications\ApplicantFileSubmittedNotification;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -233,6 +236,10 @@ class PermitController extends Controller
             $permit->disapproval_reason = null;
         }
 
+        if ($isApplicantUser) {
+            $permit->disapproval_reason = null;
+        }
+
         $permit->save();
         $permit->setRelation('applicant', $applicant);
 
@@ -260,9 +267,36 @@ class PermitController extends Controller
             );
         }
 
+        $permitFileFields = [
+            'health_card',
+            'permit_nbi_clearance',
+            'permit_police_clearance',
+            'cedula',
+            'referral_letter',
+        ];
+
+        if ($isApplicantUser && collect($permitFileFields)->contains(fn (string $field) => $request->hasFile($field))) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            Notification::send(
+                User::query()->where('role', User::ROLE_STAFF)->get(),
+                new ApplicantFileSubmittedNotification(
+                    $applicantName !== '' ? $applicantName : 'An applicant',
+                    $applicant->id,
+                    "Mayor's Permit to Work files",
+                    route('applicants.edit', $applicant->id).'#permit'
+                )
+            );
+        }
+
         if ($isApplicantUser) {
             return redirect()
-                ->to(route('applicants.index').'#permit-compliance')
+                ->route('dashboard')
                 ->with('success', 'Permit updated successfully.');
         }
 
@@ -300,6 +334,24 @@ class PermitController extends Controller
             $request->user()
         );
 
+        $applicantUser = User::query()->where('applicant_id', $applicant->id)->first();
+
+        if ($applicantUser) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            $applicantUser->notify(new ApplicantDocumentApprovedNotification(
+                $applicantName !== '' ? $applicantName : 'Your application',
+                $applicant->id,
+                "Mayor's Permit to Work",
+                route('applicants.edit', $applicant->id).'#permit'
+            ));
+        }
+
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#permit')
             ->with('success', 'Permit approved successfully.');
@@ -307,6 +359,8 @@ class PermitController extends Controller
 
     public function disapprove(Request $request, $id)
     {
+        abort_if($request->user()?->isAdmin(), 403, 'Admins cannot disapprove permit requirements.');
+
         $validator = Validator::make($request->all(), [
             'disapproval_reason' => ['required', 'string', 'max:2000'],
         ]);

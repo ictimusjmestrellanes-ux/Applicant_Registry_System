@@ -34,6 +34,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/notifications/{notification}/read', function (string $notification) {
+        $user = auth()->user();
+        $record = $user?->notifications()->where('id', $notification)->firstOrFail();
+        $record->markAsRead();
+
+        $redirectUrl = data_get($record->data, 'url', route('dashboard'));
+
+        return redirect()->to($redirectUrl);
+    })->name('notifications.read');
 
     Route::get('/users', [UserController::class, 'index'])
         ->middleware(['auth'])

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Models\MayorsClearance;
 use App\Models\User;
+use App\Notifications\ApplicantDocumentApprovedNotification;
+use App\Notifications\ApplicantFileSubmittedNotification;
 use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -187,6 +190,10 @@ class ClearanceController extends Controller
             $clearance->disapproval_reason = null;
         }
 
+        if ($isApplicantUser) {
+            $clearance->disapproval_reason = null;
+        }
+
         /*
         |--------------------------------------------------------------------------
         | SAVE CLEARANCE
@@ -213,6 +220,33 @@ class ClearanceController extends Controller
                 $applicant,
                 $changes,
                 $request->user()
+            );
+        }
+
+        $clearanceFileFields = [
+            'prosecutor_clearance',
+            'mtc_clearance',
+            'rtc_clearance',
+            'nbi_clearance',
+            'barangay_clearance',
+        ];
+
+        if ($isApplicantUser && collect($clearanceFileFields)->contains(fn (string $field) => $request->hasFile($field))) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            Notification::send(
+                User::query()->where('role', User::ROLE_STAFF)->get(),
+                new ApplicantFileSubmittedNotification(
+                    $applicantName !== '' ? $applicantName : 'An applicant',
+                    $applicant->id,
+                    "Mayor's Clearance files",
+                    route('applicants.edit', $applicant->id).'#clearance'
+                )
             );
         }
 
@@ -254,6 +288,24 @@ class ClearanceController extends Controller
             $request->user()
         );
 
+        $applicantUser = User::query()->where('applicant_id', $applicant->id)->first();
+
+        if ($applicantUser) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            $applicantUser->notify(new ApplicantDocumentApprovedNotification(
+                $applicantName !== '' ? $applicantName : 'Your application',
+                $applicant->id,
+                "Mayor's Clearance",
+                route('applicants.edit', $applicant->id).'#clearance'
+            ));
+        }
+
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#clearance')
             ->with('success', 'Clearance approved successfully.');
@@ -261,6 +313,8 @@ class ClearanceController extends Controller
 
     public function disapprove(Request $request, $id)
     {
+        abort_if($request->user()?->isAdmin(), 403, 'Admins cannot disapprove clearance requirements.');
+
         $validator = Validator::make($request->all(), [
             'disapproval_reason' => ['required', 'string', 'max:2000'],
         ]);

@@ -1,6 +1,25 @@
 <nav class="navbar dashboard-navbar">
     @php
         $navProfileImageUrl = auth()->user()?->profileImageUrl();
+        $navIsAdminUser = auth()->check() && auth()->user()?->isAdmin();
+
+        if ($navIsAdminUser) {
+            $navUnreadNotifications = \Illuminate\Support\Facades\DB::table('notifications')
+                ->latest()
+                ->limit(10)
+                ->get()
+                ->map(function ($notification) {
+                    return (object) [
+                        'id' => $notification->id,
+                        'data' => json_decode($notification->data ?? '[]', true) ?: [],
+                        'read_at' => $notification->read_at,
+                    ];
+                });
+            $navUnreadCount = $navUnreadNotifications->count();
+        } else {
+            $navUnreadNotifications = auth()->check() ? auth()->user()->unreadNotifications : collect();
+            $navUnreadCount = auth()->check() ? auth()->user()->unreadNotifications()->count() : 0;
+        }
     @endphp
 
     <div class="container-fluid px-md-4 px-3">
@@ -15,6 +34,61 @@
         </div>
 
         <div class="d-flex align-items-center gap-2 gap-md-3">
+            <div class="dropdown">
+                <button class="nav-notification-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                    aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    @if($navUnreadCount > 0)
+                        <span class="notification-count">{{ $navUnreadCount > 99 ? '99+' : $navUnreadCount }}</span>
+                    @else
+                        <span class="notification-dot" aria-hidden="true"></span>
+                    @endif
+                </button>
+
+                <div class="dropdown-menu dropdown-menu-end notification-menu shadow-sm border-0">
+                    <div class="notification-menu-header">
+                        <div>
+                            <div class="notification-menu-title">Notifications</div>
+                            <div class="notification-menu-subtitle">Updates from the applicant portal</div>
+                        </div>
+                    </div>
+                    @if($navUnreadNotifications->count() > 0)
+                        <div class="notification-list">
+                            @foreach($navUnreadNotifications->take(5) as $notification)
+                                @php
+                                    $notificationData = $notification->data ?? [];
+                                    $notificationUrl = $navIsAdminUser
+                                        ? data_get($notificationData, 'url', route('dashboard'))
+                                        : route('notifications.read', $notification->id);
+                                @endphp
+                                <a class="notification-item" href="{{ $notificationUrl }}">
+                                    <div class="notification-item-icon">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                    <div class="notification-item-body">
+                                        <div class="notification-item-title">
+                                            {{ data_get($notificationData, 'title', 'New notification') }}
+                                        </div>
+                                        <div class="notification-item-text">
+                                            {{ data_get($notificationData, 'message', 'You have a new update.') }}
+                                        </div>
+                                    </div>
+                                    @if($navIsAdminUser && empty($notification->read_at))
+                                        <span class="notification-read-indicator"></span>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="notification-empty">
+                            <i class="bi bi-bell-slash notification-empty-icon"></i>
+                            <div class="fw-semibold text-dark">No new notifications</div>
+                            <div class="text-muted small">New updates will appear here.</div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="nav-utility d-none d-md-flex">
                 <div class="utility-icon">
                     <i class="bi bi-calendar3"></i>
@@ -27,6 +101,51 @@
         </div>
     </div>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const unreadCount = @json($navUnreadCount);
+        const userId = @json(auth()->id());
+        const storageKey = `app-notification-tone:${userId}`;
+        const previousCount = Number(localStorage.getItem(storageKey) || '0');
+
+        const playTone = () => {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+                return;
+            }
+
+            const audioContext = new AudioContextClass();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(660, audioContext.currentTime + 0.18);
+
+            gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.18, audioContext.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.22);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.24);
+
+            oscillator.onended = () => audioContext.close();
+        };
+
+        if (unreadCount > previousCount) {
+            try {
+                playTone();
+            } catch (error) {
+                // If autoplay or audio init is blocked, keep the UI functional.
+            }
+        }
+
+        localStorage.setItem(storageKey, String(unreadCount));
+    });
+</script>
 
 <style>
     /* NAVBAR + SIDEBAR UI updates: white background, black text/icons, subtle surfaces */
@@ -81,6 +200,153 @@
         background: var(--bg-white);
     }
 
+    .nav-notification-btn {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg-white);
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .notification-dot {
+        position: absolute;
+        top: 9px;
+        right: 10px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ef4444;
+        box-shadow: 0 0 0 2px #fff;
+    }
+
+    .notification-count {
+        position: absolute;
+        top: -6px;
+        right: -8px;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        border-radius: 999px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 0.68rem;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 0 2px #fff;
+    }
+
+    .notification-menu {
+        width: 320px;
+        padding: 0;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .notification-menu-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(13,110,253,0.08), rgba(13,110,253,0.02));
+    }
+
+    .notification-menu-title {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .notification-menu-subtitle {
+        font-size: 0.75rem;
+        color: var(--muted);
+    }
+
+    .notification-empty {
+        padding: 18px 16px 20px;
+        text-align: center;
+    }
+
+    .notification-list {
+        max-height: 340px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+        transition: background-color .15s ease;
+    }
+
+    .notification-item:hover {
+        background: rgba(13,110,253,0.04);
+    }
+
+    .notification-item:last-child {
+        border-bottom: 0;
+    }
+
+    .notification-item-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: rgba(13,110,253,0.08);
+        color: #0d6efd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+    }
+
+    .notification-item-body {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .notification-item-title {
+        color: var(--ink);
+        font-size: 0.88rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .notification-item-text {
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.35;
+        margin-top: 2px;
+    }
+
+    .notification-read-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ef4444;
+        flex: 0 0 auto;
+        align-self: center;
+    }
+
+    .notification-empty-icon {
+        display: inline-flex;
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.04);
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        color: var(--muted);
+    }
+
     .utility-icon {
         width: 36px;
         height: 36px;
@@ -101,6 +367,7 @@
     @media (max-width: 767.98px) {
         .dashboard-navbar { padding: 10px 0; }
         .nav-page-title { font-size: 1rem; }
+        .notification-menu { width: 290px; }
     }
 
 </style>

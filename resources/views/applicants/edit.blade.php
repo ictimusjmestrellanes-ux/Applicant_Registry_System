@@ -114,6 +114,7 @@
     @php
         $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
         $isApplicantUser = auth()->check() && auth()->user()?->role === \App\Models\User::ROLE_USER;
+        $isAdminUser = auth()->check() && auth()->user()?->isAdmin();
         $isFirstTimeJobSeeker = strtoupper(trim((string) ($applicant->first_time_job_seeker ?? ''))) === 'YES';
         $disapproveRequirement = session('disapprove_requirement');
         $disapproveRequirementId = session('disapprove_requirement_id');
@@ -1863,7 +1864,7 @@
                             @endif
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles() && ! $permit->isApproved())
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles() && ! $permit->isApproved() && $permit->approval_status !== \App\Models\MayorsPermit::APPROVAL_DISAPPROVED)
                                     <button type="submit" form="permit-approve-form-{{ $applicant->id }}"
                                         class="btn btn-success px-4 shadow-sm" formnovalidate>
                                             <i class="fa-solid fa-circle-check me-2"></i>Approve Permit Requirements
@@ -1872,7 +1873,7 @@
                             @endunless
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles())
+                                @if(! $isAdminUser && auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles())
                                     <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#disapprovePermitModal-{{ $applicant->id }}">
@@ -2672,7 +2673,7 @@
                     <div class="modal-header">
                         <div>
                             <h5 class="modal-title mb-1">Disapprove Permit</h5>
-                            <div class="text-muted small">{{ $applicant->full_name ?? $fullName }}</div>
+                            <div class="text-muted small">{{ auth()->user()->name ?? $fullName }}</div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

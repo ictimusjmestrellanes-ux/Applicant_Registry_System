@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Models\MayorsReferral;
 use App\Models\User;
+use App\Notifications\ApplicantDocumentApprovedNotification;
+use App\Notifications\ApplicantFileSubmittedNotification;
 use App\Support\ActivityLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -136,6 +139,10 @@ class ReferralController extends Controller
             'approval_status' => $approvalStatus,
             'referral_type' => $referral->referral_type ?: ($referralType ?: MayorsReferral::TYPE_PESO_OFFICE),
         ];
+
+        if ($isApplicantUser) {
+            $referral->disapproval_reason = null;
+        }
 
         if (! $isApplicantUser && $referralType === MayorsReferral::TYPE_PESO_OFFICE) {
             $existingDetails = array_values(array_slice($referral->referral_details ?? [], 1));
@@ -266,6 +273,32 @@ class ReferralController extends Controller
             );
         }
 
+        $referralFileFields = [
+            'resume',
+            'ref_barangay_clearance',
+            'ref_police_clearance',
+            'ref_nbi_clearance',
+        ];
+
+        if ($isApplicantUser && collect($referralFileFields)->contains(fn (string $field) => $request->hasFile($field))) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            Notification::send(
+                User::query()->where('role', User::ROLE_STAFF)->get(),
+                new ApplicantFileSubmittedNotification(
+                    $applicantName !== '' ? $applicantName : 'An applicant',
+                    $applicant->id,
+                    "Mayor's Referral files",
+                    route('applicants.edit', $applicant->id).'#referral'
+                )
+            );
+        }
+
         if ($isApplicantUser) {
             return redirect()
                 ->to(route('applicants.index').'#referral-compliance')
@@ -317,6 +350,24 @@ class ReferralController extends Controller
             $request->user()
         );
 
+        $applicantUser = User::query()->where('applicant_id', $applicant->id)->first();
+
+        if ($applicantUser) {
+            $applicantName = trim(implode(' ', array_filter([
+                $applicant->first_name ?? '',
+                $applicant->middle_name ?? '',
+                $applicant->last_name ?? '',
+                $applicant->suffix ?? '',
+            ])));
+
+            $applicantUser->notify(new ApplicantDocumentApprovedNotification(
+                $applicantName !== '' ? $applicantName : 'Your application',
+                $applicant->id,
+                "Mayor's Referral",
+                route('applicants.edit', $applicant->id).'#referral'
+            ));
+        }
+
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#referral')
             ->with('success', 'Referral approved successfully.');
@@ -324,6 +375,8 @@ class ReferralController extends Controller
 
     public function disapprove(Request $request, $id)
     {
+        abort_if($request->user()?->isAdmin(), 403, 'Admins cannot disapprove referral requirements.');
+
         $validator = Validator::make($request->all(), [
             'disapproval_reason' => ['required', 'string', 'max:2000'],
         ]);
