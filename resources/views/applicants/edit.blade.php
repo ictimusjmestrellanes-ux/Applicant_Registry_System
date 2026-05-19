@@ -2702,27 +2702,6 @@
                                     </button>
                                 @endif
 
-                                @php
-                                    $referralLetterReason = !auth()->user()->hasPermission('generate_referral')
-                                        ? 'No permission to view referral letter'
-                                        : (($referral && ! $referral->canPrint())
-                                            ? 'Awaiting admin or staff approval'
-                                            : 'Complete all requirements first');
-                                @endphp
-
-                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => $referral->referral_type === \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT ? \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT : \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
-                                        id="printReferralActionButton" class="btn btn-outline-primary px-4"
-                                        target="_blank">
-                                        <i class="fas fa-print me-1"></i> View Referral Letter
-                                    </a>
-                                @else
-                                    <button type="button" id="printReferralActionButton"
-                                        class="btn btn-outline-secondary px-4" disabled
-                                        title="{{ $referralLetterReason }}">
-                                        <i class="fas fa-print me-1"></i> View Referral Letter
-                                    </button>
-                                @endif
                             @endunless
 
                         </div>
