@@ -28,7 +28,7 @@ class PermitController extends Controller
         abort_if($isApplicantUser && $resolvedApplicantId <= 0, 403, 'Your account is not linked to an applicant record.');
         $approvalStatus = $isApplicantUser
             ? MayorsPermit::APPROVAL_PENDING
-            : ($request->user()?->hasPermission('auto_approve_uploaded_files')
+            : ($request->user()?->canAutoApproveUploadedFiles()
                 ? MayorsPermit::APPROVAL_APPROVED
                 : MayorsPermit::APPROVAL_PENDING);
 

@@ -46,7 +46,7 @@ class ClearanceController extends Controller
         $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
         $approvalStatus = $isApplicantUser
             ? MayorsClearance::APPROVAL_PENDING
-            : ($request->user()?->hasPermission('auto_approve_uploaded_files')
+            : ($request->user()?->canAutoApproveUploadedFiles()
                 ? MayorsClearance::APPROVAL_APPROVED
                 : MayorsClearance::APPROVAL_PENDING);
 

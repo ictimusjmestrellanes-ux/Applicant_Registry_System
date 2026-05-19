@@ -63,7 +63,7 @@ class ReferralController extends Controller
         $before = $referral->exists ? $referral->only($referral->getFillable()) : [];
         $approvalStatus = $isApplicantUser
             ? MayorsReferral::APPROVAL_PENDING
-            : ($request->user()?->hasPermission('auto_approve_uploaded_files')
+            : ($request->user()?->canAutoApproveUploadedFiles()
                 ? MayorsReferral::APPROVAL_APPROVED
                 : MayorsReferral::APPROVAL_PENDING);
         $fullName = Str::lower(Str::slug($applicant->last_name, '_'));

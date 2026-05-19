@@ -145,6 +145,11 @@ class MayorsPermit extends Model
             || ! empty($this->referral_letter);
     }
 
+    public function canReview(): bool
+    {
+        return $this->hasSubmittedFiles() && ! $this->isApproved();
+    }
+
     public function approvalStatusLabel(): string
     {
         return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));

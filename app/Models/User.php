@@ -119,6 +119,13 @@ class User extends Authenticatable
         return $this->role === self::ROLE_STAFF;
     }
 
+    public function canAutoApproveUploadedFiles(): bool
+    {
+        return $this->isAdmin()
+            || $this->isStaff()
+            || $this->hasPermission('auto_approve_uploaded_files');
+    }
+
     public function roleLabel(): string
     {
         return ucfirst((string) ($this->role ?: self::ROLE_USER));

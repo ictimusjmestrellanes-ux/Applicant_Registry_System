@@ -67,6 +67,20 @@ class MayorsClearance extends Model
         return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;
     }
 
+    public function hasSubmittedFiles(): bool
+    {
+        return ! empty($this->prosecutor_clearance)
+            || ! empty($this->mtc_clearance)
+            || ! empty($this->rtc_clearance)
+            || ! empty($this->nbi_clearance)
+            || ! empty($this->barangay_clearance);
+    }
+
+    public function canReview(): bool
+    {
+        return $this->hasSubmittedFiles() && ! $this->isApproved();
+    }
+
     public function approvalStatusLabel(): string
     {
         return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));

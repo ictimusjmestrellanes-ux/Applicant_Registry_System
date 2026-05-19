@@ -173,6 +173,20 @@ class MayorsReferral extends Model
         return ($this->approval_status ?? self::APPROVAL_APPROVED) === self::APPROVAL_APPROVED;
     }
 
+    public function hasSubmittedFiles(): bool
+    {
+        return ! empty($this->resume)
+            || ! empty($this->biodata)
+            || ! empty($this->ref_barangay_clearance)
+            || ! empty($this->ref_police_clearance)
+            || ! empty($this->ref_nbi_clearance);
+    }
+
+    public function canReview(): bool
+    {
+        return $this->hasSubmittedFiles() && ! $this->isApproved();
+    }
+
     public function approvalStatusLabel(): string
     {
         return ucfirst((string) ($this->approval_status ?: self::APPROVAL_APPROVED));

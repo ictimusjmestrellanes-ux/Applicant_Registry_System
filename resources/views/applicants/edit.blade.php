@@ -1864,7 +1864,7 @@
                             @endif
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles() && ! $permit->isApproved() && $permit->approval_status !== \App\Models\MayorsPermit::APPROVAL_DISAPPROVED)
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->canReview())
                                     <button type="submit" form="permit-approve-form-{{ $applicant->id }}"
                                         class="btn btn-success px-4 shadow-sm" formnovalidate>
                                             <i class="fa-solid fa-circle-check me-2"></i>Approve Permit Requirements
@@ -1873,12 +1873,12 @@
                             @endunless
 
                             @unless($isApplicantUser)
-                                @if(! $isAdminUser && auth()->user()->hasPermission('approve_document') && $permit && $permit->hasSubmittedFiles())
+                                @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->canReview())
                                     <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#disapprovePermitModal-{{ $applicant->id }}">
                                         <i class="fa-solid fa-circle-xmark me-2"></i>
-                                        {{ $permit->approval_status === \App\Models\MayorsPermit::APPROVAL_DISAPPROVED ? 'Update Reason' : 'Disapprove Permit Requirements' }}
+                                        Disapprove Permit Requirements
                                     </button>
                                 @endif
                             @endunless
@@ -2136,7 +2136,7 @@
                             @endif
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $clearance && ! $clearance->isApproved() && $clearance->approval_status !== \App\Models\MayorsClearance::APPROVAL_DISAPPROVED)
+                                @if(auth()->user()->hasPermission('approve_document') && $clearance && $clearance->canReview())
                                     <button type="submit" form="clearance-approve-form-{{ $applicant->id }}"
                                         class="btn btn-success px-4 shadow-sm" formnovalidate>
                                         <i class="fa-solid fa-circle-check me-2"></i>Approve Clearance Requirements
@@ -2145,18 +2145,12 @@
                             @endunless
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $clearance && (
-                                    !empty($clearance->prosecutor_clearance) ||
-                                    !empty($clearance->mtc_clearance) ||
-                                    !empty($clearance->rtc_clearance) ||
-                                    !empty($clearance->nbi_clearance) ||
-                                    !empty($clearance->barangay_clearance)
-                                ))
+                                @if(auth()->user()->hasPermission('approve_document') && $clearance && $clearance->canReview())
                                     <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#disapproveClearanceModal-{{ $applicant->id }}">
                                         <i class="fa-solid fa-circle-xmark me-2"></i>
-                                        {{ $clearance->approval_status === \App\Models\MayorsClearance::APPROVAL_DISAPPROVED ? 'Update Reason' : 'Disapprove Clearance Requirements' }}
+                                        Disapprove Clearance Requirements
                                     </button>
                                 @endif
                             @endunless
@@ -2690,7 +2684,7 @@
                             @endif
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $referral && ! $referral->isApproved() && $referral->approval_status !== \App\Models\MayorsReferral::APPROVAL_DISAPPROVED)
+                                @if(auth()->user()->hasPermission('approve_document') && $referral && $referral->canReview())
                                     <button type="submit" form="referral-approve-form-{{ $applicant->id }}"
                                         class="btn btn-success px-4 shadow-sm" formnovalidate>
                                         <i class="fa-solid fa-circle-check me-2"></i>Approve Referral Requirements
@@ -2699,18 +2693,12 @@
                             @endunless
 
                             @unless($isApplicantUser)
-                                @if(auth()->user()->hasPermission('approve_document') && $referral && (
-                                    !empty($referral->resume) ||
-                                    !empty($referral->biodata) ||
-                                    !empty($referral->ref_barangay_clearance) ||
-                                    !empty($referral->ref_police_clearance) ||
-                                    !empty($referral->ref_nbi_clearance)
-                                ))
+                                @if(auth()->user()->hasPermission('approve_document') && $referral && $referral->canReview())
                                     <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#disapproveReferralModal-{{ $applicant->id }}">
                                         <i class="fa-solid fa-circle-xmark me-2"></i>
-                                        {{ $referral->approval_status === \App\Models\MayorsReferral::APPROVAL_DISAPPROVED ? 'Update Reason' : 'Disapprove Referral Requirements' }}
+                                        Disapprove Referral Requirements
                                     </button>
                                 @endif
 
