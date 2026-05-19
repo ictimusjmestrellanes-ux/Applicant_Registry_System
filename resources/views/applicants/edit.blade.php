@@ -2640,30 +2640,6 @@
                                                 required>
                                         </div>
 
-                                        <div class="col-12">
-                                            <div class="d-flex flex-wrap gap-2 mt-3">
-                                            @php
-                                                $referralReason = !auth()->user()->hasPermission('generate_referral')
-                                                    ? 'No permission to generate letter'
-                                                    : (($referral && ! $referral->canPrint())
-                                                        ? 'Awaiting admin or staff approval'
-                                                        : null);
-                                            @endphp
-                                            @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
-                                                <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
-                                                    id="printReferralOtherCityButton" class="btn btn-outline-primary px-4"
-                                                    target="_blank">
-                                                        <i class="fas fa-print me-1"></i> View Referral Letter
-                                                </a>
-                                            @else
-                                                <button type="button" id="printReferralOtherCityButton"
-                                                    class="btn btn-outline-secondary px-4" disabled
-                                                    title="{{ $referralReason ?? 'Complete all requirements first' }}">
-                                                    <i class="fas fa-print me-1"></i> View Referral Letter
-                                                </button>
-                                            @endif
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 
