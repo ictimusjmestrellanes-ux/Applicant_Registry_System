@@ -165,7 +165,19 @@ class MayorsReferral extends Model
 
     public function canPrint(): bool
     {
-        return $this->isApproved() && $this->isComplete();
+        if (! in_array($this->referral_type, [self::TYPE_PESO_OFFICE, self::TYPE_OTHER_CITY_GOVERNMENT], true)) {
+            return false;
+        }
+
+        $hasProfile = ! empty($this->resume) || ! empty($this->biodata);
+        $hasClearance = ! empty($this->ref_barangay_clearance)
+            || ! empty($this->ref_police_clearance)
+            || ! empty($this->ref_nbi_clearance);
+
+        return $hasProfile
+            && $hasClearance
+            && $this->hasRequiredDetails()
+            && $this->hasCompletePesoExtraDetails();
     }
 
     public function isApproved(): bool

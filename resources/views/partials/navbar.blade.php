@@ -15,7 +15,9 @@
                         'read_at' => $notification->read_at,
                     ];
                 });
-            $navUnreadCount = $navUnreadNotifications->count();
+            $navUnreadCount = \Illuminate\Support\Facades\DB::table('notifications')
+                ->whereNull('read_at')
+                ->count();
         } else {
             $navUnreadNotifications = auth()->check() ? auth()->user()->unreadNotifications : collect();
             $navUnreadCount = auth()->check() ? auth()->user()->unreadNotifications()->count() : 0;
@@ -61,22 +63,33 @@
                                         ? data_get($notificationData, 'url', route('dashboard'))
                                         : route('notifications.read', $notification->id);
                                 @endphp
-                                <a class="notification-item" href="{{ $notificationUrl }}">
-                                    <div class="notification-item-icon">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                    </div>
-                                    <div class="notification-item-body">
-                                        <div class="notification-item-title">
-                                            {{ data_get($notificationData, 'title', 'New notification') }}
+                                <div class="notification-item">
+                                    <a class="notification-item-main" href="{{ $notificationUrl }}">
+                                        <div class="notification-item-icon">
+                                            <i class="bi bi-file-earmark-text"></i>
                                         </div>
-                                        <div class="notification-item-text">
-                                            {{ data_get($notificationData, 'message', 'You have a new update.') }}
+                                        <div class="notification-item-body">
+                                            <div class="notification-item-title">
+                                                {{ data_get($notificationData, 'title', 'New notification') }}
+                                            </div>
+                                            <div class="notification-item-text">
+                                                {{ data_get($notificationData, 'message', 'You have a new update.') }}
+                                            </div>
                                         </div>
+                                    </a>
+
+                                    <div class="notification-item-actions">
+                                        @if(empty($notification->read_at))
+                                            <a class="notification-mark-read" href="{{ route('notifications.read', $notification->id) }}">
+                                                Mark as read
+                                            </a>
+                                        @endif
                                     </div>
-                                    @if($navIsAdminUser && empty($notification->read_at))
+
+                                    @if(empty($notification->read_at))
                                         <span class="notification-read-indicator"></span>
                                     @endif
-                                </a>
+                                </div>
                             @endforeach
                         </div>
                     @else
@@ -84,6 +97,14 @@
                             <i class="bi bi-bell-slash notification-empty-icon"></i>
                             <div class="fw-semibold text-dark">No new notifications</div>
                             <div class="text-muted small">New updates will appear here.</div>
+                        </div>
+                    @endif
+                    @if($navUnreadCount > 0)
+                        <div class="notification-menu-footer">
+                            <form action="{{ route('notifications.read-all') }}" method="POST" class="m-0">
+                                @csrf
+                                <button type="submit" class="notification-mark-all-btn">Mark all as read</button>
+                            </form>
                         </div>
                     @endif
                 </div>
@@ -272,6 +293,12 @@
         text-align: center;
     }
 
+    .notification-menu-footer {
+        padding: 12px 16px 14px;
+        border-top: 1px solid var(--line);
+        background: #fff;
+    }
+
     .notification-list {
         max-height: 340px;
         overflow-y: auto;
@@ -281,13 +308,21 @@
         display: flex;
         gap: 12px;
         padding: 14px 16px;
-        text-decoration: none;
         border-bottom: 1px solid var(--line);
         transition: background-color .15s ease;
+        align-items: flex-start;
     }
 
     .notification-item:hover {
         background: rgba(13,110,253,0.04);
+    }
+
+    .notification-item-main {
+        display: flex;
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
+        text-decoration: none;
     }
 
     .notification-item:last-child {
@@ -323,6 +358,38 @@
         font-size: 0.8rem;
         line-height: 1.35;
         margin-top: 2px;
+    }
+
+    .notification-item-actions {
+        display: flex;
+        align-items: center;
+        flex: 0 0 auto;
+        margin-left: 8px;
+    }
+
+    .notification-mark-read {
+        color: #0d6efd;
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .notification-mark-read:hover {
+        text-decoration: underline;
+    }
+
+    .notification-mark-all-btn {
+        border: 0;
+        background: transparent;
+        color: #0d6efd;
+        font-size: 0.78rem;
+        font-weight: 800;
+        padding: 0;
+    }
+
+    .notification-mark-all-btn:hover {
+        text-decoration: underline;
     }
 
     .notification-read-indicator {

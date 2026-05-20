@@ -36,13 +36,42 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::get('/notifications/{notification}/read', function (string $notification) {
         $user = auth()->user();
-        $record = $user?->notifications()->where('id', $notification)->firstOrFail();
-        $record->markAsRead();
+        $record = $user?->isAdmin()
+            ? \Illuminate\Support\Facades\DB::table('notifications')->where('id', $notification)->first()
+            : $user?->notifications()->where('id', $notification)->firstOrFail();
 
-        $redirectUrl = data_get($record->data, 'url', route('dashboard'));
+        abort_if(! $record, 404);
+
+        if ($user?->isAdmin()) {
+            \Illuminate\Support\Facades\DB::table('notifications')
+                ->where('id', $notification)
+                ->update(['read_at' => now()]);
+        } else {
+            $record->markAsRead();
+        }
+
+        $recordData = is_string($record->data ?? null)
+            ? (json_decode($record->data ?? '[]', true) ?: [])
+            : ($record->data ?? []);
+
+        $redirectUrl = data_get($recordData, 'url', route('dashboard'));
 
         return redirect()->to($redirectUrl);
     })->name('notifications.read');
+
+    Route::post('/notifications/read-all', function () {
+        $user = auth()->user();
+
+        if ($user?->isAdmin()) {
+            \Illuminate\Support\Facades\DB::table('notifications')
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        } else {
+            $user?->unreadNotifications()->update(['read_at' => now()]);
+        }
+
+        return back();
+    })->name('notifications.read-all');
 
     Route::get('/users', [UserController::class, 'index'])
         ->middleware(['auth'])
@@ -106,7 +135,7 @@ Route::get('/applicants/{id}/permit-id', [PermitController::class, 'printId'])->
 Route::get('/applicants/{id}/print-clearance', [ClearanceController::class, 'printLetter'])->middleware(['auth', 'permission:generate_clearance'])
     ->name('clearances.printLetter');
     
-Route::get('/applicants/{id}/print-referral', [ReferralController::class, 'printLetter'])->middleware(['auth', 'permission:generate_referral'])
+Route::get('/applicants/{id}/print-referral', [ReferralController::class, 'printLetter'])->middleware(['auth'])
     ->name('referrals.printLetter');
 Route::get('/storage/view/{filename}', [App\Http\Controllers\StorageController::class, 'viewfile'])
     ->middleware('auth')

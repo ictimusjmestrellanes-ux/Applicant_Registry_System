@@ -183,7 +183,7 @@
         }
 
         .applicant-wrapper {
-            max-width: 1800px;
+            max-width: 2000px;
         }
 
         .page-header {
@@ -2418,24 +2418,24 @@
                                                 </div>
                                             </div>
                                             @php
-                                                $pesoReferralReason = !auth()->user()->hasPermission('generate_referral')
+                                                $pesoReferralReason = !auth()->user()->canViewReferralLetter()
                                                     ? 'No permission to generate letter'
                                                     : (($referral && ! $referral->canPrint())
                                                         ? 'Awaiting admin or staff approval'
                                                         : null);
                                             @endphp
                                             <div class="mt-3">
-                                                @if(auth()->user()->hasPermission('generate_referral') && $referral && $referral->canPrint())
+                                                @if(auth()->user()->canViewReferralLetter() && $referral && $referral->canPrint())
                                                     <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
                                                         id="printReferralPesoButton" class="btn btn-outline-primary px-4"
                                                         target="_blank">
-                                                        View Employer Letter Detail 1
+                                                        <i class="fas fa-print me-1"></i> View Referral Letter Within Imus
                                                     </a>
                                                 @else
                                                     <button type="button" id="printReferralPesoButton"
                                                         class="btn btn-outline-secondary justify-content-center px-4"
                                                         disabled title="{{ $pesoReferralReason ?? 'Complete all requirements first' }}">
-                                                        <i class="fas fa-print me-1"></i> View Employer Letter Detail 1
+                                                        <i class="fas fa-print me-1"></i> View Referral Letter Within Imus
                                                     </button>
                                                 @endif
                                             </div>
@@ -2642,6 +2642,31 @@
                                                 required>
                                         </div>
 
+                                        <div class="col-12">
+                                            <div class="mt-3">
+                                                @php
+                                                    $referralReason = !auth()->user()->canViewReferralLetter()
+                                                        ? 'No permission to view referral letter'
+                                                        : (($referral && ! $referral->canPrint())
+                                                            ? 'Awaiting admin or staff approval'
+                                                            : 'Complete all requirements first');
+                                                @endphp
+                                                @if(auth()->user()->canViewReferralLetter() && $referral && $referral->canPrint())
+                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
+                                                        id="printReferralOtherCityButton" class="btn btn-outline-primary px-4"
+                                                        target="_blank">
+                                                        <i class="fas fa-print me-1"></i> View Referral Letter Outside Imus
+                                                    </a>
+                                                @else
+                                                    <button type="button" id="printReferralOtherCityButton"
+                                                        class="btn btn-outline-secondary px-4" disabled
+                                                        title="{{ $referralReason }}">
+                                                        <i class="fas fa-print me-1"></i> View Referral Letter Outside Imus
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
 
@@ -2679,7 +2704,6 @@
                                         Disapprove Referral Requirements
                                     </button>
                                 @endif
-
                             @endunless
 
                         </div>

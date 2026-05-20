@@ -485,6 +485,8 @@ class ReferralController extends Controller
 
     public function printLetter(Request $request, $id)
     {
+        abort_unless($request->user()?->canViewReferralLetter(), 403);
+
         $applicant = Applicant::with('referral')->findOrFail($id);
 
         if (! $applicant->referral || ! $applicant->referral->canPrint()) {

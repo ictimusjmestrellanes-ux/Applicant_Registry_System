@@ -126,6 +126,16 @@ class User extends Authenticatable
             || $this->hasPermission('auto_approve_uploaded_files');
     }
 
+    public function canViewReferralLetter(): bool
+    {
+        return $this->isAdmin()
+            || $this->isStaff()
+            || $this->hasPermission('generate_referral')
+            || $this->hasPermission('approve_document')
+            || ($this->role === self::ROLE_USER
+                && $this->linkedApplicant()?->referral?->canPrint());
+    }
+
     public function roleLabel(): string
     {
         return ucfirst((string) ($this->role ?: self::ROLE_USER));
