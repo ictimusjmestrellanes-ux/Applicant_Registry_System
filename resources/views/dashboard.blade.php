@@ -43,8 +43,8 @@
             </div>
         </section>
 
-        <section class="row g-3 mb-4">
-            <div class="col-xl-2 col-md-4">
+        <section class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3 mb-4">
+            <div class="col">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-blue">
                         <i class="bi bi-people-fill"></i>
@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-4">
+            <div class="col">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-slate">
                         <i class="bi bi-archive-fill"></i>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-4">
+            <div class="col">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-emerald">
                         <i class="bi bi-patch-check-fill"></i>
@@ -78,7 +78,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-2 col-md-4">
+            <div class="col">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-slate">
                         <i class="bi bi-person-badge-fill"></i>
@@ -89,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-2 col-md-4">
+            <div class="col">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-amber">
                         <i class="bi bi-folder2-open"></i>
