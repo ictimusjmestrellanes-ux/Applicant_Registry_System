@@ -162,7 +162,8 @@ class DashboardController extends Controller
             ->take(10)
             ->values();
 
-        $totalApplicants = $applicants->count();
+        $activeApplicantsCount = $applicants->count();
+        $totalApplicants = Applicant::withTrashed()->count();
         $newThisMonth = Applicant::query()
             ->withoutTrashed()
             ->whereYear('created_at', now()->year)
@@ -206,15 +207,15 @@ class DashboardController extends Controller
         $completion = [
             'permit' => [
                 'count' => $completePermitCount,
-                'percent' => $totalApplicants > 0 ? (int) round(($completePermitCount / $totalApplicants) * 100) : 0,
+                'percent' => $activeApplicantsCount > 0 ? (int) round(($completePermitCount / $activeApplicantsCount) * 100) : 0,
             ],
             'clearance' => [
                 'count' => $completeClearanceCount,
-                'percent' => $totalApplicants > 0 ? (int) round(($completeClearanceCount / $totalApplicants) * 100) : 0,
+                'percent' => $activeApplicantsCount > 0 ? (int) round(($completeClearanceCount / $activeApplicantsCount) * 100) : 0,
             ],
             'referral' => [
                 'count' => $completeReferralCount,
-                'percent' => $totalApplicants > 0 ? (int) round(($completeReferralCount / $totalApplicants) * 100) : 0,
+                'percent' => $activeApplicantsCount > 0 ? (int) round(($completeReferralCount / $activeApplicantsCount) * 100) : 0,
             ],
         ];
 
