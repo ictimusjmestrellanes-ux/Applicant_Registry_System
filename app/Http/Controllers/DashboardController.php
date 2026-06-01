@@ -46,12 +46,12 @@ class DashboardController extends Controller
         $monthlyRegistrationYears = $trendYears->slice(max($trendYears->count() - 2, 0))->values();
 
         $trendPalette = [
-            ['border' => '#ff5c7a', 'background' => 'rgba(255, 92, 122, 0.14)'],
+            ['border' => '#7c3aed', 'background' => 'rgba(255, 92, 122, 0.14)'],
             ['border' => '#3b82f6', 'background' => 'rgba(59, 130, 246, 0.14)'],
             ['border' => '#16a34a', 'background' => 'rgba(22, 163, 74, 0.14)'],
-            ['border' => '#7c3aed', 'background' => 'rgba(124, 58, 237, 0.14)'],
-            ['border' => '#ea580c', 'background' => 'rgba(234, 88, 12, 0.14)'],
-            ['border' => '#0f766e', 'background' => 'rgba(15, 118, 110, 0.14)'],
+            ['border' => '#535353', 'background' => 'rgba(124, 58, 237, 0.14)'],
+            ['border' => '#feffff', 'background' => 'rgba(234, 88, 12, 0.14)'],
+            ['border' => '#f0ff25', 'background' => 'rgba(15, 118, 110, 0.14)'],
         ];
 
         $yearlyApplicantTrendDatasets = $trendYears->map(function (int $year, int $index) use ($yearlyApplicantTrends, $trendPalette) {
@@ -221,6 +221,7 @@ class DashboardController extends Controller
 
         $summary = [
             'totalApplicants' => $totalApplicants,
+            'totalArchivedApplicants' => Applicant::onlyTrashed()->count(),
             'newThisMonth' => $newThisMonth,
             'totalClearances' => $totalClearances,
             'totalReferrals' => $totalReferrals,

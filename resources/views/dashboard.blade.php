@@ -5,6 +5,7 @@
 @section('content')
     @php
         $totalApplicants = data_get($summary, 'totalApplicants', 0);
+        $totalArchivedApplicants = data_get($summary, 'totalArchivedApplicants', 0);
         $newThisMonth = data_get($summary, 'newThisMonth', 0);
         $totalClearances = data_get($summary, 'totalClearances', 0);
         $totalReferrals = data_get($summary, 'totalReferrals', 0);
@@ -43,7 +44,7 @@
         </section>
 
         <section class="row g-3 mb-4">
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-2 col-md-4">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-blue">
                         <i class="bi bi-people-fill"></i>
@@ -54,7 +55,18 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-2 col-md-4">
+                <div class="metric-card h-100">
+                    <div class="metric-icon icon-slate">
+                        <i class="bi bi-archive-fill"></i>
+                    </div>
+                    <div>
+                        <div class="metric-label">Total Archive</div>
+                        <div class="metric-value">{{ number_format($totalArchivedApplicants) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-emerald">
                         <i class="bi bi-patch-check-fill"></i>
@@ -66,7 +78,7 @@
                 </div>
             </div>
 
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-2 col-md-4">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-slate">
                         <i class="bi bi-person-badge-fill"></i>
@@ -77,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-2 col-md-4">
                 <div class="metric-card h-100">
                     <div class="metric-icon icon-amber">
                         <i class="bi bi-folder2-open"></i>
@@ -1151,9 +1163,9 @@
                     datasets: [{
                         data: cityData,
                         label: 'City Count',
-                        borderColor: '#7c3aed',
+                        borderColor: '#e7ed3a',
                         backgroundColor: 'rgba(58, 237, 118, 0.14)',
-                        pointBackgroundColor: '#7c3aed',
+                        pointBackgroundColor: '#e7ed3a',
                         pointBorderColor: '#ffffff',
                         fill: false,
                     }],
@@ -1176,9 +1188,9 @@
                     datasets: [{
                         data: provinceData,
                         label: 'Province Count',
-                        borderColor: '#475569',
+                        borderColor: '#248a3d',
                         backgroundColor: 'rgba(71, 85, 105, 0.14)',
-                        pointBackgroundColor: '#475569',
+                        pointBackgroundColor: '#248a3d',
                         pointBorderColor: '#ffffff',
                         fill: false,
                     }],
