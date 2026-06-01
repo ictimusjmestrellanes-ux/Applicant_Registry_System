@@ -29,7 +29,7 @@
         }
 
         .logs-page {
-            max-width: 1720px;
+            max-width: 1800px;
         }
 
         .logs-shell {
@@ -414,6 +414,146 @@
             border-color: #e2e8f0;
         }
 
+        html[data-theme="night"] body {
+            background: #050816;
+        }
+
+        html[data-theme="night"] .page-subtitle,
+        html[data-theme="night"] .metric-copy,
+        html[data-theme="night"] .table-copy,
+        html[data-theme="night"] .empty-copy,
+        html[data-theme="night"] .pagination-copy,
+        html[data-theme="night"] .log-muted,
+        html[data-theme="night"] .log-date,
+        html[data-theme="night"] .log-time,
+        html[data-theme="night"] .description-copy,
+        html[data-theme="night"] .form-label,
+        html[data-theme="night"] .table-kicker,
+        html[data-theme="night"] .logs-search-icon {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .logs-hero,
+        html[data-theme="night"] .metric-card,
+        html[data-theme="night"] .logs-table-shell,
+        html[data-theme="night"] .logs-table-wrap,
+        html[data-theme="night"] .mobile-log-card,
+        html[data-theme="night"] .empty-state,
+        html[data-theme="night"] .logs-search-shell,
+        html[data-theme="night"] .search-chip,
+        html[data-theme="night"] .page-link {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .logs-hero::after {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        html[data-theme="night"] .logs-hero h2,
+        html[data-theme="night"] .metric-value,
+        html[data-theme="night"] .empty-title,
+        html[data-theme="night"] .entity-name {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .page-kicker {
+            background: rgba(37, 99, 235, 0.16);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .logs-table thead th {
+            background: #111827 !important;
+            color: #cbd5e1;
+            border-bottom-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .logs-table tbody td {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.12) !important;
+        }
+
+        html[data-theme="night"] .logs-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.06) !important;
+        }
+
+        html[data-theme="night"] .logs-search-input {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .logs-search-input::placeholder {
+            color: #64748b;
+        }
+
+        html[data-theme="night"] .search-chip {
+            background: rgba(59, 130, 246, 0.12);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .logs-search-shell {
+            background: #0b1220;
+        }
+
+        html[data-theme="night"] .badge-soft,
+        html[data-theme="night"] .btn-view-log {
+            background: #111827;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .badge-module {
+            background: rgba(107, 114, 128, 0.18);
+            color: #e5e7eb;
+        }
+
+        html[data-theme="night"] .badge-action {
+            background: rgba(96, 165, 250, 0.16);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .btn-view-log:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .mobile-log-card {
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .empty-state {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+        }
+
+        html[data-theme="night"] .empty-icon {
+            background: rgba(59, 130, 246, 0.12);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-link {
+            background: #111827 !important;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-link:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-item.active .page-link {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #fff;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-item.disabled .page-link {
+            background: #0b1220;
+            color: #64748b;
+            border-color: rgba(148, 163, 184, 0.12) !important;
+        }
+
         @media (max-width: 1200px) {
             .metrics-grid {
                 grid-template-columns: 1fr;
@@ -459,13 +599,9 @@
         }
     </style>
 
-    <div class="container-fluid logs-page py-4 px-md-4 px-xl-5">
+    <div class="container-fluid logs-page py-0 px-md-2 px-xl-0">
         <div class="logs-shell">
             <section class="logs-hero">
-                <span class="page-kicker">
-                    <i class="bi bi-clock-history"></i>
-                    Audit trail
-                </span>
 
                 <div>
                     <h2>Activity Logs</h2>

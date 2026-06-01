@@ -10,7 +10,7 @@
         $displayInitial = strtoupper(substr($user->name ?? 'U', 0, 1));
     @endphp
 
-    <div class="container-fluid py-4 px-md-4 px-xl-5 profile-shell">
+    <div class="container-fluid py-0 px-md-4 px-xl-0 profile-shell">
         @if(session('success'))
             <div id="profileSuccessAlert" class="alert alert-success border-0 shadow-sm mb-4 profile-alert fade show" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -147,7 +147,19 @@
 
                             <div class="mt-3">
                                 <label class="form-label">Upload New Image</label>
-                                <input type="file" name="profile_image" class="form-control modern-control" accept="image/*">
+                                <div class="upload-control">
+                                    <input
+                                        type="file"
+                                        name="profile_image"
+                                        id="profile_image"
+                                        class="d-none"
+                                        accept="image/*"
+                                    >
+                                    <button type="button" class="btn upload-trigger" data-upload-trigger="#profile_image">
+                                        <i class="bi bi-upload me-1"></i> Choose Image
+                                    </button>
+                                    <span class="upload-filename" data-upload-filename>No file chosen</span>
+                                </div>
                                 <div class="upload-note mt-2">Accepted image files only. Max size: 5MB.</div>
                             </div>
                         </div>
@@ -165,7 +177,7 @@
 
     <style>
         .profile-shell {
-            max-width: 1520px;
+            max-width: 1800px;
         }
 
         .profile-banner {
@@ -334,6 +346,43 @@
             flex-direction: column;
         }
 
+        .upload-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.55rem;
+            border-radius: 16px;
+            border: 1px solid #d9e4ef;
+            background: #f8fbff;
+        }
+
+        .upload-trigger {
+            flex-shrink: 0;
+            min-height: 44px;
+            padding: 0.65rem 1rem;
+            border: 1px solid #cfe0f2;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #10243d;
+            font-weight: 800;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.04);
+        }
+
+        .upload-trigger:hover {
+            background: #e0ecff;
+            color: #0f172a;
+            border-color: #bcd5ff;
+        }
+
+        .upload-filename {
+            min-width: 0;
+            color: #64748b;
+            font-size: 0.95rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
         .image-preview-box {
             display: flex;
             justify-content: center;
@@ -375,6 +424,142 @@
         .profile-alert {
             border-radius: 16px;
             transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+
+        html[data-theme="night"] body {
+            background: #050816;
+        }
+
+        html[data-theme="night"] .profile-banner,
+        html[data-theme="night"] .profile-card {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.16);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+        }
+
+        html[data-theme="night"] .profile-banner {
+            background:
+                radial-gradient(circle at top right, rgba(37, 99, 235, 0.16), transparent 24%),
+                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.14), transparent 28%),
+                linear-gradient(135deg, #0f172a 0%, #111827 100%);
+        }
+
+        html[data-theme="night"] .profile-kicker {
+            background: rgba(59, 130, 246, 0.18);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .profile-title,
+        html[data-theme="night"] .section-title,
+        html[data-theme="night"] .summary-name {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .profile-copy,
+        html[data-theme="night"] .section-copy,
+        html[data-theme="night"] .summary-meta,
+        html[data-theme="night"] .upload-note,
+        html[data-theme="night"] .form-label {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .profile-tag {
+            background: rgba(15, 23, 42, 0.72);
+            border-color: rgba(148, 163, 184, 0.18);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .section-head {
+            border-bottom-color: rgba(148, 163, 184, 0.14);
+        }
+
+        html[data-theme="night"] .modern-control {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.18);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .modern-control:focus {
+            background: #0f172a;
+            border-color: #7aa2ff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+        }
+
+        html[data-theme="night"] .modern-control::placeholder {
+            color: #64748b;
+        }
+
+        html[data-theme="night"] .profile-banner-spotlight {
+            background: rgba(15, 23, 42, 0.78);
+            border-color: rgba(148, 163, 184, 0.16);
+        }
+
+        html[data-theme="night"] .upload-control {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .upload-trigger {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.22);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .upload-trigger:hover {
+            background: #1f2937;
+            color: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.32);
+        }
+
+        html[data-theme="night"] .upload-filename {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .image-preview-box {
+            background:
+                radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 30%),
+                linear-gradient(180deg, #0b1324 0%, #111827 100%);
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .summary-avatar-fallback,
+        html[data-theme="night"] .image-preview-fallback {
+            background: linear-gradient(135deg, #2563eb, #10b981);
+        }
+
+        html[data-theme="night"] .alert-info {
+            background: rgba(14, 165, 233, 0.12) !important;
+            color: #bfdbfe !important;
+            border-color: rgba(56, 189, 248, 0.18) !important;
+        }
+
+        html[data-theme="night"] .profile-save-btn {
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.3);
+        }
+
+        html[data-theme="night"] .profile-save-btn:hover {
+            filter: brightness(1.05);
+        }
+
+        html[data-theme="night"] .upload-control {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .upload-trigger {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.22);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .upload-trigger:hover {
+            background: #1f2937;
+            color: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.32);
+        }
+
+        html[data-theme="night"] .upload-filename {
+            color: #94a3b8;
         }
 
         @media (max-width: 1199.98px) {
@@ -435,6 +620,26 @@
                     }
                 });
             });
+
+            document.querySelectorAll('[data-upload-trigger]').forEach(function (trigger) {
+                trigger.addEventListener('click', function () {
+                    const input = document.querySelector(this.getAttribute('data-upload-trigger'));
+                    if (input) {
+                        input.click();
+                    }
+                });
+            });
+
+            const profileImageInput = document.getElementById('profile_image');
+            const uploadFilename = document.querySelector('[data-upload-filename]');
+
+            if (profileImageInput && uploadFilename) {
+                profileImageInput.addEventListener('change', function () {
+                    uploadFilename.textContent = this.files && this.files.length
+                        ? this.files[0].name
+                        : 'No file chosen';
+                });
+            }
         });
     </script>
 @endsection

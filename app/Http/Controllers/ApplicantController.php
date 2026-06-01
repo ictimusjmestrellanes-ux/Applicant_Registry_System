@@ -21,6 +21,7 @@ class ApplicantController extends Controller
             // Applicant Personal Information
             'first_name' => 'required',
             'last_name' => 'required',
+            'email' => 'nullable|email|max:255',
             'contact_no' => 'required',
             'gender' => 'required',
             'civil_status' => 'required',
@@ -139,6 +140,7 @@ class ApplicantController extends Controller
                 'Middle Name' => (string) ($applicant->middle_name ?? ''),
                 'Suffix' => (string) ($applicant->suffix ?? ''),
                 'Age' => $applicant->age !== null ? (string) $applicant->age : '',
+                'Email' => (string) ($applicant->email ?? ''),
                 'Sex' => (string) ($applicant->gender ?? ''),
                 'PWD' => (string) ($applicant->pwd ?? ''),
                 '4Ps' => (string) ($applicant->four_ps ?? ''),
@@ -199,6 +201,7 @@ class ApplicantController extends Controller
             'last_name' => $request->last_name,
             'suffix' => $request->suffix,
             'age' => $request->age,
+            'email' => $request->email,
             'contact_no' => $request->contact_no,
             'gender' => $request->gender,
             'civil_status' => $request->civil_status,

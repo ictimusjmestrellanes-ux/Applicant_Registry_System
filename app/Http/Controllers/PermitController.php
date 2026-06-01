@@ -66,6 +66,7 @@ class PermitController extends Controller
                 'clearance_type' => null,
                 'approval_status' => MayorsPermit::APPROVAL_PENDING,
                 'disapproval_reason' => null,
+                'expiry_reminder_sent_at' => null,
             ]);
         }
 
@@ -226,6 +227,9 @@ class PermitController extends Controller
         $permit->clearance_type = $request->clearance_type;
 
         if (! $isApplicantUser) {
+            $expiresOnChanged = $permit->exists
+                && (string) ($permit->expires_on ?? '') !== (string) ($request->expires_on ?? '');
+
             $permit->fill([
                 'permit_or_no' => $isFirstTimeJobSeeker ? 'RA11261' : $request->permit_or_no,
                 'community_tax_no' => $request->community_tax_no,
@@ -236,6 +240,9 @@ class PermitController extends Controller
                 'permit_doc_stamp_control_no' => $isFirstTimeJobSeeker ? '-' : $request->permit_doc_stamp_control_no,
                 'permit_date_of_payment' => $request->permit_date_of_payment,
             ]);
+            if ($expiresOnChanged) {
+                $permit->expiry_reminder_sent_at = null;
+            }
             $permit->disapproval_reason = null;
         }
 

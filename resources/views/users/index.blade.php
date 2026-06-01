@@ -18,7 +18,7 @@
         }
 
         .users-page {
-            max-width: 1720px;
+            max-width: 1800px;
         }
 
         .users-shell {
@@ -674,15 +674,163 @@
                 height: 36px;
             }
         }
+        html[data-theme="night"] body {
+            background: #050816;
+        }
+
+        html[data-theme="night"] .page-subtitle,
+        html[data-theme="night"] .metric-copy,
+        html[data-theme="night"] .panel-copy,
+        html[data-theme="night"] .table-copy,
+        html[data-theme="night"] .pagination-copy,
+        html[data-theme="night"] .empty-copy,
+        html[data-theme="night"] .user-meta,
+        html[data-theme="night"] .provider-meta,
+        html[data-theme="night"] .form-label,
+        html[data-theme="night"] .section-kicker,
+        html[data-theme="night"] .user-search-icon {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .users-hero,
+        html[data-theme="night"] .users-panel,
+        html[data-theme="night"] .users-table-shell,
+        html[data-theme="night"] .search-card,
+        html[data-theme="night"] .users-table-wrap,
+        html[data-theme="night"] .mobile-user-card,
+        html[data-theme="night"] .empty-state,
+        html[data-theme="night"] .user-search-wrap,
+        html[data-theme="night"] .permission-pill,
+        html[data-theme="night"] .role-pill,
+        html[data-theme="night"] .page-link {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .users-hero::after {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        html[data-theme="night"] .users-hero h2,
+        html[data-theme="night"] .metric-value,
+        html[data-theme="night"] .empty-title,
+        html[data-theme="night"] .user-name,
+        html[data-theme="night"] .provider-main {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .page-kicker {
+            background: rgba(37, 99, 235, 0.16);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .users-table thead th {
+            background: #111827 !important;
+            color: #cbd5e1;
+            border-bottom-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .users-table tbody td {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.12) !important;
+        }
+
+        html[data-theme="night"] .users-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.06) !important;
+        }
+
+        html[data-theme="night"] .btn-ghost {
+            background: #111827;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .btn-ghost:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .btn-primary-soft {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+        }
+
+        html[data-theme="night"] .btn-delete-user {
+            background: rgba(248, 113, 113, 0.14);
+            color: #fecaca;
+            border-color: rgba(248, 113, 113, 0.22);
+        }
+
+        html[data-theme="night"] .btn-delete-user:hover {
+            background: rgba(248, 113, 113, 0.22);
+            color: #fff1f2;
+        }
+
+        html[data-theme="night"] .btn-edit-user {
+            background: rgba(96, 165, 250, 0.16);
+            color: #bfdbfe;
+            border-color: rgba(96, 165, 250, 0.22);
+        }
+
+        html[data-theme="night"] .btn-edit-user:hover {
+            background: rgba(96, 165, 250, 0.24);
+            color: #eff6ff;
+        }
+
+        html[data-theme="night"] .user-avatar {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .role-pill-user {
+            background: #1f2937;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .permission-pill {
+            background: #111827;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.16);
+        }
+
+        html[data-theme="night"] .permission-pill-success {
+            background: rgba(16, 185, 129, 0.16);
+            color: #a7f3d0;
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        html[data-theme="night"] .mobile-user-card {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .empty-state {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+        }
+
+        html[data-theme="night"] .page-link {
+            background: #111827 !important;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .page-link:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .page-item.active .page-link {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #fff;
+        }
     </style>
 
-    <div class="container-fluid users-page py-1 px-md-4 px-xl-1">
+    <div class="container-fluid users-page py-0 px-md-2 px-xl-0">
         <div class="users-shell">
             <section class="users-hero">
-                <span class="page-kicker">
-                    <i class="bi bi-people"></i>
-                    User workspace
-                </span>
 
                 <div class="hero-top">
                     <div>

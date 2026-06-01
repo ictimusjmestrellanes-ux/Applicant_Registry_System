@@ -14,12 +14,14 @@
         $pwdNoCount = data_get($pwdBreakdown->firstWhere('label', 'NO'), 'count', 0);
         $fourPsYesCount = data_get($fourPsBreakdown->firstWhere('label', 'YES'), 'count', 0);
         $fourPsNoCount = data_get($fourPsBreakdown->firstWhere('label', 'NO'), 'count', 0);
+        $monthlyRegistrationLabels = $trendMonths ?? [];
         $yearlyApplicantTrendLabels = $trendMonths ?? [];
         $yearlyApplicantTrendDatasets = $yearlyApplicantTrendDatasets ?? [];
         $timeGreeting = (now()->hour >= 0 && now()->hour <= 11) ? 'Good Morning' : ((now()->hour >= 12 && now()->hour <= 17) ? 'Good Afternoon' : 'Good Evening');
+        $isAdminOrStaff = auth()->check() && auth()->user()?->role !== \App\Models\User::ROLE_USER;
     @endphp
 
-    <div class="dashboard-page container-fluid px-md-4 px-xl-1">
+    <div class="dashboard-page container-fluid py-0 px-md-4 px-xl-0">
         <section class="hero-panel mb-4">
             <div class="row g-4 align-items-center">
                 <div class="col-lg-8">
@@ -30,6 +32,13 @@
                         attention today.
                     </p>
                 </div>
+                @if($isAdminOrStaff)
+                    <div class="col-lg-4 d-flex justify-content-lg-end align-items-start">
+                        <button type="button" id="exportChartsButton" class="btn btn-light fw-bold px-4">
+                            <i class="bi bi-download me-2"></i>Export Charts
+                        </button>
+                    </div>
+                @endif
             </div>
         </section>
 
@@ -84,11 +93,10 @@
         @unless(auth()->user()?->role === 'user')
             <section class="row g-4 mb-4">
                 <div class="col-12">
-                    <div class="dashboard-card">
+                    <div class="dashboard-card monthly-registration-card">
                         <div class="section-header">
                             <div>
-                                <h5 class="section-title mb-1">Applicant Registrations by Year</h5>
-                                <p class="section-copy mb-0">Monthly registrations for every recorded year.</p>
+                                <h5 class="section-title mb-1">Monthly Registration</h5>
                             </div>
                             <div class="year-filter-wrap">
                                 <label for="trendYearFilter" class="visually-hidden">Filter by year</label>
@@ -103,10 +111,11 @@
 
                         <div class="chart-card">
                             <div class="chart-canvas-wrap chart-canvas-wrap--line">
-                                <canvas id="monthlyApplicantsChart"></canvas>
+                                <canvas id="monthlyRegistrationChart"></canvas>
                             </div>
                         </div>
                     </div>
+                </div>
             </section>
 
             <section class="row g-4 mb-4">
@@ -115,7 +124,7 @@
                         <div class="section-header">
                             <div>
                                 <h5 class="section-title mb-1">Male and Female Summary</h5>
-                                <p class="section-copy mb-0">Polar area view of applicant gender breakdown.</p>
+                                <p class="section-copy mb-0">Applicant gender breakdown.</p>
                             </div>
                         </div>
 
@@ -132,7 +141,7 @@
                         <div class="section-header">
                             <div>
                                 <h5 class="section-title mb-1">PWD Summary</h5>
-                                <p class="section-copy mb-0">Polar area view of applicant PWD participation.</p>
+                                <p class="section-copy mb-0">Applicant mark as PWD.</p>
                             </div>
                         </div>
 
@@ -143,7 +152,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-xl-4">
                     <div class="dashboard-card h-100">
                         <div class="section-header">
                             <div>
@@ -510,6 +519,18 @@
             height: 300px;
         }
 
+        .monthly-registration-card .section-header {
+            margin-bottom: 0.5rem;
+        }
+
+        .monthly-registration-card .chart-card {
+            padding-top: 0;
+        }
+
+        .monthly-registration-card .chart-canvas-wrap--line {
+            height: 420px;
+        }
+
         .chart-canvas-wrap canvas {
             width: 100% !important;
             height: 100% !important;
@@ -672,14 +693,89 @@
                 height: 180px;
             }
         }
+
+        html[data-theme="night"] .hero-panel,
+        html[data-theme="night"] .metric-card,
+        html[data-theme="night"] .dashboard-card,
+        html[data-theme="night"] .list-item,
+        html[data-theme="night"] .action-card,
+        html[data-theme="night"] .summary-card,
+        html[data-theme="night"] .progress-card {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.16);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+        }
+
+        html[data-theme="night"] .hero-title,
+        html[data-theme="night"] .section-title,
+        html[data-theme="night"] .metric-value,
+        html[data-theme="night"] .progress-title,
+        html[data-theme="night"] .list-title,
+        html[data-theme="night"] .action-title,
+        html[data-theme="night"] .chart-value {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .hero-copy,
+        html[data-theme="night"] .section-copy,
+        html[data-theme="night"] .list-copy,
+        html[data-theme="night"] .metric-note,
+        html[data-theme="night"] .progress-subtitle,
+        html[data-theme="night"] .empty-state {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .eyebrow {
+            background: rgba(59, 130, 246, 0.16);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .hero-highlight {
+            background: linear-gradient(180deg, #111827, #0f172a);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .metric-label,
+        html[data-theme="night"] .hero-highlight-label,
+        html[data-theme="night"] .empty-state i {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .year-filter {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .dashboard-progress {
+            background: #1e293b;
+        }
+
+        html[data-theme="night"] .chart-bar-wrap {
+            background: linear-gradient(to top, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.14));
+        }
+
+        html[data-theme="night"] .empty-state {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] #exportChartsButton {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: rgba(148, 163, 184, 0.2);
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const yearlyTrendLabels = @json($yearlyApplicantTrendLabels);
+            const exportChartsButton = document.getElementById('exportChartsButton');
+            const monthlyRegistrationLabels = @json($monthlyRegistrationLabels);
             const yearlyTrendDatasets = @json($yearlyApplicantTrendDatasets);
             const trendYearFilter = document.getElementById('trendYearFilter');
+
             const chartMaxForDatasets = (datasets) => Math.max(...datasets.flatMap((dataset) => dataset.data), 0) + 2;
             const getDatasetsForYear = (year) => {
                 if (year === 'all') {
@@ -713,6 +809,83 @@
             const provinceLabels = @json($provinceBreakdown->pluck('label')->values());
             const provinceData = @json($provinceBreakdown->pluck('count')->values());
 
+            const chartExportItems = [
+                { id: 'monthlyRegistrationChart', title: 'Monthly Registration' },
+                { id: 'sexPolarChart', title: 'Male and Female Summary' },
+                { id: 'pwdPolarChart', title: 'PWD Summary' },
+                { id: 'fourPsPolarChart', title: '4Ps Summary' },
+                { id: 'cityColumnChart', title: 'City Summary' },
+                { id: 'provinceColumnChart', title: 'Province Summary' },
+            ];
+
+            const getCanvasDataUrl = (canvas) => {
+                if (!canvas) {
+                    return null;
+                }
+
+                return canvas.toDataURL('image/png', 1.0);
+            };
+
+            const exportChartsToPdf = async () => {
+                if (!window.jspdf || !window.jspdf.jsPDF) {
+                    alert('PDF export is not available right now.');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('l', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 8;
+                const gap = 4;
+                const columns = 2;
+                const rows = 3;
+                const cellWidth = (pageWidth - (margin * 2) - gap) / columns;
+                const cellHeight = (pageHeight - (margin * 2) - (gap * (rows - 1))) / rows;
+                const titleHeight = 8;
+
+                chartExportItems.forEach((item, index) => {
+                    const canvas = document.getElementById(item.id);
+
+                    if (!canvas) {
+                        return;
+                    }
+
+                    const image = getCanvasDataUrl(canvas);
+
+                    if (!image) {
+                        return;
+                    }
+
+                    const imgProps = pdf.getImageProperties(image);
+                    const col = index % columns;
+                    const row = Math.floor(index / columns);
+                    const x = margin + (col * (cellWidth + gap));
+                    const y = margin + (row * (cellHeight + gap));
+                    const imageAreaWidth = cellWidth;
+                    const imageAreaHeight = cellHeight - titleHeight;
+                    const scale = Math.min(
+                        imageAreaWidth / imgProps.width,
+                        imageAreaHeight / imgProps.height
+                    );
+                    const drawWidth = imgProps.width * scale;
+                    const drawHeight = imgProps.height * scale;
+                    const drawX = x + ((imageAreaWidth - drawWidth) / 2);
+                    const drawY = y + titleHeight + ((imageAreaHeight - drawHeight) / 2);
+
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(11);
+                    pdf.text(item.title, x, y + 4);
+                    pdf.addImage(image, 'PNG', drawX, drawY, drawWidth, drawHeight);
+                });
+
+                pdf.save(`dashboard-charts-${new Date().toISOString().slice(0, 10)}.pdf`);
+            };
+
+            if (exportChartsButton) {
+                exportChartsButton.addEventListener('click', exportChartsToPdf);
+            }
+
             const lineOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -745,7 +918,6 @@
                     },
                     y: {
                         beginAtZero: true,
-                        suggestedMax: yearlyTrendMax,
                         ticks: {
                             precision: 0,
                             color: '#475569',
@@ -777,17 +949,23 @@
                 new Chart(canvas, config);
             };
 
-            const monthlyCanvas = document.getElementById('monthlyApplicantsChart');
+            const monthlyCanvas = document.getElementById('monthlyRegistrationChart');
 
             if (monthlyCanvas) {
-                const monthlyApplicantsChart = new Chart(monthlyCanvas, {
+                const monthlyRegistrationChart = new Chart(monthlyCanvas, {
                     type: 'line',
                     data: {
-                        labels: yearlyTrendLabels,
+                        labels: monthlyRegistrationLabels,
                         datasets: initialTrendDatasets,
                     },
                     options: {
                         ...lineOptions,
+                        plugins: {
+                            ...lineOptions.plugins,
+                            title: {
+                                display: false,
+                            },
+                        },
                         scales: {
                             ...lineOptions.scales,
                             y: {
@@ -803,9 +981,9 @@
                         const selectedYear = this.value;
                         const datasets = getDatasetsForYear(selectedYear);
 
-                        monthlyApplicantsChart.data.datasets = datasets;
-                        monthlyApplicantsChart.options.scales.y.suggestedMax = chartMaxForDatasets(datasets);
-                        monthlyApplicantsChart.update();
+                        monthlyRegistrationChart.data.datasets = datasets;
+                        monthlyRegistrationChart.options.scales.y.suggestedMax = chartMaxForDatasets(datasets);
+                        monthlyRegistrationChart.update();
                     });
                 }
             }
@@ -974,7 +1152,7 @@
                         data: cityData,
                         label: 'City Count',
                         borderColor: '#7c3aed',
-                        backgroundColor: 'rgba(124, 58, 237, 0.14)',
+                        backgroundColor: 'rgba(58, 237, 118, 0.14)',
                         pointBackgroundColor: '#7c3aed',
                         pointBorderColor: '#ffffff',
                         fill: false,

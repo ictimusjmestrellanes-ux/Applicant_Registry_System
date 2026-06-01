@@ -45,6 +45,20 @@
         .hero-copy {
             color: #64748b;
         }
+
+        html[data-theme="night"] .hero-panel {
+            background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+            border-color: rgba(148, 163, 184, 0.16);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+        }
+
+        html[data-theme="night"] .hero-title {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .hero-copy {
+            color: #94a3b8;
+        }
     </style>
 
     @if(auth()->check() && auth()->user()?->role === \App\Models\User::ROLE_USER)
@@ -70,14 +84,14 @@
                 Swal.fire({
                     title: 'Applicant Successfully Created',
                     html: `
-                                <div style="font-size:14px;">
-                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
-                                    @if (session('applicant_id'))
-                                        <p class="mb-2"><strong>Record ID:</strong> #{{ session('applicant_id') }}</p>
-                                    @endif
-                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
-                                </div>
-                            `,
+                                                <div style="font-size:14px;">
+                                                    <p class="mb-2">The applicant profile has been saved successfully.</p>
+                                                    @if (session('applicant_id'))
+                                                        <p class="mb-2"><strong>Record ID:</strong> #{{ session('applicant_id') }}</p>
+                                                    @endif
+                                                    <p class="text-muted">Would you like to continue editing the applicant requirements?</p>
+                                                </div>
+                                            `,
                     icon: 'success',
                     background: '#ffffff',
                     color: '#333',
@@ -163,6 +177,16 @@
         ])->filter()->count() > 0;
         $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
         $referralPercent = round(($referralUploaded / 2) * 100);
+
+        $permitSubmitLocked = $isApplicantUser
+            && $permit
+            && ($permit->approval_status ?? null) !== \App\Models\MayorsPermit::APPROVAL_DISAPPROVED;
+        $clearanceSubmitLocked = $isApplicantUser
+            && $clearance
+            && ($clearance->approval_status ?? null) !== \App\Models\MayorsClearance::APPROVAL_DISAPPROVED;
+        $referralSubmitLocked = $isApplicantUser
+            && $referral
+            && ($referral->approval_status ?? null) !== \App\Models\MayorsReferral::APPROVAL_DISAPPROVED;
     @endphp
 
     <style>
@@ -375,7 +399,6 @@
             border: 1px solid #e5edf5;
             background: #ffffff;
             backdrop-filter: blur(14px);
-            box-shadow: 0 28px 70px rgba(15, 34, 58, 0.1);
         }
 
         .content-intro {
@@ -667,8 +690,8 @@
             gap: 10px;
             margin-bottom: 18px;
             color: black;
-            font-size: 0.7rem;
-            font-weight: 500;
+            font-size: 0.9rem;
+            font-weight: 700;
             letter-spacing: 0.01em;
         }
 
@@ -1075,12 +1098,12 @@
                 min-height: auto;
                 padding: 12px 14px;
                 border-radius: 16px;
-                justify-content: flex-start;
+                justify-content: center;
             }
 
             .nav-tab-label {
-                justify-content: flex-start;
-                text-align: left;
+                justify-content: center;
+                text-align: center;
             }
 
             .tab-content {
@@ -1304,15 +1327,187 @@
                 box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
             }
         }
+
+        html[data-theme="night"] .requirements-container,
+        html[data-theme="night"] .content-intro,
+        html[data-theme="night"] .tab-shell,
+        html[data-theme="night"] .tab-content,
+        html[data-theme="night"] .form-card,
+        html[data-theme="night"] .document-upload-card,
+        html[data-theme="night"] .document-upload-card-resume,
+        html[data-theme="night"] .referral-letter-shell,
+        html[data-theme="night"] .peso-extra-detail-card,
+        html[data-theme="night"] .activity-log-card {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .referral-pane .peso-extra-detail-card.bg-light {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .referral-pane .peso-extra-detail-card.bg-light .badge.bg-primary-subtle {
+            background: rgba(59, 130, 246, 0.18) !important;
+            color: #bfdbfe !important;
+        }
+
+        html[data-theme="night"] .referral-pane .peso-extra-detail-card.bg-light .btn-light {
+            background: #111827 !important;
+            color: #e2e8f0 !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+        }
+
+        html[data-theme="night"] .referral-pane .peso-extra-detail-card.bg-light .btn-light:hover {
+            background: #1f2937 !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="night"] .content-intro,
+        html[data-theme="night"] .tab-content {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .fw-bold,
+        html[data-theme="night"] .section-title,
+        html[data-theme="night"] .section-title-c,
+        html[data-theme="night"] .nav-tab-label,
+        html[data-theme="night"] h5,
+        html[data-theme="night"] h6 {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .section-copy,
+        html[data-theme="night"] .content-intro p,
+        html[data-theme="night"] .file-name-text,
+        html[data-theme="night"] .text-muted,
+        html[data-theme="night"] .small {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="night"] .badge.text-bg-light {
+            background: rgba(15, 23, 42, 0.9) !important;
+            color: #cbd5e1 !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .nav-tabs {
+            border-bottom-color: rgba(148, 163, 184, 0.16);
+        }
+
+        html[data-theme="night"] .nav-tabs .nav-link {
+            color: #94a3b8;
+            background: transparent;
+        }
+
+        html[data-theme="night"] .nav-tabs .nav-link.active {
+            color: #f8fafc;
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.16);
+        }
+
+        html[data-theme="night"] .form-label {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .form-control,
+        html[data-theme="night"] .form-select,
+        html[data-theme="night"] .select2-container .select2-selection--single,
+        html[data-theme="night"] input[type=file] {
+            background: #0b1220;
+            border-color: rgba(148, 163, 184, 0.18);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .form-control::placeholder {
+            color: #64748b;
+        }
+
+        html[data-theme="night"] .form-control:hover,
+        html[data-theme="night"] .form-select:hover,
+        html[data-theme="night"] .select2-container .select2-selection--single:hover {
+            background: #111827;
+            border-color: rgba(96, 165, 250, 0.28);
+        }
+
+        html[data-theme="night"] .form-control:focus,
+        html[data-theme="night"] .form-select:focus,
+        html[data-theme="night"] .select2-container--default.select2-container--focus .select2-selection--single,
+        html[data-theme="night"] .select2-container--open .select2-selection--single {
+            background: #111827;
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+        }
+
+        html[data-theme="night"] .select2-container--default .select2-selection--single .select2-selection__rendered,
+        html[data-theme="night"] .select2-results__option {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .select2-dropdown {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .select2-search--dropdown .select2-search__field {
+            background: #111827;
+            color: #e2e8f0;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .select2-results__option--highlighted[aria-selected] {
+            background: rgba(59, 130, 246, 0.22);
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .document-upload-card:hover,
+        html[data-theme="night"] .document-upload-card-resume:hover {
+            border-color: rgba(96, 165, 250, 0.28);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+        }
+
+        html[data-theme="night"] .upload-disabled {
+            background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+            opacity: 0.82;
+        }
+
+        html[data-theme="night"] .btn-primary,
+        html[data-theme="night"] .btn-success,
+        html[data-theme="night"] .btn-secondary,
+        html[data-theme="night"] .btn-outline-primary,
+        html[data-theme="night"] .btn-outline-secondary,
+        html[data-theme="night"] .btn-light.border,
+        html[data-theme="night"] .btn-back-list {
+            background: #111827 !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="night"] .btn-primary:hover,
+        html[data-theme="night"] .btn-success:hover,
+        html[data-theme="night"] .btn-secondary:hover,
+        html[data-theme="night"] .btn-outline-primary:hover,
+        html[data-theme="night"] .btn-outline-secondary:hover,
+        html[data-theme="night"] .btn-light.border:hover,
+        html[data-theme="night"] .btn-back-list:hover {
+            background: #1f2937 !important;
+            border-color: rgba(96, 165, 250, 0.28) !important;
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="night"] .btn:disabled,
+        html[data-theme="night"] .btn.disabled {
+            background: #0b1220 !important;
+            border-color: rgba(148, 163, 184, 0.12) !important;
+            color: #64748b !important;
+        }
     </style>
 
-    <div class="container applicant-wrapper">
+    <div class="container applicant-wrapper py-0 px-md-4 px-xl-0">
         <div class="requirements-container">
             <div class="content-intro">
-                <div>
-                    <h5 class="fw-bold mb-1">Document Compliance</h5>
-                    <p class="small">Manage permit, clearance, and referral requirements with a cleaner workflow.</p>
-                </div>
+                <h5 class="fw-bold mb-1">Document Compliance</h5>
+                <p class="small">Manage permit, clearance, and referral requirements with a cleaner workflow.</p>
                 <span class="badge rounded-pill text-bg-light border px-3 py-2">
                     <i class="bi bi-upc-scan me-1"></i> Record ID: #{{ $applicant->id }}
                 </span>
@@ -1458,6 +1653,11 @@
                                             </option>
                                         </select>
                                     </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Email Address<span class="required-mark">*</span></label>
+                                        <input type="email" name="email" class="form-control"
+                                            value="{{ $applicant->email }}" placeholder="name@example.com" required>
+                                    </div>
                                 </div>
                             </section>
 
@@ -1581,8 +1781,8 @@
                             );
                         @endphp
 
-                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                            <h6 class="section-title text-primary mb-4">Mayor’s Permit to Work Requirements</h6>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-4">
+                            <h6 class="section-title text-primary mb-1">Mayor’s Permit to Work Requirements</h6>
                             @if($applicant->permit)
                                 <div class="d-flex flex-column align-items-end gap-1">
                                     <span class="badge rounded-pill {{ $permit->approvalStatusClass() }}">
@@ -1602,7 +1802,8 @@
                         @if($isPermitRenewalDue)
                             <div class="alert alert-warning border-0 shadow-sm mb-3">
                                 <strong>Renewal due:</strong> this permit has reached its 6-month renewal cycle.
-                                The current upload set is refreshed when renewal is due, and new files are required before saving.
+                                The current upload set is refreshed when renewal is due, and new files are required before
+                                saving.
                             </div>
                         @endif
 
@@ -1637,9 +1838,9 @@
                                             {{ $isPermitRenewalDue ? 'Renewal due - upload a new file' : (!empty($permit->permit_nbi_clearance) ? basename($permit->permit_nbi_clearance) : 'No file selected') }}
                                         </small>
 
-                                        @if(!empty($permit->permit_nbi_clearance) && ! $isPermitRenewalDue)
-                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_nbi_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                        @if(!empty($permit->permit_nbi_clearance) && !$isPermitRenewalDue)
+                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_nbi_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -1663,9 +1864,9 @@
                                         </small>
 
                                         <!-- VIEW FILE -->
-                                        @if(!empty($permit->permit_police_clearance) && ! $isPermitRenewalDue)
-                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_police_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                        @if(!empty($permit->permit_police_clearance) && !$isPermitRenewalDue)
+                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_police_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -1689,8 +1890,8 @@
                                             {{ !empty($permit->health_card) ? basename($permit->health_card) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->health_card))
-                                            <a href="{{ route('storage.view', ['filename' => $permit->health_card]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $permit->health_card]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -1713,8 +1914,8 @@
                                             {{ !empty($permit->cedula) ? basename($permit->cedula) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->cedula))
-                                            <a href="{{ route('storage.view', ['filename' => $permit->cedula]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $permit->cedula]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -1743,7 +1944,8 @@
                                             {{ !empty($permit->referral_letter) ? basename($permit->referral_letter) : 'No file selected' }}
                                         </small>
                                         @if(!empty($permit->referral_letter))
-                                            <a id="referral_view_link" href="{{ route('storage.view', ['filename' => $permit->referral_letter]) }}"
+                                            <a id="referral_view_link"
+                                                href="{{ route('storage.view', ['filename' => $permit->referral_letter]) }}"
                                                 target="_blank"
                                                 class="btn btn-light btn-sm text-primary border {{ $isImusResident ? 'd-none' : '' }}">
                                                 <i class="fas fa-eye me-1"></i> View Current
@@ -1798,37 +2000,38 @@
                                         value="{{$permit->community_tax_no}}" required>
                                 </div>
 
-                            {{-- Issued On --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
-                                <input type="date" name="permit_issued_on" class="form-control"
-                                    value="{{$permit->permit_issued_on}}" required>
-                            </div>
+                                {{-- Issued On --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
+                                    <input type="date" name="permit_issued_on" class="form-control"
+                                        value="{{$permit->permit_issued_on}}" required>
+                                </div>
 
-                            {{-- Permit Issued At --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
-                                <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select" required>
-                                    @php
-                                        $permitIssuedAtValue = strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? '')));
-                                    @endphp
-                                    <option value="">Select City</option>
-                                </select>
-                            </div>
+                                {{-- Permit Issued At --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Permit Issued At<span class="required-mark">*</span></label>
+                                    <select type="text" name="permit_issued_at" id="permitIssuedAtSelect" class="form-select"
+                                        required>
+                                        @php
+                                            $permitIssuedAtValue = strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? '')));
+                                        @endphp
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
 
-                            {{-- Permit Date --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Permit Date<span class="required-mark">*</span></label>
-                                <input type="date" id="permit_date" name="permit_date" class="form-control"
-                                    value="{{$permit->permit_date}}" required>
-                            </div>
+                                {{-- Permit Date --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Permit Date<span class="required-mark">*</span></label>
+                                    <input type="date" id="permit_date" name="permit_date" class="form-control"
+                                        value="{{$permit->permit_date}}" required>
+                                </div>
 
-                            {{-- Expiration --}}
-                            <div class="col-md-2">
-                                <label class="form-label">Expires On<span class="required-mark">*</span></label>
-                                <input type="date" id="expires_on" name="expires_on" class="form-control"
-                                    value="{{$permit->expires_on}}" readonly>
-                            </div>
+                                {{-- Expiration --}}
+                                <div class="col-md-2">
+                                    <label class="form-label">Expires On<span class="required-mark">*</span></label>
+                                    <input type="date" id="expires_on" name="expires_on" class="form-control"
+                                        value="{{$permit->expires_on}}" readonly>
+                                </div>
 
                                 {{-- Documentary Stamp --}}
                                 <div class="col-md-2">
@@ -1853,8 +2056,10 @@
                         <div class="permit-action-bar mt-4">
                             {{-- Action: Save/Update --}}
                             @if($isApplicantUser || auth()->user()->hasPermission('update_permit'))
-                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-floppy-disk me-2"></i>{{ $isApplicantUser ? 'Submit Upload File' : 'Save Permit' }}
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm"
+                                    @if($isApplicantUser && $permitSubmitLocked) disabled title="Submission is locked until staff or admin disapproves this request." @endif>
+                                    <i
+                                        class="fa-solid fa-floppy-disk me-2"></i>{{ $isApplicantUser ? ($permitSubmitLocked ? 'Submitted' : 'Submit Upload File') : 'Save Permit' }}
                                 </button>
                             @else
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -1869,15 +2074,14 @@
                                 @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->canReview())
                                     <button type="submit" form="permit-approve-form-{{ $applicant->id }}"
                                         class="btn btn-success px-4 shadow-sm" formnovalidate>
-                                            <i class="fa-solid fa-circle-check me-2"></i>Approve Permit Requirements
+                                        <i class="fa-solid fa-circle-check me-2"></i>Approve Permit Requirements
                                     </button>
                                 @endif
                             @endunless
 
                             @unless($isApplicantUser)
                                 @if(auth()->user()->hasPermission('approve_document') && $permit && $permit->canReview())
-                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
-                                        data-bs-toggle="modal"
+                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm" data-bs-toggle="modal"
                                         data-bs-target="#disapprovePermitModal-{{ $applicant->id }}">
                                         <i class="fa-solid fa-circle-xmark me-2"></i>
                                         Disapprove Permit Requirements
@@ -1897,7 +2101,7 @@
                                         // Logic para sa error message
                                         $reason = !auth()->user()->hasPermission('generate_permit')
                                             ? 'No permission to generate ID'
-                                            : (($permit && ! $permit->isApproved())
+                                            : (($permit && !$permit->isApproved())
                                                 ? 'Awaiting admin or staff approval'
                                                 : 'Complete all requirements first');
                                     @endphp
@@ -1911,7 +2115,8 @@
                             @endunless
                         </div>
                     </form>
-                    <form id="permit-approve-form-{{ $applicant->id }}" action="{{ route('permits.approve', $applicant->id) }}" method="POST" class="d-none">
+                    <form id="permit-approve-form-{{ $applicant->id }}"
+                        action="{{ route('permits.approve', $applicant->id) }}" method="POST" class="d-none">
                         @csrf
                         @method('PUT')
                     </form>
@@ -1929,8 +2134,8 @@
 
                         @php $clearance = optional($applicant->clearance); @endphp
 
-                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                            <h6 class="section-title text-primary mb-4">Mayor's Clearance Requirements</h6>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-4">
+                            <h6 class="section-title text-primary mb-1">Mayor's Clearance Requirements</h6>
                             @if($applicant->clearance)
                                 <div class="d-flex flex-column align-items-end gap-1">
                                     <span class="badge rounded-pill {{ $clearance->approvalStatusClass() }}">
@@ -1955,8 +2160,7 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="prosecutor_input" name="prosecutor_clearance"
-                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')"
-                                            {{ empty($clearance->prosecutor_clearance) ? 'required' : '' }}>
+                                            style="display:none" onchange="showFileName(this, 'prosecutor_name')" {{ empty($clearance->prosecutor_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('prosecutor_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1965,8 +2169,8 @@
                                             {{ !empty($clearance->prosecutor_clearance) ? basename($clearance->prosecutor_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->prosecutor_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->prosecutor_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->prosecutor_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -1980,8 +2184,7 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="mtc_input" name="mtc_clearance" style="display:none"
-                                            onchange="showFileName(this, 'mtc_name')"
-                                            {{ empty($clearance->mtc_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'mtc_name')" {{ empty($clearance->mtc_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('mtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -1990,8 +2193,8 @@
                                             {{ !empty($clearance->mtc_clearance) ? basename($clearance->mtc_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->mtc_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->mtc_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->mtc_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2005,8 +2208,7 @@
                                             class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="rtc_input" name="rtc_clearance" style="display:none"
-                                            onchange="showFileName(this, 'rtc_name')"
-                                            {{ empty($clearance->rtc_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'rtc_name')" {{ empty($clearance->rtc_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('rtc_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2015,8 +2217,8 @@
                                             {{ !empty($clearance->rtc_clearance) ? basename($clearance->rtc_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->rtc_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->rtc_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->rtc_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2029,8 +2231,7 @@
                                     <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="c_nbi_input" name="nbi_clearance" style="display:none"
-                                            onchange="showFileName(this, 'c_nbi_name')"
-                                            {{ empty($clearance->nbi_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'c_nbi_name')" {{ empty($clearance->nbi_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('c_nbi_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2039,8 +2240,8 @@
                                             {{ !empty($clearance->nbi_clearance) ? basename($clearance->nbi_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->nbi_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->nbi_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->nbi_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2053,8 +2254,7 @@
                                     <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
                                     <div class="d-grid gap-2">
                                         <input type="file" id="brgy_input" name="barangay_clearance" style="display:none"
-                                            onchange="showFileName(this, 'brgy_name')"
-                                            {{ empty($clearance->barangay_clearance) ? 'required' : '' }}>
+                                            onchange="showFileName(this, 'brgy_name')" {{ empty($clearance->barangay_clearance) ? 'required' : '' }}>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="document.getElementById('brgy_input').click()">
                                             <i class="fas fa-upload me-1"></i> Upload File
@@ -2063,8 +2263,8 @@
                                             {{ !empty($clearance->barangay_clearance) ? basename($clearance->barangay_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($clearance->barangay_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->barangay_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border">
+                                            <a href="{{ route('storage.view', ['filename' => $clearance->barangay_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2126,8 +2326,10 @@
                         <div class="clearance-action-bar mt-4">
                             {{-- Update/Save Section --}}
                             @if($isApplicantUser || auth()->user()->hasPermission('update_clearance'))
-                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-certificate me-2"></i>{{ $isApplicantUser ? 'Submit Upload File' : 'Save Clearance' }}
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm"
+                                    @if($isApplicantUser && $clearanceSubmitLocked) disabled title="Submission is locked until staff or admin disapproves this request." @endif>
+                                    <i
+                                        class="fa-solid fa-certificate me-2"></i>{{ $isApplicantUser ? ($clearanceSubmitLocked ? 'Submitted' : 'Submit Upload File') : 'Save Clearance' }}
                                 </button>
                             @else
                                 <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
@@ -2148,8 +2350,7 @@
 
                             @unless($isApplicantUser)
                                 @if(auth()->user()->hasPermission('approve_document') && $clearance && $clearance->canReview())
-                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
-                                        data-bs-toggle="modal"
+                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm" data-bs-toggle="modal"
                                         data-bs-target="#disapproveClearanceModal-{{ $applicant->id }}">
                                         <i class="fa-solid fa-circle-xmark me-2"></i>
                                         Disapprove Clearance Requirements
@@ -2168,7 +2369,7 @@
                                     @php
                                         $reason = !auth()->user()->hasPermission('generate_clearance')
                                             ? 'No permission to generate letter'
-                                            : (($clearance && ! $clearance->isApproved())
+                                            : (($clearance && !$clearance->isApproved())
                                                 ? 'Awaiting admin or staff approval'
                                                 : 'Requirements incomplete');
                                     @endphp
@@ -2212,8 +2413,8 @@
                             }
                         @endphp
 
-                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
-                            <h6 class="section-title text-primary mb-4">Mayor's Referral Requirements</h6>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-4">
+                            <h6 class="section-title text-primary mb-1">Mayor's Referral Requirements</h6>
                             @if($applicant->referral)
                                 <div class="d-flex flex-column align-items-end gap-1">
                                     <span class="badge rounded-pill {{ $referral->approvalStatusClass() }}">
@@ -2232,11 +2433,10 @@
 
                         <div class="mb-3">
                             <div class="document-upload-card-resume">
-                                    <label class="form-label">Resume / Bio-data<span class="required-mark">*</span></label>
-                                    <div class="d-grid gap-2">
-                                        <input type="file" id="resume_input" name="resume" style="display:none"
-                                        onchange="showFileName(this, 'resume_name')"
-                                        {{ empty($referral->resume) ? 'required' : '' }}>
+                                <label class="form-label">Resume / Bio-data<span class="required-mark">*</span></label>
+                                <div class="d-grid gap-2">
+                                    <input type="file" id="resume_input" name="resume" style="display:none"
+                                        onchange="showFileName(this, 'resume_name')" {{ empty($referral->resume) ? 'required' : '' }}>
                                     <button type="button" class="btn btn-outline-primary btn-sm"
                                         onclick="document.getElementById('resume_input').click()">
                                         <i class="fas fa-upload me-1"></i> Upload File
@@ -2296,8 +2496,9 @@
                                             {{ !empty($referral->ref_police_clearance) ? basename($referral->ref_police_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($referral->ref_police_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_police_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border" id="ref_police_current_link">
+                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_police_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border"
+                                                id="ref_police_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2319,8 +2520,9 @@
                                             {{ !empty($referral->ref_nbi_clearance) ? basename($referral->ref_nbi_clearance) : 'No file selected' }}
                                         </small>
                                         @if(!empty($referral->ref_nbi_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_nbi_clearance]) }}" target="_blank"
-                                                class="btn btn-light btn-sm text-primary border" id="ref_nbi_current_link">
+                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_nbi_clearance]) }}"
+                                                target="_blank" class="btn btn-light btn-sm text-primary border"
+                                                id="ref_nbi_current_link">
                                                 <i class="fas fa-eye me-1"></i> View Current
                                             </a>
                                         @endif
@@ -2420,7 +2622,7 @@
                                             @php
                                                 $pesoReferralReason = !auth()->user()->canViewReferralLetter()
                                                     ? 'No permission to generate letter'
-                                                    : (($referral && ! $referral->canPrint())
+                                                    : (($referral && !$referral->canPrint())
                                                         ? 'Awaiting admin or staff approval'
                                                         : null);
                                             @endphp
@@ -2433,8 +2635,8 @@
                                                     </a>
                                                 @else
                                                     <button type="button" id="printReferralPesoButton"
-                                                        class="btn btn-outline-secondary justify-content-center px-4"
-                                                        disabled title="{{ $pesoReferralReason ?? 'Complete all requirements first' }}">
+                                                        class="btn btn-outline-secondary justify-content-center px-4" disabled
+                                                        title="{{ $pesoReferralReason ?? 'Complete all requirements first' }}">
                                                         <i class="fas fa-print me-1"></i> View Referral Letter Within Imus
                                                     </button>
                                                 @endif
@@ -2590,7 +2792,7 @@
                                             <div class="mt-3 d-flex flex-wrap gap-2">
                                                 <button type="button"
                                                     class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled
-                                                    title="{{ $referral && ! $referral->isApproved() ? 'Awaiting admin or staff approval' : 'Complete the employer detail fields first' }}">
+                                                    title="{{ $referral && !$referral->isApproved() ? 'Awaiting admin or staff approval' : 'Complete the employer detail fields first' }}">
                                                     <i class="fas fa-print me-1"></i> View Employer Letter Detail
                                                 </button>
                                                 <button type="button"
@@ -2647,7 +2849,7 @@
                                                 @php
                                                     $referralReason = !auth()->user()->canViewReferralLetter()
                                                         ? 'No permission to view referral letter'
-                                                        : (($referral && ! $referral->canPrint())
+                                                        : (($referral && !$referral->canPrint())
                                                             ? 'Awaiting admin or staff approval'
                                                             : 'Complete all requirements first');
                                                 @endphp
@@ -2675,8 +2877,10 @@
 
                         <div class="referral-action-bar mt-4">
                             @if($isApplicantUser || auth()->user()->hasPermission('update_referral'))
-                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                                    <i class="fa-solid fa-file-export me-2"></i>{{ $isApplicantUser ? 'Submit Upload File' : 'Save Referral' }}
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm"
+                                    @if($isApplicantUser && $referralSubmitLocked) disabled title="Submission is locked until staff or admin disapproves this request." @endif>
+                                    <i
+                                        class="fa-solid fa-file-export me-2"></i>{{ $isApplicantUser ? ($referralSubmitLocked ? 'Submitted' : 'Submit Upload File') : 'Save Referral' }}
                                 </button>
                             @else
                                 <span class="d-inline-block" data-bs-toggle="tooltip" title="No permission to update">
@@ -2697,8 +2901,7 @@
 
                             @unless($isApplicantUser)
                                 @if(auth()->user()->hasPermission('approve_document') && $referral && $referral->canReview())
-                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
-                                        data-bs-toggle="modal"
+                                    <button type="button" class="btn btn-outline-danger px-4 shadow-sm" data-bs-toggle="modal"
                                         data-bs-target="#disapproveReferralModal-{{ $applicant->id }}">
                                         <i class="fa-solid fa-circle-xmark me-2"></i>
                                         Disapprove Referral Requirements
@@ -2739,7 +2942,8 @@
                         @endif
                         <div class="mb-0">
                             <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
-                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason', $permit->disapproval_reason ?? '') }}</textarea>
+                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus
+                                required>{{ old('disapproval_reason', $permit->disapproval_reason ?? '') }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -2753,7 +2957,8 @@
         </div>
     </div>
 
-    <form id="clearance-approve-form-{{ $applicant->id }}" action="{{ route('clearances.approve', $applicant->id) }}" method="POST" class="d-none">
+    <form id="clearance-approve-form-{{ $applicant->id }}" action="{{ route('clearances.approve', $applicant->id) }}"
+        method="POST" class="d-none">
         @csrf
         @method('PUT')
     </form>
@@ -2784,7 +2989,8 @@
                         @endif
                         <div class="mb-0">
                             <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
-                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason') }}</textarea>
+                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus
+                                required>{{ old('disapproval_reason') }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -2798,7 +3004,8 @@
         </div>
     </div>
 
-    <form id="referral-approve-form-{{ $applicant->id }}" action="{{ route('referrals.approve', $applicant->id) }}" method="POST" class="d-none">
+    <form id="referral-approve-form-{{ $applicant->id }}" action="{{ route('referrals.approve', $applicant->id) }}"
+        method="POST" class="d-none">
         @csrf
         @method('PUT')
     </form>
@@ -2829,7 +3036,8 @@
                         @endif
                         <div class="mb-0">
                             <label class="form-label fw-semibold">Reason <span class="text-danger">*</span></label>
-                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus required>{{ old('disapproval_reason') }}</textarea>
+                            <textarea name="disapproval_reason" class="form-control" rows="4" autofocus
+                                required>{{ old('disapproval_reason') }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -3918,7 +4126,7 @@
 @if($disapproveRequirement && $disapproveRequirementId)
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const modalId = @json('disapprove'.ucfirst($disapproveRequirement).'Modal-'.$disapproveRequirementId);
+            const modalId = @json('disapprove' . ucfirst($disapproveRequirement) . 'Modal-' . $disapproveRequirementId);
             const modalEl = document.getElementById(modalId);
 
             if (modalEl && window.bootstrap && window.bootstrap.Modal) {

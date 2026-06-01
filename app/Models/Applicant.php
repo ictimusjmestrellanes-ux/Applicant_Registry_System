@@ -15,6 +15,7 @@ class Applicant extends Model
         'last_name',
         'suffix',
         'age',
+        'email',
         'contact_no',
         'gender',
         'civil_status',

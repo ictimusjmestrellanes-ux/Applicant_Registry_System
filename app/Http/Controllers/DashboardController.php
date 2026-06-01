@@ -43,6 +43,8 @@ class DashboardController extends Controller
             ->unique()
             ->values();
 
+        $monthlyRegistrationYears = $trendYears->slice(max($trendYears->count() - 2, 0))->values();
+
         $trendPalette = [
             ['border' => '#ff5c7a', 'background' => 'rgba(255, 92, 122, 0.14)'],
             ['border' => '#3b82f6', 'background' => 'rgba(59, 130, 246, 0.14)'],
@@ -72,6 +74,30 @@ class DashboardController extends Controller
                 'pointBackgroundColor' => $palette['border'],
                 'pointBorderColor' => '#ffffff',
                 'fill' => false,
+            ];
+        })->values();
+
+        $monthlyRegistrationDatasets = $monthlyRegistrationYears->map(function (int $year, int $index) use ($yearlyApplicantTrends, $trendPalette) {
+            $palette = $trendPalette[$index % count($trendPalette)];
+            $yearRows = $yearlyApplicantTrends
+                ->where('year', $year)
+                ->keyBy('month');
+
+            $data = collect(range(1, 12))
+                ->map(function (int $month) use ($yearRows) {
+                    return (int) ($yearRows->get($month)?->total ?? 0);
+                })
+                ->values();
+
+            return [
+                'label' => (string) $year,
+                'data' => $data,
+                'borderColor' => $palette['border'],
+                'backgroundColor' => $palette['background'],
+                'pointBackgroundColor' => $palette['border'],
+                'pointBorderColor' => '#ffffff',
+                'fill' => false,
+                'tension' => 0.35,
             ];
         })->values();
 
@@ -213,6 +239,12 @@ class DashboardController extends Controller
                 ->max() ?? 0,
             1
         );
+        $monthlyRegistrationValues = $monthlyRegistrationDatasets
+            ->pluck('data')
+            ->flatten()
+            ->filter(fn ($value) => $value > 0);
+        $monthlyRegistrationMin = max(($monthlyRegistrationValues->min() ?? 0) - 2, 0);
+        $monthlyRegistrationMax = max(($monthlyRegistrationDatasets->pluck('data')->flatten()->max() ?? 0) + 2, 1);
         $maxGenderApplicants = max($genderBreakdown->max('count') ?? 0, 1);
         $maxCityApplicants = max($cityBreakdown->max('count') ?? 0, 1);
         $maxProvinceApplicants = max($provinceBreakdown->max('count') ?? 0, 1);
@@ -226,6 +258,10 @@ class DashboardController extends Controller
             'trendMonths',
             'trendYears',
             'yearlyApplicantTrendDatasets',
+            'monthlyRegistrationYears',
+            'monthlyRegistrationDatasets',
+            'monthlyRegistrationMin',
+            'monthlyRegistrationMax',
             'maxMonthlyApplicants',
             'genderBreakdown',
             'maxGenderApplicants',

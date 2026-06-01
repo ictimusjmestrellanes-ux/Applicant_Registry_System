@@ -16,14 +16,9 @@ return [
         'children' => [
             ['label' => 'Add Applicant', 'route' => 'applicants.create', 'visible_roles' => ['admin', 'staff']],
             ['label' => 'List of Applicants', 'route' => 'applicants.index'],
+            ['label' => 'Archive Applicants', 'route' => 'applicants.archive', 'visible_permissions' => ['view_archive_applicants']],
+            
         ],
-    ],
-
-    [
-        'label' => 'Archive Applicants',
-        'icon' => 'bi bi-archive',
-        'route' => 'applicants.archive',
-        'visible_permissions' => ['view_archive_applicants'],
     ],
 
     [

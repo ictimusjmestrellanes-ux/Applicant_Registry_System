@@ -110,12 +110,23 @@
                 </div>
             </div>
 
+            <button
+                type="button"
+                class="nav-theme-btn"
+                data-theme-toggle
+                onclick="toggleAppTheme()"
+                aria-label="Switch to night mode"
+                title="Switch to night mode"
+            >
+                <i class="bi bi-moon-stars"></i>
+            </button>
+
             <div class="nav-utility d-none d-md-flex">
                 <div class="utility-icon">
                     <i class="bi bi-calendar3"></i>
                 </div>
                 <div>
-                    <div class="utility-label">Today</div>
+                    <div class="utility-label">{{ now()->format('l') }}</div>
                     <div class="utility-value">{{ now()->format('M d, Y') }}</div>
                 </div>
             </div>
@@ -172,6 +183,7 @@
     /* NAVBAR + SIDEBAR UI updates: white background, black text/icons, subtle surfaces */
     :root {
         --bg-white: #ffffff;
+        --navbar-surface: #f3f4f6;
         --muted: #6b7280;
         --line: #e5e7eb;
         --ink: #000000;
@@ -186,7 +198,7 @@
         top: 0;
         z-index: 1030;
         padding: 12px 0;
-        background: var(--bg-white);
+        background: var(--navbar-surface);
         border-bottom: 1px solid var(--line);
         box-shadow: 0 4px 10px rgba(0,0,0,0.04);
     }
@@ -202,6 +214,25 @@
         align-items: center;
         justify-content: center;
         font-size: 1.15rem;
+    }
+
+    .nav-theme-btn {
+        width: 50px;
+        height: 50px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--bg-white);
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        transition: all 0.15s ease;
+    }
+
+    .nav-theme-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(0,0,0,0.03);
     }
 
     .nav-page-title {
@@ -223,8 +254,8 @@
 
     .nav-notification-btn {
         position: relative;
-        width: 42px;
-        height: 42px;
+        width: 50px;
+        height: 50px;
         border: 1px solid var(--line);
         border-radius: 12px;
         background: var(--bg-white);
@@ -415,8 +446,8 @@
     }
 
     .utility-icon {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 10px;
         display: flex;
         align-items: center;
@@ -435,6 +466,77 @@
         .dashboard-navbar { padding: 10px 0; }
         .nav-page-title { font-size: 1rem; }
         .notification-menu { width: 290px; }
+    }
+
+    html[data-theme="night"] {
+        --bg-white: #0f172a;
+        --navbar-surface: #0b1220;
+        --muted: #94a3b8;
+        --line: rgba(148, 163, 184, 0.18);
+        --ink: #e2e8f0;
+        --surface: #1e293b;
+        --accent-dark: #f8fafc;
+        --danger: #f87171;
+    }
+
+    html[data-theme="night"] .dashboard-navbar {
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    html[data-theme="night"] .nav-toggle-btn,
+    html[data-theme="night"] .nav-notification-btn,
+    html[data-theme="night"] .nav-theme-btn,
+    html[data-theme="night"] .nav-utility {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    html[data-theme="night"] .nav-theme-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    html[data-theme="night"] .notification-menu {
+        background: #0f172a;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    html[data-theme="night"] .notification-menu-header {
+        background: linear-gradient(180deg, rgba(59, 130, 246, 0.16), rgba(59, 130, 246, 0.02));
+    }
+
+    html[data-theme="night"] .notification-menu-footer {
+        background: #0f172a;
+    }
+
+    html[data-theme="night"] .notification-item:hover {
+        background: rgba(59, 130, 246, 0.08);
+    }
+
+    html[data-theme="night"] .notification-item-icon {
+        background: rgba(59, 130, 246, 0.16);
+        color: #93c5fd;
+    }
+
+    html[data-theme="night"] .notification-empty-icon {
+        background: rgba(255, 255, 255, 0.04);
+        color: #94a3b8;
+    }
+
+    html[data-theme="night"] .notification-empty .text-dark {
+        color: #e2e8f0 !important;
+    }
+
+    html[data-theme="night"] .notification-empty .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    html[data-theme="night"] .notification-count,
+    html[data-theme="night"] .notification-dot {
+        box-shadow: 0 0 0 2px #0b1220;
+    }
+
+    html[data-theme="night"] .user-menu-link:hover,
+    html[data-theme="night"] .navbar-item:hover {
+        background: rgba(255, 255, 255, 0.05);
     }
 
 </style>

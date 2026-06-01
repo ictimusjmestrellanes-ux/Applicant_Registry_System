@@ -36,12 +36,17 @@ class MayorsPermit extends Model
 
         'permit_date',
         'expires_on',
+        'expiry_reminder_sent_at',
 
         'permit_doc_stamp_control_no',
         'permit_date_of_payment',
         'penalty_applied',
         'penalty_applied_at',
 
+    ];
+
+    protected $casts = [
+        'expiry_reminder_sent_at' => 'datetime',
     ];
 
     /*
@@ -181,5 +186,25 @@ class MayorsPermit extends Model
             $this->isReadyForIdGeneration() &&
             ! empty($this->peso_id_no) &&
             ! empty($this->permit_date_of_payment);
+    }
+
+    public function expiresWithinDays(int $days = 15): bool
+    {
+        if (empty($this->expires_on)) {
+            return false;
+        }
+
+        $expiresOn = Carbon::parse($this->expires_on)->startOfDay();
+        $windowEnd = now()->addDays($days)->startOfDay();
+
+        return $expiresOn->betweenIncluded(now()->startOfDay(), $windowEnd);
+    }
+
+    public function needsExpiryReminder(int $days = 15): bool
+    {
+        return $this->isApproved()
+            && $this->isComplete()
+            && empty($this->expiry_reminder_sent_at)
+            && $this->expiresWithinDays($days);
     }
 }

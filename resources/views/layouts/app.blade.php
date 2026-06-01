@@ -14,13 +14,23 @@
     <style>
         :root {
             --sidebar-width: 280px;
+            --app-bg: #f1f5f9;
+            --app-text: #0f172a;
             --sidebar-bg: #0f172a;
+        }
+
+        html[data-theme="night"] {
+            color-scheme: dark;
+            --app-bg: #050816;
+            --app-text: #e2e8f0;
         }
 
         body {
             overflow-x: hidden;
-            background: #f1f5f9;
+            background: var(--app-bg);
+            color: var(--app-text);
             font-family: 'Inter', 'Segoe UI', sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         /* SIDEBAR INITIAL STATE */
@@ -90,6 +100,41 @@
             }
         }
     </style>
+    <script>
+        (function () {
+            const storageKey = 'app-theme';
+            const storedTheme = localStorage.getItem(storageKey);
+            const theme = storedTheme === 'night' ? 'night' : 'day';
+
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.style.colorScheme = theme === 'night' ? 'dark' : 'light';
+
+            window.setAppTheme = function (nextTheme) {
+                const normalizedTheme = nextTheme === 'night' ? 'night' : 'day';
+                document.documentElement.dataset.theme = normalizedTheme;
+                document.documentElement.style.colorScheme = normalizedTheme === 'night' ? 'dark' : 'light';
+                localStorage.setItem(storageKey, normalizedTheme);
+
+                document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+                    const isNight = normalizedTheme === 'night';
+                    button.setAttribute('aria-label', isNight ? 'Switch to day mode' : 'Switch to night mode');
+                    button.setAttribute('title', isNight ? 'Switch to day mode' : 'Switch to night mode');
+                    button.innerHTML = isNight
+                        ? '<i class="bi bi-sun-fill"></i>'
+                        : '<i class="bi bi-moon-stars"></i>';
+                });
+            };
+
+            window.toggleAppTheme = function () {
+                const currentTheme = document.documentElement.dataset.theme === 'night' ? 'night' : 'day';
+                window.setAppTheme(currentTheme === 'night' ? 'day' : 'night');
+            };
+
+            document.addEventListener('DOMContentLoaded', function () {
+                window.setAppTheme(document.documentElement.dataset.theme === 'night' ? 'night' : 'day');
+            });
+        })();
+    </script>
 </head>
 
 <body>

@@ -24,7 +24,7 @@
         }
 
         .archive-page {
-            max-width: 1720px;
+            max-width: 2000px;
         }
 
         .archive-shell {
@@ -511,15 +511,131 @@
                 flex-wrap: wrap;
             }
         }
+
+        html[data-theme="night"] body {
+            background: #050816;
+        }
+
+        html[data-theme="night"] .page-subtitle,
+        html[data-theme="night"] .metric-copy,
+        html[data-theme="night"] .panel-copy,
+        html[data-theme="night"] .table-copy,
+        html[data-theme="night"] .empty-copy,
+        html[data-theme="night"] .pagination-copy,
+        html[data-theme="night"] .contact-meta,
+        html[data-theme="night"] .archive-time,
+        html[data-theme="night"] .mobile-archive-label,
+        html[data-theme="night"] .form-label,
+        html[data-theme="night"] .archive-search-icon {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .archive-hero,
+        html[data-theme="night"] .metric-card,
+        html[data-theme="night"] .archive-panel,
+        html[data-theme="night"] .archive-table-shell,
+        html[data-theme="night"] .search-card,
+        html[data-theme="night"] .archive-table-wrap,
+        html[data-theme="night"] .mobile-archive-card,
+        html[data-theme="night"] .empty-state,
+        html[data-theme="night"] .archive-search-wrap,
+        html[data-theme="night"] .address-pill,
+        html[data-theme="night"] .pagination-wrap .page-link {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .archive-hero::after {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        html[data-theme="night"] .archive-hero h2,
+        html[data-theme="night"] .metric-value,
+        html[data-theme="night"] .empty-title,
+        html[data-theme="night"] .applicant-name,
+        html[data-theme="night"] .archive-date {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .page-kicker {
+            background: rgba(245, 158, 11, 0.16);
+            color: #fcd34d;
+        }
+
+        html[data-theme="night"] .archive-table thead th {
+            background: #111827 !important;
+            color: #cbd5e1;
+            border-bottom-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .archive-table tbody td {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.12) !important;
+        }
+
+        html[data-theme="night"] .archive-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.06) !important;
+        }
+
+        html[data-theme="night"] .btn-ghost {
+            background: #111827;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .btn-ghost:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .btn-primary-soft {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+        }
+
+        html[data-theme="night"] .btn-restore {
+            background: #059669;
+            color: #fff;
+        }
+
+        html[data-theme="night"] .btn-restore:hover {
+            background: #047857;
+            color: #fff;
+        }
+
+        html[data-theme="night"] .applicant-avatar {
+            background: #111827;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-link {
+            background: #111827 !important;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-link:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-item.active .page-link {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #fff;
+        }
+
+        html[data-theme="night"] .pagination-wrap .page-item.disabled .page-link {
+            background: #0b1220;
+            color: #64748b;
+            border-color: rgba(148, 163, 184, 0.12) !important;
+        }
     </style>
 
-    <div class="container-fluid archive-page py-4 px-md-4 px-xl-5">
+    <div class="container-fluid archive-page py-0 px-md-4 px-xl-0">
         <div class="archive-shell">
             <section class="archive-hero">
-                <span class="page-kicker">
-                    <i class="bi bi-archive"></i>
-                    Archive workspace
-                </span>
 
                 <div class="hero-top">
                     <div>
@@ -660,7 +776,8 @@
                                         <div class="applicant-name">
                                             {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
                                         </div>
-                                        <div class="applicant-meta">ID: #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                        <div class="applicant-meta">ID: #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -669,7 +786,8 @@
                                 <div class="mobile-archive-row">
                                     <div class="mobile-archive-label">Contact</div>
                                     <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
-                                    <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} / {{ $applicant->civil_status ?: 'N/A' }}</div>
+                                    <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} /
+                                        {{ $applicant->civil_status ?: 'N/A' }}</div>
                                 </div>
 
                                 <div class="mobile-archive-row">
@@ -704,7 +822,8 @@
                                 <i class="bi bi-archive"></i>
                             </div>
                             <div class="empty-title">No archived applicants found</div>
-                            <p class="empty-copy mb-0">Try clearing the search or archive a record from the active applicants list.</p>
+                            <p class="empty-copy mb-0">Try clearing the search or archive a record from the active applicants
+                                list.</p>
                         </div>
                     @endforelse
                 </div>

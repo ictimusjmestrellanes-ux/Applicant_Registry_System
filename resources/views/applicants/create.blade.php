@@ -24,7 +24,7 @@
         }
 
         .applicant-create-page {
-            max-width: 1680px;
+            max-width: 1800px;
         }
 
         .create-hero {
@@ -128,8 +128,8 @@
 
         .form-section {
             padding: 1.35rem;
-            border-radius: 22px;
-            border: 1px solid #e4edf7;
+            /* border-radius: 22px;
+            border: 1px solid #e4edf7; */
             background: #ffffff;
         }
 
@@ -268,9 +268,140 @@
                 width: 100%;
             }
         }
+
+        html[data-theme="night"] .create-hero {
+            background: linear-gradient(180deg, #0f172a 0%, #111827 100%) !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28) !important;
+        }
+
+        html[data-theme="night"] .create-hero::after {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        html[data-theme="night"] .page-title,
+        html[data-theme="night"] .section-title {
+            color: #f8fafc !important;
+        }
+
+        html[data-theme="night"] .page-copy,
+        html[data-theme="night"] .form-label {
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="night"] .page-kicker {
+            background: rgba(59, 130, 246, 0.18) !important;
+            color: #bfdbfe !important;
+            border-color: rgba(96, 165, 250, 0.24) !important;
+        }
+
+        html[data-theme="night"] .hero-chip {
+            background: rgba(15, 23, 42, 0.92) !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="night"] .form-shell {
+            background: rgba(15, 23, 42, 0.96) !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.32) !important;
+        }
+
+        html[data-theme="night"] .form-section {
+            background: #111827 !important;
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.14) !important;
+        }
+
+        html[data-theme="night"] .section-title::before {
+            background: linear-gradient(135deg, #60a5fa, #38bdf8);
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.14);
+        }
+
+        html[data-theme="night"] .form-control,
+        html[data-theme="night"] .form-select,
+        html[data-theme="night"] .select2-container .select2-selection--single {
+            background: #0b1220 !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+            color: #e2e8f0 !important;
+        }
+
+        html[data-theme="night"] .form-control::placeholder {
+            color: #64748b;
+        }
+
+        html[data-theme="night"] .form-control:hover,
+        html[data-theme="night"] .form-select:hover,
+        html[data-theme="night"] .select2-container .select2-selection--single:hover {
+            background: #111827 !important;
+            border-color: rgba(96, 165, 250, 0.28) !important;
+        }
+
+        html[data-theme="night"] .form-control:focus,
+        html[data-theme="night"] .form-select:focus,
+        html[data-theme="night"] .select2-container--default .select2-selection--single:focus,
+        html[data-theme="night"] .select2-container--default.select2-container--focus .select2-selection--single,
+        html[data-theme="night"] .select2-container--open .select2-selection--single {
+            background: #111827 !important;
+            border-color: rgba(96, 165, 250, 0.55) !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18) !important;
+        }
+
+        html[data-theme="night"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .select2-container--default .select2-selection--single .select2-selection__arrow b {
+            border-color: #94a3b8 transparent transparent transparent;
+        }
+
+        html[data-theme="night"] .select2-dropdown {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .select2-search--dropdown .select2-search__field {
+            background: #111827;
+            color: #e2e8f0;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .select2-results__option {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .select2-results__option--highlighted[aria-selected] {
+            background: rgba(59, 130, 246, 0.22);
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .form-footer {
+            border-top-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .btn-cancel {
+            background: #111827;
+            color: #cbd5e1;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .btn-cancel:hover {
+            background: #1f2937;
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .btn-save {
+            background: linear-gradient(180deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.3);
+        }
+
+        html[data-theme="night"] .btn-save:hover {
+            color: #ffffff;
+        }
     </style>
 
-    <div class="container-fluid applicant-create-page py-4 px-md-4 px-xl-5">
+    <div class="container-fluid applicant-create-page py-0 px-md-4 px-xl-0">
         @if ($errors->any())
             <div class="alert alert-danger border-0 shadow-sm mb-4">
                 <ul class="mb-0">
@@ -284,7 +415,6 @@
         <div class="create-hero">
             <div class="row g-3 align-items-start">
                 <div class="col-lg-8">
-                    <span class="page-kicker">Applicant Intake</span>
                     <h1 class="page-title">Add a new applicant record</h1>
                     <p class="page-copy">
                         Use this form to register an applicant profile before moving on to permits, clearance, or referral processing.
@@ -374,6 +504,12 @@
                                         <option value="NO" {{ old('four_ps', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
                                         <option value="YES" {{ old('four_ps') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Email Address<span class="required-mark">*</span></label>
+                                    <input type="email" name="email" class="form-control"
+                                        value="{{ old('email') }}"
+                                        placeholder="name@example.com" required>
                                 </div>
                             </div>
                         </section>

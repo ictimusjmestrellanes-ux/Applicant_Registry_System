@@ -40,7 +40,6 @@
 
         .auth-shell {
             min-height: 100vh;
-            padding: 22px;
             display: flex;
             align-items: stretch;
         }
@@ -51,7 +50,6 @@
             background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(12px);
             border: 1px solid var(--panel-border);
-            border-radius: 34px;
             overflow: hidden;
             box-shadow: var(--panel-shadow);
         }

@@ -114,6 +114,84 @@
         font-size: 0.78rem;
         margin-top: 3px;
     }
+
+    html[data-theme="night"] .permission-panel {
+        background: #0f172a;
+        border-color: rgba(148, 163, 184, 0.16);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    html[data-theme="night"] .permission-card {
+        background: #111827;
+        border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html[data-theme="night"] .permission-card:hover {
+        border-color: rgba(96, 165, 250, 0.28);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+    }
+
+    html[data-theme="night"] .permission-title {
+        color: #f8fafc;
+    }
+
+    html[data-theme="night"] .permission-key {
+        color: #94a3b8;
+    }
+
+    html[data-theme="night"] .permission-panel h5 {
+        color: #f8fafc;
+    }
+
+    html[data-theme="night"] .permission-panel .text-muted {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="night"] .user-edit-page small.text-muted {
+        color: #f8fafc !important;
+    }
+
+    html[data-theme="night"] .permission-panel .badge.text-bg-light {
+        background: rgba(15, 23, 42, 0.9) !important;
+        color: #cbd5e1 !important;
+        border-color: rgba(148, 163, 184, 0.18) !important;
+    }
+
+    html[data-theme="night"] .permission-panel .alert-light {
+        background: rgba(15, 23, 42, 0.95) !important;
+        border-color: rgba(148, 163, 184, 0.16) !important;
+        color: #e2e8f0 !important;
+    }
+
+    html[data-theme="night"] .permission-panel .form-check-input {
+        background-color: #0b1220;
+        border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    html[data-theme="night"] .permission-panel .form-check-input:checked {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    html[data-theme="night"] .permission-panel ~ .d-flex.gap-2.mt-4.pt-3.border-top {
+        border-top-color: rgba(148, 163, 184, 0.18) !important;
+    }
+
+    html[data-theme="night"] .permission-panel ~ .d-flex.gap-2.mt-4.pt-3.border-top .btn-primary {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+    }
+
+    html[data-theme="night"] .permission-panel ~ .d-flex.gap-2.mt-4.pt-3.border-top .btn-outline-secondary {
+        background: #111827;
+        color: #cbd5e1;
+        border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html[data-theme="night"] .permission-panel ~ .d-flex.gap-2.mt-4.pt-3.border-top .btn-outline-secondary:hover {
+        background: #1f2937;
+        color: #f8fafc;
+    }
 </style>
 
 <script>

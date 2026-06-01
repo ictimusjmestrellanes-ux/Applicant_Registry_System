@@ -1322,6 +1322,231 @@
             border-color: #2563eb;
         }
 
+        html[data-theme="night"] .index-copy,
+        html[data-theme="night"] .section-copy,
+        html[data-theme="night"] .overview-copy,
+        html[data-theme="night"] .applicant-meta,
+        html[data-theme="night"] .pagination-summary,
+        html[data-theme="night"] .requirement-note,
+        html[data-theme="night"] .hero-side-copy,
+        html[data-theme="night"] .table-id,
+        html[data-theme="night"] .created-date,
+        html[data-theme="night"] .contact-line,
+        html[data-theme="night"] .mobile-meta-line,
+        html[data-theme="night"] .location-cell,
+        html[data-theme="night"] .search-chip,
+        html[data-theme="night"] .limit-shell-label {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .hero-side-card,
+        html[data-theme="night"] .overview-card,
+        html[data-theme="night"] .filter-card,
+        html[data-theme="night"] .records-card,
+        html[data-theme="night"] .filter-panel,
+        html[data-theme="night"] .view-pill,
+        html[data-theme="night"] .mobile-record-card,
+        html[data-theme="night"] .empty-state,
+        html[data-theme="night"] .limit-trigger,
+        html[data-theme="night"] .search-shell,
+        html[data-theme="night"] .filter-input-shell,
+        html[data-theme="night"] .results-chip,
+        html[data-theme="night"] .search-chip,
+        html[data-theme="night"] .mini-pill,
+        html[data-theme="night"] .requirement-progress,
+        html[data-theme="night"] .page-link,
+        html[data-theme="night"] .applicants-table,
+        html[data-theme="night"] .applicants-table tbody,
+        html[data-theme="night"] .applicants-table tbody tr,
+        html[data-theme="night"] .table-responsive {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .limit-menu {
+            background: rgba(15, 23, 42, 0.98) !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36) !important;
+        }
+
+        html[data-theme="night"] .limit-menu-option {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .limit-menu-option:hover,
+        html[data-theme="night"] .limit-menu-option:focus-visible {
+            background: rgba(59, 130, 246, 0.16);
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .limit-menu-option.is-active {
+            background: rgba(59, 130, 246, 0.24);
+            color: #eff6ff;
+        }
+
+        html[data-theme="night"] .hero-side-card {
+            background: linear-gradient(180deg, #0b1220, #111827);
+        }
+
+        html[data-theme="night"] .overview-card::after {
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        html[data-theme="night"] .index-title,
+        html[data-theme="night"] .view-pill strong,
+        html[data-theme="night"] .applicant-name,
+        html[data-theme="night"] .section-title,
+        html[data-theme="night"] .overview-value,
+        html[data-theme="night"] .requirement-meta,
+        html[data-theme="night"] .limit-trigger-text,
+        html[data-theme="night"] .table-id strong,
+        html[data-theme="night"] .page-item.active .page-link {
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .index-kicker {
+            background: rgba(59, 130, 246, 0.16);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .hero-side-label,
+        html[data-theme="night"] .view-pill small,
+        html[data-theme="night"] .applicant-code,
+        html[data-theme="night"] .limit-trigger-icon,
+        html[data-theme="night"] .search-icon,
+        html[data-theme="night"] .empty-state i {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .view-pill.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(15, 23, 42, 0.96));
+            border-color: rgba(96, 165, 250, 0.24);
+        }
+
+        html[data-theme="night"] .view-pill:hover,
+        html[data-theme="night"] .overview-card:hover,
+        html[data-theme="night"] .filter-card:hover,
+        html[data-theme="night"] .records-card:hover {
+            border-color: rgba(96, 165, 250, 0.2);
+            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+        }
+
+        html[data-theme="night"] .filter-toggle,
+        html[data-theme="night"] .index-btn-secondary,
+        html[data-theme="night"] .index-btn-export,
+        html[data-theme="night"] .limit-trigger {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.18);
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .filter-toggle:hover,
+        html[data-theme="night"] .index-btn-secondary:hover,
+        html[data-theme="night"] .index-btn-export:hover,
+        html[data-theme="night"] .limit-trigger:hover {
+            background: #1f2937;
+            border-color: rgba(96, 165, 250, 0.24);
+            color: #f8fafc;
+        }
+
+        html[data-theme="night"] .index-btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+        }
+
+        html[data-theme="night"] .index-btn-export:hover {
+            background: #0f172a;
+            border-color: rgba(45, 212, 191, 0.28);
+            color: #99f6e4;
+        }
+
+        html[data-theme="night"] .filter-panel {
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(12px);
+        }
+
+        html[data-theme="night"] .search-shell,
+        html[data-theme="night"] .filter-input-shell {
+            background: #0b1220;
+        }
+
+        html[data-theme="night"] .index-field-control,
+        html[data-theme="night"] .index-select-control,
+        html[data-theme="night"] .index-date-control {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .applicants-table thead th {
+            background: #111827 !important;
+            border-bottom-color: rgba(148, 163, 184, 0.16) !important;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .applicants-table tbody td {
+            background: #0f172a !important;
+            border-top-color: rgba(148, 163, 184, 0.12) !important;
+        }
+
+        html[data-theme="night"] .applicants-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        html[data-theme="night"] .mini-pill {
+            background: #111827;
+            border-color: rgba(148, 163, 184, 0.16);
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .requirement-progress {
+            background: #1e293b;
+        }
+
+        html[data-theme="night"] .requirement-meta {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .btn-view {
+            background: rgba(96, 165, 250, 0.16);
+            color: #bfdbfe;
+        }
+
+        html[data-theme="night"] .btn-view:hover {
+            background: rgba(96, 165, 250, 0.24);
+            color: #eff6ff;
+        }
+
+        html[data-theme="night"] .btn-archive {
+            background: rgba(248, 113, 113, 0.14);
+            color: #fecaca;
+        }
+
+        html[data-theme="night"] .btn-archive:hover {
+            background: rgba(248, 113, 113, 0.22);
+            color: #fff1f2;
+        }
+
+        html[data-theme="night"] .mobile-record-card {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .empty-state {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-color: rgba(148, 163, 184, 0.18) !important;
+        }
+
+        html[data-theme="night"] .page-link {
+            background: #111827 !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .page-item.active .page-link {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+
         @media (max-width: 1199.98px) {
 
             .hero-side-actions,
