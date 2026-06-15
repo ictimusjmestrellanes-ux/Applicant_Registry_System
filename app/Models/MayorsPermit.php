@@ -13,6 +13,10 @@ class MayorsPermit extends Model
 
     public const APPROVAL_DISAPPROVED = 'disapproved';
 
+    private const PESO_ID_MINIMUMS_BY_YEAR = [
+        2026 => 7930,
+    ];
+
     protected $fillable = [
 
         'applicant_id',
@@ -85,10 +89,16 @@ class MayorsPermit extends Model
         return $year.'-';
     }
 
+    private static function minimumPesoIdNumberForYear(int $year): int
+    {
+        return static::PESO_ID_MINIMUMS_BY_YEAR[$year] ?? 1;
+    }
+
     public static function generateNextPesoIdNo(?int $year = null): string
     {
         $year = $year ?? (int) now()->format('Y');
         $prefix = static::pesoIdPrefix($year);
+        $minimumNumber = static::minimumPesoIdNumberForYear($year);
 
         $latestNumber = static::query()
             ->where('peso_id_no', 'like', $prefix.'%')
@@ -102,7 +112,7 @@ class MayorsPermit extends Model
             })
             ->max() ?: 0;
 
-        $nextNumber = $latestNumber + 1;
+        $nextNumber = max($latestNumber + 1, $minimumNumber);
 
         if ($nextNumber > 99999) {
             $nextNumber = 1;
