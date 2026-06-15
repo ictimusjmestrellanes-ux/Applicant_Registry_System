@@ -107,6 +107,13 @@
             font-size: 9pt;
         }
 
+        .address_line {
+            left: 53.6%;
+            top: 30.8%;
+            width: 42%;
+            font-size: 8pt;
+        }
+
         .address {
             left: 53.6%;
             top: 31%;
@@ -231,7 +238,8 @@
             $applicant->last_name,
             $applicant->suffix,
         ])->filter()->implode(' ')));
-        $address = strtoupper(trim(collect([
+        $address_line = strtoupper(trim(collect([
+            $applicant->address_line,
             $applicant->barangay,
             $applicant->city,
             $applicant->province,
@@ -258,7 +266,7 @@
             <div class="field front-name">{{ $fullName }}</div>
 
             <div class="field employer">{{ $employer }}</div>
-            <div class="field address">{{ $address }}</div>
+            <div class="field address_line">{{ $address_line }}</div>
             <div class="field community-tax">{{ strtoupper($permit->community_tax_no ?? 'N/A') }}</div>
             <div class="field issued-on">{{ $issuedOn }}</div>
             <div class="field issued-at">{{ $issuedAt }}</div>
