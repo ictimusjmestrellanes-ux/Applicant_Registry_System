@@ -3774,6 +3774,39 @@
             // 'BATANGAS CITY': ['Poblacion I', 'Poblacion II']
         };
 
+        function normalizeName(value) {
+            return String(value || '').replace(/^\s*(city of|municipality of)\s+/i, '').trim().toUpperCase();
+        }
+
+        function isBacoorCity(value) {
+            return normalizeName(value).includes('BACOOR');
+        }
+
+        function remapBarangayName(rawName, cityName = '') {
+            const name = String(rawName || '').replace(/\(\s*POB\.?\s*\)/ig, '').trim().toUpperCase();
+            const normalizedCity = normalizeName(cityName);
+
+            if (isBacoorCity(normalizedCity) && /^P\.F\. ESPIRITU\b/.test(name)) {
+                return name.replace(/^P\.F\. ESPIRITU\b/, 'PANAPAAN');
+            }
+
+            return name;
+        }
+
+        function isBarangayMatch(savedName, optionName, cityName = '') {
+            const normalizedSaved = String(savedName || '').trim().toUpperCase();
+            const normalizedOption = String(optionName || '').trim().toUpperCase();
+            const normalizedCity = normalizeName(cityName);
+
+            if (isBacoorCity(normalizedCity)) {
+                return normalizedSaved === normalizedOption
+                    || (normalizedSaved.startsWith('P.F. ESPIRITU') && normalizedOption.startsWith('PANAPAAN'))
+                    || (normalizedSaved.startsWith('PANAPAAN') && normalizedOption.startsWith('P.F. ESPIRITU'));
+            }
+
+            return normalizedSaved === normalizedOption;
+        }
+
 
 
         // ---------- LOAD PROVINCES ----------
@@ -3903,7 +3936,7 @@
                 })();
 
                 const selectedCity = citySelect.options[citySelect.selectedIndex];
-                if (selectedCity && selectedCity.dataset.code) loadBarangays(selectedCity.dataset.code);
+                if (selectedCity && selectedCity.dataset.code) loadBarangays(selectedCity.value, selectedCity.dataset.code);
             } catch (e) {
                 citySelect.innerHTML = '<option value="">Unable to load cities</option>';
             }
@@ -3912,24 +3945,24 @@
 
 
         // ---------- LOAD BARANGAYS ----------
-        function loadBarangays(cityCode) {
+        function loadBarangays(cityName, cityCode) {
             barangaySelect.innerHTML = '<option>Loading barangays...</option>';
-            if (!cityCode) return barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            if (!cityCode && !cityName) return barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
-            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(cityCode)}/barangays/`)
+            const normalizedCity = normalizeName(cityName);
+            const identifier = cityCode || cityName;
+
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(identifier)}/barangays/`)
                 .then(res => res.json())
                 .then(data => {
                     barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                     data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                     data.forEach(b => {
-                        const rawName = b.name || '';
-                        // remove occurrences like (POB.) or (Pob) that appear in some datasets
-                        const cleaned = String(rawName).replace(/\(\s*POB\.?\s*\)/ig, '').trim();
-                        const name = String(cleaned).toUpperCase();
+                        const name = remapBarangayName(b.name || '', cityName);
                         const option = document.createElement('option');
                         option.value = name;
                         option.textContent = name;
-                        if (savedBarangay && name === String(savedBarangay).toUpperCase()) option.selected = true;
+                        if (savedBarangay && isBarangayMatch(savedBarangay, name, normalizedCity)) option.selected = true;
                         barangaySelect.appendChild(option);
                     });
                 })
@@ -3964,7 +3997,7 @@
             let val = selected?.value;
 
             if (code) {
-                loadBarangays(code);
+                loadBarangays(val, code);
             } else if (val) {
                 loadBarangays(val);
             } else {

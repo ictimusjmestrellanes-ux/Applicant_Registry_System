@@ -619,11 +619,173 @@
             const savedProvince = @json(old('province'));
             const savedCity = @json(old('city'));
             const savedBarangay = @json(old('barangay'));
+            const localBarangays = {
+                'IMUS CITY': [
+                    'ALAPAN I-A',
+                    'ALAPAN I-B',
+                    'ALAPAN I-C',
+                    'ALAPAN II-A',
+                    'ALAPAN II-B',
+                    'BUCANDALA I',
+                    'BUCANDALA II',
+                    'BUCANDALA III',
+                    'BUCANDALA IV',
+                    'BUCANDALA V',
+                    'CARSADANG BAGO I',
+                    'CARSADANG BAGO II',
+                    'MALAGASANG I-A',
+                    'MALAGASANG I-B',
+                    'MALAGASANG I-C',
+                    'MALAGASANG I-D',
+                    'MALAGASANG I-E',
+                    'MALAGASANG I-F',
+                    'MALAGASANG I-G',
+                    'MALAGASANG II-A',
+                    'MALAGASANG II-B',
+                    'MALAGASANG II-C',
+                    'MALAGASANG II-D',
+                    'MALAGASANG II-E',
+                    'MALAGASANG II-F',
+                    'MALAGASANG II-G',
+                    'MEDICION I-A',
+                    'MEDICION I-B',
+                    'MEDICION I-C',
+                    'MEDICION I-D',
+                    'MEDICION II-A',
+                    'MEDICION II-B',
+                    'MEDICION II-C',
+                    'MEDICION II-D',
+                    'MEDICION II-E',
+                    'MEDICION II-F',
+                    'PAG-ASA I',
+                    'PAG-ASA II',
+                    'PAG-ASA III',
+                    'POBLACION I-A',
+                    'POBLACION I-B',
+                    'POBLACION I-C',
+                    'POBLACION II-A',
+                    'POBLACION II-B',
+                    'POBLACION III-A',
+                    'POBLACION III-B',
+                    'POBLACION IV-A',
+                    'POBLACION IV-B',
+                    'POBLACION IV-C',
+                    'POBLACION IV-D',
+                    'TOCLONG I-A',
+                    'TOCLONG I-B',
+                    'TOCLONG I-C',
+                    'TOCLONG II-A',
+                    'TOCLONG II-B',
+                    'ANABU I-A',
+                    'ANABU I-B',
+                    'ANABU I-C',
+                    'ANABU I-D',
+                    'ANABU I-E',
+                    'ANABU I-F',
+                    'ANABU I-G',
+                    'ANABU II-A',
+                    'ANABU II-B',
+                    'ANABU II-C',
+                    'ANABU II-D',
+                    'ANABU II-E',
+                    'ANABU II-F',
+                    'BAGONG SILANG',
+                    'BAYAN LUMA I',
+                    'BAYAN LUMA II',
+                    'BAYAN LUMA III',
+                    'BAYAN LUMA IV',
+                    'BAYAN LUMA V',
+                    'BAYAN LUMA VI',
+                    'BAYAN LUMA VII',
+                    'BAYAN LUMA VIII',
+                    'BAYAN LUMA IX',
+                    'BUHAY NA TUBIG',
+                    'MAGDALO',
+                    'MAHARLIKA',
+                    'MARIANO ESPELETA I',
+                    'MARIANO ESPELETA II',
+                    'MARIANO ESPELETA III',
+                    'PALICO I',
+                    'PALICO II',
+                    'PALICO III',
+                    'PALICO IV',
+                    'PASONG BUAYA I',
+                    'PASONG BUAYA II',
+                    'PINAGBUKLOD',
+                    'TANZANG LUMA I',
+                    'TANZANG LUMA II',
+                    'TANZANG LUMA III',
+                    'TANZANG LUMA IV',
+                    'TANZANG LUMA V',
+                    'TANZANG LUMA VI'
+                ]
+            };
 
             if (!provinceSelect || !citySelect || !barangaySelect) return;
 
             function normalizeName(value) {
                 return String(value || '').replace(/^\s*(city of|municipality of)\s+/i, '').trim().toUpperCase();
+            }
+
+            function isBacoorCity(value) {
+                return normalizeName(value).includes('BACOOR');
+            }
+
+            function remapBarangayName(rawName, cityName = '') {
+                const name = String(rawName || '').replace(/\(\s*POB\.?\s*\)/ig, '').trim().toUpperCase();
+                const normalizedCity = normalizeName(cityName);
+
+                if (isBacoorCity(normalizedCity) && /^P\.F\. ESPIRITU\b/.test(name)) {
+                    return name.replace(/^P\.F\. ESPIRITU\b/, 'PANAPAAN');
+                }
+
+                return name;
+            }
+
+            function isBarangayMatch(savedName, optionName, cityName = '') {
+                const normalizedSaved = String(savedName || '').trim().toUpperCase();
+                const normalizedOption = String(optionName || '').trim().toUpperCase();
+                const normalizedCity = normalizeName(cityName);
+
+                if (isBacoorCity(normalizedCity)) {
+                    return normalizedSaved === normalizedOption
+                        || (normalizedSaved.startsWith('P.F. ESPIRITU') && normalizedOption.startsWith('PANAPAAN'))
+                        || (normalizedSaved.startsWith('PANAPAAN') && normalizedOption.startsWith('P.F. ESPIRITU'));
+                }
+
+                return normalizedSaved === normalizedOption;
+            }
+
+            function setBarangayOptions(items, selectedBarangay = '', cityName = '') {
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+
+                const normalizedSelectedBarangay = String(selectedBarangay || '').toUpperCase();
+
+                items
+                    .slice()
+                    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+                    .forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item;
+                        option.textContent = item;
+
+                        if (normalizedSelectedBarangay && isBarangayMatch(normalizedSelectedBarangay, item, cityName)) {
+                            option.selected = true;
+                        }
+
+                        barangaySelect.appendChild(option);
+                    });
+            }
+
+            function loadLocalBarangays(cityName) {
+                const normalizedCity = normalizeName(cityName);
+
+                if (!normalizedCity || !localBarangays[normalizedCity]) {
+                    return false;
+                }
+
+                setBarangayOptions(localBarangays[normalizedCity], savedBarangay, cityName);
+                return true;
             }
 
             function loadProvinces() {
@@ -720,8 +882,8 @@
                         });
 
                         const selectedCity = citySelect.options[citySelect.selectedIndex];
-                        if (selectedCity && selectedCity.dataset.code) {
-                            loadBarangays(selectedCity.dataset.code);
+                        if (selectedCity) {
+                            loadBarangays(selectedCity.value, selectedCity.dataset.code);
                         }
                     })
                     .catch(() => {
@@ -729,7 +891,11 @@
                     });
             }
 
-            function loadBarangays(cityCode) {
+            function loadBarangays(cityName, cityCode) {
+                if (loadLocalBarangays(cityName)) {
+                    return;
+                }
+
                 barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
 
                 if (!cityCode) {
@@ -740,26 +906,13 @@
                 fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(cityCode)}/barangays/`)
                     .then(res => res.json())
                     .then(data => {
-                        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                         const barangays = Array.isArray(data) ? data : [];
-
-                        barangays.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
-
-                        barangays.forEach(barangay => {
+                        const barangayNames = barangays.map(barangay => {
                             const rawName = barangay.name || '';
-                            const cleaned = String(rawName).replace(/\(\s*POB\.?\s*\)/ig, '').trim();
-                            const name = String(cleaned).toUpperCase();
-
-                            const option = document.createElement('option');
-                            option.value = name;
-                            option.textContent = name;
-
-                            if (savedBarangay && name === String(savedBarangay).toUpperCase()) {
-                                option.selected = true;
-                            }
-
-                            barangaySelect.appendChild(option);
+                            return remapBarangayName(rawName, cityName);
                         });
+
+                        setBarangayOptions(barangayNames, savedBarangay, cityName);
                     })
                     .catch(() => {
                         barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
@@ -780,9 +933,12 @@
             citySelect.addEventListener('change', function () {
                 const selected = this.options[this.selectedIndex];
                 const code = selected?.dataset.code;
+                const value = selected?.value || '';
 
                 if (code) {
-                    loadBarangays(code);
+                    loadBarangays(value, code);
+                } else if (value) {
+                    loadBarangays(value);
                 } else {
                     barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                 }

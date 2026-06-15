@@ -36,7 +36,10 @@ class ApplicantController extends Controller
             'first_time_job_seeker' => 'required',
         ]);
 
-        $applicant = Applicant::create($request->all());
+        $data = $request->all();
+        $data['barangay'] = $this->normalizeBarangay($request->city, $request->barangay);
+
+        $applicant = Applicant::create($data);
         $applicant->forceFill([
             'profile_completed' => true,
         ])->saveQuietly();
@@ -184,6 +187,21 @@ class ApplicantController extends Controller
         return view('applicants.edit', compact('applicant', 'activityLogs'));
     }
 
+    private function normalizeBarangay(?string $city, ?string $barangay): string
+    {
+        $normalizedCity = trim((string) $city);
+        $normalizedCity = preg_replace('/^\s*(city of|municipality of)\s+/i', '', $normalizedCity);
+        $normalizedCity = strtoupper(trim((string) $normalizedCity));
+
+        $normalizedBarangay = strtoupper(trim((string) $barangay));
+
+        if (str_contains($normalizedCity, 'BACOOR') && str_starts_with($normalizedBarangay, 'P.F. ESPIRITU')) {
+            return preg_replace('/^P\.F\. ESPIRITU\b/i', 'PANAPAAN', $normalizedBarangay) ?: $normalizedBarangay;
+        }
+
+        return $normalizedBarangay;
+    }
+
     public function update(Request $request, $id)
     {
         $applicant = Applicant::findOrFail($id);
@@ -210,7 +228,7 @@ class ApplicantController extends Controller
             'address_line' => $request->address_line,
             'province' => $request->province,
             'city' => $request->city,
-            'barangay' => $request->barangay,
+            'barangay' => $this->normalizeBarangay($request->city, $request->barangay),
             'educational_attainment' => $request->educational_attainment,
             'hiring_company' => $request->hiring_company,
             'position_hired' => $request->position_hired,
