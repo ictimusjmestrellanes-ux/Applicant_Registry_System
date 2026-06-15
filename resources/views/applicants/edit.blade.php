@@ -3209,13 +3209,14 @@
         const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
         const refCompanyAddressList = document.getElementById("refCompanyAddressList");
         const selectedPermitIssuedAt = `{{ strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? ''))) }}`;
-        const calabarzonProvinceNames = new Set(["CAVITE", "LAGUNA", "BATANGAS", "RIZAL", "QUEZON"]);
+        const permitIssuedAtApiUrl = `{{ route('api.permit-issued-at.city-governments') }}`;
         const selectedCityGovernment = `{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}`;
         const selectedRefRecipient = `{{ old('ref_recipient', $referral->ref_recipient ?? '') }}`;
         const selectedRefPlace = `{{ old('ref_place', $referral->ref_place ?? '') }}`;
         const selectedRefCompanyAddress = `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
         const referralRecipientSearchUrl = `{{ route('referrals.recipients.search') }}`;
         const configuredMayors = @json(config('philippine_mayors', []));
+        let permitIssuedAtOptionsPromise = null;
         const appendOptionIfMissing = (select, value, label, dataAttributes = {}) => {
             if (!select || !value) {
                 return;
@@ -3261,6 +3262,20 @@
                 .replace(/^City of\s+/i, "")
                 .trim()
                 .toLowerCase();
+        };
+
+        const ensurePermitIssuedAtOptions = () => {
+            if (!permitIssuedAtOptionsPromise) {
+                permitIssuedAtOptionsPromise = fetch(permitIssuedAtApiUrl)
+                    .then(response => response.json())
+                    .then(data => Array.isArray(data?.results) ? data.results : [])
+                    .catch(error => {
+                        console.error("Error loading permit issued-at options:", error);
+                        return [];
+                    });
+            }
+
+            return permitIssuedAtOptionsPromise;
         };
 
         const populateCityAddressOptions = (datalist, cities, currentValue = "") => {
@@ -3615,37 +3630,38 @@
                 return;
             }
 
-            const currentValue = (permitIssuedAtDropdown.value || selectedPermitIssuedAt || "").toUpperCase().trim();
-            const permitIssuedAtValues = [...new Set(
-                configuredMayors
-                    .map(mayor => mayor.company_address || mayor.city_government || "")
-                    .map(value => String(value).toUpperCase().trim())
-                    .filter(Boolean)
-            )].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+            return ensurePermitIssuedAtOptions().then(options => {
+                const currentValue = (permitIssuedAtDropdown.value || selectedPermitIssuedAt || "").toUpperCase().trim();
+                const permitIssuedAtValues = [...new Set(
+                    options
+                        .map(item => String(item?.id || item?.text || "").toUpperCase().trim())
+                        .filter(Boolean)
+                )].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 
-            permitIssuedAtDropdown.innerHTML = "";
+                permitIssuedAtDropdown.innerHTML = "";
 
-            const placeholderOption = document.createElement("option");
-            placeholderOption.value = "";
-            placeholderOption.text = "Select City Government";
-            placeholderOption.selected = currentValue === "";
-            permitIssuedAtDropdown.appendChild(placeholderOption);
+                const placeholderOption = document.createElement("option");
+                placeholderOption.value = "";
+                placeholderOption.text = "Select City Government";
+                placeholderOption.selected = currentValue === "";
+                permitIssuedAtDropdown.appendChild(placeholderOption);
 
-            permitIssuedAtValues.forEach(value => {
-                const option = document.createElement("option");
-                option.value = value;
-                option.text = value;
-                option.selected = value === currentValue;
-                permitIssuedAtDropdown.appendChild(option);
+                permitIssuedAtValues.forEach(value => {
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.text = value;
+                    option.selected = value === currentValue;
+                    permitIssuedAtDropdown.appendChild(option);
+                });
+
+                if (currentValue && !permitIssuedAtValues.includes(currentValue)) {
+                    appendOptionIfMissing(permitIssuedAtDropdown, currentValue, currentValue);
+                }
+
+                if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                    window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
+                }
             });
-
-            if (currentValue && !permitIssuedAtValues.includes(currentValue)) {
-                appendOptionIfMissing(permitIssuedAtDropdown, currentValue, currentValue);
-            }
-
-            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
-                window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
-            }
         };
 
         const populatePsgcCityData = () => {
@@ -3666,6 +3682,8 @@
                 });
             });
         };
+
+        populatePermitIssuedAtOptions();
 
         if (permitIssuedAtDropdown) {
             permitIssuedAtDropdown.addEventListener("focus", populatePsgcCityData, { once: true });
