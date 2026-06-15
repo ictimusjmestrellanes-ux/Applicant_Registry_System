@@ -6,6 +6,7 @@
     @php
         $totalApplicants = data_get($summary, 'totalApplicants', 0);
         $totalArchivedApplicants = data_get($summary, 'totalArchivedApplicants', 0);
+        $totalPermits = data_get($summary, 'totalPermits', 0);
         $newThisMonth = data_get($summary, 'newThisMonth', 0);
         $totalClearances = data_get($summary, 'totalClearances', 0);
         $totalReferrals = data_get($summary, 'totalReferrals', 0);
@@ -73,7 +74,7 @@
                     </div>
                     <div>
                         <div class="metric-label">Total Permit</div>
-                        <div class="metric-value">{{ data_get($completion, 'permit.count', 0) }}</div>
+                        <div class="metric-value">{{ number_format($totalPermits) }}</div>
                     </div>
                 </div>
             </div>

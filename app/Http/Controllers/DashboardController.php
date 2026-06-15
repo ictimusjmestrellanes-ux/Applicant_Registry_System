@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Applicant;
+use App\Models\MayorsPermit;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -195,6 +196,11 @@ class DashboardController extends Controller
             return $count;
         });
 
+        $totalPermits = MayorsPermit::query()
+            ->whereHas('applicant', function ($query) {
+                $query->withoutTrashed();
+            })
+            ->count();
         $completePermitCount = $applicants->filter(fn (Applicant $applicant) => $applicant->isPermitComplete())->count();
         $completeClearanceCount = $applicants->filter(fn (Applicant $applicant) => $applicant->isClearanceComplete())->count();
         $completeReferralCount = $applicants->filter(fn (Applicant $applicant) => $applicant->isReferralComplete())->count();
@@ -222,6 +228,7 @@ class DashboardController extends Controller
         $summary = [
             'totalApplicants' => $totalApplicants,
             'totalArchivedApplicants' => Applicant::onlyTrashed()->count(),
+            'totalPermits' => $totalPermits,
             'newThisMonth' => $newThisMonth,
             'totalClearances' => $totalClearances,
             'totalReferrals' => $totalReferrals,
