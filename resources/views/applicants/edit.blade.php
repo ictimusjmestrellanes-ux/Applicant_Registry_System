@@ -2014,8 +2014,20 @@
                                         required>
                                         @php
                                             $permitIssuedAtValue = strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? '')));
+                                            $permitIssuedAtOptions = collect(config('philippine_mayors', []))
+                                                ->pluck('company_address')
+                                                ->filter()
+                                                ->map(fn ($value) => strtoupper(trim((string) $value)))
+                                                ->unique()
+                                                ->sort()
+                                                ->values();
                                         @endphp
-                                        <option value="">Select City</option>
+                                        <option value="">Select City Government</option>
+                                        @foreach($permitIssuedAtOptions as $permitIssuedAtOption)
+                                            <option value="{{ $permitIssuedAtOption }}" {{ $permitIssuedAtValue === $permitIssuedAtOption ? 'selected' : '' }}>
+                                                {{ $permitIssuedAtOption }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -3598,57 +3610,47 @@
 
         syncRecipientDetailsFromSelectedOption();
 
+        const populatePermitIssuedAtOptions = () => {
+            if (!permitIssuedAtDropdown) {
+                return;
+            }
+
+            const currentValue = (permitIssuedAtDropdown.value || selectedPermitIssuedAt || "").toUpperCase().trim();
+            const permitIssuedAtValues = [...new Set(
+                configuredMayors
+                    .map(mayor => mayor.company_address || mayor.city_government || "")
+                    .map(value => String(value).toUpperCase().trim())
+                    .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+            permitIssuedAtDropdown.innerHTML = "";
+
+            const placeholderOption = document.createElement("option");
+            placeholderOption.value = "";
+            placeholderOption.text = "Select City Government";
+            placeholderOption.selected = currentValue === "";
+            permitIssuedAtDropdown.appendChild(placeholderOption);
+
+            permitIssuedAtValues.forEach(value => {
+                const option = document.createElement("option");
+                option.value = value;
+                option.text = value;
+                option.selected = value === currentValue;
+                permitIssuedAtDropdown.appendChild(option);
+            });
+
+            if (currentValue && !permitIssuedAtValues.includes(currentValue)) {
+                appendOptionIfMissing(permitIssuedAtDropdown, currentValue, currentValue);
+            }
+
+            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
+            }
+        };
+
         const populatePsgcCityData = () => {
             Promise.all([ensurePsgcCityData(), ensurePsgcProvinceData()]).then(([cities, provinces]) => {
-                if (permitIssuedAtDropdown) {
-                    const currentValue = (permitIssuedAtDropdown.value || selectedPermitIssuedAt || "").toUpperCase();
-                    const calabarzonCities = (Array.isArray(cities) ? cities : [])
-                        .filter(city => {
-                            const rawName = String(city.name || city.description || "");
-                            const cleanedName = rawName.toUpperCase().trim();
-                            const provinceCode = city.provinceCode || city.province_code || city.province?.code || city.province?.provinceCode || "";
-                            const provinceName = String(
-                                city.province?.name ||
-                                city.province?.description ||
-                                (typeof city.province === "string" ? city.province : "") ||
-                                provinces.find(province => String(province.code || "") === String(provinceCode))?.name ||
-                                provinces.find(province => String(province.code || "") === String(provinceCode))?.province ||
-                                provinces.find(province => String(province.code || "") === String(provinceCode))?.description ||
-                                ""
-                            ).toUpperCase().trim();
-
-                            return /CITY/i.test(rawName) && calabarzonProvinceNames.has(provinceName) && cleanedName;
-                        })
-                        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), undefined, { sensitivity: "base" }));
-
-                    permitIssuedAtDropdown.innerHTML = "";
-
-                    const placeholderOption = document.createElement("option");
-                    placeholderOption.value = "";
-                    placeholderOption.text = "Select City";
-                    placeholderOption.selected = currentValue === "";
-                    permitIssuedAtDropdown.appendChild(placeholderOption);
-
-                    calabarzonCities.forEach(city => {
-                        const rawName = String(city.name || city.description || "");
-                        const cleaned = rawName.replace(/^City of\s+/i, "").replace(/^City\s+/i, "").replace(/\s+City$/i, "").trim();
-                        const name = `CITY OF ${String(cleaned).toUpperCase()}`.trim();
-
-                        const option = document.createElement("option");
-                        option.value = name;
-                        option.text = name;
-                        option.selected = name === currentValue;
-                        permitIssuedAtDropdown.appendChild(option);
-                    });
-
-                    if (currentValue !== "" && !calabarzonCities.some(city => {
-                        const rawName = String(city.name || city.description || "");
-                        const cleaned = rawName.replace(/^City of\s+/i, "").replace(/^City\s+/i, "").replace(/\s+City$/i, "").trim();
-                        return `CITY OF ${String(cleaned).toUpperCase()}` === currentValue;
-                    })) {
-                        permitIssuedAtDropdown.value = "";
-                    }
-                }
+                populatePermitIssuedAtOptions();
 
                 if (refPlaceOptions) {
                     populateCityAddressOptions(refPlaceOptions, cities, refPlaceInput ? refPlaceInput.value : selectedRefPlace || "");
@@ -3662,10 +3664,6 @@
                         input.value = input.value.toUpperCase();
                     }
                 });
-
-                if (window.jQuery && typeof window.jQuery.fn.select2 === "function" && permitIssuedAtDropdown) {
-                    window.jQuery(permitIssuedAtDropdown).trigger("change.select2");
-                }
             });
         };
 
