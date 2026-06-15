@@ -505,12 +505,12 @@
                                         <option value="YES" {{ old('four_ps') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                {{-- <div class="col-md-4">
                                     <label class="form-label">Email Address<span class="required-mark">*</span></label>
                                     <input type="email" name="email" class="form-control"
                                         value="{{ old('email') }}"
                                         placeholder="name@example.com" required>
-                                </div>
+                                </div> --}}
                             </div>
                         </section>
 
@@ -605,18 +605,7 @@
                     allowClear: true,
                     width: '100%',
                     dropdownAutoWidth: true,
-                    minimumResultsForSearch: 0,
-                    ajax: {
-                        url: '{{ url('/api/educational-attainments') }}',
-                        dataType: 'json',
-                        delay: 250,
-                        data: params => ({
-                            q: params.term || ''
-                        }),
-                        processResults: data => ({
-                            results: data.results || []
-                        })
-                    }
+                    minimumResultsForSearch: 0
                 });
             }
         });
