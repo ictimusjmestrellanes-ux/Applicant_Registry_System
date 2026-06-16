@@ -14,6 +14,7 @@ class Applicant extends Model
         'middle_name',
         'last_name',
         'suffix',
+        'birthdate',
         'age',
         'email',
         'contact_no',
@@ -30,6 +31,10 @@ class Applicant extends Model
         'position_hired',
         'first_time_job_seeker',
         'profile_completed',
+    ];
+
+    protected $casts = [
+        'birthdate' => 'date',
     ];
 
     public function permit()

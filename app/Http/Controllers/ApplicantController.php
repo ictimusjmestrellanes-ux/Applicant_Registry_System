@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Models\User;
 use App\Support\ActivityLogger;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 
 class ApplicantController extends Controller
@@ -21,6 +22,7 @@ class ApplicantController extends Controller
             // Applicant Personal Information
             'first_name' => 'required',
             'last_name' => 'required',
+            'birthdate' => 'required|date',
             'email' => 'nullable|email|max:255',
             'contact_no' => 'required',
             'gender' => 'required',
@@ -38,6 +40,7 @@ class ApplicantController extends Controller
 
         $data = $request->all();
         $data['barangay'] = $this->normalizeBarangay($request->city, $request->barangay);
+        $data['age'] = $this->calculateAgeFromBirthdate($data['birthdate'] ?? null);
 
         $applicant = Applicant::create($data);
         $applicant->forceFill([
@@ -213,12 +216,15 @@ class ApplicantController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        $birthdate = $request->filled('birthdate') ? $request->birthdate : $applicant->birthdate?->format('Y-m-d');
+
         $applicant->update([
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'suffix' => $request->suffix,
-            'age' => $request->age,
+            'birthdate' => $birthdate,
+            'age' => $this->calculateAgeFromBirthdate($birthdate),
             'email' => $request->email,
             'contact_no' => $request->contact_no,
             'gender' => $request->gender,
@@ -422,6 +428,21 @@ class ApplicantController extends Controller
         $value = trim($value);
 
         return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
+    }
+
+    private function calculateAgeFromBirthdate(?string $birthdate): ?int
+    {
+        $birthdate = trim((string) $birthdate);
+
+        if ($birthdate === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($birthdate)->age;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     private function getDistinctApplicantFieldOptions(string $field)

@@ -1612,9 +1612,14 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <label class="form-label">Age <span class="required-mark">*</span></label>
-                                        <input type="number" name="age" class="form-control" value="{{ $applicant->age }}"
-                                            placeholder="e.g. 25" required>
+                                        <label class="form-label">Birthdate</label>
+                                        <input type="date" name="birthdate" id="birthdate" class="form-control"
+                                            value="{{ old('birthdate', optional($applicant->birthdate)->format('Y-m-d')) }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Age (Auto)</label>
+                                        <input type="number" name="age" id="age" class="form-control"
+                                            value="{{ $applicant->age }}" placeholder="Auto-calculated" min="0" readonly>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Sex <span class="required-mark">*</span></label>
@@ -4158,6 +4163,43 @@
             dropdownAutoWidth: true,
             minimumResultsForSearch: 0
         });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const birthdateInput = document.getElementById('birthdate');
+        const ageInput = document.getElementById('age');
+
+        if (!birthdateInput || !ageInput) {
+            return;
+        }
+
+        const updateAge = () => {
+            const birthdate = birthdateInput.value;
+
+            if (!birthdate) {
+                ageInput.value = '';
+                return;
+            }
+
+            const birthDate = new Date(`${birthdate}T00:00:00`);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age -= 1;
+            }
+
+            ageInput.value = age >= 0 ? age : '';
+        };
+
+        birthdateInput.addEventListener('change', updateAge);
+        birthdateInput.addEventListener('input', updateAge);
+        updateAge();
     });
 </script>
 
