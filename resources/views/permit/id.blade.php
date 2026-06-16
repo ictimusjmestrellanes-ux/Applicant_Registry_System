@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Mayor's Permit to Work ID</title>
@@ -230,27 +231,46 @@
         }
     </style>
 </head>
+
 <body>
     @php
         $permit = optional($applicant->permit);
-        $fullName = strtoupper(trim(collect([
-            $applicant->first_name,
-            $applicant->last_name,
-            $applicant->suffix,
-        ])->filter()->implode(' ')));
-        $address_line = strtoupper(trim(collect([
-            $applicant->address_line,
-            $applicant->barangay,
-            $applicant->city,
-            $applicant->province,
-        ])->filter()->implode(', ')));
+        $fullName = strtoupper(
+            trim(
+                collect([
+                    $applicant->first_name,
+                    $applicant->middle_name
+                        ? strtoupper(substr(trim((string) $applicant->middle_name), 0, 1)) . '.'
+                        : null,
+                    $applicant->last_name,
+                    $applicant->suffix,
+                ])
+                    ->filter()
+                    ->implode(' '),
+            ),
+        );
+        $address_line = strtoupper(
+            trim(
+                collect([$applicant->address_line, $applicant->barangay, $applicant->city, $applicant->province])
+                    ->filter()
+                    ->implode(', '),
+            ),
+        );
         $employer = strtoupper($applicant->hiring_company ?: $applicant->hired_company ?: 'N/A');
-        $photoPath = ! empty($applicant->photo) ? public_path('storage/'.$applicant->photo) : null;
-        $issuedOn = $permit->permit_issued_on ? strtoupper(\Carbon\Carbon::parse($permit->permit_issued_on)->format('F j, Y')) : 'N/A';
+        $photoPath = !empty($applicant->photo) ? public_path('storage/' . $applicant->photo) : null;
+        $issuedOn = $permit->permit_issued_on
+            ? strtoupper(\Carbon\Carbon::parse($permit->permit_issued_on)->format('F j, Y'))
+            : 'N/A';
         $issuedAt = strtoupper($permit->permit_issued_at ?? 'N/A');
-        $permitDate = $permit->permit_date ? strtoupper(\Carbon\Carbon::parse($permit->permit_date)->format('F j, Y')) : 'N/A';
-        $expiresOn = $permit->expires_on ? strtoupper(\Carbon\Carbon::parse($permit->expires_on)->format('F j, Y')) : 'N/A';
-        $paymentDate = $permit->permit_date_of_payment ? strtoupper(\Carbon\Carbon::parse($permit->permit_date_of_payment)->format('F j, Y')) : 'N/A';
+        $permitDate = $permit->permit_date
+            ? strtoupper(\Carbon\Carbon::parse($permit->permit_date)->format('F j, Y'))
+            : 'N/A';
+        $expiresOn = $permit->expires_on
+            ? strtoupper(\Carbon\Carbon::parse($permit->expires_on)->format('F j, Y'))
+            : 'N/A';
+        $paymentDate = $permit->permit_date_of_payment
+            ? strtoupper(\Carbon\Carbon::parse($permit->permit_date_of_payment)->format('F j, Y'))
+            : 'N/A';
     @endphp
     <div class="no-print">
         <button onclick="window.print()">Print Permit to Work ID</button>
@@ -258,7 +278,7 @@
 
     <div class="print-page">
         <div class="id-sheet">
-            @if($photoPath && file_exists($photoPath))
+            @if ($photoPath && file_exists($photoPath))
                 <img src="{{ $photoPath }}" alt="Applicant Photo" class="photo">
             @endif
 
@@ -280,6 +300,7 @@
         </div>
     </div>
 
-    
+
 </body>
+
 </html>

@@ -2,214 +2,298 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>System Login</title>
+    <meta charset="utf-8">
+    <title>Mayor's Permit to Work ID</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
         body {
-            position: relative;
+            margin: 0;
+            padding: 0;
             background: #ffffff;
-            color: #000000;
-            min-height: 100vh;
-            overflow-x: hidden;
+            font-family: Calibri, 'Candara', 'Segoe UI', 'Optima', 'Arial', sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-            filter: blur(10px);
+        :root {
+            --page-width: 210mm;
+            --page-height: 297mm;
+            --text: #111111;
+            --green: #0a9c39;
+            --blue: #173b8f;
+            --soft-gray: rgba(17, 17, 17, 0.08);
         }
 
-        body::before {
-            top: -120px;
-            right: -80px;
-            width: 320px;
-            height: 320px;
-            background: rgba(0, 0, 0, 0.04);
+        .print-page {
+            width: var(--page-width);
+            min-height: var(--page-height);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
         }
 
-        body::after {
-            left: -70px;
-            bottom: -90px;
-            width: 280px;
-            height: 280px;
-            background: rgba(0, 0, 0, 0.03);
-        }
-
-        .auth-wrapper {
+        .id-sheet {
             position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            padding: 2rem 0;
-        }
-
-        .auth-card {
-            border-radius: 28px;
-            border: 1px solid #e5e7eb;
-            background: #ffffff;
-            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(16px);
-        }
-
-        .brand-section {
-            position: relative;
-            background: #ffffff;
-            border-right: 1px solid #e5e7eb;
+            width: 6in;
+            height: 4in;
+            margin: 28px auto 0;
+            background-image: url('{{ asset('images/permit_id_new.png') }}');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% 100%;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
         }
 
-        .brand-section::before,
-        .brand-section::after {
-            content: '';
+        .id-sheet::before {
+            content: "";
             position: absolute;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.03);
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.10) 38%, rgba(255, 255, 255, 0.18) 100%);
+            pointer-events: none;
         }
 
-        .brand-section::before {
-            width: 220px;
-            height: 220px;
-            top: -70px;
-            right: -80px;
-        }
-
-        .brand-section::after {
-            width: 180px;
-            height: 180px;
-            left: -60px;
-            bottom: -60px;
-        }
-
-        .brand-section>* {
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand-title {
-            color: #000000;
-            font-size: clamp(2rem, 3vw, 2.7rem);
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-        }
-
-        .brand-text {
-            color: #4b5563;
-            font-size: 1rem;
-            line-height: 1.8;
-        }
-
-        .brand-section .text-muted {
-            color: #6b7280 !important;
-        }
-
-        .microsoft-btn {
-            min-height: 60px;
-            background: #ffffff;
-            border: 1px solid #d1d5db;
+        .field {
+            position: absolute;
             color: #000000;
             font-weight: 700;
-            border-radius: 18px;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            text-transform: uppercase;
+            line-height: 1.15;
+            word-break: break-word;
         }
 
-        .microsoft-btn:hover {
-            background: #ffffff;
-            border-color: #9ca3af;
-            color: #000000;
-            transform: translateY(-2px);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.1);
+        .photo {
+            position: absolute;
+            left: 17.3%;
+            top: 23.8%;
+            width: 16.7%;
+            height: 24.2%;
+            object-fit: cover;
         }
 
-        .divider {
-            display: flex;
-            align-items: center;
+        .peso-id {
+            left: 24%;
+            top: 52.5%;
+            width: 25.8%;
+            font-size: 9px;
+            position: absolute;
+            font-weight: 800;
+        }
+
+        .front-name {
+            left: 14.6%;
+            top: 58.7%;
+            width: 32%;
+            font-size: 10pt;
+        }
+
+        .employer {
+            left: 53.6%;
+            top: 16.5%;
+            width: 42%;
+            font-size: 9pt;
+        }
+
+        .address_line {
+            left: 53.6%;
+            top: 32.3%;
+            width: 42%;
+            font-size: 8pt;
+        }
+
+        .community-tax {
+            left: 77%;
+            top: 39.2%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .issued-on {
+            left: 77%;
+            top: 44.8%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .issued-at {
+            left: 77%;
+            top: 50.5%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .official-receipt {
+            left: 77%;
+            top: 56.3%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .dated {
+            left: 77%;
+            top: 61.9%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .expires {
+            left: 77%;
+            top: 67.6%;
+            width: 35.6%;
+            font-size: 7pt;
+        }
+
+        .stamp-control {
+            left: 60.3%;
+            top: 83%;
+            width: 29.5%;
+            font-size: 8pt;
+            color: #b12222;
             text-align: center;
-            color: #6b7280;
-            font-size: 0.85rem;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .divider::before,
-        .divider::after {   
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #e5e7eb;
+        .stamp-gor {
+            left: 56.2%;
+            top: 90%;
+            width: 14.6%;
+            font-size: 7pt;
+            color: #b12222;
+            text-align: center;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .divider:not(:empty)::before {
-            margin-right: .75em;
+        .stamp-payment {
+            left: 79.4%;
+            top: 90%;
+            width: 15%;
+            font-size: 7pt;
+            color: #b12222;
+            text-align: center;
+            font-family: Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .divider:not(:empty)::after {
-            margin-left: .75em;
+        .no-print {
+            width: var(--page-width);
+            margin: 18px auto;
+            text-align: right;
+        }
+
+        .no-print button {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 18px;
+            background: var(--blue);
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .id-sheet {
+                box-shadow: none;
+            }
+
+            .print-page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
         }
     </style>
 </head>
 
-<body class="d-flex align-items-center">
+<body>
+    @php
+        $permit = optional($applicant->permit);
+        $fullName = strtoupper(
+            trim(
+                collect([
+                    $applicant->first_name,
+                    $applicant->middle_name
+                        ? strtoupper(substr(trim((string) $applicant->middle_name), 0, 1)) . '.'
+                        : null,
+                    $applicant->last_name,
+                    $applicant->suffix,
+                ])
+                    ->filter()
+                    ->implode(' '),
+            ),
+        );
+        $address_line = strtoupper(
+            trim(
+                collect([$applicant->address_line, $applicant->barangay, $applicant->city, $applicant->province])
+                    ->filter()
+                    ->implode(', '),
+            ),
+        );
+        $employer = strtoupper($applicant->hiring_company ?: $applicant->hired_company ?: 'N/A');
+        $photoPath = !empty($applicant->photo) ? public_path('storage/' . $applicant->photo) : null;
+        $issuedOn = $permit->permit_issued_on
+            ? strtoupper(\Carbon\Carbon::parse($permit->permit_issued_on)->format('F j, Y'))
+            : 'N/A';
+        $issuedAt = strtoupper($permit->permit_issued_at ?? 'N/A');
+        $permitDate = $permit->permit_date
+            ? strtoupper(\Carbon\Carbon::parse($permit->permit_date)->format('F j, Y'))
+            : 'N/A';
+        $expiresOn = $permit->expires_on
+            ? strtoupper(\Carbon\Carbon::parse($permit->expires_on)->format('F j, Y'))
+            : 'N/A';
+        $paymentDate = $permit->permit_date_of_payment
+            ? strtoupper(\Carbon\Carbon::parse($permit->permit_date_of_payment)->format('F j, Y'))
+            : 'N/A';
+    @endphp
+    <div class="no-print">
+        <button onclick="window.print()">Print Permit to Work ID</button>
+    </div>
 
-    <div class="container auth-wrapper d-flex align-items-center justify-content-center">
-        <div class="row w-100 shadow-sm bg-white auth-card overflow-hidden" style="max-width: 900px;">
+    <div class="print-page">
+        <div class="id-sheet">
+            @if ($photoPath && file_exists($photoPath))
+                <img src="{{ $photoPath }}" alt="Applicant Photo" class="photo">
+            @endif
 
-            <!-- Left Branding Section -->
-            <div class="col-md-6 p-5 brand-section d-flex flex-column justify-content-center">
-                <h2 class="fw-bold mb-3 brand-title">Applicant Registry System</h2>
-                <p class="brand-text">
-                    Manage your application journey: from initial registration and
-                    document submission to final evaluation and status updates.
-                </p>
-                <small class="text-muted mt-3">
-                    Developed by the City Government IT Team.
-                </small>
-            </div>
+            <div class="field peso-id">OP{{ strtoupper($permit->peso_id_no ?? 'N/A') }}</div>
+            <div class="field front-name">{{ $fullName }}</div>
 
-            <!-- Right Login Section -->
-            <div class="col-md-6 p-5">
+            <div class="field employer">{{ $employer }}</div>
+            <div class="field address_line">{{ $address_line }}</div>
+            <div class="field community-tax">{{ strtoupper($permit->community_tax_no ?? 'N/A') }}</div>
+            <div class="field issued-on">{{ $issuedOn }}</div>
+            <div class="field issued-at">{{ $issuedAt }}</div>
+            <div class="field official-receipt">{{ strtoupper($permit->permit_or_no ?? 'N/A') }}</div>
+            <div class="field dated">{{ $permitDate }}</div>
+            <div class="field expires">{{ $expiresOn }}</div>
 
-                <h4 class="mb-4 fw-semibold text-center">Sign in to your account</h4>
-
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0 small">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                
-                <!-- Microsoft Login -->
-                <a href="{{ route('login.azure.redirect') }}"
-                    class="btn microsoft-btn w-100 d-flex align-items-center justify-content-center gap-2">
-
-                    <svg width="18" height="18" viewBox="0 0 23 23">
-                        <rect width="10" height="10" fill="#F25022" />
-                        <rect x="13" width="10" height="10" fill="#7FBA00" />
-                        <rect y="13" width="10" height="10" fill="#00A4EF" />
-                        <rect x="13" y="13" width="10" height="10" fill="#FFB900" />
-                    </svg>
-
-                    Sign in with Microsoft
-                </a>
-
-                <div class="text-center mt-4">
-                    <small class="text-muted">
-                        © {{ now()->year }} City Government. All rights reserved.
-                    </small>
-                </div>
-
-            </div>
+            <div class="field stamp-control">CGI-{{ strtoupper($permit->permit_doc_stamp_control_no ?? 'N/A') }}</div>
+            <div class="field stamp-gor">{{ strtoupper($permit->permit_or_no ?? 'N/A') }}</div>
+            <div class="field stamp-payment">{{ $paymentDate }}</div>
         </div>
     </div>
 
+    @vite('resources/js/app.js')
 </body>
 
 </html>

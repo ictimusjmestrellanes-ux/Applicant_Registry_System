@@ -30,55 +30,64 @@
             $dateTo,
         ])->contains(fn($value) => trim((string) $value) !== '');
         $permitCompleteCount = $visibleApplicants->filter(fn($applicant) => $applicant->isPermitComplete())->count();
-        $clearanceCompleteCount = $visibleApplicants->filter(fn($applicant) => $applicant->isClearanceComplete())->count();
-        $referralCompleteCount = $visibleApplicants->filter(fn($applicant) => $applicant->isReferralComplete())->count();
-        $fullyReadyCount = $visibleApplicants->filter(
-            fn($applicant) => $applicant->isPermitComplete() && $applicant->isClearanceComplete() && $applicant->isReferralComplete()
-        )->count();
+        $clearanceCompleteCount = $visibleApplicants
+            ->filter(fn($applicant) => $applicant->isClearanceComplete())
+            ->count();
+        $referralCompleteCount = $visibleApplicants
+            ->filter(fn($applicant) => $applicant->isReferralComplete())
+            ->count();
+        $fullyReadyCount = $visibleApplicants
+            ->filter(
+                fn($applicant) => $applicant->isPermitComplete() &&
+                    $applicant->isClearanceComplete() &&
+                    $applicant->isReferralComplete(),
+            )
+            ->count();
         $filterPanelOpen = $hasActiveFilters;
         $sortBy = $sortBy ?? 'id';
         $sortOrder = $sortOrder ?? 'desc';
         $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
-        
-        $sortHelper = function($field, $label) use ($sortBy, $sortOrder, $filters) {
-            $nextOrder = ($sortBy === $field && $sortOrder === 'asc') ? 'desc' : 'asc';
-            $icon = ($sortBy === $field) ? ($sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-sort';
+
+        $sortHelper = function ($field, $label) use ($sortBy, $sortOrder, $filters) {
+            $nextOrder = $sortBy === $field && $sortOrder === 'asc' ? 'desc' : 'asc';
+            $icon = $sortBy === $field ? ($sortOrder === 'asc' ? 'bi-sort-up' : 'bi-sort-down') : 'bi-sort';
             $queryParams = array_filter($filters, fn($value) => trim((string) $value) !== '');
             $queryParams['sort_by'] = $field;
             $queryParams['sort_order'] = $nextOrder;
             return [
                 'url' => route('applicants.index', $queryParams),
                 'icon' => $icon,
-                'label' => $label
+                'label' => $label,
             ];
         };
     @endphp
 
-    @if(! $isApplicantUser)
+    @if (!$isApplicantUser)
         <section class="filter-card mb-4">
             <div class="section-head">
                 <div>
                     <h5 class="section-title mb-1">Filter Applicants</h5>
-                    <p class="section-copy mb-0">Narrow records by keyword, profile details, transaction type, location, and created date range.</p>
+                    <p class="section-copy mb-0">Narrow records by keyword, profile details, transaction type, location, and
+                        created date range.</p>
                 </div>
                 <div class="section-head-actions">
-                    <button type="button"
-                        class="btn filter-toggle js-filter-toggle {{ $filterPanelOpen ? 'is-open' : '' }}"
-                        aria-expanded="{{ $filterPanelOpen ? 'true' : 'false' }}"
-                        aria-controls="applicant-filter-panel">
+                    <button type="button" class="btn filter-toggle js-filter-toggle {{ $filterPanelOpen ? 'is-open' : '' }}"
+                        aria-expanded="{{ $filterPanelOpen ? 'true' : 'false' }}" aria-controls="applicant-filter-panel">
                         <span class="filter-toggle-label js-filter-toggle-text">
                             {{ $filterPanelOpen ? 'Hide Filters' : 'Show Filters' }}
                         </span>
                         <i class="bi bi-chevron-down filter-toggle-icon"></i>
                     </button>
-                    <a href="{{ route('applicants.export', array_filter($filters, fn($value) => trim((string) $value) !== '')) }}" class="btn index-btn-export">
+                    <a href="{{ route('applicants.export', array_filter($filters, fn($value) => trim((string) $value) !== '')) }}"
+                        class="btn index-btn-export">
                         <i class="bi bi-download me-2"></i>Export XLSX
                     </a>
                     <div class="results-chip">
-                        @if($isUnpaginatedView)
+                        @if ($isUnpaginatedView)
                             Viewing all {{ number_format($totalApplicants) }} Applicants
                         @else
-                            Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants
+                            Showing {{ $showingFrom }}-{{ $showingTo }} of {{ number_format($totalApplicants) }}
+                            Applicants
                         @endif
                     </div>
                 </div>
@@ -100,8 +109,9 @@
                             <div class="filter-input-shell">
                                 <select name="gender" class="form-select index-select-control">
                                     <option value="">Select Sex</option>
-                                    @foreach($genderOptions as $genderOption)
-                                        <option value="{{ $genderOption }}" {{ $selectedGender === $genderOption ? 'selected' : '' }}>
+                                    @foreach ($genderOptions as $genderOption)
+                                        <option value="{{ $genderOption }}"
+                                            {{ $selectedGender === $genderOption ? 'selected' : '' }}>
                                             {{ $genderOption }}
                                         </option>
                                     @endforeach
@@ -113,8 +123,9 @@
                             <div class="filter-input-shell">
                                 <select name="civil_status" class="form-select index-select-control">
                                     <option value="">All civil statuses</option>
-                                    @foreach($civilStatusOptions as $civilStatusOption)
-                                        <option value="{{ $civilStatusOption }}" {{ $selectedCivilStatus === $civilStatusOption ? 'selected' : '' }}>
+                                    @foreach ($civilStatusOptions as $civilStatusOption)
+                                        <option value="{{ $civilStatusOption }}"
+                                            {{ $selectedCivilStatus === $civilStatusOption ? 'selected' : '' }}>
                                             {{ $civilStatusOption }}
                                         </option>
                                     @endforeach
@@ -126,8 +137,9 @@
                             <div class="filter-input-shell">
                                 <select name="city" class="form-select index-select-control">
                                     <option value="">All cities</option>
-                                    @foreach($cityOptions as $cityOption)
-                                        <option value="{{ $cityOption }}" {{ $selectedCity === $cityOption ? 'selected' : '' }}>
+                                    @foreach ($cityOptions as $cityOption)
+                                        <option value="{{ $cityOption }}"
+                                            {{ $selectedCity === $cityOption ? 'selected' : '' }}>
                                             {{ $cityOption }}
                                         </option>
                                     @endforeach
@@ -139,8 +151,9 @@
                             <div class="filter-input-shell">
                                 <select name="barangay" class="form-select index-select-control">
                                     <option value="">All barangays</option>
-                                    @foreach($barangayOptions as $barangayOption)
-                                        <option value="{{ $barangayOption }}" {{ $selectedBarangay === $barangayOption ? 'selected' : '' }}>
+                                    @foreach ($barangayOptions as $barangayOption)
+                                        <option value="{{ $barangayOption }}"
+                                            {{ $selectedBarangay === $barangayOption ? 'selected' : '' }}>
                                             {{ $barangayOption }}
                                         </option>
                                     @endforeach
@@ -155,10 +168,12 @@
                                     <option value="permit" {{ $selectedTransactionType === 'permit' ? 'selected' : '' }}>
                                         Mayor's Permit
                                     </option>
-                                    <option value="clearance" {{ $selectedTransactionType === 'clearance' ? 'selected' : '' }}>
+                                    <option value="clearance"
+                                        {{ $selectedTransactionType === 'clearance' ? 'selected' : '' }}>
                                         Mayor's Clearance
                                     </option>
-                                    <option value="referral" {{ $selectedTransactionType === 'referral' ? 'selected' : '' }}>
+                                    <option value="referral"
+                                        {{ $selectedTransactionType === 'referral' ? 'selected' : '' }}>
                                         Mayor's Referral
                                     </option>
                                     <option value="all" {{ $selectedTransactionType === 'all' ? 'selected' : '' }}>
@@ -170,13 +185,15 @@
                         <div class="col-12 col-md-6 col-xl-2">
                             <label class="form-label field-label">Date From</label>
                             <div class="filter-input-shell">
-                                <input type="date" name="date_from" class="form-control index-date-control" value="{{ $dateFrom }}">
+                                <input type="date" name="date_from" class="form-control index-date-control"
+                                    value="{{ $dateFrom }}">
                             </div>
                         </div>
                         <div class="col-12 col-md-6 col-xl-2">
                             <label class="form-label field-label">Date To</label>
                             <div class="filter-input-shell">
-                                <input type="date" name="date_to" class="form-control index-date-control" value="{{ $dateTo }}">
+                                <input type="date" name="date_to" class="form-control index-date-control"
+                                    value="{{ $dateTo }}">
                             </div>
                         </div>
                         <div class="col-12 col-xl-4">
@@ -194,427 +211,473 @@
         </section>
     @endif
 
-        @if(session('success'))
-            <div class="alert alert-success success-banner border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                <div>{{ session('success') }}</div>
-            </div>
-        @endif
+    @if (session('success'))
+        <div class="alert alert-success success-banner border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <div>{{ session('success') }}</div>
+        </div>
+    @endif
 
-        <section class="records-card">
-            <div class="section-head mb-3">
-                <div>
-                    <h5 class="section-title mb-1">Applicant Records</h5>
-                    <p class="section-copy mb-0">Review profile details and document readiness before opening the full
-                        applicant workspace.</p>
-                </div>
-                <div class="section-head-actions">
-                    @if($hasActiveFilters)
-                        <div class="active-filter-list">
-                            @if($searchTerm !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-search me-1"></i>Keyword: "{{ $searchTerm }}"
-                                </div>
-                            @endif
-                            @if($selectedGender !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-person-badge me-1"></i>Gender: {{ $selectedGender }}
-                                </div>
-                            @endif
-                            @if($selectedCivilStatus !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-heart me-1"></i>Status: {{ $selectedCivilStatus }}
-                                </div>
-                            @endif
-                            @if($selectedCity !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-geo-alt me-1"></i>City: {{ $selectedCity }}
-                                </div>
-                            @endif
-                            @if($selectedBarangay !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-pin-map me-1"></i>Barangay: {{ $selectedBarangay }}
-                                </div>
-                            @endif
-                            @if($selectedTransactionType !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-diagram-3 me-1"></i>Transaction:
-                                    @if($selectedTransactionType === 'permit')
-                                        Mayor's Permit
-                                    @elseif($selectedTransactionType === 'clearance')
-                                        Mayor's Clearance
-                                    @elseif($selectedTransactionType === 'referral')
-                                        Mayor's Referral
-                                    @else
-                                        Any transaction
-                                    @endif
-                                </div>
-                            @endif
-                            @if($dateFrom !== '' || $dateTo !== '')
-                                <div class="search-chip">
-                                    <i class="bi bi-calendar-range me-1"></i>Date:
-                                    {{ $dateFrom !== '' ? \Illuminate\Support\Carbon::parse($dateFrom)->format('M d, Y') : 'Any' }}
-                                    -
-                                    {{ $dateTo !== '' ? \Illuminate\Support\Carbon::parse($dateTo)->format('M d, Y') : 'Any' }}
-                                </div>
-                            @endif
-                        </div>
+    <section class="records-card">
+        <div class="section-head mb-3">
+            <div>
+                <h5 class="section-title mb-1">Applicant Records</h5>
+                <p class="section-copy mb-0">Review profile details and document readiness before opening the full
+                    applicant workspace.</p>
+            </div>
+            <div class="section-head-actions">
+                @if ($hasActiveFilters)
+                    <div class="active-filter-list">
+                        @if ($searchTerm !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-search me-1"></i>Keyword: "{{ $searchTerm }}"
+                            </div>
+                        @endif
+                        @if ($selectedGender !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-person-badge me-1"></i>Gender: {{ $selectedGender }}
+                            </div>
+                        @endif
+                        @if ($selectedCivilStatus !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-heart me-1"></i>Status: {{ $selectedCivilStatus }}
+                            </div>
+                        @endif
+                        @if ($selectedCity !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-geo-alt me-1"></i>City: {{ $selectedCity }}
+                            </div>
+                        @endif
+                        @if ($selectedBarangay !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-pin-map me-1"></i>Barangay: {{ $selectedBarangay }}
+                            </div>
+                        @endif
+                        @if ($selectedTransactionType !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-diagram-3 me-1"></i>Transaction:
+                                @if ($selectedTransactionType === 'permit')
+                                    Mayor's Permit
+                                @elseif($selectedTransactionType === 'clearance')
+                                    Mayor's Clearance
+                                @elseif($selectedTransactionType === 'referral')
+                                    Mayor's Referral
+                                @else
+                                    Any transaction
+                                @endif
+                            </div>
+                        @endif
+                        @if ($dateFrom !== '' || $dateTo !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-calendar-range me-1"></i>Date:
+                                {{ $dateFrom !== '' ? \Illuminate\Support\Carbon::parse($dateFrom)->format('M d, Y') : 'Any' }}
+                                -
+                                {{ $dateTo !== '' ? \Illuminate\Support\Carbon::parse($dateTo)->format('M d, Y') : 'Any' }}
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                <form method="GET" action="{{ route('applicants.index') }}" class="records-view-form">
+                    @if ($searchTerm !== '')
+                        <input type="hidden" name="search" value="{{ $searchTerm }}">
+                    @endif
+                    @if ($selectedGender !== '')
+                        <input type="hidden" name="gender" value="{{ $selectedGender }}">
+                    @endif
+                    @if ($selectedCivilStatus !== '')
+                        <input type="hidden" name="civil_status" value="{{ $selectedCivilStatus }}">
+                    @endif
+                    @if ($selectedCity !== '')
+                        <input type="hidden" name="city" value="{{ $selectedCity }}">
+                    @endif
+                    @if ($selectedBarangay !== '')
+                        <input type="hidden" name="barangay" value="{{ $selectedBarangay }}">
+                    @endif
+                    @if ($selectedTransactionType !== '')
+                        <input type="hidden" name="transaction_type" value="{{ $selectedTransactionType }}">
+                    @endif
+                    @if ($dateFrom !== '')
+                        <input type="hidden" name="date_from" value="{{ $dateFrom }}">
+                    @endif
+                    @if ($dateTo !== '')
+                        <input type="hidden" name="date_to" value="{{ $dateTo }}">
                     @endif
 
-                    <form method="GET" action="{{ route('applicants.index') }}" class="records-view-form">
-                        @if($searchTerm !== '')
-                            <input type="hidden" name="search" value="{{ $searchTerm }}">
-                        @endif
-                        @if($selectedGender !== '')
-                            <input type="hidden" name="gender" value="{{ $selectedGender }}">
-                        @endif
-                        @if($selectedCivilStatus !== '')
-                            <input type="hidden" name="civil_status" value="{{ $selectedCivilStatus }}">
-                        @endif
-                        @if($selectedCity !== '')
-                            <input type="hidden" name="city" value="{{ $selectedCity }}">
-                        @endif
-                        @if($selectedBarangay !== '')
-                            <input type="hidden" name="barangay" value="{{ $selectedBarangay }}">
-                        @endif
-                        @if($selectedTransactionType !== '')
-                            <input type="hidden" name="transaction_type" value="{{ $selectedTransactionType }}">
-                        @endif
-                        @if($dateFrom !== '')
-                            <input type="hidden" name="date_from" value="{{ $dateFrom }}">
-                        @endif
-                        @if($dateTo !== '')
-                            <input type="hidden" name="date_to" value="{{ $dateTo }}">
-                        @endif
-
-                        <div class="limit-shell js-limit-dropdown">
-                            <div class="limit-shell-copy">
-                                <span class="limit-shell-label">View Page</span>
-                                <select name="per_page" class="form-select index-limit-select js-limit-native"
-                                    onchange="this.form.submit()">
-                                    @foreach([10, 20, 30, 40, 50, 100] as $limit)
-                                        <option value="{{ $limit }}" {{ $perPage === (string) $limit ? 'selected' : '' }}>
-                                            {{ $limit }}
-                                        </option>
-                                    @endforeach
-                                    {{-- 'View all' option removed per request --}}
-                                </select>
-                                <button type="button" class="limit-trigger js-limit-trigger" aria-haspopup="listbox" aria-expanded="false">
-                                    <span class="limit-trigger-text js-limit-trigger-text">Select view</span>
-                                    <i class="bi bi-chevron-down limit-trigger-icon"></i>
-                                </button>
-                                <div class="limit-menu js-limit-menu" role="listbox"></div>
-                            </div>
+                    <div class="limit-shell js-limit-dropdown">
+                        <div class="limit-shell-copy">
+                            <span class="limit-shell-label">View Page</span>
+                            <select name="per_page" class="form-select index-limit-select js-limit-native"
+                                onchange="this.form.submit()">
+                                @foreach ([10, 20, 30, 40, 50, 100] as $limit)
+                                    <option value="{{ $limit }}"
+                                        {{ $perPage === (string) $limit ? 'selected' : '' }}>
+                                        {{ $limit }}
+                                    </option>
+                                @endforeach
+                                {{-- 'View all' option removed per request --}}
+                            </select>
+                            <button type="button" class="limit-trigger js-limit-trigger" aria-haspopup="listbox"
+                                aria-expanded="false">
+                                <span class="limit-trigger-text js-limit-trigger-text">Select view</span>
+                                <i class="bi bi-chevron-down limit-trigger-icon"></i>
+                            </button>
+                            <div class="limit-menu js-limit-menu" role="listbox"></div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
+        </div>
 
-            <div class="table-responsive d-none d-lg-block">
-                <table class="table applicants-table align-middle mb-0">
-                    <thead>
-                        <tr>
-                            @php $sort = $sortHelper('id', 'ID'); @endphp
-                            <th class="text-center">
-                                <a href="{{ $sort['url'] }}" class="sort-header">
-                                    {{ $sort['label'] }}
-                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
-                                </a>
-                            </th>
-                            @php $sort = $sortHelper('first_name', 'Applicant'); @endphp
-                            <th>
-                                <a href="{{ $sort['url'] }}" class="sort-header">
-                                    {{ $sort['label'] }}
-                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
-                                </a>
-                            </th>
-                            @php $sort = $sortHelper('contact_no', 'Contact'); @endphp
-                            <th>
-                                <a href="{{ $sort['url'] }}" class="sort-header">
-                                    {{ $sort['label'] }}
-                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
-                                </a>
-                            </th>
-                            @php $sort = $sortHelper('city', 'Location'); @endphp
-                            <th>
-                                <a href="{{ $sort['url'] }}" class="sort-header">
-                                    {{ $sort['label'] }}
-                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
-                                </a>
-                            </th>
-                            <th>Permit</th>
-                            <th>Clearance</th>
-                            <th>Referral</th>
-                            @php $sort = $sortHelper('created_at', 'Created'); @endphp
-                            <th class="text-center">
-                                <a href="{{ $sort['url'] }}" class="sort-header">
-                                    {{ $sort['label'] }}
-                                    <i class="bi {{ $sort['icon'] }} ms-1"></i>
-                                </a>
-                            </th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($applicants as $applicant)
-                            @php
-                                $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
-                                $permit = optional($applicant->permit);
-                                $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
-                                $hasPermitClearance =
-                                    ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
-                                    ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
-                                $permitRequirements = [!empty($permit->health_card), !empty($permit->cedula), $hasPermitClearance];
-                                if (!$isImusResident) {
-                                    $permitRequirements[] = !empty($permit->referral_letter);
-                                }
-                                $permitTotal = count($permitRequirements);
-                                $permitUploaded = collect($permitRequirements)->filter()->count();
-                                $permitPercent = $permitTotal > 0 ? ($permitUploaded / $permitTotal) * 100 : 0;
+        <div class="table-responsive d-none d-lg-block">
+            <table class="table applicants-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        @php $sort = $sortHelper('id', 'ID'); @endphp
+                        <th class="text-center">
+                            <a href="{{ $sort['url'] }}" class="sort-header">
+                                {{ $sort['label'] }}
+                                <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                            </a>
+                        </th>
+                        @php $sort = $sortHelper('first_name', 'Applicant'); @endphp
+                        <th>
+                            <a href="{{ $sort['url'] }}" class="sort-header">
+                                {{ $sort['label'] }}
+                                <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                            </a>
+                        </th>
+                        @php $sort = $sortHelper('contact_no', 'Contact'); @endphp
+                        <th>
+                            <a href="{{ $sort['url'] }}" class="sort-header">
+                                {{ $sort['label'] }}
+                                <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                            </a>
+                        </th>
+                        @php $sort = $sortHelper('city', 'Location'); @endphp
+                        <th>
+                            <a href="{{ $sort['url'] }}" class="sort-header">
+                                {{ $sort['label'] }}
+                                <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                            </a>
+                        </th>
+                        <th>Permit</th>
+                        <th>Clearance</th>
+                        <th>Referral</th>
+                        @php $sort = $sortHelper('created_at', 'Created'); @endphp
+                        <th class="text-center">
+                            <a href="{{ $sort['url'] }}" class="sort-header">
+                                {{ $sort['label'] }}
+                                <i class="bi {{ $sort['icon'] }} ms-1"></i>
+                            </a>
+                        </th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($applicants as $applicant)
+                        @php
+                            $fullName = trim(
+                                $applicant->first_name .
+                                    ' ' .
+                                    ($applicant->middle_name
+                                        ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. '
+                                        : '') .
+                                    $applicant->last_name .
+                                    ' ' .
+                                    ($applicant->suffix ?? ''),
+                            );
+                            $permit = optional($applicant->permit);
+                            $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
+                            $hasPermitClearance =
+                                ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
+                                ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
+                            $permitRequirements = [
+                                !empty($permit->health_card),
+                                !empty($permit->cedula),
+                                $hasPermitClearance,
+                            ];
+                            if (!$isImusResident) {
+                                $permitRequirements[] = !empty($permit->referral_letter);
+                            }
+                            $permitTotal = count($permitRequirements);
+                            $permitUploaded = collect($permitRequirements)->filter()->count();
+                            $permitPercent = $permitTotal > 0 ? ($permitUploaded / $permitTotal) * 100 : 0;
 
-                                $clearance = optional($applicant->clearance);
-                                $clearanceRequirements = [
-                                    $clearance->prosecutor_clearance,
-                                    $clearance->mtc_clearance,
-                                    $clearance->rtc_clearance,
-                                    $clearance->nbi_clearance,
-                                    $clearance->barangay_clearance,
-                                ];
-                                $clearanceUploaded = collect($clearanceRequirements)->filter()->count();
-                                $clearanceTotal = count($clearanceRequirements);
-                                $clearancePercent = $clearanceTotal > 0 ? ($clearanceUploaded / $clearanceTotal) * 100 : 0;
+                            $clearance = optional($applicant->clearance);
+                            $clearanceRequirements = [
+                                $clearance->prosecutor_clearance,
+                                $clearance->mtc_clearance,
+                                $clearance->rtc_clearance,
+                                $clearance->nbi_clearance,
+                                $clearance->barangay_clearance,
+                            ];
+                            $clearanceUploaded = collect($clearanceRequirements)->filter()->count();
+                            $clearanceTotal = count($clearanceRequirements);
+                            $clearancePercent = $clearanceTotal > 0 ? ($clearanceUploaded / $clearanceTotal) * 100 : 0;
 
-                                $referral = optional($applicant->referral);
-                                $hasResume = !empty($referral->resume);
-                                $hasReferralClearance = collect([
+                            $referral = optional($applicant->referral);
+                            $hasResume = !empty($referral->resume);
+                            $hasReferralClearance =
+                                collect([
                                     $referral->ref_barangay_clearance,
                                     $referral->ref_police_clearance,
                                     $referral->ref_nbi_clearance,
-                                ])->filter()->count() > 0;
-                                $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
-                                $referralPercent = ($referralUploaded / 2) * 100;
-                                $completedStages = collect([$permitPercent == 100, $clearancePercent == 100, $referralPercent == 100])->filter()->count();
-                                $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
-                            @endphp
-                                <tr>
-                                <td class="text-center table-id">#{{ $applicant->id }}</td>
-                                <td>
-                                    <div class="applicant-name">{{ $fullName }}</div>
-                                </td>
-                                <td>
-                                    <div class="contact-line"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
-                                </td>
-                                <td class="location-cell">
-                                    <div>{{ $applicant->address_line ?: 'Address line not set' }}</div>
-                                    <div class="applicant-meta mt-1">{{ $applicant->barangay ?: 'Barangay not set' }},
-                                        {{ $applicant->city ?: 'City not set' }}
+                                ])
+                                    ->filter()
+                                    ->count() > 0;
+                            $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
+                            $referralPercent = ($referralUploaded / 2) * 100;
+                            $completedStages = collect([
+                                $permitPercent == 100,
+                                $clearancePercent == 100,
+                                $referralPercent == 100,
+                            ])
+                                ->filter()
+                                ->count();
+                            $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
+                        @endphp
+                        <tr>
+                            <td class="text-center table-id">#{{ $applicant->id }}</td>
+                            <td>
+                                <div class="applicant-name">{{ $fullName }}</div>
+                            </td>
+                            <td>
+                                <div class="contact-line"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
+                            </td>
+                            <td class="location-cell">
+                                <div>{{ $applicant->address_line ?: 'Address line not set' }}</div>
+                                <div class="applicant-meta mt-1">{{ $applicant->barangay ?: 'Barangay not set' }},
+                                    {{ $applicant->city ?: 'City not set' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="requirement-card">
+                                    <div class="requirement-meta"><span>Mayor's
+                                            Permit</span><span>{{ $permitUploaded }}/{{ $permitTotal }}</span></div>
+                                    <div class="progress requirement-progress">
+                                        <div class="progress-bar {{ $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                            style="width: {{ $permitPercent }}%;"></div>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="requirement-card">
-                                        <div class="requirement-meta"><span>Mayor's
-                                                Permit</span><span>{{ $permitUploaded }}/{{ $permitTotal }}</span></div>
-                                        <div class="progress requirement-progress">
-                                            <div class="progress-bar {{ $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                                style="width: {{ $permitPercent }}%;"></div>
-                                        </div>
-                                        <div class="requirement-note">{{ round($permitPercent) }}% submitted</div>
+                                    <div class="requirement-note">{{ round($permitPercent) }}% submitted</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="requirement-card">
+                                    <div class="requirement-meta"><span>Mayor's
+                                            Clearance</span><span>{{ $clearanceUploaded }}/{{ $clearanceTotal }}</span>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="requirement-card">
-                                        <div class="requirement-meta"><span>Mayor's
-                                                Clearance</span><span>{{ $clearanceUploaded }}/{{ $clearanceTotal }}</span>
-                                        </div>
-                                        <div class="progress requirement-progress">
-                                            <div class="progress-bar {{ $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                                style="width: {{ $clearancePercent }}%;"></div>
-                                        </div>
-                                        <div class="requirement-note">{{ round($clearancePercent) }}% submitted</div>
+                                    <div class="progress requirement-progress">
+                                        <div class="progress-bar {{ $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                            style="width: {{ $clearancePercent }}%;"></div>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="requirement-card">
-                                        <div class="requirement-meta"><span>Mayor's
-                                                Referral</span><span>{{ $referralUploaded }}/2</span></div>
-                                        <div class="progress requirement-progress">
-                                            <div class="progress-bar {{ $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                                style="width: {{ $referralPercent }}%;"></div>
-                                        </div>
-                                        <div class="requirement-note">{{ round($referralPercent) }}% submitted</div>
+                                    <div class="requirement-note">{{ round($clearancePercent) }}% submitted</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="requirement-card">
+                                    <div class="requirement-meta"><span>Mayor's
+                                            Referral</span><span>{{ $referralUploaded }}/2</span></div>
+                                    <div class="progress requirement-progress">
+                                        <div class="progress-bar {{ $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                            style="width: {{ $referralPercent }}%;"></div>
                                     </div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="created-date">{{ $applicant->created_at->format('M d, Y') }}</div>
-                                </td>
-                                <td class="text-center">
-                                    <div class="action-stack">
-                                        <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
-                                            title="View Applicant"><i class="bi bi-eye-fill"></i></a>
-                                        @if(! $isApplicantUser)
-                                            <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
-                                                onsubmit="return confirm('Are you sure you want to archive this applicant?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
-                                                        class="bi bi-archive-fill"></i></button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="9" class="text-center p-5">
-                                    <div class="empty-state">
-                                        <i class="bi bi-people"></i>
-                                        <h6 class="mb-1">No applicants found</h6>
-                                        <p class="mb-0">Try adjusting the filters to bring more records into view.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                    <div class="requirement-note">{{ round($referralPercent) }}% submitted</div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="created-date">{{ $applicant->created_at->format('M d, Y') }}</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="action-stack">
+                                    <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
+                                        title="View Applicant"><i class="bi bi-eye-fill"></i></a>
+                                    @if (!$isApplicantUser)
+                                        <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
+                                            onsubmit="return confirm('Are you sure you want to archive this applicant?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-archive"
+                                                title="Archive Applicant"><i class="bi bi-archive-fill"></i></button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="9" class="text-center p-5">
+                                <div class="empty-state">
+                                    <i class="bi bi-people"></i>
+                                    <h6 class="mb-1">No applicants found</h6>
+                                    <p class="mb-0">Try adjusting the filters to bring more records into view.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-            <div class="mobile-records d-lg-none">
-                @forelse($applicants as $applicant)
-                    @php
-                        $fullName = trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? ''));
-                        $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
-                        $permit = optional($applicant->permit);
-                        $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
-                        $hasPermitClearance =
-                            ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
-                            ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
-                        $permitRequirements = [!empty($permit->health_card), !empty($permit->cedula), $hasPermitClearance];
-                        if (!$isImusResident) {
-                            $permitRequirements[] = !empty($permit->referral_letter);
-                        }
-                        $permitTotal = count($permitRequirements);
-                        $permitUploaded = collect($permitRequirements)->filter()->count();
-                        $permitPercent = $permitTotal > 0 ? ($permitUploaded / $permitTotal) * 100 : 0;
+        <div class="mobile-records d-lg-none">
+            @forelse($applicants as $applicant)
+                @php
+                    $fullName = trim(
+                        $applicant->first_name .
+                            ' ' .
+                            ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') .
+                            $applicant->last_name .
+                            ' ' .
+                            ($applicant->suffix ?? ''),
+                    );
+                    $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
+                    $permit = optional($applicant->permit);
+                    $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
+                    $hasPermitClearance =
+                        ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
+                        ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
+                    $permitRequirements = [!empty($permit->health_card), !empty($permit->cedula), $hasPermitClearance];
+                    if (!$isImusResident) {
+                        $permitRequirements[] = !empty($permit->referral_letter);
+                    }
+                    $permitTotal = count($permitRequirements);
+                    $permitUploaded = collect($permitRequirements)->filter()->count();
+                    $permitPercent = $permitTotal > 0 ? ($permitUploaded / $permitTotal) * 100 : 0;
 
-                        $clearance = optional($applicant->clearance);
-                        $clearanceRequirements = [
-                            $clearance->prosecutor_clearance,
-                            $clearance->mtc_clearance,
-                            $clearance->rtc_clearance,
-                            $clearance->nbi_clearance,
-                            $clearance->barangay_clearance,
-                        ];
-                        $clearanceUploaded = collect($clearanceRequirements)->filter()->count();
-                        $clearanceTotal = count($clearanceRequirements);
-                        $clearancePercent = $clearanceTotal > 0 ? ($clearanceUploaded / $clearanceTotal) * 100 : 0;
+                    $clearance = optional($applicant->clearance);
+                    $clearanceRequirements = [
+                        $clearance->prosecutor_clearance,
+                        $clearance->mtc_clearance,
+                        $clearance->rtc_clearance,
+                        $clearance->nbi_clearance,
+                        $clearance->barangay_clearance,
+                    ];
+                    $clearanceUploaded = collect($clearanceRequirements)->filter()->count();
+                    $clearanceTotal = count($clearanceRequirements);
+                    $clearancePercent = $clearanceTotal > 0 ? ($clearanceUploaded / $clearanceTotal) * 100 : 0;
 
-                        $referral = optional($applicant->referral);
-                        $hasResume = !empty($referral->resume);
-                        $hasReferralClearance = collect([
+                    $referral = optional($applicant->referral);
+                    $hasResume = !empty($referral->resume);
+                    $hasReferralClearance =
+                        collect([
                             $referral->ref_barangay_clearance,
                             $referral->ref_police_clearance,
                             $referral->ref_nbi_clearance,
-                        ])->filter()->count() > 0;
-                        $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
-                        $referralPercent = ($referralUploaded / 2) * 100;
-                    @endphp
-                    <article class="mobile-record-card">
-                        <div class="mobile-record-head">
-                            <div>
-                                <div class="applicant-name">{{ $fullName }}</div>
-                                <div class="applicant-code">Record #{{ $applicant->id }}</div>
-                                <div class="applicant-meta">#{{ $applicant->id }} •
-                                    {{ $applicant->created_at->format('M d, Y') }}
-                                </div>
-                            </div>
-                            <div class="mobile-actions">
-                                <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
-                                    title="View Applicant"><i class="bi bi-eye-fill"></i></a>
-                                @if(! $isApplicantUser)
-                                    <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
-                                        onsubmit="return confirm('Are you sure you want to archive this applicant?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
-                                                class="bi bi-archive-fill"></i></button>
-                                    </form>
-                                @endif
+                        ])
+                            ->filter()
+                            ->count() > 0;
+                    $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
+                    $referralPercent = ($referralUploaded / 2) * 100;
+                @endphp
+                <article class="mobile-record-card">
+                    <div class="mobile-record-head">
+                        <div>
+                            <div class="applicant-name">{{ $fullName }}</div>
+                            <div class="applicant-code">Record #{{ $applicant->id }}</div>
+                            <div class="applicant-meta">#{{ $applicant->id }} •
+                                {{ $applicant->created_at->format('M d, Y') }}
                             </div>
                         </div>
-                        <div class="mini-pill-row mb-3">
-                            <span class="mini-pill">{{ $applicant->gender ?: 'N/A' }}</span>
-                            <span class="mini-pill">{{ $applicant->civil_status ?: 'Status not set' }}</span>
-                            <span class="mini-pill">4Ps: {{ $applicant->four_ps ?: 'N/A' }}</span>
+                        <div class="mobile-actions">
+                            <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
+                                title="View Applicant"><i class="bi bi-eye-fill"></i></a>
+                            @if (!$isApplicantUser)
+                                <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to archive this applicant?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-archive" title="Archive Applicant"><i
+                                            class="bi bi-archive-fill"></i></button>
+                                </form>
+                            @endif
                         </div>
-                        <div class="mobile-meta-line"><i
-                                class="bi bi-telephone-fill me-2"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
-                        <div class="mobile-meta-line"><i
-                                class="bi bi-geo-alt-fill me-2"></i>{{ $applicant->barangay ?: 'Barangay not set' }},
-                            {{ $applicant->city ?: 'City not set' }}
-                        </div>
-                        <div class="mobile-progress-list">
-                            <div class="requirement-card">
-                                <div class="requirement-meta"><span>Mayor's
-                                        Permit</span><span>{{ $permitUploaded }}/{{ $permitTotal }}</span></div>
-                                <div class="progress requirement-progress">
-                                    <div class="progress-bar {{ $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                        style="width: {{ $permitPercent }}%;"></div>
-                                </div>
-                            </div>
-                            <div class="requirement-card">
-                                <div class="requirement-meta"><span>Mayor's
-                                        Clearance</span><span>{{ $clearanceUploaded }}/{{ $clearanceTotal }}</span></div>
-                                <div class="progress requirement-progress">
-                                    <div class="progress-bar {{ $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                        style="width: {{ $clearancePercent }}%;"></div>
-                                </div>
-                            </div>
-                            <div class="requirement-card">
-                                <div class="requirement-meta"><span>Mayor's
-                                        Referral</span><span>{{ $referralUploaded }}/2</span></div>
-                                <div class="progress requirement-progress">
-                                    <div class="progress-bar {{ $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
-                                        style="width: {{ $referralPercent }}%;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                @empty
-                    <div class="empty-state">
-                        <i class="bi bi-people"></i>
-                        <h6 class="mb-1">No applicants found</h6>
-                        <p class="mb-0">Try adjusting the filters to bring more records into view.</p>
                     </div>
-                @endforelse
-            </div>
-        </section>
+                    <div class="mini-pill-row mb-3">
+                        <span class="mini-pill">{{ $applicant->gender ?: 'N/A' }}</span>
+                        <span class="mini-pill">{{ $applicant->civil_status ?: 'Status not set' }}</span>
+                        <span class="mini-pill">4Ps: {{ $applicant->four_ps ?: 'N/A' }}</span>
+                    </div>
+                    <div class="mobile-meta-line"><i
+                            class="bi bi-telephone-fill me-2"></i>{{ $applicant->contact_no ?: 'No contact number' }}
+                    </div>
+                    <div class="mobile-meta-line"><i
+                            class="bi bi-geo-alt-fill me-2"></i>{{ $applicant->barangay ?: 'Barangay not set' }},
+                        {{ $applicant->city ?: 'City not set' }}
+                    </div>
+                    <div class="mobile-progress-list">
+                        <div class="requirement-card">
+                            <div class="requirement-meta"><span>Mayor's
+                                    Permit</span><span>{{ $permitUploaded }}/{{ $permitTotal }}</span></div>
+                            <div class="progress requirement-progress">
+                                <div class="progress-bar {{ $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                    style="width: {{ $permitPercent }}%;"></div>
+                            </div>
+                        </div>
+                        <div class="requirement-card">
+                            <div class="requirement-meta"><span>Mayor's
+                                    Clearance</span><span>{{ $clearanceUploaded }}/{{ $clearanceTotal }}</span></div>
+                            <div class="progress requirement-progress">
+                                <div class="progress-bar {{ $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                    style="width: {{ $clearancePercent }}%;"></div>
+                            </div>
+                        </div>
+                        <div class="requirement-card">
+                            <div class="requirement-meta"><span>Mayor's
+                                    Referral</span><span>{{ $referralUploaded }}/2</span></div>
+                            <div class="progress requirement-progress">
+                                <div class="progress-bar {{ $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                    style="width: {{ $referralPercent }}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <h6 class="mb-1">No applicants found</h6>
+                    <p class="mb-0">Try adjusting the filters to bring more records into view.</p>
+                </div>
+            @endforelse
+        </div>
+    </section>
 
-        @if($applicants->hasPages())
-            <div class="pagination-wrap" style="margin-top:0.5rem;gap:0.5rem;align-items:center;">
-                <div class="pagination-copy" style="font-size:0.92rem;white-space:nowrap;margin-right:0.5rem;">
-                    <span class="pagination-copy--full">Showing {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants</span>
-                    <span class="pagination-copy--mobile" style="display:none">Showing {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants</span>
-                </div>
-                <div style="flex:0 0 auto;">
-                    {{ $applicants->appends(request()->query())->links('vendor.pagination.activity-logs') }}
-                </div>
+    @if ($applicants->hasPages())
+        <div class="pagination-wrap" style="margin-top:0.5rem;gap:0.5rem;align-items:center;">
+            <div class="pagination-copy" style="font-size:0.92rem;white-space:nowrap;margin-right:0.5rem;">
+                <span class="pagination-copy--full">Showing {{ $showingFrom }}–{{ $showingTo }} of
+                    {{ number_format($totalApplicants) }} Applicants</span>
+                <span class="pagination-copy--mobile" style="display:none">Showing
+                    {{ $showingFrom }}–{{ $showingTo }} of {{ number_format($totalApplicants) }} Applicants</span>
             </div>
-        @elseif($isUnpaginatedView && $totalApplicants > 0)
-            <div class="pagination-wrap" style="margin-top:0.5rem;">
-                <div class="pagination-copy" style="font-size:0.92rem;">
-                    <span class="pagination-copy--full">Showing all {{ number_format($totalApplicants) }} applicants</span>
-                    <span class="pagination-copy--mobile" style="display:none">All {{ number_format($totalApplicants) }} Applicants</span>
-                </div>
+            <div style="flex:0 0 auto;">
+                {{ $applicants->appends(request()->query())->links('vendor.pagination.activity-logs') }}
             </div>
-        @endif
+        </div>
+    @elseif($isUnpaginatedView && $totalApplicants > 0)
+        <div class="pagination-wrap" style="margin-top:0.5rem;">
+            <div class="pagination-copy" style="font-size:0.92rem;">
+                <span class="pagination-copy--full">Showing all {{ number_format($totalApplicants) }} applicants</span>
+                <span class="pagination-copy--mobile" style="display:none">All {{ number_format($totalApplicants) }}
+                    Applicants</span>
+            </div>
+        </div>
+    @endif
 
-        <style>
-            @media (max-width: 767.98px) {
-                .pagination-copy--full { display: none !important; }
-                .pagination-copy--mobile { display: inline !important; }
-                .pagination-wrap { gap: 0.4rem !important; }
+    <style>
+        @media (max-width: 767.98px) {
+            .pagination-copy--full {
+                display: none !important;
             }
-        </style>
+
+            .pagination-copy--mobile {
+                display: inline !important;
+            }
+
+            .pagination-wrap {
+                gap: 0.4rem !important;
+            }
+        }
+    </style>
     </div>
 
     <style>
@@ -778,7 +841,7 @@
             font-weight: 800;
         }
 
-        .applicant-code{
+        .applicant-code {
             color: #64748b;
             font-size: 0.85rem;
             margin-top: 0.15rem;
@@ -1619,16 +1682,16 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('input[name="search"]');
 
             if (searchInput && searchInput.form) {
                 let searchTimer = null;
 
-                searchInput.addEventListener('input', function () {
+                searchInput.addEventListener('input', function() {
                     clearTimeout(searchTimer);
 
-                    searchTimer = setTimeout(function () {
+                    searchTimer = setTimeout(function() {
                         if (typeof searchInput.form.requestSubmit === 'function') {
                             searchInput.form.requestSubmit();
                         } else {
@@ -1643,7 +1706,7 @@
             const filterToggleText = document.querySelector('.js-filter-toggle-text');
 
             if (filterToggle && filterPanel && filterToggleText) {
-                filterToggle.addEventListener('click', function () {
+                filterToggle.addEventListener('click', function() {
                     const isOpen = filterPanel.classList.toggle('is-open');
 
                     filterToggle.classList.toggle('is-open', isOpen);
@@ -1652,7 +1715,7 @@
                 });
             }
 
-            document.querySelectorAll('.js-limit-dropdown').forEach(function (dropdown) {
+            document.querySelectorAll('.js-limit-dropdown').forEach(function(dropdown) {
                 const select = dropdown.querySelector('.js-limit-native');
                 const trigger = dropdown.querySelector('.js-limit-trigger');
                 const triggerText = dropdown.querySelector('.js-limit-trigger-text');
@@ -1666,18 +1729,21 @@
                     const options = Array.from(select.options);
                     const selectedOption = options.find(option => option.selected) || options[0];
 
-                    triggerText.textContent = selectedOption ? selectedOption.textContent.trim() : 'Select view';
+                    triggerText.textContent = selectedOption ? selectedOption.textContent.trim() :
+                        'Select view';
                     menu.innerHTML = '';
 
                     options.forEach(option => {
                         const button = document.createElement('button');
                         button.type = 'button';
-                        button.className = 'limit-menu-option' + (option.selected ? ' is-active' : '');
+                        button.className = 'limit-menu-option' + (option.selected ?
+                            ' is-active' : '');
                         button.textContent = option.textContent.trim();
                         button.setAttribute('role', 'option');
-                        button.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+                        button.setAttribute('aria-selected', option.selected ? 'true' :
+                        'false');
 
-                        button.addEventListener('click', function () {
+                        button.addEventListener('click', function() {
                             select.value = option.value;
                             renderOptions();
                             dropdown.classList.remove('is-open');
@@ -1689,19 +1755,19 @@
                     });
                 };
 
-                trigger.addEventListener('click', function () {
+                trigger.addEventListener('click', function() {
                     const isOpen = dropdown.classList.toggle('is-open');
                     trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
                 });
 
-                document.addEventListener('click', function (event) {
+                document.addEventListener('click', function(event) {
                     if (!dropdown.contains(event.target)) {
                         dropdown.classList.remove('is-open');
                         trigger.setAttribute('aria-expanded', 'false');
                     }
                 });
 
-                document.addEventListener('keydown', function (event) {
+                document.addEventListener('keydown', function(event) {
                     if (event.key === 'Escape') {
                         dropdown.classList.remove('is-open');
                         trigger.setAttribute('aria-expanded', 'false');

@@ -129,7 +129,7 @@
         .form-section {
             padding: 1.35rem;
             /* border-radius: 22px;
-            border: 1px solid #e4edf7; */
+                border: 1px solid #e4edf7; */
             background: #ffffff;
         }
 
@@ -252,6 +252,7 @@
         }
 
         @media (max-width: 768px) {
+
             .create-hero,
             .form-shell,
             .form-section {
@@ -417,10 +418,11 @@
                 <div class="col-lg-8">
                     <h1 class="page-title">Add a new applicant record</h1>
                     <p class="page-copy">
-                        Use this form to register an applicant profile before moving on to permits, clearance, or referral processing.
+                        Use this form to register an applicant profile before moving on to permits, clearance, or referral
+                        processing.
                     </p>
                 </div>
-                
+
             </div>
         </div>
 
@@ -434,10 +436,13 @@
                             <h2 class="section-title">Personal Information</h2>
                             <div class="row g-4">
                                 <div class="col-md-2">
-                                    <label class="form-label">First Time Jobseeker <span class="required-mark">*</span></label>
+                                    <label class="form-label">First Time Jobseeker <span
+                                            class="required-mark">*</span></label>
                                     <select name="first_time_job_seeker" class="form-select" required>
-                                        <option value="NO" {{ old('first_time_job_seeker', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
-                                        <option value="YES" {{ old('first_time_job_seeker') === 'YES' ? 'selected' : '' }}>YES</option>
+                                        <option value="NO"
+                                            {{ old('first_time_job_seeker', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
+                                        <option value="YES"
+                                            {{ old('first_time_job_seeker') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -463,7 +468,8 @@
                                     <select name="suffix" class="form-select">
                                         <option value="">Optional</option>
                                         @foreach (['JR.', 'SR.', 'II', 'III', 'IV'] as $suffix)
-                                            <option value="{{ $suffix }}" {{ old('suffix') === $suffix ? 'selected' : '' }}>
+                                            <option value="{{ $suffix }}"
+                                                {{ old('suffix') === $suffix ? 'selected' : '' }}>
                                                 {{ $suffix }}
                                             </option>
                                         @endforeach
@@ -477,37 +483,46 @@
                                 <div class="col-md-2">
                                     <label class="form-label">Age (Auto)</label>
                                     <input type="number" name="age" id="age" class="form-control"
-                                        value="{{ old('age') }}" placeholder="Auto-calculated" min="0" readonly>
+                                        value="{{ old('age') }}" placeholder="Auto-calculated" min="0"
+                                        readonly>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Sex <span class="required-mark">*</span></label>
                                     <select name="gender" class="form-select" required>
                                         <option value="">Select Sex</option>
-                                        <option value="MALE" {{ old('gender') === 'MALE' ? 'selected' : '' }}>MALE</option>
-                                        <option value="FEMALE" {{ old('gender') === 'FEMALE' ? 'selected' : '' }}>FEMALE</option>
+                                        <option value="MALE" {{ old('gender') === 'MALE' ? 'selected' : '' }}>MALE
+                                        </option>
+                                        <option value="FEMALE" {{ old('gender') === 'FEMALE' ? 'selected' : '' }}>FEMALE
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Civil Status <span class="required-mark">*</span></label>
                                     <select name="civil_status" class="form-select" required>
                                         <option value="">Select Status</option>
-                                        <option value="SINGLE" {{ old('civil_status') === 'SINGLE' ? 'selected' : '' }}>SINGLE</option>
-                                        <option value="MARRIED" {{ old('civil_status') === 'MARRIED' ? 'selected' : '' }}>MARRIED</option>
-                                        <option value="WIDOWED" {{ old('civil_status') === 'WIDOWED' ? 'selected' : '' }}>WIDOWED</option>
+                                        <option value="SINGLE" {{ old('civil_status') === 'SINGLE' ? 'selected' : '' }}>
+                                            SINGLE</option>
+                                        <option value="MARRIED" {{ old('civil_status') === 'MARRIED' ? 'selected' : '' }}>
+                                            MARRIED</option>
+                                        <option value="WIDOWED" {{ old('civil_status') === 'WIDOWED' ? 'selected' : '' }}>
+                                            WIDOWED</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1 text-center">
                                     <label class="form-label">PWD<span class="required-mark">*</span></label>
                                     <select name="pwd" class="form-select" required>
-                                        <option value="NO" {{ old('pwd', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
+                                        <option value="NO" {{ old('pwd', 'NO') === 'NO' ? 'selected' : '' }}>NO
+                                        </option>
                                         <option value="YES" {{ old('pwd') === 'YES' ? 'selected' : '' }}>YES</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1 text-center">
                                     <label class="form-label">4Ps<span class="required-mark">*</span></label>
                                     <select name="four_ps" class="form-select" required>
-                                        <option value="NO" {{ old('four_ps', 'NO') === 'NO' ? 'selected' : '' }}>NO</option>
-                                        <option value="YES" {{ old('four_ps') === 'YES' ? 'selected' : '' }}>YES</option>
+                                        <option value="NO" {{ old('four_ps', 'NO') === 'NO' ? 'selected' : '' }}>NO
+                                        </option>
+                                        <option value="YES" {{ old('four_ps') === 'YES' ? 'selected' : '' }}>YES
+                                        </option>
                                     </select>
                                 </div>
                                 {{-- <div class="col-md-4">
@@ -525,11 +540,12 @@
                                 <div class="col-md-4">
                                     <label class="form-label">Contact Number <span class="required-mark">*</span></label>
                                     <input type="tel" name="contact_no" class="form-control"
-                                        value="{{ old('contact_no') }}" placeholder="09123456789"
-                                        pattern="[0-9]{11}" maxlength="11" inputmode="numeric" required>
+                                        value="{{ old('contact_no') }}" placeholder="09123456789" pattern="[0-9]{11}"
+                                        maxlength="11" inputmode="numeric" required>
                                 </div>
                                 <div class="col-md-8">
-                                    <label class="form-label">Complete Address <span class="required-mark">*</span></label>
+                                    <label class="form-label">Complete Address <span
+                                            class="required-mark">*</span></label>
                                     <input type="text" name="address_line" class="form-control"
                                         value="{{ old('address_line') }}" oninput="this.value = this.value.toUpperCase()"
                                         placeholder="House No. / Street / Phase / Block" required>
@@ -541,7 +557,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label">City / Municipality <span class="required-mark">*</span></label>
+                                    <label class="form-label">City / Municipality <span
+                                            class="required-mark">*</span></label>
                                     <select name="city" id="city" class="form-select" required>
                                         <option value="">Select City</option>
                                     </select>
@@ -559,29 +576,35 @@
                             <h2 class="section-title">Education & Hiring</h2>
                             <div class="row g-4">
                                 <div class="col-md-4">
-                                    <label class="form-label">Educational Attainment <span class="required-mark">*</span></label>
-                                    <select name="educational_attainment" id="educationalAttainmentSelect" class="form-select" required>
+                                    <label class="form-label">Educational Attainment <span
+                                            class="required-mark">*</span></label>
+                                    <select name="educational_attainment" id="educationalAttainmentSelect"
+                                        class="form-select" required>
                                         <option value="">Select educational attainment</option>
                                         @foreach ($educationalAttainments as $attainment)
-                                            <option value="{{ $attainment }}" {{ $selectedEducationalAttainment === $attainment ? 'selected' : '' }}>
+                                            <option value="{{ $attainment }}"
+                                                {{ $selectedEducationalAttainment === $attainment ? 'selected' : '' }}>
                                                 {{ $attainment }}
                                             </option>
                                         @endforeach
                                         @if ($selectedEducationalAttainment && !in_array($selectedEducationalAttainment, $educationalAttainments, true))
-                                            <option value="{{ $selectedEducationalAttainment }}" selected>{{ $selectedEducationalAttainment }}</option>
+                                            <option value="{{ $selectedEducationalAttainment }}" selected>
+                                                {{ $selectedEducationalAttainment }}</option>
                                         @endif
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Hiring Company <span class="required-mark">*</span></label>
                                     <input type="text" name="hiring_company" class="form-control"
-                                        value="{{ old('hiring_company') }}" oninput="this.value = this.value.toUpperCase()"
-                                        placeholder="e.g. TECH CORP" required>
+                                        value="{{ old('hiring_company') }}"
+                                        oninput="this.value = this.value.toUpperCase()" placeholder="e.g. TECH CORP"
+                                        required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Position Hired <span class="required-mark">*</span></label>
                                     <input type="text" name="position_hired" class="form-control"
-                                        value="{{ old('position_hired') }}" oninput="this.value = this.value.toUpperCase()"
+                                        value="{{ old('position_hired') }}"
+                                        oninput="this.value = this.value.toUpperCase()"
                                         placeholder="e.g. SOFTWARE ENGINEER" required>
                                 </div>
                             </div>
@@ -601,7 +624,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const educationalAttainmentSelect = document.getElementById('educationalAttainmentSelect');
 
             if (educationalAttainmentSelect && window.jQuery && typeof window.jQuery.fn.select2 === 'function') {
@@ -617,7 +640,7 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const birthdateInput = document.getElementById('birthdate');
             const ageInput = document.getElementById('age');
 
@@ -654,7 +677,7 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const provinceSelect = document.getElementById('province');
             const citySelect = document.getElementById('city');
             const barangaySelect = document.getElementById('barangay');
@@ -790,9 +813,9 @@
                 const normalizedCity = normalizeName(cityName);
 
                 if (isBacoorCity(normalizedCity)) {
-                    return normalizedSaved === normalizedOption
-                        || (normalizedSaved.startsWith('P.F. ESPIRITU') && normalizedOption.startsWith('PANAPAAN'))
-                        || (normalizedSaved.startsWith('PANAPAAN') && normalizedOption.startsWith('P.F. ESPIRITU'));
+                    return normalizedSaved === normalizedOption ||
+                        (normalizedSaved.startsWith('P.F. ESPIRITU') && normalizedOption.startsWith('PANAPAAN')) ||
+                        (normalizedSaved.startsWith('PANAPAAN') && normalizedOption.startsWith('P.F. ESPIRITU'));
                 }
 
                 return normalizedSaved === normalizedOption;
@@ -805,13 +828,16 @@
 
                 items
                     .slice()
-                    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+                    .sort((a, b) => a.localeCompare(b, undefined, {
+                        sensitivity: 'base'
+                    }))
                     .forEach(item => {
                         const option = document.createElement('option');
                         option.value = item;
                         option.textContent = item;
 
-                        if (normalizedSelectedBarangay && isBarangayMatch(normalizedSelectedBarangay, item, cityName)) {
+                        if (normalizedSelectedBarangay && isBarangayMatch(normalizedSelectedBarangay, item,
+                                cityName)) {
                             option.selected = true;
                         }
 
@@ -843,7 +869,9 @@
                         provinces.sort((a, b) => {
                             const an = (a.name || a.province || a.description || '').toString();
                             const bn = (b.name || b.province || b.description || '').toString();
-                            return an.localeCompare(bn, undefined, { sensitivity: 'base' });
+                            return an.localeCompare(bn, undefined, {
+                                sensitivity: 'base'
+                            });
                         });
 
                         provinces.forEach(p => {
@@ -886,12 +914,13 @@
 
                 let provinceCode = provinceIdentifier;
                 if (isNaN(Number(provinceCode))) {
-                    provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode]
-                        ? window._provinceCodeMap[provinceCode]
-                        : provinceCode;
+                    provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode] ?
+                        window._provinceCodeMap[provinceCode] :
+                        provinceCode;
                 }
 
-                fetch(`https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`)
+                fetch(
+                        `https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`)
                     .then(res => {
                         if (!res.ok) {
                             throw new Error('no-cities');
@@ -903,13 +932,16 @@
                         citySelect.innerHTML = '<option value="">Select City</option>';
                         const cities = Array.isArray(data) ? data : [];
 
-                        cities.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+                        cities.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, {
+                            sensitivity: 'base'
+                        }));
 
                         cities.forEach(city => {
                             const rawName = city.name || city.description || '';
                             const cleaned = normalizeName(rawName);
                             const isCity = /city/i.test(rawName);
-                            const name = isCity && !/\bCITY$/.test(cleaned) ? `${cleaned} CITY` : cleaned;
+                            const name = isCity && !/\bCITY$/.test(cleaned) ? `${cleaned} CITY` :
+                                cleaned;
 
                             const option = document.createElement('option');
                             option.value = name;
@@ -961,7 +993,7 @@
                     });
             }
 
-            provinceSelect.addEventListener('change', function () {
+            provinceSelect.addEventListener('change', function() {
                 const selected = this.options[this.selectedIndex];
                 const code = selected?.dataset.code;
 
@@ -972,7 +1004,7 @@
                 }
             });
 
-            citySelect.addEventListener('change', function () {
+            citySelect.addEventListener('change', function() {
                 const selected = this.options[this.selectedIndex];
                 const code = selected?.dataset.code;
                 const value = selected?.value || '';

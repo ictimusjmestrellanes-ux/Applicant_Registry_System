@@ -671,7 +671,7 @@
                 </form>
             </section>
 
-            @if(session('success'))
+            @if (session('success'))
                 <div class="alert alert-success border-0 shadow-sm mb-0" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
                 </div>
@@ -724,17 +724,20 @@
                                         </td>
                                         <td>
                                             <span class="address-pill">
-                                                {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
+                                                {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?:'N/A' }}
                                             </span>
                                         </td>
                                         <td>
-                                            <div class="archive-date">{{ $applicant->deleted_at?->format('M d, Y') ?? 'N/A' }}
+                                            <div class="archive-date">
+                                                {{ $applicant->deleted_at?->format('M d, Y') ?? 'N/A' }}
                                             </div>
-                                            <div class="archive-time">{{ $applicant->deleted_at?->format('h:i A') ?? '' }}</div>
+                                            <div class="archive-time">{{ $applicant->deleted_at?->format('h:i A') ?? '' }}
+                                            </div>
                                         </td>
                                         <td class="text-end">
-                                            @if(auth()->user()?->hasPermission('restore_archive_applicants') || auth()->user()?->isAdmin())
-                                                <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}"
+                                            @if (auth()->user()?->hasPermission('restore_archive_applicants') || auth()->user()?->isAdmin())
+                                                <form method="POST"
+                                                    action="{{ route('applicants.restore', $applicant->id) }}"
                                                     class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="btn btn-restore"
@@ -753,7 +756,8 @@
                                                     <i class="bi bi-archive"></i>
                                                 </div>
                                                 <div class="empty-title">No archived applicants found</div>
-                                                <p class="empty-copy mb-0">Try clearing the search or archive a record from the
+                                                <p class="empty-copy mb-0">Try clearing the search or archive a record from
+                                                    the
                                                     active applicants list.</p>
                                             </div>
                                         </td>
@@ -776,7 +780,8 @@
                                         <div class="applicant-name">
                                             {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
                                         </div>
-                                        <div class="applicant-meta">ID: #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}
+                                        <div class="applicant-meta">ID:
+                                            #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}
                                         </div>
                                     </div>
                                 </div>
@@ -793,18 +798,19 @@
                                 <div class="mobile-archive-row">
                                     <div class="mobile-archive-label">Address</div>
                                     <span class="address-pill">
-                                        {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
+                                        {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?:'N/A' }}
                                     </span>
                                 </div>
 
                                 <div class="mobile-archive-row">
                                     <div class="mobile-archive-label">Archived On</div>
-                                    <div class="archive-date">{{ $applicant->deleted_at?->format('M d, Y') ?? 'N/A' }}</div>
+                                    <div class="archive-date">{{ $applicant->deleted_at?->format('M d, Y') ?? 'N/A' }}
+                                    </div>
                                     <div class="archive-time">{{ $applicant->deleted_at?->format('h:i A') ?? '' }}</div>
                                 </div>
 
                                 <div class="mobile-archive-row">
-                                    @if(auth()->user()?->hasPermission('restore_archive_applicants') || auth()->user()?->isAdmin())
+                                    @if (auth()->user()?->hasPermission('restore_archive_applicants') || auth()->user()?->isAdmin())
                                         <form method="POST" action="{{ route('applicants.restore', $applicant->id) }}">
                                             @csrf
                                             <button type="submit" class="btn btn-restore w-100"
@@ -822,13 +828,14 @@
                                 <i class="bi bi-archive"></i>
                             </div>
                             <div class="empty-title">No archived applicants found</div>
-                            <p class="empty-copy mb-0">Try clearing the search or archive a record from the active applicants
+                            <p class="empty-copy mb-0">Try clearing the search or archive a record from the active
+                                applicants
                                 list.</p>
                         </div>
                     @endforelse
                 </div>
 
-                @if($applicants->hasPages())
+                @if ($applicants->hasPages())
                     <div class="pagination-wrap">
                         <div class="pagination-copy">
                             Showing {{ $applicants->firstItem() }} to {{ $applicants->lastItem() }} of
