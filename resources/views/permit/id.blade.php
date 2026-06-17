@@ -109,8 +109,8 @@
         }
 
         .address_line {
-            left: 73.7%;
-            top: 27%;
+            left: 53.6%;
+            top: 30.8%;
             width: 42%;
             font-size: 8pt;
         }
@@ -246,22 +246,15 @@
                     $applicant->suffix,
                 ])
                     ->filter()
-                    ->implode(' ')
-            )
+                    ->implode(' '),
+            ),
         );
         $address_line = strtoupper(
             trim(
-                collect([$applicant->address_line, ' '])
+                collect([$applicant->address_line, $applicant->barangay, $applicant->city, $applicant->province])
                     ->filter()
-                    ->implode(', ')
-            )
-        );
-        $address= strtoupper(
-            trim(
-                collect([$applicant->barangay, $applicant->city, $applicant->province])
-                    ->filter()
-                    ->implode(', ')
-            )
+                    ->implode(', '),
+            ),
         );
         $employer = strtoupper($applicant->hiring_company ?: $applicant->hired_company ?: 'N/A');
         $photoPath = !empty($applicant->photo) ? public_path('storage/' . $applicant->photo) : null;
@@ -294,7 +287,6 @@
 
             <div class="field employer">{{ $employer }}</div>
             <div class="field address_line">{{ $address_line }}</div>
-            <div class="field address">{{ $address }}</div>
             <div class="field community-tax">{{ strtoupper($permit->community_tax_no ?? 'N/A') }}</div>
             <div class="field issued-on">{{ $issuedOn }}</div>
             <div class="field issued-at">{{ $issuedAt }}</div>
@@ -309,7 +301,6 @@
     </div>
 
 
-    @vite('resources/js/app.js')
 </body>
 
 </html>
