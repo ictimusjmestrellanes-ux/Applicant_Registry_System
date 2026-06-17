@@ -2067,15 +2067,16 @@
                                             $permitIssuedAtValue = strtoupper(
                                                 trim((string) old('permit_issued_at', $permit->permit_issued_at ?? '')),
                                             );
-                                            $permitIssuedAtOptions = collect(config('philippine_mayors', []))
-                                                ->pluck('company_address')
-                                                ->filter()
+                                            $permitIssuedAtOptions = collect(
+                                                config('permit_issued_at.city_governments', []),
+                                            )
                                                 ->map(fn($value) => strtoupper(trim((string) $value)))
+                                                ->filter()
                                                 ->unique()
                                                 ->sort()
                                                 ->values();
                                         @endphp
-                                        <option value="">Select City Government</option>
+                                        <option value="">Select City / Municipality</option>
                                         @foreach ($permitIssuedAtOptions as $permitIssuedAtOption)
                                             <option value="{{ $permitIssuedAtOption }}"
                                                 {{ $permitIssuedAtValue === $permitIssuedAtOption ? 'selected' : '' }}>
@@ -3748,7 +3749,7 @@
 
                 const placeholderOption = document.createElement("option");
                 placeholderOption.value = "";
-                placeholderOption.text = "Select City Government";
+                placeholderOption.text = "Select City / Municipality";
                 placeholderOption.selected = currentValue === "";
                 permitIssuedAtDropdown.appendChild(placeholderOption);
 
