@@ -15,3 +15,9 @@ Route::get('/permit-issued-at/city-governments', [PermitIssuedAtCityGovernmentCo
     ->name('api.permit-issued-at.city-governments');
 
 // Provinces/cities/barangays routes removed — frontend now uses PSGC directly
+
+// Local NCR (Metro Manila) city/municipality API
+use App\Http\Controllers\Api\NcrController;
+
+Route::get('/ncr/cities', [NcrController::class, 'cities'])->name('api.ncr.cities');
+Route::get('/ncr/barangays', [NcrController::class, 'barangays'])->name('api.ncr.barangays');

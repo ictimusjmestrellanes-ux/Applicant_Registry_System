@@ -786,6 +786,28 @@
                 ]
             };
 
+            const localCities = {
+                'NCR': [
+                    'MANILA CITY',
+                    'QUEZON CITY',
+                    'CALOOCAN CITY',
+                    'LAS PINAS CITY',
+                    'MAKATI CITY',
+                    'MALABON CITY',
+                    'MANDALUYONG CITY',
+                    'MARIKINA CITY',
+                    'MUNTINLUPA CITY',
+                    'NAVOTAS CITY',
+                    'PARANAQUE CITY',
+                    'PASAY CITY',
+                    'PASIG CITY',
+                    'SAN JUAN CITY',
+                    'TAGUIG CITY',
+                    'VALENZUELA CITY',
+                    'PATEROS'
+                ]
+            };
+
             if (!provinceSelect || !citySelect || !barangaySelect) return;
 
             function normalizeName(value) {
@@ -895,6 +917,29 @@
                             }
                         });
 
+                                    // Ensure NCR is available as a province option (some consumers expect this label)
+                                    // Use PSGC code for NCR if available; fallback to a common code string.
+                                    (function ensureNCR() {
+                                        const ncrName = 'NCR';
+                                        const ncrCode = '130000000';
+
+                                        if (!window._provinceCodeMap[ncrName]) {
+                                            window._provinceCodeMap[ncrName] = ncrCode;
+
+                                            const ncrOption = document.createElement('option');
+                                            ncrOption.value = ncrName;
+                                            ncrOption.textContent = ncrName;
+                                            ncrOption.dataset.code = ncrCode;
+
+                                            if (savedProvince && String(savedProvince).toUpperCase() === ncrName) {
+                                                ncrOption.selected = true;
+                                            }
+
+                                            // Insert NCR after the placeholder option (at index 0)
+                                            provinceSelect.insertBefore(ncrOption, provinceSelect.options[1] || null);
+                                        }
+                                    })();
+
                         const selected = provinceSelect.options[provinceSelect.selectedIndex];
                         if (selected) {
                             const code = selected.dataset.code || window._provinceCodeMap[selected.value];
@@ -907,6 +952,58 @@
                         provinceSelect.innerHTML = '<option value="">Unable to load provinces</option>';
                     });
             }
+            
+            function setCityOptions(items, selectedCity = '') {
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                const normalizedSelected = String(selectedCity || '').toUpperCase();
+
+                items
+                    .slice()
+                    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+                    .forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item;
+                        option.textContent = item;
+
+                        if (normalizedSelected && String(item).toUpperCase() === normalizedSelected) {
+                            option.selected = true;
+                        }
+
+                        citySelect.appendChild(option);
+                    });
+            }
+
+            function loadLocalCities(provinceIdentifier) {
+                const normalized = normalizeName(provinceIdentifier);
+
+                // Direct match by normalized province name
+                if (normalized && localCities[normalized]) {
+                    setCityOptions(localCities[normalized], savedCity);
+
+                    const selectedCity = citySelect.options[citySelect.selectedIndex];
+                    if (selectedCity) {
+                        loadBarangays(selectedCity.value, selectedCity.dataset.code);
+                    }
+
+                    return true;
+                }
+
+                // Also allow matching by known NCR code (numeric)
+                const ncrCode = window._provinceCodeMap && (window._provinceCodeMap['NCR'] || window._provinceCodeMap['METRO MANILA']);
+                if (ncrCode && String(provinceIdentifier) === String(ncrCode)) {
+                    setCityOptions(localCities['NCR'], savedCity);
+
+                    const selectedCity = citySelect.options[citySelect.selectedIndex];
+                    if (selectedCity) {
+                        loadBarangays(selectedCity.value, selectedCity.dataset.code);
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
 
             function loadCities(provinceIdentifier) {
                 citySelect.innerHTML = '<option value="">Loading cities...</option>';
@@ -917,6 +1014,11 @@
                     provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode] ?
                         window._provinceCodeMap[provinceCode] :
                         provinceCode;
+                }
+
+                // If this province maps to a local city list (e.g., NCR), use that instead of the API
+                if (loadLocalCities(provinceIdentifier) || (provinceCode && window._provinceCodeMap && window._provinceCodeMap['NCR'] && String(provinceCode) === String(window._provinceCodeMap['NCR']))) {
+                    return;
                 }
 
                 fetch(
@@ -973,6 +1075,44 @@
                 barangaySelect.innerHTML = '<option value="">Loading barangays...</option>';
 
                 if (!cityCode) {
+                    // If province is NCR (local cities), use local API to fetch barangays
+                    const rawProvince = provinceSelect.value || '';
+                    const selectedProvince = normalizeName(rawProvince);
+
+                    const knownNcrCodes = [];
+                    if (window._provinceCodeMap) {
+                        if (window._provinceCodeMap['NCR']) knownNcrCodes.push(String(window._provinceCodeMap['NCR']));
+                        if (window._provinceCodeMap['METRO MANILA']) knownNcrCodes.push(String(window._provinceCodeMap['METRO MANILA']));
+                    }
+                    // Always include common PSGC NCR code as fallback
+                    knownNcrCodes.push('130000000');
+
+                    const selectedOption = provinceSelect.options[provinceSelect.selectedIndex];
+                    const selectedOptionCode = selectedOption && selectedOption.dataset ? String(selectedOption.dataset.code || '') : '';
+
+                    const provinceIsNcr = (
+                        selectedProvince === 'NCR' ||
+                        selectedProvince.includes('NATIONAL CAPITAL') ||
+                        selectedProvince.includes('METRO MANILA') ||
+                        (selectedOptionCode && knownNcrCodes.includes(selectedOptionCode)) ||
+                        knownNcrCodes.includes(String(rawProvince))
+                    );
+
+                    if (provinceIsNcr) {
+                        // fetch from local API
+                        fetch(`/api/ncr/barangays?city=${encodeURIComponent(cityName)}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                const barangays = Array.isArray(data) ? data : [];
+                                setBarangayOptions(barangays, savedBarangay, cityName);
+                            })
+                            .catch(() => {
+                                barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
+                            });
+
+                        return;
+                    }
+
                     barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                     return;
                 }
