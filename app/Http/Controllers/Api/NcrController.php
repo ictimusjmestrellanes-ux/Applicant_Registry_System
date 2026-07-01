@@ -170,6 +170,15 @@ class NcrController extends Controller
             return $this->generateMakatiBarangays();
         }
 
+        $malabonNames = [
+            'MALABON',
+            'MALABON CITY',
+        ];
+
+        if (in_array($cityParam, $malabonNames, true)) {
+            return $this->generateMalabonBarangays();
+        }
+
         $manilaNames = [
             'MANILA',
             'MANILA CITY',
@@ -177,6 +186,15 @@ class NcrController extends Controller
 
         if (in_array($cityParam, $manilaNames, true)) {
             return $this->generateManilaBarangays();
+        }
+
+        $mandaluyongNames = [
+            'MANDALUYONG',
+            'MANDALUYONG CITY',
+        ];
+
+        if (in_array($cityParam, $mandaluyongNames, true)) {
+            return $this->generateMandaluyongBarangays();
         }
 
         $makatiNames2 = [
@@ -359,6 +377,33 @@ class NcrController extends Controller
         ];
     }
 
+    private function generateMalabonBarangays(): array
+    {
+        return [
+            'ACACIA',
+            'BARITAN',
+            'BAYAN-BAYANAN',
+            'CATMON',
+            'CONCEPCION',
+            'DAMPALIT',
+            'FLORES',
+            'HULONG DUHAT',
+            'IBABA',
+            'LONGOS',
+            'MAYSILO',
+            'MUZON',
+            'NIUGAN',
+            'PANGHULO',
+            'POTRERO',
+            'SAN AGUSTIN',
+            'SANTOLAN',
+            'TAÑONG',
+            'TINAJEROS',
+            'TONSUYA',
+            'TUGATOG',
+        ];
+    }
+
     private function generateManilaBarangays(): array
     {
         $barangays = [];
@@ -368,6 +413,39 @@ class NcrController extends Controller
         }
 
         return $barangays;
+    }
+
+    private function generateMandaluyongBarangays(): array
+    {
+        return [
+            'ADDITION HILLS',
+            'BAGONG SILANG',
+            'BARANGKA DRIVE',
+            'BARANGKA IBABA',
+            'BARANGKA ILAYA',
+            'BARANGKA ITAAS',
+            'BUAYANG BATO',
+            'BUROL',
+            'DAANG BAKAL',
+            'HAGDANG BATO ITAAS',
+            'HAGDANG BATO LIBIS',
+            'HARAPIN ANG BUKAS',
+            'HIGHWAY HILLS',
+            'HULO',
+            'MABINI-J. RIZAL',
+            'MALAMIG',
+            'MAUWAY',
+            'NAMAYAN',
+            'NEW ZAÑIGA',
+            'OLD ZAÑIGA',
+            'PAG-ASA',
+            'PLAINVIEW',
+            'PLEASANT HILLS',
+            'POBLACION',
+            'SAN JOSE',
+            'VERGARA',
+            'WACK-WACK GREENHILLS',
+        ];
     }
 
     private function generateMarikinajBarangays(): array
