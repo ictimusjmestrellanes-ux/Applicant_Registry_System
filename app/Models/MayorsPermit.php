@@ -123,20 +123,17 @@ class MayorsPermit extends Model
 
     public function isReadyForIdGeneration()
     {
+        $city = strtoupper(trim((string) optional($this->applicant)->city));
+        $isImus = str_contains($city, 'IMUS CITY') || str_contains($city, 'CITY OF IMUS');
+
         return
-            // REQUIREMENTS
             ! empty($this->health_card) &&
             ! empty($this->cedula) &&
             (
                 ! empty($this->permit_nbi_clearance) ||
                 ! empty($this->permit_police_clearance)
             ) &&
-            (
-                stripos(optional($this->applicant)->city, 'IMUS CITY') !== false
-                || ! empty($this->referral_letter)
-            ) &&
-
-            // DETAILS REQUIRED BEFORE ID NUMBER CAN BE GENERATED
+            ($isImus || ! empty($this->referral_letter)) &&
             ! empty($this->permit_or_no) &&
             ! empty($this->community_tax_no) &&
             ! empty($this->permit_issued_on) &&
@@ -144,6 +141,27 @@ class MayorsPermit extends Model
             ! empty($this->permit_date) &&
             ! empty($this->expires_on) &&
             ! empty($this->permit_doc_stamp_control_no);
+    }
+
+    public function idGenerationStatus(): array
+    {
+        $city = strtoupper(trim((string) optional($this->applicant)->city));
+        $isImus = str_contains($city, 'IMUS CITY') || str_contains($city, 'CITY OF IMUS');
+
+        return [
+            'Health Card' => ! empty($this->health_card),
+            'Cedula' => ! empty($this->cedula),
+            'Clearance (NBI/Police)' => ! empty($this->permit_nbi_clearance) || ! empty($this->permit_police_clearance),
+            'Imus Resident or Referral' => $isImus || ! empty($this->referral_letter),
+            'O.R No.' => ! empty($this->permit_or_no),
+            'Community Tax No.' => ! empty($this->community_tax_no),
+            'Permit Issued On' => ! empty($this->permit_issued_on),
+            'Permit Issued At' => ! empty($this->permit_issued_at),
+            'Permit Date' => ! empty($this->permit_date),
+            'Expires On' => ! empty($this->expires_on),
+            'Doc Stamp Control No.' => ! empty($this->permit_doc_stamp_control_no),
+            'Permit Approved' => $this->isApproved(),
+        ];
     }
 
     public function isApproved(): bool

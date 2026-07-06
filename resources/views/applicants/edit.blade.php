@@ -4167,7 +4167,7 @@
                         const caviteExtras = [
                             'ALFONSO', 'AMADEO', 'BACOOR CITY', 'CARMONA', 'CAVITE CITY',
                             'DASMARIÑAS CITY', 'GENERAL EMILIO AGUINALDO',
-                            'GENERAL MARIANO ALVAREZ', 'CITY OF GENERAL TRIAS', 'IMUS CITY',
+                            'GENERAL MARIANO ALVAREZ', 'CITY OF GENERAL TRIAS', 'CITY OF IMUS',
                             'INDANG', 'KAWIT', 'MAGALLANES', 'MARAGONDON', 'MENDEZ', 'NAIC',
                             'NOVELETA', 'ROSARIO', 'SILANG', 'TAGAYTAY CITY', 'TANZA', 'TERNATE',
                             'TRECE MARTIRES CITY', 'CAVITE PROVINCE'

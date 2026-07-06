@@ -73,7 +73,8 @@ class Applicant extends Model
             );
 
         // Detect if resident of IMUS CITY
-        $isImusResident = stripos($this->city, 'IMUS CITY') !== false;
+        $city = strtoupper(trim((string) $this->city));
+        $isImusResident = str_contains($city, 'IMUS CITY') || str_contains($city, 'CITY OF IMUS');
 
         // Always required
         if (
