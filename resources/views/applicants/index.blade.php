@@ -532,7 +532,7 @@
                     );
                     $isApplicantUser = auth()->user()?->role === \App\Models\User::ROLE_USER;
                     $permit = optional($applicant->permit);
-                    $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
+                    $isImusResident = $applicant->city && stripos($applicant->city, 'CITY OF IMUS') !== false;
                     $hasPermitClearance =
                         ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
                         ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
