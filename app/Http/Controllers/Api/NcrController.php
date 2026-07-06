@@ -15,22 +15,22 @@ class NcrController extends Controller
     public function cities(Request $request): JsonResponse
     {
         $cities = [
-            'MANILA CITY',
-            'QUEZON CITY',
-            'CALOOCAN CITY',
-            'LAS PINAS CITY',
-            'MAKATI CITY',
-            'MALABON CITY',
-            'MANDALUYONG CITY',
-            'MARIKINA CITY',
-            'MUNTINLUPA CITY',
-            'NAVOTAS CITY',
-            'PARANAQUE CITY',
-            'PASAY CITY',
-            'PASIG CITY',
-            'SAN JUAN CITY',
-            'TAGUIG CITY',
-            'VALENZUELA CITY',
+            'CITY OF MANILA',
+            'CITY OF QUEZON',
+            'CITY OF CALOOCAN',
+            'CITY OF LAS PINAS',
+            'CITY OF MAKATI',
+            'CITY OF MALABON',
+            'CITY OF MANDALUYONG',
+            'CITY OF MARIKINA',
+            'CITY OF MUNTINLUPA',
+            'CITY OF NAVOTAS',
+            'CITY OF PARANAQUE',
+            'CITY OF PASAY',
+            'CITY OF PASIG',
+            'CITY OF SAN JUAN',
+            'CITY OF TAGUIG',
+            'CITY OF VALENZUELA',
             'PATEROS'
         ];
 
@@ -145,6 +145,7 @@ class NcrController extends Controller
         $caloocanNames = [
             'CALOOCAN',
             'CALOOCAN CITY',
+            'CITY OF CALOOCAN',
         ];
 
         if (in_array($cityParam, $caloocanNames, true)) {
@@ -155,6 +156,7 @@ class NcrController extends Controller
             'LAS PINAS',
             'LAS PINAS CITY',
             'LAS PINAS, CITY',
+            'CITY OF LAS PINAS',
         ];
 
         if (in_array($cityParam, $lasPinasNames, true)) {
@@ -164,6 +166,7 @@ class NcrController extends Controller
         $makatiNames = [
             'MAKATI',
             'MAKATI CITY',
+            'CITY OF MAKATI',
         ];
 
         if (in_array($cityParam, $makatiNames, true)) {
@@ -173,6 +176,7 @@ class NcrController extends Controller
         $malabonNames = [
             'MALABON',
             'MALABON CITY',
+            'CITY OF MALABON',
         ];
 
         if (in_array($cityParam, $malabonNames, true)) {
@@ -182,6 +186,7 @@ class NcrController extends Controller
         $manilaNames = [
             'MANILA',
             'MANILA CITY',
+            'CITY OF MANILA',
         ];
 
         if (in_array($cityParam, $manilaNames, true)) {
@@ -191,6 +196,7 @@ class NcrController extends Controller
         $mandaluyongNames = [
             'MANDALUYONG',
             'MANDALUYONG CITY',
+            'CITY OF MANDALUYONG',
         ];
 
         if (in_array($cityParam, $mandaluyongNames, true)) {
@@ -200,6 +206,7 @@ class NcrController extends Controller
         $makatiNames2 = [
             'MARIKINA',
             'MARIKINA CITY',
+            'CITY OF MARIKINA',
         ];
 
         if (in_array($cityParam, $makatiNames2, true)) {
@@ -209,6 +216,7 @@ class NcrController extends Controller
         $muntinlupaNames = [
             'MUNTINLUPA',
             'MUNTINLUPA CITY',
+            'CITY OF MUNTINLUPA',
         ];
 
         if (in_array($cityParam, $muntinlupaNames, true)) {
@@ -218,6 +226,7 @@ class NcrController extends Controller
         $navotasNames = [
             'NAVOTAS',
             'NAVOTAS CITY',
+            'CITY OF NAVOTAS',
         ];
 
         if (in_array($cityParam, $navotasNames, true)) {
@@ -228,6 +237,7 @@ class NcrController extends Controller
             'PARANAQUE',
             'PARANAQUE CITY',
             'PARANAQUE, CITY',
+            'CITY OF PARANAQUE',
         ];
 
         if (in_array($cityParam, $parañaqueNames, true)) {
@@ -237,6 +247,7 @@ class NcrController extends Controller
         $pasayNames = [
             'PASAY',
             'PASAY CITY',
+            'CITY OF PASAY',
         ];
         
         if (in_array($cityParam, $pasayNames, true)) {
@@ -246,6 +257,7 @@ class NcrController extends Controller
         $pasigNames = [
             'PASIG',
             'PASIG CITY',
+            'CITY OF PASIG',
         ];
 
         if (in_array($cityParam, $pasigNames, true)) {
@@ -255,6 +267,7 @@ class NcrController extends Controller
         $sanJuanNames = [
             'SAN JUAN',
             'SAN JUAN CITY',
+            'CITY OF SAN JUAN',
         ];
 
         if (in_array($cityParam, $sanJuanNames, true)) {
@@ -264,6 +277,7 @@ class NcrController extends Controller
         $taguigNames = [
             'TAGUIG',
             'TAGUIG CITY',
+            'CITY OF TAGUIG',
         ];
 
         if (in_array($cityParam, $taguigNames, true)) {
@@ -274,6 +288,7 @@ class NcrController extends Controller
             'QUEZON',
             'QUEZON CITY',
             'QUEZON, CITY',
+            'CITY OF QUEZON',
         ];
 
         if (in_array($cityParam, $quezonCityNames, true)) {
@@ -283,6 +298,7 @@ class NcrController extends Controller
         $valenzuelaNames = [
             'VALENZUELA',
             'VALENZUELA CITY',
+            'CITY OF VALENZUELA',
         ];
 
         if (in_array($cityParam, $valenzuelaNames, true)) {

@@ -685,7 +685,7 @@
             const savedCity = @json(old('city'));
             const savedBarangay = @json(old('barangay'));
             const localBarangays = {
-                'IMUS CITY': [
+                'IMUS': [
                     'ALAPAN I-A',
                     'ALAPAN I-B',
                     'ALAPAN I-C',
@@ -788,22 +788,22 @@
 
             const localCities = {
                 'NCR': [
-                    'MANILA CITY',
-                    'QUEZON CITY',
-                    'CALOOCAN CITY',
-                    'LAS PINAS CITY',
-                    'MAKATI CITY',
-                    'MALABON CITY',
-                    'MANDALUYONG CITY',
-                    'MARIKINA CITY',
-                    'MUNTINLUPA CITY',
-                    'NAVOTAS CITY',
-                    'PARANAQUE CITY',
-                    'PASAY CITY',
-                    'PASIG CITY',
-                    'SAN JUAN CITY',
-                    'TAGUIG CITY',
-                    'VALENZUELA CITY',
+                    'CITY OF MANILA',
+                    'CITY OF QUEZON',
+                    'CITY OF CALOOCAN',
+                    'CITY OF LAS PINAS',
+                    'CITY OF MAKATI',
+                    'CITY OF MALABON',
+                    'CITY OF MANDALUYONG',
+                    'CITY OF MARIKINA',
+                    'CITY OF MUNTINLUPA',
+                    'CITY OF NAVOTAS',
+                    'CITY OF PARANAQUE',
+                    'CITY OF PASAY',
+                    'CITY OF PASIG',
+                    'CITY OF SAN JUAN',
+                    'CITY OF TAGUIG',
+                    'CITY OF VALENZUELA',
                     'PATEROS'
                 ]
             };
@@ -957,6 +957,7 @@
                 citySelect.innerHTML = '<option value="">Select City</option>';
 
                 const normalizedSelected = String(selectedCity || '').toUpperCase();
+                const selectedBase = normalizeName(normalizedSelected).replace(/\s*CITY\s*$/, '');
 
                 items
                     .slice()
@@ -968,6 +969,8 @@
 
                         if (normalizedSelected && String(item).toUpperCase() === normalizedSelected) {
                             option.selected = true;
+                        } else if (selectedBase && normalizeName(item).replace(/\s*CITY\s*$/, '') === selectedBase) {
+                            option.selected = true;
                         }
 
                         citySelect.appendChild(option);
@@ -977,15 +980,17 @@
             function loadLocalCities(provinceIdentifier) {
                 const normalized = normalizeName(provinceIdentifier);
 
+                function loadSelectedCityBarangays() {
+                    const selectedCity = citySelect.options[citySelect.selectedIndex];
+                    if (selectedCity && selectedCity.value) {
+                        loadBarangays(selectedCity.value, selectedCity.dataset.code);
+                    }
+                }
+
                 // Direct match by normalized province name
                 if (normalized && localCities[normalized]) {
                     setCityOptions(localCities[normalized], savedCity);
-
-                    const selectedCity = citySelect.options[citySelect.selectedIndex];
-                    if (selectedCity) {
-                        loadBarangays(selectedCity.value, selectedCity.dataset.code);
-                    }
-
+                    loadSelectedCityBarangays();
                     return true;
                 }
 
@@ -993,12 +998,7 @@
                 const ncrCode = window._provinceCodeMap && (window._provinceCodeMap['NCR'] || window._provinceCodeMap['METRO MANILA']);
                 if (ncrCode && String(provinceIdentifier) === String(ncrCode)) {
                     setCityOptions(localCities['NCR'], savedCity);
-
-                    const selectedCity = citySelect.options[citySelect.selectedIndex];
-                    if (selectedCity) {
-                        loadBarangays(selectedCity.value, selectedCity.dataset.code);
-                    }
-
+                    loadSelectedCityBarangays();
                     return true;
                 }
 
@@ -1042,7 +1042,7 @@
                             const rawName = city.name || city.description || '';
                             const cleaned = normalizeName(rawName);
                             const isCity = /city/i.test(rawName);
-                            const name = isCity && !/\bCITY$/.test(cleaned) ? `${cleaned} CITY` :
+                            const name = isCity ? `CITY OF ${cleaned.replace(/\s*CITY\s*$/, '')}` :
                                 cleaned;
 
                             const option = document.createElement('option');
@@ -1050,8 +1050,12 @@
                             option.textContent = name;
                             option.dataset.code = city.code || '';
 
-                            if (savedCity && name === String(savedCity).toUpperCase()) {
-                                option.selected = true;
+                            if (savedCity) {
+                                const savedNorm = normalizeName(savedCity).replace(/\s*CITY\s*$/, '');
+                                const optionNorm = normalizeName(name).replace(/\s*CITY\s*$/, '');
+                                if (savedNorm === optionNorm) {
+                                    option.selected = true;
+                                }
                             }
 
                             citySelect.appendChild(option);
