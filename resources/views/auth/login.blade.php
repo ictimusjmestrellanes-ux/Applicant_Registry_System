@@ -352,7 +352,7 @@
                         </div>
                     @endif
 
-                    <a href="{{ route('login.azure.redirect') }}" class="microsoft-btn mt-3">
+                    <a href="{{ route('login.azure.redirect') }}" class="microsoft-btn">
                         <span class="microsoft-icon" aria-hidden="true">
                             <span class="one"></span>
                             <span class="two"></span>
