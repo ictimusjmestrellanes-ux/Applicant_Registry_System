@@ -6,10 +6,6 @@
     <div class="activity-log-detail-page container-fluid py-0 px-md-4 px-xl-0">
         <section class="activity-log-hero mb-4">
             <div>
-                <span class="page-kicker">
-                    <i class="bi bi-journal-text"></i>
-                    Audit Trail
-                </span>
                 <h3 class="fw-bold mb-1">Activity Log Details</h3>
                 <p class="text-muted mb-0">{{ $activityLog->description }}</p>
             </div>
@@ -52,6 +48,12 @@
                         <div class="activity-meta">
                             <small class="text-muted d-block">Action</small>
                             <div class="activity-pill activity-pill-action">{{ $activityLog->action }}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="activity-meta">
+                            <small class="text-muted d-block">Description</small>
+                            <div class="fw-semibold">{{ $activityLog->description }}</div>
                         </div>
                     </div>
                 </div>
@@ -171,6 +173,7 @@
             border-radius: 18px;
             border: 1px solid #e6edf5;
             background: #f8fbff;
+            text-transform: uppercase;
         }
 
         .activity-meta small {
