@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Activity Log Details')
+@section('title', 'ARS | Activity Log Details')
 
 @section('content')
     <div class="activity-log-detail-page container-fluid py-0 px-md-4 px-xl-0">

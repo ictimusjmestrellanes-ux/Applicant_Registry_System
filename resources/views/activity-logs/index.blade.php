@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Activity Logs')
+@section('title', 'ARS | Activity Logs')
 
 @section('content')
     @php
