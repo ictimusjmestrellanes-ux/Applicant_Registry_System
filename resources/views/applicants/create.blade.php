@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Applicant')
+@section('title', 'ARS | Add Applicant')
 
 @section('content')
     @php

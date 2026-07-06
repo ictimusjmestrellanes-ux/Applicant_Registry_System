@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Mayor's Permit to Work ID</title>
+    <title>ARS | Mayor's Permit to Work ID</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>

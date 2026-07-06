@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
-    <title>Mayor's Clearance Letter</title>
+    <title>ARS | Mayor's Clearance Letter</title>
     <style>
         @page {
             size: legal;

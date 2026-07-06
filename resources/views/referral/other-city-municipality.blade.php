@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mayor's Referral Letter Outside Imus</title>
+    <title>ARS | Mayor's Referral Letter Outside Imus</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
 
     <style>

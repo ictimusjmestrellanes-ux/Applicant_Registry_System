@@ -7,7 +7,7 @@
             : 'Update Applicant';
 @endphp
 
-@section('title', $pageTitle)
+@section('title', 'ARS | ' . $pageTitle)
 
 @section('content')
 

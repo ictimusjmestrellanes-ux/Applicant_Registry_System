@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Archived Applicants')
+@section('title', 'ARS | Archived Applicants')
 
 @section('content')
     <style>

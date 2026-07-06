@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Applicants Records')
+@section('title', 'ARS | Applicants Records')
 
 @section('content')
     @php
@@ -594,8 +594,8 @@
                     </div>
                     <div class="mini-pill-row mb-3">
                         <span class="mini-pill">{{ $applicant->gender ?: 'N/A' }}</span>
-                        <span class="mini-pill">{{ $applicant->civil_status ?: 'Status not set' }}</span>
                         <span class="mini-pill">4Ps: {{ $applicant->four_ps ?: 'N/A' }}</span>
+                        <span class="mini-pill">PWD: {{ $applicant->pwd ?: 'N/A' }}</span>
                     </div>
                     <div class="mobile-meta-line"><i
                             class="bi bi-telephone-fill me-2"></i>{{ $applicant->contact_no ?: 'No contact number' }}
@@ -1174,6 +1174,7 @@
             border-radius: 999px;
             font-size: 0.82rem;
             font-weight: 700;
+            text-transform: uppercase;
         }
 
         .active-filter-list {
@@ -1266,6 +1267,7 @@
             color: #334155;
             font-size: 0.78rem;
             font-weight: 700;
+            text-transform: uppercase;
         }
 
         .requirement-progress {

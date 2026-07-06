@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit User')
+@section('title', 'ARS | Edit User')
 
 @section('content')
     <style>

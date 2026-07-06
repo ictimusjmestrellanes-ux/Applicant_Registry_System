@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users')
+@section('title', 'ARS | Users')
 
 @section('content')
     <style>
