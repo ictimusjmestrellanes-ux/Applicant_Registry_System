@@ -428,7 +428,7 @@
 
         <div class="form-layout">
             <div class="form-shell">
-                <form action="{{ route('applicants.store') }}" method="POST">
+                <form action="{{ route('applicants.store') }}" method="POST" onsubmit="document.querySelector('.btn-save').disabled = true; this.querySelector('.btn-save').innerHTML = '<span class=\'spinner-border spinner-border-sm me-2\'></span>Saving...';">
                     @csrf
 
                     <div class="form-stack">
