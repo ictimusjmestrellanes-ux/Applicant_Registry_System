@@ -884,9 +884,14 @@
                 fetch('https://psgc.gitlab.io/api/provinces/')
                     .then(res => res.json())
                     .then(data => {
-                        const provinces = Array.isArray(data) ? data : [];
+                        let provinces = Array.isArray(data) ? data : [];
                         provinceSelect.innerHTML = '<option value="">Select Province</option>';
                         window._provinceCodeMap = window._provinceCodeMap || {};
+
+                        provinces.push({
+                            name: 'NCR',
+                            code: '130000000'
+                        });
 
                         provinces.sort((a, b) => {
                             const an = (a.name || a.province || a.description || '').toString();
@@ -916,29 +921,6 @@
                                 window._provinceCodeMap[name] = code;
                             }
                         });
-
-                                    // Ensure NCR is available as a province option (some consumers expect this label)
-                                    // Use PSGC code for NCR if available; fallback to a common code string.
-                                    (function ensureNCR() {
-                                        const ncrName = 'NCR';
-                                        const ncrCode = '130000000';
-
-                                        if (!window._provinceCodeMap[ncrName]) {
-                                            window._provinceCodeMap[ncrName] = ncrCode;
-
-                                            const ncrOption = document.createElement('option');
-                                            ncrOption.value = ncrName;
-                                            ncrOption.textContent = ncrName;
-                                            ncrOption.dataset.code = ncrCode;
-
-                                            if (savedProvince && String(savedProvince).toUpperCase() === ncrName) {
-                                                ncrOption.selected = true;
-                                            }
-
-                                            // Insert NCR after the placeholder option (at index 0)
-                                            provinceSelect.insertBefore(ncrOption, provinceSelect.options[1] || null);
-                                        }
-                                    })();
 
                         const selected = provinceSelect.options[provinceSelect.selectedIndex];
                         if (selected) {

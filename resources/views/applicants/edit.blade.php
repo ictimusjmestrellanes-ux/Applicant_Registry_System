@@ -149,7 +149,7 @@
         $permitModel = $applicant->permit;
         $permit = optional($permitModel);
         $isPermitRenewalDue = $permitModel ? $permitModel->isRenewalDue() : false;
-        $isImusResident = $applicant->city && stripos($applicant->city, 'IMUS CITY') !== false;
+        $isImusResident = $applicant->city && (stripos($applicant->city, 'IMUS CITY') !== false || stripos($applicant->city, 'CITY OF IMUS') !== false);
         $hasPermitClearance =
             ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
             ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
@@ -1809,7 +1809,7 @@
 
                         @php
                             $permit = optional($applicant->permit);
-                            $isImusResident = stripos($applicant->city, 'IMUS CITY') !== false;
+                            $isImusResident = stripos($applicant->city, 'IMUS CITY') !== false || stripos($applicant->city, 'CITY OF IMUS') !== false;
                             $selectedClearanceType = old(
                                 'clearance_type',
                                 $permit->clearance_type ??
@@ -3900,9 +3900,48 @@
         let savedCity = "{{ $applicant->city }}";
         let savedBarangay = "{{ $applicant->barangay }}";
 
-        // Local barangay mappings: add cityName: [ 'Barangay 1', 'Barangay 2', ... ]
+        // Local barangay mappings
         const localBarangays = {
-            // 'BATANGAS CITY': ['Poblacion I', 'Poblacion II']
+            'IMUS': [
+                'ALAPAN I-A', 'ALAPAN I-B', 'ALAPAN I-C', 'ALAPAN II-A', 'ALAPAN II-B',
+                'BUCANDALA I', 'BUCANDALA II', 'BUCANDALA III', 'BUCANDALA IV', 'BUCANDALA V',
+                'CARSADANG BAGO I', 'CARSADANG BAGO II',
+                'MALAGASANG I-A', 'MALAGASANG I-B', 'MALAGASANG I-C', 'MALAGASANG I-D',
+                'MALAGASANG I-E', 'MALAGASANG I-F', 'MALAGASANG I-G',
+                'MALAGASANG II-A', 'MALAGASANG II-B', 'MALAGASANG II-C', 'MALAGASANG II-D',
+                'MALAGASANG II-E', 'MALAGASANG II-F', 'MALAGASANG II-G',
+                'MEDICION I-A', 'MEDICION I-B', 'MEDICION I-C', 'MEDICION I-D',
+                'MEDICION II-A', 'MEDICION II-B', 'MEDICION II-C', 'MEDICION II-D',
+                'MEDICION II-E', 'MEDICION II-F',
+                'PAG-ASA I', 'PAG-ASA II', 'PAG-ASA III',
+                'POBLACION I-A', 'POBLACION I-B', 'POBLACION I-C',
+                'POBLACION II-A', 'POBLACION II-B',
+                'POBLACION III-A', 'POBLACION III-B',
+                'POBLACION IV-A', 'POBLACION IV-B', 'POBLACION IV-C', 'POBLACION IV-D',
+                'TOCLONG I-A', 'TOCLONG I-B', 'TOCLONG I-C', 'TOCLONG II-A', 'TOCLONG II-B',
+                'ANABU I-A', 'ANABU I-B', 'ANABU I-C', 'ANABU I-D', 'ANABU I-E', 'ANABU I-F', 'ANABU I-G',
+                'ANABU II-A', 'ANABU II-B', 'ANABU II-C', 'ANABU II-D', 'ANABU II-E', 'ANABU II-F',
+                'BAGONG SILANG', 'BAYAN LUMA I', 'BAYAN LUMA II', 'BAYAN LUMA III',
+                'BAYAN LUMA IV', 'BAYAN LUMA V', 'BAYAN LUMA VI', 'BAYAN LUMA VII',
+                'BAYAN LUMA VIII', 'BAYAN LUMA IX',
+                'BUHAY NA TUBIG', 'MAGDALO', 'MAHARLIKA',
+                'MARIANO ESPELETA I', 'MARIANO ESPELETA II', 'MARIANO ESPELETA III',
+                'PALICO I', 'PALICO II', 'PALICO III', 'PALICO IV',
+                'PASONG BUAYA I', 'PASONG BUAYA II', 'PINAGBUKLOD',
+                'TANZANG LUMA I', 'TANZANG LUMA II', 'TANZANG LUMA III',
+                'TANZANG LUMA IV', 'TANZANG LUMA V', 'TANZANG LUMA VI'
+            ]
+        };
+
+        const localCities = {
+            'NCR': [
+                'CITY OF MANILA', 'CITY OF QUEZON', 'CITY OF CALOOCAN',
+                'CITY OF LAS PINAS', 'CITY OF MAKATI', 'CITY OF MALABON',
+                'CITY OF MANDALUYONG', 'CITY OF MARIKINA', 'CITY OF MUNTINLUPA',
+                'CITY OF NAVOTAS', 'CITY OF PARANAQUE', 'CITY OF PASAY',
+                'CITY OF PASIG', 'CITY OF SAN JUAN', 'CITY OF TAGUIG',
+                'CITY OF VALENZUELA', 'PATEROS'
+            ]
         };
 
         function normalizeName(value) {
@@ -3938,27 +3977,87 @@
             return normalizedSaved === normalizedOption;
         }
 
+        function setBarangayOptions(items, selectedBarangay = '', cityName = '') {
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            const normalizedSelectedBarangay = String(selectedBarangay || '').toUpperCase();
+            items.slice().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })).forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                if (normalizedSelectedBarangay && isBarangayMatch(normalizedSelectedBarangay, item, cityName)) {
+                    option.selected = true;
+                }
+                barangaySelect.appendChild(option);
+            });
+        }
 
+        function loadLocalBarangays(cityName) {
+            const normalizedCity = normalizeName(cityName);
+            if (!normalizedCity || !localBarangays[normalizedCity]) {
+                return false;
+            }
+            setBarangayOptions(localBarangays[normalizedCity], savedBarangay, cityName);
+            return true;
+        }
+
+        function setCityOptions(items, selectedCity = '') {
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            const normalizedSelected = String(selectedCity || '').toUpperCase();
+            const selectedBase = normalizeName(normalizedSelected).replace(/\s*CITY\s*$/, '');
+            items.slice().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })).forEach(item => {
+                const option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                if (normalizedSelected && String(item).toUpperCase() === normalizedSelected) {
+                    option.selected = true;
+                } else if (selectedBase && normalizeName(item).replace(/\s*CITY\s*$/, '') === selectedBase) {
+                    option.selected = true;
+                }
+                citySelect.appendChild(option);
+            });
+        }
+
+        function loadLocalCities(provinceIdentifier) {
+            const normalized = normalizeName(provinceIdentifier);
+            function loadSelectedCityBarangays() {
+                const selectedCity = citySelect.options[citySelect.selectedIndex];
+                if (selectedCity && selectedCity.value) {
+                    loadBarangays(selectedCity.value, selectedCity.dataset.code);
+                }
+            }
+            if (normalized && localCities[normalized]) {
+                setCityOptions(localCities[normalized], savedCity);
+                loadSelectedCityBarangays();
+                return true;
+            }
+            const ncrCode = window._provinceCodeMap && (window._provinceCodeMap['NCR'] || window._provinceCodeMap['METRO MANILA']);
+            if (ncrCode && String(provinceIdentifier) === String(ncrCode)) {
+                setCityOptions(localCities['NCR'], savedCity);
+                loadSelectedCityBarangays();
+                return true;
+            }
+            return false;
+        }
 
         // ---------- LOAD PROVINCES ----------
         function loadProvinces() {
             provinceSelect.innerHTML = '<option value="">Loading provinces...</option>';
-            // Fetch provinces from PSGC
             fetch('https://psgc.gitlab.io/api/provinces/')
                 .then(res => res.json())
                 .then(data => {
-                    const provinces = Array.isArray(data) ? data : [];
+                    let provinces = Array.isArray(data) ? data : [];
                     provinceSelect.innerHTML = '<option value="">Select Province</option>';
-
-                    // store mapping name -> code for later
                     window._provinceCodeMap = window._provinceCodeMap || {};
+
+                    provinces.push({
+                        name: 'NCR',
+                        code: '130000000'
+                    });
 
                     provinces.sort((a, b) => {
                         const an = (a.name || a.province || a.description || '').toString();
                         const bn = (b.name || b.province || b.description || '').toString();
-                        return an.localeCompare(bn, undefined, {
-                            sensitivity: 'base'
-                        });
+                        return an.localeCompare(bn, undefined, { sensitivity: 'base' });
                     });
 
                     provinces.forEach(p => {
@@ -3975,7 +4074,6 @@
                         }
 
                         provinceSelect.appendChild(option);
-
                         if (name && code) window._provinceCodeMap[name] = code;
                     });
 
@@ -3990,47 +4088,52 @@
                 });
         }
 
-
-
         // ---------- LOAD CITIES ----------
         async function loadCities(provinceIdentifier) {
-
             citySelect.innerHTML = '<option>Loading cities...</option>';
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
             let provinceCode = provinceIdentifier;
-            if (isNaN(Number(provinceCode))) provinceCode = window._provinceCodeMap && window
-                ._provinceCodeMap[provinceCode] ? window._provinceCodeMap[provinceCode] : provinceCode;
+            if (isNaN(Number(provinceCode))) provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode] ? window._provinceCodeMap[provinceCode] : provinceCode;
+
+            if (loadLocalCities(provinceIdentifier) || (provinceCode && window._provinceCodeMap && window._provinceCodeMap['NCR'] && String(provinceCode) === String(window._provinceCodeMap['NCR']))) {
+                return;
+            }
 
             try {
                 const res = await fetch(
-                    `https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`
-                    );
+                    `https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`);
                 if (!res.ok) throw new Error('no-cities');
                 const data = await res.json();
                 citySelect.innerHTML = '<option value="">Select City</option>';
                 data.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
                 data.forEach(city => {
                     const rawName = city.name || city.description || '';
-                    const cleaned = String(rawName).replace(/^\s*(city of|municipality of)\s+/i,
-                    '');
-                    let name = String(cleaned).toUpperCase().trim();
+                    const cleaned = normalizeName(rawName);
                     const isCity = /city/i.test(rawName);
-                    if (isCity && !/\bCITY$/.test(name)) name = (name + ' CITY').trim();
+                    const name = isCity ? `CITY OF ${cleaned.replace(/\s*CITY\s*$/, '')}` : cleaned;
+
                     const option = document.createElement('option');
                     option.value = name;
                     option.textContent = name;
                     option.dataset.code = city.code || '';
-                    if (savedCity && name === String(savedCity).toUpperCase()) option.selected =
-                        true;
+
+                    if (savedCity) {
+                        const savedNorm = normalizeName(savedCity).replace(/\s*CITY\s*$/, '');
+                        const optionNorm = normalizeName(name).replace(/\s*CITY\s*$/, '');
+                        if (savedNorm === optionNorm) {
+                            option.selected = true;
+                        }
+                    }
+
                     citySelect.appendChild(option);
                 });
 
-                // If provinceIdentifier corresponds to Batangas, append extra institutions/entries
+                // Batangas extras
                 (function appendBatangasExtras() {
                     let provinceNameUpper = '';
-                    if (isNaN(Number(provinceIdentifier))) provinceNameUpper = String(
-                        provinceIdentifier).toUpperCase();
+                    if (isNaN(Number(provinceIdentifier))) provinceNameUpper = String(provinceIdentifier).toUpperCase();
                     else if (window._provinceCodeMap) {
                         for (const k in window._provinceCodeMap) {
                             if (window._provinceCodeMap[k] === provinceCode) {
@@ -4042,22 +4145,19 @@
 
                     if (provinceNameUpper && provinceNameUpper.includes('BATANGAS')) {
                         const extras = ['BATANGAS PROVINCE', 'BATANGAS STATE UNIVERSITY',
-                            'UNIVERSITY OF BATANGAS-MAIN', 'RIZAL COLLEGE OF TAAL'
-                        ];
+                            'UNIVERSITY OF BATANGAS-MAIN', 'RIZAL COLLEGE OF TAAL'];
                         extras.forEach(raw => {
-                            const base = String(raw).replace(
-                                /^\s*(city of|municipality of)\s+/i, '').toUpperCase()
-                            .trim();
-                            const isCityExtra = /city/i.test(raw);
-                            const name = (isCityExtra && !/\bCITY$/.test(base)) ? (base +
-                                ' CITY') : base;
+                            const name = String(raw).toUpperCase().trim();
                             if (!Array.from(citySelect.options).some(o => o.value === name)) {
                                 const option = document.createElement('option');
                                 option.value = name;
                                 option.textContent = name;
                                 option.dataset.code = '';
-                                if (savedCity && name === String(savedCity).toUpperCase())
-                                    option.selected = true;
+                                if (savedCity) {
+                                    const savedNorm = normalizeName(savedCity).replace(/\s*CITY\s*$/, '');
+                                    const optionNorm = normalizeName(name).replace(/\s*CITY\s*$/, '');
+                                    if (savedNorm === optionNorm) option.selected = true;
+                                }
                                 citySelect.appendChild(option);
                             }
                         });
@@ -4073,19 +4173,19 @@
                             'TRECE MARTIRES CITY', 'CAVITE PROVINCE'
                         ];
                         caviteExtras.forEach(raw => {
-                            const base = String(raw).replace(
-                                /^\s*(city of|municipality of)\s+/i, '').toUpperCase()
-                            .trim();
+                            const cleaned = normalizeName(raw);
                             const isCityExtra = /city/i.test(raw);
-                            const name = (isCityExtra && !/\bCITY$/.test(base)) ? (base +
-                                ' CITY') : base;
+                            const name = isCityExtra ? `CITY OF ${cleaned.replace(/\s*CITY\s*$/, '')}` : cleaned;
                             if (!Array.from(citySelect.options).some(o => o.value === name)) {
                                 const option = document.createElement('option');
                                 option.value = name;
                                 option.textContent = name;
                                 option.dataset.code = '';
-                                if (savedCity && name === String(savedCity).toUpperCase())
-                                    option.selected = true;
+                                if (savedCity) {
+                                    const savedNorm = normalizeName(savedCity).replace(/\s*CITY\s*$/, '');
+                                    const optionNorm = normalizeName(name).replace(/\s*CITY\s*$/, '');
+                                    if (savedNorm === optionNorm) option.selected = true;
+                                }
                                 citySelect.appendChild(option);
                             }
                         });
@@ -4093,26 +4193,59 @@
                 })();
 
                 const selectedCity = citySelect.options[citySelect.selectedIndex];
-                if (selectedCity && selectedCity.dataset.code) loadBarangays(selectedCity.value,
-                    selectedCity.dataset.code);
+                if (selectedCity && selectedCity.dataset.code && selectedCity.value) {
+                    loadBarangays(selectedCity.value, selectedCity.dataset.code);
+                }
             } catch (e) {
                 citySelect.innerHTML = '<option value="">Unable to load cities</option>';
             }
         }
 
-
-
         // ---------- LOAD BARANGAYS ----------
         function loadBarangays(cityName, cityCode) {
+            if (loadLocalBarangays(cityName)) {
+                return;
+            }
+
             barangaySelect.innerHTML = '<option>Loading barangays...</option>';
-            if (!cityCode && !cityName) return barangaySelect.innerHTML =
-                '<option value="">Select Barangay</option>';
 
-            const normalizedCity = normalizeName(cityName);
-            const identifier = cityCode || cityName;
+            if (!cityCode) {
+                const rawProvince = provinceSelect.value || '';
+                const selectedProvince = normalizeName(rawProvince);
+                const knownNcrCodes = [];
+                if (window._provinceCodeMap) {
+                    if (window._provinceCodeMap['NCR']) knownNcrCodes.push(String(window._provinceCodeMap['NCR']));
+                    if (window._provinceCodeMap['METRO MANILA']) knownNcrCodes.push(String(window._provinceCodeMap['METRO MANILA']));
+                }
+                knownNcrCodes.push('130000000');
+                const selectedOption = provinceSelect.options[provinceSelect.selectedIndex];
+                const selectedOptionCode = selectedOption && selectedOption.dataset ? String(selectedOption.dataset.code || '') : '';
+                const provinceIsNcr = (
+                    selectedProvince === 'NCR' ||
+                    selectedProvince.includes('NATIONAL CAPITAL') ||
+                    selectedProvince.includes('METRO MANILA') ||
+                    (selectedOptionCode && knownNcrCodes.includes(selectedOptionCode)) ||
+                    knownNcrCodes.includes(String(rawProvince))
+                );
 
-            fetch(
-                    `https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(identifier)}/barangays/`)
+                if (provinceIsNcr) {
+                    fetch(`/api/ncr/barangays?city=${encodeURIComponent(cityName)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            const barangays = Array.isArray(data) ? data : [];
+                            setBarangayOptions(barangays, savedBarangay, cityName);
+                        })
+                        .catch(() => {
+                            barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>';
+                        });
+                    return;
+                }
+
+                barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                return;
+            }
+
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${encodeURIComponent(cityCode)}/barangays/`)
                 .then(res => res.json())
                 .then(data => {
                     barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
@@ -4122,7 +4255,7 @@
                         const option = document.createElement('option');
                         option.value = name;
                         option.textContent = name;
-                        if (savedBarangay && isBarangayMatch(savedBarangay, name, normalizedCity))
+                        if (savedBarangay && isBarangayMatch(savedBarangay, name, normalizeName(cityName)))
                             option.selected = true;
                         barangaySelect.appendChild(option);
                     });
@@ -4130,11 +4263,8 @@
                 .catch(() => barangaySelect.innerHTML = '<option value="">Unable to load barangays</option>');
         }
 
-
-
         // ---------- EVENTS ----------
         provinceSelect.addEventListener('change', function() {
-
             let selected = this.options[this.selectedIndex];
             let code = selected?.dataset.code;
             let val = selected?.value;
@@ -4147,12 +4277,9 @@
                 citySelect.innerHTML = '<option>Select City</option>';
                 barangaySelect.innerHTML = '<option>Select Barangay</option>';
             }
-
         });
 
-
         citySelect.addEventListener('change', function() {
-
             let selected = this.options[this.selectedIndex];
             let code = selected?.dataset.code;
             let val = selected?.value;
@@ -4164,10 +4291,7 @@
             } else {
                 barangaySelect.innerHTML = '<option>Select Barangay</option>';
             }
-
         });
-
-
 
         // ---------- INIT ----------
         loadProvinces();
