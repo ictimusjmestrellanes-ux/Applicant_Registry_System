@@ -12,6 +12,7 @@
         $selectedCity = $filters['city'] ?? '';
         $selectedBarangay = $filters['barangay'] ?? '';
         $selectedTransactionType = $filters['transaction_type'] ?? '';
+        $selectedFirstTimeJobSeeker = $filters['first_time_job_seeker'] ?? '';
         $dateFrom = $filters['date_from'] ?? '';
         $dateTo = $filters['date_to'] ?? '';
         $perPage = (string) request('per_page', '10');
@@ -26,6 +27,7 @@
             $selectedCity,
             $selectedBarangay,
             $selectedTransactionType,
+            $selectedFirstTimeJobSeeker,
             $dateFrom,
             $dateTo,
         ])->contains(fn($value) => trim((string) $value) !== '');
@@ -160,7 +162,17 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6 col-xl-3">
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <label class="form-label field-label">1st Time Jobseeker</label>
+                            <div class="filter-input-shell">
+                                <select name="first_time_job_seeker" class="form-select index-select-control">
+                                    <option value="">All</option>
+                                    <option value="YES" {{ $selectedFirstTimeJobSeeker === 'YES' ? 'selected' : '' }}>YES</option>
+                                    <option value="NO" {{ $selectedFirstTimeJobSeeker === 'NO' ? 'selected' : '' }}>NO</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2">
                             <label class="form-label field-label">Transaction Type</label>
                             <div class="filter-input-shell">
                                 <select name="transaction_type" class="form-select index-select-control">
@@ -267,6 +279,11 @@
                                 @endif
                             </div>
                         @endif
+                        @if ($selectedFirstTimeJobSeeker !== '')
+                            <div class="search-chip">
+                                <i class="bi bi-person-check me-1"></i>1st Time Jobseeker: {{ $selectedFirstTimeJobSeeker }}
+                            </div>
+                        @endif
                         @if ($dateFrom !== '' || $dateTo !== '')
                             <div class="search-chip">
                                 <i class="bi bi-calendar-range me-1"></i>Date:
@@ -296,6 +313,9 @@
                     @endif
                     @if ($selectedTransactionType !== '')
                         <input type="hidden" name="transaction_type" value="{{ $selectedTransactionType }}">
+                    @endif
+                    @if ($selectedFirstTimeJobSeeker !== '')
+                        <input type="hidden" name="first_time_job_seeker" value="{{ $selectedFirstTimeJobSeeker }}">
                     @endif
                     @if ($dateFrom !== '')
                         <input type="hidden" name="date_from" value="{{ $dateFrom }}">
@@ -733,8 +753,8 @@
             align-items: center;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            font-size: 0.76rem;
-            font-weight: 800;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .index-kicker {
@@ -767,7 +787,7 @@
         .filter-card,
         .records-card {
             background: rgba(255, 255, 255, 0.92);
-            border: 1px solid rgba(226, 232, 240, 0.95);
+            border: 1px solid rgba(211, 211, 211, 0.95);
             border-radius: 22px;
             box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
         }
@@ -803,25 +823,31 @@
         .index-btn-primary,
         .index-btn-secondary {
             border-radius: 14px;
-            padding: 0.82rem 1.15rem;
+            padding: 6px 1rem;
             font-weight: 700;
         }
 
         .index-btn-primary {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            background: #2563eb;
             border: none;
             box-shadow: 0 12px 24px rgba(37, 99, 235, 0.2);
         }
 
         .index-btn-secondary {
             background: #fff;
-            border: 1px solid #dbeafe;
-            color: #1e3a8a;
+            border: 1px solid #bbbbbb;
+            color: #1d1d1d;
+        }
+
+        .index-btn-secondary:hover {
+            background: #a7a7a7;
+            border: 1px solid #bbbbbb;
+            color: #1d1d1d;
         }
 
         .index-btn-export {
             border-radius: 14px;
-            padding: 0.82rem 1.15rem;
+            padding: 6px 1rem;
             font-weight: 700;
             background: #fff;
             border: 1px solid #dbeafe;
@@ -977,7 +1003,7 @@
             align-items: center;
             gap: 0.55rem;
             border-radius: 14px;
-            padding: 0.72rem 1rem;
+            padding: 6px 1rem;
             background: #eff6ff;
             border: 1px solid #bfdbfe;
             color: #1d4ed8;
@@ -1036,7 +1062,7 @@
         .index-field-control,
         .index-select-control,
         .index-date-control {
-            min-height: 54px;
+            min-height: 40px;
             border: none;
             background: transparent;
         }

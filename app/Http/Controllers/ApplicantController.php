@@ -483,6 +483,7 @@ class ApplicantController extends Controller
         $transactionType = trim((string) ($filters['transaction_type'] ?? ''));
         $dateFrom = trim((string) ($filters['date_from'] ?? ''));
         $dateTo = trim((string) ($filters['date_to'] ?? ''));
+        $firstTimeJobSeeker = trim((string) ($filters['first_time_job_seeker'] ?? ''));
 
         return Applicant::query()
             ->where('profile_completed', true)
@@ -524,6 +525,9 @@ class ApplicantController extends Controller
                     }),
                     default => $query,
                 };
+            })
+            ->when($firstTimeJobSeeker !== '', function ($query) use ($firstTimeJobSeeker) {
+                $query->whereRaw('UPPER(TRIM(first_time_job_seeker)) = ?', [strtoupper($firstTimeJobSeeker)]);
             });
     }
 
@@ -543,6 +547,7 @@ class ApplicantController extends Controller
             'city' => trim((string) $request->query('city', '')),
             'barangay' => trim((string) $request->query('barangay', '')),
             'transaction_type' => trim((string) $request->query('transaction_type', '')),
+            'first_time_job_seeker' => trim((string) $request->query('first_time_job_seeker', '')),
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
         ];
