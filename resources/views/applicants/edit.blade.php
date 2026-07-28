@@ -534,7 +534,7 @@
             border-radius: 16px;
             background: #ffffff;
             box-shadow: 0 4px 24px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
-            overflow: hidden;
+            overflow-x: auto;
         }
 
         .transaction-panel-head {
@@ -696,10 +696,8 @@
         .hide-actions .transaction-table th:last-child,
         .hide-actions .transaction-table td:last-child {
             display: none !important;
-        }
-
-        border-top: none;
-        border-radius: 0 0 16px 16px;
+            border-top: none;
+            border-radius: 0 0 16px 16px;
         }
 
         .transaction-table-wrap {
@@ -2366,6 +2364,12 @@
             color: #64748b;
         }
 
+        @media (max-width: 1279.98px) {
+            .transaction-table .hide-below-1280 {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 991.98px) {
             .transaction-panel-head {
                 flex-direction: column;
@@ -2503,10 +2507,10 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Birthdate</label>
-                                        <input type="text" name="birthdate" id="birthdate"
-                                            class="form-control flatpickr-input"
+                                        <input type="date" name="birthdate" id="birthdate"
+                                            class="form-control"
                                             value="{{ old('birthdate', optional($applicant->birthdate)->format('Y-m-d')) }}"
-                                            placeholder="Select birthdate" readonly>
+                                            max="{{ date('Y-m-d') }}" min="1920-01-01">
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Age (Auto)</label>
@@ -4135,8 +4139,7 @@
                                                                         <button class="dropdown-item" type="button"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}">
-                                                                            <i
-                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                            <i class="bi bi-paperclip me-2 text-info"></i>View Requirements
                                                                         </button>
                                                                     </li>
                                                                     <li>
@@ -7091,18 +7094,8 @@
             return age >= 0 ? age : '';
         }
 
-        flatpickr(birthdateInput, {
-            dateFormat: 'Y-m-d',
-            maxDate: 'today',
-            minDate: '1920-01-01',
-            defaultDate: birthdateInput.value || null,
-            disableMobile: true,
-            weekNumbers: true,
-            monthSelector: 'dropdown',
-            yearSelector: 'dropdown',
-            onChange: function(selectedDates, dateStr) {
-                if (ageInput) ageInput.value = calcAge(dateStr);
-            }
+        birthdateInput.addEventListener('change', function() {
+            if (ageInput) ageInput.value = calcAge(this.value);
         });
 
         if (ageInput && birthdateInput.value) {

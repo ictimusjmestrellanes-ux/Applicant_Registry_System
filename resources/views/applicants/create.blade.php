@@ -927,8 +927,8 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Birthdate <span class="required-mark">*</span></label>
-                                    <input type="text" name="birthdate" id="birthdate" class="form-control flatpickr-input"
-                                        value="{{ old('birthdate') }}" placeholder="Select birthdate" readonly required>
+                                    <input type="date" name="birthdate" id="birthdate" class="form-control"
+                                        value="{{ old('birthdate') }}" max="{{ date('Y-m-d') }}" min="1920-01-01" required>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Age (Auto)</label>
@@ -1096,30 +1096,18 @@
 
             if (!birthdateInput) return;
 
-            const isNight = document.documentElement.dataset.theme === 'night';
-
-            flatpickr(birthdateInput, {
-                dateFormat: 'Y-m-d',
-                maxDate: 'today',
-                minDate: '1920-01-01',
-                defaultDate: birthdateInput.value || null,
-                disableMobile: true,
-                weekNumbers: true,
-                monthSelector: 'dropdown',
-                yearSelector: 'dropdown',
-                onChange: function(selectedDates, dateStr) {
-                    if (!ageInput || !dateStr) {
-                        if (ageInput) ageInput.value = '';
-                        return;
-                    }
-                    const birthDate = new Date(dateStr + 'T00:00:00');
-                    const today = new Date();
-                    let age = today.getFullYear() - birthDate.getFullYear();
-                    const monthDiff = today.getMonth() - birthDate.getMonth();
-                    const dayDiff = today.getDate() - birthDate.getDate();
-                    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
-                    ageInput.value = age >= 0 ? age : '';
+            birthdateInput.addEventListener('change', function() {
+                if (!ageInput || !this.value) {
+                    if (ageInput) ageInput.value = '';
+                    return;
                 }
+                const birthDate = new Date(this.value + 'T00:00:00');
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                const dayDiff = today.getDate() - birthDate.getDate();
+                if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
+                ageInput.value = age >= 0 ? age : '';
             });
 
             if (ageInput && birthdateInput.value) {
