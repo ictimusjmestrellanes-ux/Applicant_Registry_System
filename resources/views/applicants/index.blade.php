@@ -381,9 +381,9 @@
                                 <i class="bi {{ $sort['icon'] }} ms-1"></i>
                             </a>
                         </th>
-                        <th>Permit</th>
-                        <th>Clearance</th>
-                        <th>Referral</th>
+                        <th>Mayor's Permit to Work</th>
+                        <th>Mayor's Clearance</th>
+                        <th>Mayor's Referral</th>
                         @php $sort = $sortHelper('created_at', 'Created'); @endphp
                         <th class="text-center">
                             <a href="{{ $sort['url'] }}" class="sort-header">
@@ -424,6 +424,15 @@
                             $permitUploaded = collect($permitRequirements)->filter()->count();
                             $permitPercent = $permitTotal > 0 ? ($permitUploaded / $permitTotal) * 100 : 0;
 
+                            $permitMonthsOld = $permit->created_at ? $permit->created_at->diffInMonths(now()) : null;
+                            if ($permitMonthsOld !== null && $permitMonthsOld >= 6) {
+                                $permitBarColor = 'bg-danger';
+                            } elseif ($permitMonthsOld !== null && $permitMonthsOld >= 5) {
+                                $permitBarColor = 'bg-warning';
+                            } else {
+                                $permitBarColor = $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger');
+                            }
+
                             $clearance = optional($applicant->clearance);
                             $clearanceRequirements = [
                                 $clearance->prosecutor_clearance,
@@ -435,6 +444,15 @@
                             $clearanceUploaded = collect($clearanceRequirements)->filter()->count();
                             $clearanceTotal = count($clearanceRequirements);
                             $clearancePercent = $clearanceTotal > 0 ? ($clearanceUploaded / $clearanceTotal) * 100 : 0;
+
+                            $clearanceMonthsOld = $clearance->created_at ? $clearance->created_at->diffInMonths(now()) : null;
+                            if ($clearanceMonthsOld !== null && $clearanceMonthsOld >= 6) {
+                                $clearanceBarColor = 'bg-danger';
+                            } elseif ($clearanceMonthsOld !== null && $clearanceMonthsOld >= 5) {
+                                $clearanceBarColor = 'bg-warning';
+                            } else {
+                                $clearanceBarColor = $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger');
+                            }
 
                             $referral = optional($applicant->referral);
                             $hasResume = !empty($referral->resume);
@@ -448,6 +466,16 @@
                                     ->count() > 0;
                             $referralUploaded = ($hasResume ? 1 : 0) + ($hasReferralClearance ? 1 : 0);
                             $referralPercent = ($referralUploaded / 2) * 100;
+
+                            $referralMonthsOld = $referral->created_at ? $referral->created_at->diffInMonths(now()) : null;
+                            if ($referralMonthsOld !== null && $referralMonthsOld >= 6) {
+                                $referralBarColor = 'bg-danger';
+                            } elseif ($referralMonthsOld !== null && $referralMonthsOld >= 5) {
+                                $referralBarColor = 'bg-warning';
+                            } else {
+                                $referralBarColor = $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger');
+                            }
+
                             $completedStages = collect([
                                 $permitPercent == 100,
                                 $clearancePercent == 100,
@@ -478,9 +506,14 @@
                                         <span>{{ round($permitPercent) }}% submitted</span>
                                     </div>
                                     <div class="progress requirement-progress">
-                                        <div class="progress-bar {{ $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                        <div class="progress-bar {{ $permitBarColor }}"
                                             style="width: {{ $permitPercent }}%;"></div>
                                     </div>
+                                    @if ($permitBarColor === 'bg-warning')
+                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Need to renew the permit</div>
+                                    @elseif ($permitBarColor === 'bg-danger' && $permitPercent > 0)
+                                        <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The permit is expired</div>
+                                    @endif
                                     <div class="small" style="opacity:0.7;">
                                         <i class="bi bi-calendar-date me-1"></i>
                                         @if ($permit->created_at)
@@ -499,9 +532,14 @@
                                         <span>{{ round($clearancePercent) }}% submitted</span>
                                     </div>
                                     <div class="progress requirement-progress">
-                                        <div class="progress-bar {{ $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                        <div class="progress-bar {{ $clearanceBarColor }}"
                                             style="width: {{ $clearancePercent }}%;"></div>
                                     </div>
+                                    @if ($clearanceBarColor === 'bg-warning')
+                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Need to renew the clearance</div>
+                                    @elseif ($clearanceBarColor === 'bg-danger' && $clearancePercent > 0)
+                                        <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The clearance is expired</div>
+                                    @endif
                                     <div class="small" style="opacity:0.7;">
                                         <i class="bi bi-calendar-date me-1"></i>
                                         @if ($clearance->created_at)
@@ -521,9 +559,14 @@
                                         <span>{{ round($referralPercent) }}% submitted</span>
                                     </div>
                                     <div class="progress requirement-progress">
-                                        <div class="progress-bar {{ $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
+                                        <div class="progress-bar {{ $referralBarColor }}"
                                             style="width: {{ $referralPercent }}%;"></div>
                                     </div>
+                                    @if ($referralBarColor === 'bg-warning')
+                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Need to renew the referral</div>
+                                    @elseif ($referralBarColor === 'bg-danger' && $referralPercent > 0)
+                                        <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The referral is expired</div>
+                                    @endif
                                     <div class="small" style="opacity:0.7;">
                                         <i class="bi bi-calendar-date me-1"></i>
                                         @if ($referral->created_at)
@@ -1136,7 +1179,7 @@
         .limit-trigger {
             width: 100%;
             min-height: 30px;
-            padding: 0.55rem 0.9rem;
+            padding: 6px 1rem;
             border: 1px solid rgba(191, 219, 254, 0.9);
             border-radius: 14px;
             background: #ffffff;
@@ -1145,7 +1188,7 @@
             align-items: center;
             justify-content: space-between;
             text-align: center;
-            gap: 0.75rem;
+            gap: 4px;
             font-weight: 700;
             box-shadow: 0 10px 20px rgba(37, 99, 235, 0.08);
             transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -1185,7 +1228,7 @@
             right: 0;
             z-index: 20;
             display: none;
-            padding: 0.45rem;
+            padding: 3px;
             border-radius: 16px;
             border: 1px solid #dbeafe;
             background: rgba(255, 255, 255, 0.98);
@@ -1200,13 +1243,13 @@
 
         .limit-menu-option {
             width: 100%;
-            padding: 0.7rem 0.85rem;
+            padding: 6px 1rem;
             border: none;
             border-radius: 12px;
             background: transparent;
             color: #334155;
-            text-align: left;
-            font-size: 0.92rem;
+            text-align: center;
+            font-size: 0.72rem;
             font-weight: 700;
             transition: background 0.2s ease, color 0.2s ease;
         }
