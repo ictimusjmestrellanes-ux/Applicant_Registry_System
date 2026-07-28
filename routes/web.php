@@ -5,7 +5,9 @@ use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClearanceController;
 use App\Http\Controllers\PermitController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ReferralController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 
 // Public entry point now routes to login
@@ -81,6 +83,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+        Route::post('/permissions', [PermissionController::class, 'store'])->name('permissions.store');
+        Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy'])->name('permissions.destroy');
+
+        Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+        Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
     });
 
     Route::get('/reports', function () {
@@ -106,6 +116,15 @@ Route::get('/applicants/{applicant}/view-file/{field}',
     [ApplicantController::class, 'viewFile']
 )->middleware('auth')->name('applicants.view-file');
 
+Route::post('applicants/{applicant}/duplicate', [ApplicantController::class, 'duplicate'])
+    ->middleware('auth')->name('applicants.duplicate');
+
+Route::get('applicants/duplicates', [ApplicantController::class, 'duplicates'])
+    ->middleware(['auth', 'permission:view_duplicates'])->name('applicants.duplicates');
+
+Route::get('applicants/check-duplicates', [ApplicantController::class, 'checkDuplicates'])
+    ->middleware('auth')->name('applicants.check-duplicates');
+
 // ✅ PUT RESOURCE LAST
 Route::resource('applicants', ApplicantController::class)->middleware('auth');
 Route::put('/permits/{id}', [PermitController::class, 'update'])->middleware(['auth', 'permission:update_permit'])
@@ -114,6 +133,18 @@ Route::put('/permits/{id}/approve', [PermitController::class, 'approve'])->middl
     ->name('permits.approve');
 Route::put('/permits/{id}/disapprove', [PermitController::class, 'disapprove'])->middleware(['auth', 'permission:approve_document'])
     ->name('permits.disapprove');
+Route::put('/permits/{permit}/details', [PermitController::class, 'updateDetails'])->middleware(['auth', 'permission:update_permit'])
+    ->name('permits.update-details');
+Route::put('/permits/{id}/files', [PermitController::class, 'updateFiles'])->middleware(['auth', 'permission:update_permit'])
+    ->name('permits.update-files');
+Route::put('/clearances/{clearance}/details', [ClearanceController::class, 'updateDetails'])->middleware(['auth', 'permission:update_clearance'])
+    ->name('clearances.update-details');
+Route::put('/clearances/{id}/files', [ClearanceController::class, 'updateFiles'])->middleware(['auth', 'permission:update_clearance'])
+    ->name('clearances.update-files');
+Route::put('/referrals/{referral}/details', [ReferralController::class, 'updateDetails'])->middleware(['auth', 'permission:update_referral'])
+    ->name('referrals.update-details');
+Route::put('/referrals/{id}/files', [ReferralController::class, 'updateFiles'])->middleware(['auth', 'permission:update_referral'])
+    ->name('referrals.update-files');
 Route::put('/clearances/{id}', [ClearanceController::class, 'update'])->middleware(['auth', 'permission:update_clearance'])
     ->name('clearances.update');
 Route::put('/clearances/{id}/approve', [ClearanceController::class, 'approve'])->middleware(['auth', 'permission:approve_document'])
@@ -129,7 +160,7 @@ Route::put('/referrals/{id}/disapprove', [ReferralController::class, 'disapprove
 Route::get('/api/referrals/recipients', [ReferralController::class, 'searchRecipients'])->middleware('auth')
     ->name('referrals.recipients.search');
 
-Route::get('/applicants/{id}/permit-id', [PermitController::class, 'printId'])->middleware(['auth', 'permission:generate_permit'])
+Route::get('/applicants/{id}/permit-id/{permit?}', [PermitController::class, 'printId'])->middleware(['auth', 'permission:generate_permit'])
     ->name('permits.printId');
 
 Route::get('/applicants/{id}/print-clearance', [ClearanceController::class, 'printLetter'])->middleware(['auth', 'permission:generate_clearance'])

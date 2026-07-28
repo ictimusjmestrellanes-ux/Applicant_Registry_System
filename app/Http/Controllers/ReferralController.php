@@ -56,11 +56,32 @@ class ReferralController extends Controller
 
         $applicant = Applicant::findOrFail($id);
         $referralType = $request->input('referral_type');
-        $referral = MayorsReferral::firstOrNew([
-            'applicant_id' => $applicant->id,
-        ]);
-        $wasRecentlyCreated = ! $referral->exists;
-        $before = $referral->exists ? $referral->only($referral->getFillable()) : [];
+        if (! in_array($referralType, [MayorsReferral::TYPE_PESO_OFFICE, MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT], true)) {
+            $referralType = null;
+        }
+
+        if ($isApplicantUser) {
+            $referral = MayorsReferral::firstOrNew([
+                'applicant_id' => $applicant->id,
+            ]);
+            $wasRecentlyCreated = ! $referral->exists;
+            $before = $referral->exists ? $referral->only($referral->getFillable()) : [];
+        } else {
+            $latestReferral = MayorsReferral::where('applicant_id', $applicant->id)->latest()->first();
+            $referral = new MayorsReferral(['applicant_id' => $applicant->id]);
+            $wasRecentlyCreated = true;
+            $before = [];
+
+            if ($latestReferral) {
+                $referral->resume = $latestReferral->resume;
+                $referral->biodata = $latestReferral->biodata;
+                $referral->ref_barangay_clearance = $latestReferral->ref_barangay_clearance;
+                $referral->ref_police_clearance = $latestReferral->ref_police_clearance;
+                $referral->ref_nbi_clearance = $latestReferral->ref_nbi_clearance;
+                $referral->referral_type = $latestReferral->referral_type;
+                $referral->approval_status = $latestReferral->approval_status;
+            }
+        }
         $approvalStatus = $isApplicantUser
             ? MayorsReferral::APPROVAL_PENDING
             : ($request->user()?->canAutoApproveUploadedFiles()
@@ -138,9 +159,13 @@ class ReferralController extends Controller
             return $assigned;
         };
 
+        $resolvedReferralType = $isApplicantUser
+            ? ($referral->referral_type ?: MayorsReferral::TYPE_PESO_OFFICE)
+            : ($referralType ?: ($referral->referral_type ?: MayorsReferral::TYPE_PESO_OFFICE));
+
         $referralData = [
             'approval_status' => $approvalStatus,
-            'referral_type' => $referral->referral_type ?: ($referralType ?: MayorsReferral::TYPE_PESO_OFFICE),
+            'referral_type' => $resolvedReferralType,
         ];
 
         if ($isApplicantUser) {
@@ -229,8 +254,17 @@ class ReferralController extends Controller
                 'referral_details' => array_values(array_merge([$primaryDetails], $supplementaryDetails)),
             ]);
         } elseif (! $isApplicantUser && $referralType === MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT) {
+            $otherCityOcrl = trim((string) ($request->ref_ocrl ?? $referral->ref_ocrl ?? ''));
+            $otherCityHasRequirements = ! empty(trim((string) $request->ref_recipient))
+                && ! empty(trim((string) $request->ref_company_address))
+                && ! empty(trim((string) $request->ref_city_gov));
+
+            if ($otherCityHasRequirements && $otherCityOcrl === '') {
+                $otherCityOcrl = MayorsReferral::generateNextOcrl();
+            }
+
             $referralData = array_merge($referralData, [
-                'ref_ocrl' => $request->ref_ocrl,
+                'ref_ocrl' => $otherCityOcrl,
                 'ref_recipient' => $request->ref_recipient,
                 'ref_company_address' => $request->ref_company_address,
                 'ref_city_gov' => $request->ref_city_gov,
@@ -308,9 +342,34 @@ class ReferralController extends Controller
                 ->with('success', 'Referral updated successfully.');
         }
 
+        $referralPromptOptions = [];
+
+        if ($referral->canPrintType(MayorsReferral::TYPE_PESO_OFFICE)) {
+            $referralPromptOptions[] = [
+                'label' => 'Referral Letter Within Imus',
+                'url' => route('referrals.printLetter', [
+                    'id' => $applicant->id,
+                    'type' => MayorsReferral::TYPE_PESO_OFFICE,
+                ]),
+            ];
+        }
+
+        if ($referral->canPrintType(MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT)) {
+            $referralPromptOptions[] = [
+                'label' => 'Referral Letter Outside Imus',
+                'url' => route('referrals.printLetter', [
+                    'id' => $applicant->id,
+                    'type' => MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT,
+                ]),
+            ];
+        }
+
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#referral')
-            ->with('success', 'Referral updated successfully.');
+            ->with('success', 'Referral updated successfully.')
+            ->with('referral_saved_prompt', [
+                'options' => $referralPromptOptions,
+            ]);
     }
 
     public function approve(Request $request, $id)
@@ -436,6 +495,115 @@ class ReferralController extends Controller
             ->with('success', 'Referral disapproved successfully.');
     }
 
+    public function updateDetails(Request $request, $referralId)
+    {
+        $referral = MayorsReferral::findOrFail($referralId);
+
+        $validated = $request->validate([
+            'referral_type' => 'required|in:peso_office,other_city_government',
+        ]);
+
+        $referral->update(['referral_type' => $validated['referral_type']]);
+
+        if ($validated['referral_type'] === MayorsReferral::TYPE_PESO_OFFICE) {
+            $pesoData = $request->validate([
+                'ref_employer_name' => 'required|string|max:255',
+                'ref_position' => 'required|string|max:255',
+                'ref_place' => 'required|string|max:255',
+                'ref_province' => 'required|string|max:255',
+                'ref_hired_company' => 'required|string|max:255',
+            ]);
+
+            $detailIndex = $request->input('detail_index');
+            $details = $referral->referral_details ?? [];
+
+            if ($detailIndex !== '' && $detailIndex !== null && isset($details[(int) $detailIndex])) {
+                $idx = (int) $detailIndex;
+                foreach ($pesoData as $key => $value) {
+                    $details[$idx][$key] = $value;
+                }
+                $referral->update(['referral_details' => $details]);
+            } else {
+                $referral->update($pesoData);
+
+                if (! empty($details[0])) {
+                    foreach ($pesoData as $key => $value) {
+                        $details[0][$key] = $value;
+                    }
+                    $referral->update(['referral_details' => $details]);
+                }
+            }
+        } else {
+            $otherData = $request->validate([
+                'ref_recipient' => 'required|string|max:255',
+                'ref_city_gov' => 'required|string|max:255',
+                'ref_company_address' => 'required|string|max:255',
+            ]);
+
+            $referral->update($otherData);
+        }
+
+        return redirect()
+            ->to(route('applicants.edit', $referral->applicant_id))
+            ->with('success', 'Referral details updated successfully.');
+    }
+
+    public function updateFiles(Request $request, $id)
+    {
+        $referral = MayorsReferral::findOrFail($id);
+
+        $fileFields = [
+            'resume' => 'referrals/resume',
+            'ref_barangay_clearance' => 'referrals/barangay',
+            'ref_police_clearance' => 'referrals/police',
+            'ref_nbi_clearance' => 'referrals/nbi',
+        ];
+
+        foreach ($fileFields as $field => $directory) {
+            if (! $request->hasFile($field)) {
+                continue;
+            }
+
+            $file = $request->file($field);
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+            if ($referral->{$field}) {
+                Storage::disk('azure')->delete($referral->{$field});
+            }
+
+            $referral->{$field} = $file->storeAs($directory, $fileName, 'azure');
+        }
+
+        $clearanceFields = ['ref_barangay_clearance', 'ref_police_clearance', 'ref_nbi_clearance'];
+        $uploadedClearanceField = collect($clearanceFields)
+            ->first(fn (string $field) => $request->hasFile($field));
+
+        if ($uploadedClearanceField) {
+            foreach ($clearanceFields as $field) {
+                if ($field === $uploadedClearanceField) {
+                    continue;
+                }
+
+                if (! empty($referral->{$field})) {
+                    Storage::disk('azure')->delete($referral->{$field});
+                }
+
+                $referral->{$field} = '';
+            }
+        }
+
+        $isStaffOrAdmin = auth()->user() && auth()->user()->role !== \App\Models\User::ROLE_USER;
+        $referral->approval_status = $isStaffOrAdmin ? MayorsReferral::APPROVAL_APPROVED : MayorsReferral::APPROVAL_PENDING;
+        $referral->disapproval_reason = null;
+        $referral->save();
+
+        return redirect()
+            ->to(route('applicants.edit', $referral->applicant_id).'#referral')
+            ->with('success', 'Referral uploads updated successfully.');
+    }
+
     private function searchPhilippineMayors(string $search, string $cityGovernment = ''): Collection
     {
         $directoryResults = collect(Config::get('philippine_mayors', []))
@@ -489,13 +657,17 @@ class ReferralController extends Controller
 
         $applicant = Applicant::with('referral')->findOrFail($id);
 
-        if (! $applicant->referral || ! $applicant->referral->canPrint()) {
+        if (! $applicant->referral) {
             return back()->with('error', 'Referral is not complete.');
         }
 
         $printType = $request->query('type', $applicant->referral->referral_type);
         if (! in_array($printType, [MayorsReferral::TYPE_PESO_OFFICE, MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT], true)) {
             $printType = $applicant->referral->referral_type;
+        }
+
+        if (! $applicant->referral->canPrintType($printType)) {
+            return back()->with('error', 'Referral is not complete.');
         }
 
         $printDetail = null;

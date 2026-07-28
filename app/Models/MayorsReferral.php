@@ -110,9 +110,37 @@ class MayorsReferral extends Model
         return sprintf('%d-%05d', $year, $highestNumber + 1);
     }
 
+    public static function formatWithinImusControlNo(?string $value): string
+    {
+        return static::formatControlNo($value, 'PESO-OCRL');
+    }
+
+    public static function formatOutsideImusControlNo(?string $value): string
+    {
+        return static::formatControlNo($value, 'PESO-IMUS-OCRL');
+    }
+
+    private static function formatControlNo(?string $value, string $prefix): string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        $number = preg_replace('/^'.preg_quote($prefix, '/').'-?/i', '', $value);
+
+        return $prefix.'-'.$number;
+    }
+
     public function hasRequiredDetails(): bool
     {
-        if ($this->referral_type === self::TYPE_PESO_OFFICE) {
+        return $this->hasRequiredDetailsFor($this->referral_type);
+    }
+
+    public function hasRequiredDetailsFor(?string $referralType): bool
+    {
+        if ($referralType === self::TYPE_PESO_OFFICE) {
             return ! empty($this->ref_employer_name)
                 && ! empty($this->ref_position)
                 && ! empty($this->ref_place)
@@ -120,7 +148,7 @@ class MayorsReferral extends Model
                 && ! empty($this->ref_hired_company);
         }
 
-        if ($this->referral_type === self::TYPE_OTHER_CITY_GOVERNMENT) {
+        if ($referralType === self::TYPE_OTHER_CITY_GOVERNMENT) {
             return ! empty($this->ref_recipient)
                 && ! empty($this->ref_company_address)
                 && ! empty($this->ref_city_gov);
@@ -144,9 +172,11 @@ class MayorsReferral extends Model
             && ! empty(trim((string) ($detail['ref_imus_ocrl'] ?? '')));
     }
 
-    public function hasCompletePesoExtraDetails(): bool
+    public function hasCompletePesoExtraDetails(?string $referralType = null): bool
     {
-        if ($this->referral_type !== self::TYPE_PESO_OFFICE) {
+        $referralType ??= $this->referral_type;
+
+        if ($referralType !== self::TYPE_PESO_OFFICE) {
             return true;
         }
 
@@ -165,7 +195,16 @@ class MayorsReferral extends Model
 
     public function canPrint(): bool
     {
+        return $this->canPrintType($this->referral_type);
+    }
+
+    public function canPrintType(?string $referralType): bool
+    {
         if (! in_array($this->referral_type, [self::TYPE_PESO_OFFICE, self::TYPE_OTHER_CITY_GOVERNMENT], true)) {
+            return false;
+        }
+
+        if (! in_array($referralType, [self::TYPE_PESO_OFFICE, self::TYPE_OTHER_CITY_GOVERNMENT], true)) {
             return false;
         }
 
@@ -176,8 +215,8 @@ class MayorsReferral extends Model
 
         return $hasProfile
             && $hasClearance
-            && $this->hasRequiredDetails()
-            && $this->hasCompletePesoExtraDetails();
+            && $this->hasRequiredDetailsFor($referralType)
+            && ($referralType !== self::TYPE_PESO_OFFICE || $this->hasCompletePesoExtraDetails($referralType));
     }
 
     public function isApproved(): bool

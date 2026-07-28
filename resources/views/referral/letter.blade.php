@@ -263,7 +263,9 @@
         ])->filter()->implode(', '));
         $letterDate = now()->format('F d, Y');
         $letterYear = now()->format('Y');
-        $referralNumber = $printDetail['ref_imus_ocrl'] ?? $referral->ref_imus_ocrl;
+        $referralNumber = \App\Models\MayorsReferral::formatWithinImusControlNo(
+            $printDetail['ref_imus_ocrl'] ?? $referral->ref_imus_ocrl,
+        );
         $referralDetails = $referral->referral_details ?? [];
         if (!is_array($referralDetails)) {
             $referralDetails = [];
@@ -285,7 +287,7 @@
             <div class="letter">
                 <p class="letter-title" style="font-size: 20px">Referral Letter</p>
 
-                <p class="ref-no">PESO-OCRL{{ $referralNumber }}</p>
+                <p class="ref-no">{{ $referralNumber }}</p>
 
                 <p class="date-line">{{ $letterDate }}</p>
 

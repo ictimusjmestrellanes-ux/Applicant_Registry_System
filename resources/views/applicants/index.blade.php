@@ -453,36 +453,67 @@
                             </td>
                             <td>
                                 <div class="requirement-card">
-                                    <div class="requirement-meta"><span>Mayor's
-                                            Permit</span><span>{{ $permitUploaded }}/{{ $permitTotal }}</span></div>
+                                    <div class="requirement-meta"><span>Mayor's Permit</span>
+                                        {{-- <span>{{ $permitUploaded }}/{{ $permitTotal }}</span> --}}
+                                        <span>{{ round($permitPercent) }}% submitted</span>
+                                    </div>
                                     <div class="progress requirement-progress">
                                         <div class="progress-bar {{ $permitPercent == 100 ? 'bg-success' : ($permitPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
                                             style="width: {{ $permitPercent }}%;"></div>
                                     </div>
-                                    <div class="requirement-note">{{ round($permitPercent) }}% submitted</div>
+                                    <div class="small" style="opacity:0.7;">
+                                        <i class="bi bi-calendar-date me-1"></i>
+                                        @if ($permit->created_at)
+                                            {{ $permit->created_at->isToday() ? 'Latest Upload:' : 'Last Upload:' }}
+                                            {{ $permit->created_at->format('M d, Y') }}
+                                            <span class="text-muted">({{ $permit->created_at->diffForHumans() }})</span>
+                                        @else
+                                            No uploaded file
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="requirement-card">
-                                    <div class="requirement-meta"><span>Mayor's
-                                            Clearance</span><span>{{ $clearanceUploaded }}/{{ $clearanceTotal }}</span>
+                                    <div class="requirement-meta"><span>Mayor's Clearance</span>
+                                        <span>{{ round($clearancePercent) }}% submitted</span>
                                     </div>
                                     <div class="progress requirement-progress">
                                         <div class="progress-bar {{ $clearancePercent == 100 ? 'bg-success' : ($clearancePercent > 0 ? 'bg-warning' : 'bg-danger') }}"
                                             style="width: {{ $clearancePercent }}%;"></div>
                                     </div>
-                                    <div class="requirement-note">{{ round($clearancePercent) }}% submitted</div>
+                                    <div class="small" style="opacity:0.7;">
+                                        <i class="bi bi-calendar-date me-1"></i>
+                                        @if ($clearance->created_at)
+                                            {{ $clearance->created_at->isToday() ? 'Latest Upload:' : 'Last Upload:' }}
+                                            {{ $clearance->created_at->format('M d, Y') }}
+                                            <span class="text-muted">({{ $clearance->created_at->diffForHumans() }})</span>
+                                        @else
+                                            No uploaded file
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="requirement-card">
-                                    <div class="requirement-meta"><span>Mayor's
-                                            Referral</span><span>{{ $referralUploaded }}/2</span></div>
+                                    <div class="requirement-meta"><span>Mayor's Referral</span>
+                                        {{-- <span>{{ $referralUploaded }}/2</span> --}}
+                                        <span>{{ round($referralPercent) }}% submitted</span>
+                                    </div>
                                     <div class="progress requirement-progress">
                                         <div class="progress-bar {{ $referralPercent == 100 ? 'bg-success' : ($referralPercent > 0 ? 'bg-warning' : 'bg-danger') }}"
                                             style="width: {{ $referralPercent }}%;"></div>
                                     </div>
-                                    <div class="requirement-note">{{ round($referralPercent) }}% submitted</div>
+                                    <div class="small" style="opacity:0.7;">
+                                        <i class="bi bi-calendar-date me-1"></i>
+                                        @if ($referral->created_at)
+                                            {{ $referral->created_at->isToday() ? 'Latest Upload:' : 'Last Upload:' }}
+                                            {{ $referral->created_at->format('M d, Y ') }}
+                                            <span class="text-muted">({{ $referral->created_at->diffForHumans() }})</span>
+                                        @else
+                                            No uploaded file
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
                             <td class="text-center">
@@ -838,7 +869,7 @@
         .applicant-name,
         .section-title {
             color: #0f172a;
-            font-weight: 800;
+            font-weight: 700;
         }
 
         .applicant-code {
@@ -1216,9 +1247,10 @@
         }
 
         .applicants-table tbody td {
-            padding: 6px;
+            padding: 4px;
             border-top: 1px solid #eef2f7;
             vertical-align: middle;
+            font-size: 12px;
         }
 
         .applicants-table tbody tr:hover {
@@ -1228,7 +1260,6 @@
         .table-id,
         .created-date {
             color: #1f1f1f;
-            font-weight: 400;
         }
 
         .mini-pill-row {
@@ -1247,7 +1278,7 @@
         .contact-line,
         .mobile-meta-line {
             color: #334155;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .location-cell {
@@ -1263,10 +1294,10 @@
             display: flex;
             justify-content: space-between;
             gap: 0.75rem;
-            margin-bottom: 0.45rem;
+            margin-bottom: 0.40rem;
             color: #334155;
-            font-size: 0.78rem;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 600;
             text-transform: uppercase;
         }
 
@@ -1290,6 +1321,7 @@
         }
 
         .btn-view,
+        .btn-duplicate,
         .btn-archive {
             width: 38px;
             height: 38px;
@@ -1308,6 +1340,16 @@
         .btn-view:hover {
             background: #dbeafe;
             color: #1e40af;
+        }
+
+        .btn-duplicate {
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+        }
+
+        .btn-duplicate:hover {
+            background: #d1fae5;
+            color: #047857;
         }
 
         .btn-archive {
@@ -1581,6 +1623,16 @@
             color: #eff6ff;
         }
 
+        html[data-theme="night"] .btn-duplicate {
+            background: rgba(52, 211, 153, 0.14);
+            color: #6ee7b7;
+        }
+
+        html[data-theme="night"] .btn-duplicate:hover {
+            background: rgba(52, 211, 153, 0.22);
+            color: #d1fae5;
+        }
+
         html[data-theme="night"] .btn-archive {
             background: rgba(248, 113, 113, 0.14);
             color: #fecaca;
@@ -1743,7 +1795,7 @@
                         button.textContent = option.textContent.trim();
                         button.setAttribute('role', 'option');
                         button.setAttribute('aria-selected', option.selected ? 'true' :
-                        'false');
+                            'false');
 
                         button.addEventListener('click', function() {
                             select.value = option.value;

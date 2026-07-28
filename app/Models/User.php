@@ -86,16 +86,29 @@ class User extends Authenticatable
 
     public static function roles(): array
     {
-        return [
+        $fallback = [
             self::ROLE_USER,
             self::ROLE_STAFF,
             self::ROLE_ADMIN,
         ];
+
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('roles')) {
+                $dbRoles = \App\Models\Role::pluck('slug')->toArray();
+                if (! empty($dbRoles)) {
+                    return $dbRoles;
+                }
+            }
+        } catch (\Exception $e) {
+            // fall through to hardcoded
+        }
+
+        return $fallback;
     }
 
     public static function permissionOptions(): array
     {
-        return [
+        $fallback = [
             'update_permit' => "Update Mayor's Permit to Work",
             'generate_permit' => "Generate Mayor's Permit to Work ID",
             'update_clearance' => "Update Mayor's Clearance",
@@ -106,7 +119,21 @@ class User extends Authenticatable
             'auto_approve_uploaded_files' => 'Auto-Approve Uploaded Files',
             'view_archive_applicants' => 'View Archived Applicants',
             'restore_archive_applicants' => 'Restore Archived Applicants',
+            'view_duplicates' => 'View Duplicate Applicants',
         ];
+
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('permissions')) {
+                $dbPermissions = \App\Models\Permission::pluck('label', 'key')->toArray();
+                if (! empty($dbPermissions)) {
+                    return $dbPermissions;
+                }
+            }
+        } catch (\Exception $e) {
+            // fall through to hardcoded
+        }
+
+        return $fallback;
     }
 
     public function isAdmin(): bool

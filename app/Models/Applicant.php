@@ -39,17 +39,32 @@ class Applicant extends Model
 
     public function permit()
     {
-        return $this->hasOne(MayorsPermit::class);
+        return $this->hasOne(MayorsPermit::class)->latest('id');
+    }
+
+    public function permits()
+    {
+        return $this->hasMany(MayorsPermit::class);
     }
 
     public function clearance()
     {
-        return $this->hasOne(MayorsClearance::class);
+        return $this->hasOne(MayorsClearance::class)->latest('id');
+    }
+
+    public function clearances()
+    {
+        return $this->hasMany(MayorsClearance::class);
     }
 
     public function referral()
     {
-        return $this->hasOne(MayorsReferral::class);
+        return $this->hasOne(MayorsReferral::class)->latest('id');
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(MayorsReferral::class);
     }
 
     public function activityLogs()

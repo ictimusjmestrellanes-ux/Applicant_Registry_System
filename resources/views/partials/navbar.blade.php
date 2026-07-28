@@ -29,10 +29,10 @@
             <button id="sidebarToggle" class="nav-toggle-btn d-lg-none" type="button" aria-label="Toggle sidebar">
                 <i class="bi bi-list"></i>
             </button>
-
+{{-- 
             <div class="nav-heading-wrap">
                 <div class="nav-page-title">@yield('title', 'Dashboard')</div>
-            </div>
+            </div> --}}
         </div>
 
         <div class="d-flex align-items-center gap-2 gap-md-3">

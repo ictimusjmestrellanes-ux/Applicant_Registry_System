@@ -44,30 +44,49 @@ class PermitController extends Controller
         | CREATE OR UPDATE PERMIT
         |--------------------------------------------------------------------------
         */
-        $permit = MayorsPermit::firstOrNew([
-            'applicant_id' => $applicant->id,
-        ]);
-        $wasRecentlyCreated = ! $permit->exists;
-        $before = $permit->exists ? $permit->only($permit->getFillable()) : [];
-        $renewalDueDate = $permit->exists ? $permit->renewalDueDate() : null;
-        $isRenewalDue = $permit->exists && $permit->isRenewalDue();
-
-        if ($isRenewalDue) {
-            $approvalStatus = MayorsPermit::APPROVAL_PENDING;
-        }
-
-        if ($isRenewalDue && $renewalDueDate) {
-            $permit->forceFill([
-                'health_card' => null,
-                'permit_nbi_clearance' => null,
-                'permit_police_clearance' => null,
-                'cedula' => null,
-                'referral_letter' => null,
-                'clearance_type' => null,
-                'approval_status' => MayorsPermit::APPROVAL_PENDING,
-                'disapproval_reason' => null,
-                'expiry_reminder_sent_at' => null,
+        if ($isApplicantUser) {
+            $permit = MayorsPermit::firstOrNew([
+                'applicant_id' => $applicant->id,
             ]);
+            $wasRecentlyCreated = ! $permit->exists;
+            $before = $permit->exists ? $permit->only($permit->getFillable()) : [];
+            $renewalDueDate = $permit->exists ? $permit->renewalDueDate() : null;
+            $isRenewalDue = $permit->exists && $permit->isRenewalDue();
+
+            if ($isRenewalDue) {
+                $approvalStatus = MayorsPermit::APPROVAL_PENDING;
+            }
+
+            if ($isRenewalDue && $renewalDueDate) {
+                $permit->forceFill([
+                    'health_card' => null,
+                    'permit_nbi_clearance' => null,
+                    'permit_police_clearance' => null,
+                    'cedula' => null,
+                    'referral_letter' => null,
+                    'clearance_type' => null,
+                    'approval_status' => MayorsPermit::APPROVAL_PENDING,
+                    'disapproval_reason' => null,
+                    'expiry_reminder_sent_at' => null,
+                ]);
+            }
+        } else {
+            $latestPermit = MayorsPermit::where('applicant_id', $applicant->id)->latest()->first();
+            $permit = new MayorsPermit(['applicant_id' => $applicant->id]);
+            $wasRecentlyCreated = true;
+            $before = [];
+            $renewalDueDate = null;
+            $isRenewalDue = false;
+
+            if ($latestPermit) {
+                $permit->health_card = $latestPermit->health_card;
+                $permit->permit_nbi_clearance = $latestPermit->permit_nbi_clearance;
+                $permit->permit_police_clearance = $latestPermit->permit_police_clearance;
+                $permit->cedula = $latestPermit->cedula;
+                $permit->referral_letter = $latestPermit->referral_letter;
+                $permit->clearance_type = $latestPermit->clearance_type;
+                $permit->approval_status = $latestPermit->approval_status;
+            }
         }
 
         /*
@@ -253,12 +272,7 @@ class PermitController extends Controller
         $permit->save();
         $permit->setRelation('applicant', $applicant);
 
-        /*
-        |--------------------------------------------------------------------------
-        | AUTO GENERATE PESO ID ONLY WHEN PERMIT IS READY
-        |--------------------------------------------------------------------------
-        */
-        if (empty($permit->peso_id_no) && $permit->isApproved() && $permit->isReadyForIdGeneration()) {
+        if ($permit->isApproved() && $permit->isReadyForIdGeneration()) {
             $permit->peso_id_no = MayorsPermit::generateNextPesoIdNo();
             $permit->save();
         }
@@ -312,13 +326,17 @@ class PermitController extends Controller
 
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#permit')
-            ->with('success', 'Permit updated successfully.');
+            ->with('success', 'Permit updated successfully.')
+            ->with('permit_saved_prompt', [
+                'can_view' => $permit->isComplete(),
+                'view_url' => route('permits.printId', ['id' => $applicant->id, 'permit' => $permit->id]),
+            ]);
     }
 
     public function approve(Request $request, $id)
     {
         $applicant = Applicant::findOrFail($id);
-        $permit = MayorsPermit::where('applicant_id', $applicant->id)->firstOrFail();
+        $permit = MayorsPermit::where('applicant_id', $applicant->id)->latest()->firstOrFail();
         $before = $permit->only($permit->getFillable());
 
         $permit->approval_status = MayorsPermit::APPROVAL_APPROVED;
@@ -327,7 +345,7 @@ class PermitController extends Controller
 
         $permit->loadMissing('applicant');
 
-        if (empty($permit->peso_id_no) && $permit->isApproved() && $permit->isReadyForIdGeneration()) {
+        if ($permit->isApproved() && $permit->isReadyForIdGeneration()) {
             $permit->peso_id_no = MayorsPermit::generateNextPesoIdNo();
             $permit->save();
         }
@@ -386,7 +404,7 @@ class PermitController extends Controller
         $validated = $validator->validated();
 
         $applicant = Applicant::findOrFail($id);
-        $permit = MayorsPermit::where('applicant_id', $applicant->id)->firstOrFail();
+        $permit = MayorsPermit::where('applicant_id', $applicant->id)->latest()->firstOrFail();
         $before = $permit->only($permit->getFillable());
 
         $permit->approval_status = MayorsPermit::APPROVAL_DISAPPROVED;
@@ -429,11 +447,139 @@ class PermitController extends Controller
             ->with('success', 'Permit disapproved successfully.');
     }
 
-    public function printId($id)
+    public function updateDetails(Request $request, $permitId)
     {
-        $applicant = Applicant::with('permit')->findOrFail($id);
+        $permit = MayorsPermit::findOrFail($permitId);
 
-        if (! $applicant->permit || ! $applicant->permit->isComplete()) {
+        $validated = $request->validate([
+            'permit_or_no' => 'required|string|max:255',
+            'community_tax_no' => 'required|string|max:255',
+            'permit_issued_on' => 'required|string|max:255',
+            'permit_issued_at' => 'required|string|max:255',
+            'permit_date' => 'required|string|max:255',
+            'expires_on' => 'required|string|max:255',
+            'permit_doc_stamp_control_no' => 'required|string|max:255',
+            'permit_date_of_payment' => 'required|string|max:255',
+        ]);
+
+        $permit->update($validated);
+
+        return redirect()
+            ->to(route('applicants.edit', $permit->applicant_id))
+            ->with('success', 'Permit details updated successfully.');
+    }
+
+    public function updateFiles(Request $request, $id)
+    {
+        $permit = MayorsPermit::findOrFail($id);
+        $applicant = Applicant::findOrFail($permit->applicant_id);
+
+        if ($request->hasFile('health_card')) {
+            $file = $request->file('health_card');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+            if ($permit->health_card) {
+                Storage::disk('azure')->delete($permit->health_card);
+            }
+
+            $permit->health_card = $file->storeAs('permits/health_cards', $fileName, 'azure');
+        }
+
+        if ($request->clearance_type === 'nbi') {
+            if ($permit->permit_police_clearance) {
+                Storage::disk('azure')->delete($permit->permit_police_clearance);
+                $permit->permit_police_clearance = null;
+            }
+
+            if ($request->hasFile('permit_nbi_clearance')) {
+                $file = $request->file('permit_nbi_clearance');
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+                if ($permit->permit_nbi_clearance) {
+                    Storage::disk('azure')->delete($permit->permit_nbi_clearance);
+                }
+
+                $permit->permit_nbi_clearance = $file->storeAs('permits/permit_nbi_clearance', $fileName, 'azure');
+            }
+        }
+
+        if ($request->clearance_type === 'police') {
+            if ($permit->permit_nbi_clearance) {
+                Storage::disk('azure')->delete($permit->permit_nbi_clearance);
+                $permit->permit_nbi_clearance = null;
+            }
+
+            if ($request->hasFile('permit_police_clearance')) {
+                $file = $request->file('permit_police_clearance');
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+                $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+                if ($permit->permit_police_clearance) {
+                    Storage::disk('azure')->delete($permit->permit_police_clearance);
+                }
+
+                $permit->permit_police_clearance = $file->storeAs('permits/permit_police_clearance', $fileName, 'azure');
+            }
+        }
+
+        if ($request->hasFile('cedula')) {
+            $file = $request->file('cedula');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+            if ($permit->cedula) {
+                Storage::disk('azure')->delete($permit->cedula);
+            }
+
+            $permit->cedula = $file->storeAs('permits/cedulas', $fileName, 'azure');
+        }
+
+        if ($request->hasFile('referral_letter')) {
+            $file = $request->file('referral_letter');
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+            if ($permit->referral_letter) {
+                Storage::disk('azure')->delete($permit->referral_letter);
+            }
+
+            $permit->referral_letter = $file->storeAs('permits/referral_letters', $fileName, 'azure');
+        }
+
+        if (! $request->hasFile('permit_nbi_clearance') && ! $request->hasFile('permit_police_clearance')) {
+            if ($request->filled('clearance_type')) {
+                $permit->clearance_type = $request->clearance_type;
+            }
+        } else {
+            $permit->clearance_type = $request->clearance_type;
+        }
+
+        $isStaffOrAdmin = auth()->user() && auth()->user()->role !== \App\Models\User::ROLE_USER;
+        $permit->approval_status = $isStaffOrAdmin ? MayorsPermit::APPROVAL_APPROVED : MayorsPermit::APPROVAL_PENDING;
+        $permit->disapproval_reason = null;
+        $permit->save();
+
+        return redirect()
+            ->to(route('applicants.edit', $permit->applicant_id).'#permit')
+            ->with('success', 'Permit uploads updated successfully.');
+    }
+
+    public function printId($id, $permit = null)
+    {
+        $applicant = Applicant::findOrFail($id);
+        $permit = MayorsPermit::where('applicant_id', $applicant->id)
+            ->when($permit, fn ($query) => $query->whereKey($permit))
+            ->latest()
+            ->first();
+
+        if (! $permit || ! $permit->isComplete()) {
             return redirect()->back()->with('error', 'Permit is not complete.');
         }
 
@@ -446,6 +592,6 @@ class PermitController extends Controller
             request()->user()
         );
 
-        return view('permit.id', compact('applicant'));
+        return view('permit.id', compact('applicant', 'permit'));
     }
 }

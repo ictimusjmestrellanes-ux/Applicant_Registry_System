@@ -8,7 +8,8 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logo_peso.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <style>
@@ -217,10 +218,21 @@
             height: 8px;
         }
 
-        .microsoft-icon .one { background: #f25022; }
-        .microsoft-icon .two { background: #7fba00; }
-        .microsoft-icon .three { background: #00a4ef; }
-        .microsoft-icon .four { background: #ffb900; }
+        .microsoft-icon .one {
+            background: #f25022;
+        }
+
+        .microsoft-icon .two {
+            background: #7fba00;
+        }
+
+        .microsoft-icon .three {
+            background: #00a4ef;
+        }
+
+        .microsoft-icon .four {
+            background: #ffb900;
+        }
 
         .auth-divider {
             display: flex;
@@ -361,12 +373,11 @@
                         </span>
                         Sign in with Microsoft
                     </a>
-
                     <div class="auth-divider">Authorized access</div>
 
                     <div class="support-text">
                         Need assistance? Contact the
-                        <a href="mailto:it.support@citrmu.gov.ph">IT Support Team</a>
+                        <a href="mailto:citrmu@cityofimus.gov.ph">IT Support Team</a>
                         for help accessing your account.
                     </div>
                 </div>

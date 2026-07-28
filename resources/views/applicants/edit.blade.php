@@ -131,6 +131,109 @@
         </script>
     @endif
 
+    @if (session('permit_saved_prompt'))
+        @php
+            $permitSavedPrompt = session('permit_saved_prompt');
+        @endphp
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const permitPrompt = @json($permitSavedPrompt);
+                const canViewPermit = Boolean(permitPrompt.can_view);
+
+                clearAllUploadLabels();
+
+                Swal.fire({
+                    title: 'Permit Saved',
+                    text: canViewPermit ?
+                        'Do you want to view the Permit to Work ID?' :
+                        'Permit details were saved, but the Permit to Work ID is not ready to view yet.',
+                    icon: 'success',
+                    showCancelButton: canViewPermit,
+                    confirmButtonText: canViewPermit ? 'View Permit to Work ID' : 'OK',
+                    cancelButtonText: 'Stay on Page',
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (canViewPermit && result.isConfirmed && permitPrompt.view_url) {
+                        window.open(permitPrompt.view_url, '_blank');
+                    }
+                });
+            });
+        </script>
+    @endif
+
+    @if (session('clearance_saved_prompt'))
+        @php
+            $clearanceSavedPrompt = session('clearance_saved_prompt');
+        @endphp
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const clearancePrompt = @json($clearanceSavedPrompt);
+                const canViewClearance = Boolean(clearancePrompt.can_view);
+
+                clearAllUploadLabels();
+
+                Swal.fire({
+                    title: 'Clearance Saved',
+                    text: canViewClearance ?
+                        'Do you want to view the Mayor\'s Clearance Letter?' :
+                        'Clearance details were saved, but the letter is not ready to view yet.',
+                    icon: 'success',
+                    showCancelButton: canViewClearance,
+                    confirmButtonText: canViewClearance ? 'View Clearance Letter' : 'OK',
+                    cancelButtonText: 'Stay on Page',
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (canViewClearance && result.isConfirmed && clearancePrompt.view_url) {
+                        window.open(clearancePrompt.view_url, '_blank');
+                    }
+                });
+            });
+        </script>
+    @endif
+
+    @if (session('referral_saved_prompt'))
+        @php
+            $referralSavedPrompt = session('referral_saved_prompt');
+        @endphp
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const referralPrompt = @json($referralSavedPrompt);
+
+                clearAllUploadLabels();
+
+                const options = referralPrompt.options || [];
+                let html = '<div style="font-size:14px;text-align:left;">';
+                html += '<p class="mb-2">Referral details were saved successfully.</p>';
+                if (options.length > 0) {
+                    html += '<p class="mb-1 fw-bold">Available referral letters:</p>';
+                    options.forEach(function(opt) {
+                        html += '<p class="mb-1"><a href="' + opt.url +
+                            '" target="_blank"><i class="bi bi-file-earmark-text me-1"></i>' + opt.label +
+                            '</a></p>';
+                    });
+                } else {
+                    html += '<p class="text-muted">No referral letters are ready to view yet.</p>';
+                }
+                html += '</div>';
+
+                Swal.fire({
+                    title: 'Referral Saved',
+                    html: html,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#198754',
+                });
+            });
+        </script>
+    @endif
+
     @php
         $fullName = trim(
             $applicant->first_name .
@@ -149,7 +252,9 @@
         $permitModel = $applicant->permit;
         $permit = optional($permitModel);
         $isPermitRenewalDue = $permitModel ? $permitModel->isRenewalDue() : false;
-        $isImusResident = $applicant->city && (stripos($applicant->city, 'IMUS CITY') !== false || stripos($applicant->city, 'CITY OF IMUS') !== false);
+        $isImusResident =
+            $applicant->city &&
+            (stripos($applicant->city, 'IMUS CITY') !== false || stripos($applicant->city, 'CITY OF IMUS') !== false);
         $hasPermitClearance =
             ($permit->clearance_type === 'nbi' && !empty($permit->permit_nbi_clearance)) ||
             ($permit->clearance_type === 'police' && !empty($permit->permit_police_clearance));
@@ -423,6 +528,336 @@
             color: var(--edit-slate);
         }
 
+        .transaction-panel {
+            margin-top: 1.5rem;
+            border: 1px solid #dfe8f3;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 4px 24px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+        }
+
+        .transaction-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.85rem 1.15rem;
+            background: linear-gradient(135deg, #f0f7ff 0%, #f8fbff 100%);
+            border-bottom: 1px solid #e2ecf7;
+        }
+
+        .transaction-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .transaction-panel-icon {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #ffffff;
+            flex: 0 0 auto;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3);
+        }
+
+        .transaction-panel-title h5 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .transaction-panel-title p {
+            margin: 0.1rem 0 0;
+            color: #64748b;
+            font-size: 0.78rem;
+        }
+
+        .transaction-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.7rem;
+            border: 1px solid #c7d9f2;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #eff6ff 0%, #e0edff 100%);
+            color: #2563eb;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+
+        .transaction-section-row {
+            margin: 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .transaction-section-row:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-row-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5edf5;
+        }
+
+        .transaction-row-head h6 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .transaction-row-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .transaction-row-icon.clearance {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .transaction-row-icon.referral {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .transaction-row-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 7px;
+            border-radius: 999px;
+            background: #e0e7ff;
+            color: #3730a3;
+            font-size: 0.72rem;
+            font-weight: 800;
+            margin-left: auto;
+        }
+
+        .transaction-section-row .transaction-table-wrap {
+            background: #ffffff;
+        }
+
+        .transaction-section-row .transaction-empty-state {
+            padding: 1.2rem 20px;
+        }
+
+        .transaction-row-head[data-bs-toggle="collapse"] {
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .transaction-row-head[data-bs-toggle="collapse"]:hover {
+            background: #eef2f7;
+        }
+
+        .transaction-chevron {
+            font-size: 0.8rem;
+            color: #64748b;
+            transition: transform 0.25s ease;
+            margin-left: auto;
+        }
+
+        .transaction-row-head[aria-expanded="true"] .transaction-chevron {
+            transform: rotate(180deg);
+        }
+
+        html[data-theme="night"] .transaction-row-head[data-bs-toggle="collapse"]:hover {
+            background: #1e293b;
+        }
+
+        .hide-actions .transaction-table th:last-child,
+        .hide-actions .transaction-table td:last-child {
+            display: none !important;
+        }
+
+        border-top: none;
+        border-radius: 0 0 16px 16px;
+        }
+
+        .transaction-table-wrap {
+            overflow-x: auto;
+        }
+
+        .transaction-table {
+            min-width: 1120px;
+            margin: 0;
+            font-size: 0.82rem;
+        }
+
+        .transaction-table thead th {
+            padding: 0.65rem 0.9rem;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .transaction-table tbody td {
+            padding: 0.7rem 0.9rem;
+            border-top: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .transaction-table tbody tr {
+            transition: background 0.12s;
+        }
+
+        .transaction-table tbody tr:hover td {
+            background: #f0fdf8;
+        }
+
+        .transaction-row-index {
+            width: 40px;
+            color: #94a3b8 !important;
+            font-weight: 700;
+            font-size: 0.78rem;
+        }
+
+        .transaction-id-link,
+        .transaction-id-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.28rem 0.6rem;
+            border-radius: 8px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .transaction-id-link:hover {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            color: #047857;
+            box-shadow: 0 1px 4px rgba(6, 95, 70, 0.12);
+        }
+
+        .transaction-empty-value {
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .transaction-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            min-width: 36px;
+            min-height: 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            transition: all 0.15s;
+        }
+
+        .btn-light-green {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-light-green:hover {
+            background: #a7f3d0;
+            color: #047857;
+        }
+
+        .btn-light-blue {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-light-blue:hover {
+            background: #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .btn-light-amber {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .btn-light-amber:hover {
+            background: #fde68a;
+            color: #b45309;
+        }
+
+        .dropdown-menu {
+            border-radius: 12px;
+            border: 1px solid #e2ebf4;
+            padding: 0.35rem;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.45rem 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            transition: background 0.12s;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+        }
+
+        .dropdown-item-text {
+            padding: 0.45rem 0.75rem;
+            font-size: 0.82rem;
+        }
+
+        .transaction-empty-state {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 1.2rem 1.15rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .transaction-empty-state i {
+            color: #cbd5e1;
+            font-size: 1.15rem;
+        }
+
         .workspace-badge {
             display: inline-flex;
             align-items: center;
@@ -463,6 +898,7 @@
             justify-content: center;
             flex-wrap: wrap;
             text-align: center;
+            font-size: 16px;
         }
 
         .record-meta-row {
@@ -703,8 +1139,29 @@
             font-weight: 700;
             letter-spacing: 0.01em;
         }
+        
+        .section-title-d {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            color: black;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
 
         .section-title-c::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08);
+        }
+
+        .section-title-d::before {
             content: "";
             width: 7px;
             height: 7px;
@@ -1086,6 +1543,11 @@
                 align-items: flex-start;
             }
 
+            .transaction-panel-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
             .page-header-actions {
                 margin-top: 1rem;
             }
@@ -1312,33 +1774,11 @@
                 padding-right: 1rem !important;
             }
 
-            #printReferralPesoButton,
-            #printReferralOtherCityButton {
-                font-size: 0.74rem;
-                line-height: 1.15;
-
-            }
-
-            .js-peso-extra-print-button {
-                font-size: 0.78rem;
-                line-height: 1.15;
-                padding-left: 0.85rem !important;
-                padding-right: 0.85rem !important;
-            }
-
-            #printReferralPesoButton:not(:disabled):hover,
-            #printReferralOtherCityButton:not(:disabled):hover,
-            .js-peso-extra-print-button:not(:disabled):hover {
-                background: #d1d5db !important;
-                border-color: #9ca3af !important;
-                color: #10243d !important;
-                transform: translateY(-1px);
-                box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
-            }
         }
 
         html[data-theme="night"] .requirements-container,
         html[data-theme="night"] .content-intro,
+        html[data-theme="night"] .transaction-panel,
         html[data-theme="night"] .tab-shell,
         html[data-theme="night"] .tab-content,
         html[data-theme="night"] .form-card,
@@ -1349,6 +1789,102 @@
         html[data-theme="night"] .activity-log-card {
             background: #0f172a;
             border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html[data-theme="night"] .transaction-panel-head {
+            background: #0c1425;
+            border-bottom-color: rgba(148, 163, 184, 0.14);
+        }
+
+        html[data-theme="night"] .transaction-panel-title h5 {
+            color: #f1f5f9;
+        }
+
+        html[data-theme="night"] .transaction-panel-title p {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .transaction-panel-icon {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+        }
+
+        html[data-theme="night"] .transaction-count-badge {
+            background: rgba(59, 130, 246, 0.14);
+            border-color: rgba(96, 165, 250, 0.22);
+            color: #93c5fd;
+        }
+
+        html[data-theme="night"] .transaction-row-head {
+            background: #0f172a;
+            border-bottom-color: rgba(148, 163, 184, 0.14);
+        }
+
+        html[data-theme="night"] .transaction-row-head h6 {
+            color: #e2e8f0;
+        }
+
+        html[data-theme="night"] .transaction-row-count {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        html[data-theme="night"] .transaction-section-row {
+            border-bottom-color: rgba(148, 163, 184, 0.1);
+        }
+
+        html[data-theme="night"] .transaction-section-row .transaction-empty-state {
+            color: #64748b;
+        }
+
+        html[data-theme="night"] .transaction-table-wrap {
+            overflow-x: auto;
+        }
+
+        html[data-theme="night"] .transaction-table thead th {
+            background: #0c1425;
+            border-bottom-color: rgba(148, 163, 184, 0.14);
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .transaction-table tbody td {
+            background: #0f172a;
+            border-top-color: rgba(148, 163, 184, 0.1);
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .transaction-table tbody tr:hover td {
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        html[data-theme="night"] .transaction-row-index {
+            color: #475569 !important;
+        }
+
+        html[data-theme="night"] .transaction-id-link,
+        html[data-theme="night"] .transaction-id-text {
+            background: rgba(16, 185, 129, 0.14);
+            border-color: rgba(52, 211, 153, 0.22);
+            color: #6ee7b7;
+        }
+
+        html[data-theme="night"] .transaction-id-link:hover {
+            background: rgba(16, 185, 129, 0.22);
+            border-color: rgba(52, 211, 153, 0.35);
+            color: #a7f3d0;
+        }
+
+        html[data-theme="night"] .transaction-empty-value {
+            color: #475569;
+        }
+
+        html[data-theme="night"] .transaction-empty-state {
+            color: #64748b;
+        }
+
+        html[data-theme="night"] .transaction-empty-state i {
+            color: #475569;
         }
 
         html[data-theme="night"] .referral-pane .peso-extra-detail-card.bg-light {
@@ -1380,6 +1916,7 @@
         html[data-theme="night"] .fw-bold,
         html[data-theme="night"] .section-title,
         html[data-theme="night"] .section-title-c,
+        html[data-theme="night"] .section-title-d,
         html[data-theme="night"] .nav-tab-label,
         html[data-theme="night"] h5,
         html[data-theme="night"] h6 {
@@ -1510,6 +2047,344 @@
             border-color: rgba(148, 163, 184, 0.12) !important;
             color: #64748b !important;
         }
+
+        /* Flatpickr Theme */
+        .flatpickr-calendar {
+            border: 1px solid #e5edf5;
+            border-radius: 16px;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        .flatpickr-months {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .flatpickr-months .flatpickr-month {
+            background: transparent;
+            color: #fff;
+            height: 44px;
+            fill: #fff;
+        }
+
+        .flatpickr-current-month {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.92rem;
+            padding-top: 6px;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-weight: 700;
+            border: none;
+            appearance: auto;
+            -webkit-appearance: auto;
+            padding: 2px 22px 2px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months option {
+            background: #1d4ed8;
+            color: #000000;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .flatpickr-current-month input.cur-year {
+            color: #fff;
+            font-weight: 800;
+            background: transparent;
+            border: none;
+            appearance: auto;
+            -webkit-appearance: auto;
+        }
+
+        .flatpickr-current-month input.cur-year option {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+        .flatpickr-current-month .flatpickr-next-month,
+        .flatpickr-current-month .flatpickr-prev-month {
+            color: #fff;
+            fill: #fff;
+            height: 44px;
+            top: 0;
+        }
+
+        .flatpickr-current-month .flatpickr-next-month:hover,
+        .flatpickr-current-month .flatpickr-prev-month:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .flatpickr-current-month .flatpickr-next-month svg,
+        .flatpickr-current-month .flatpickr-prev-month svg {
+            fill: #fff;
+        }
+
+        span.flatpickr-weekday {
+            color: #1d4ed8;
+            font-weight: 800;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: #f0f4ff;
+            padding: 8px 0;
+        }
+
+        .flatpickr-day {
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            height: 38px;
+            line-height: 38px;
+            margin: 1px;
+            border: none;
+            color: #334155;
+            transition: all 0.15s ease;
+        }
+
+        .flatpickr-day:hover {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.1);
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.selected:hover {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+        }
+
+        .flatpickr-day.today {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: transparent;
+        }
+
+        .flatpickr-day.today:hover {
+            background: #fde68a;
+        }
+
+        .flatpickr-day.today.selected {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #fff;
+        }
+
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled:hover {
+            color: #cbd5e1;
+            background: transparent;
+        }
+
+        span.flatpickr-weekNumber {
+            color: #94a3b8;
+            font-weight: 600;
+            border-right: 1px solid #e5edf5;
+        }
+
+        .flatpickr-day.inRange {
+            background: #dbeafe;
+            box-shadow: none;
+            color: #1d4ed8;
+            border-color: transparent;
+        }
+
+        html[data-theme="night"] .flatpickr-calendar {
+            background: #1e293b;
+            border-color: rgba(148, 163, 184, 0.18);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+        }
+
+        html[data-theme="night"] .flatpickr-months {
+            background: linear-gradient(135deg, #1e40af, #1d4ed8);
+        }
+
+        html[data-theme="night"] .flatpickr-current-month .flatpickr-monthDropdown-months {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        html[data-theme="night"] .flatpickr-current-month .flatpickr-monthDropdown-months option {
+            background: #1e40af;
+            color: #fff;
+        }
+
+        html[data-theme="night"] .flatpickr-current-month input.cur-year {
+            color: #fff;
+        }
+
+        html[data-theme="night"] .flatpickr-current-month input.cur-year option {
+            background: #1e40af;
+            color: #fff;
+        }
+
+        html[data-theme="night"] span.flatpickr-weekday {
+            background: rgba(30, 64, 175, 0.12);
+            color: #60a5fa;
+        }
+
+        html[data-theme="night"] .flatpickr-day {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .flatpickr-day:hover {
+            background: rgba(59, 130, 246, 0.18);
+            color: #93bbfd;
+        }
+
+        html[data-theme="night"] .flatpickr-day.selected,
+        html[data-theme="night"] .flatpickr-day.selected:hover {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #fff;
+        }
+
+        html[data-theme="night"] .flatpickr-day.today {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+        }
+
+        html[data-theme="night"] .flatpickr-day.today:hover {
+            background: rgba(245, 158, 11, 0.28);
+        }
+
+        html[data-theme="night"] span.flatpickr-weekNumber {
+            color: #64748b;
+            border-right-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .flatpickr-day.inRange {
+            background: rgba(59, 130, 246, 0.18);
+            color: #93bbfd;
+            box-shadow: none;
+        }
+
+        /* Transaction Table Responsive */
+        @media (max-width: 991.98px) {
+            .transaction-table {
+                min-width: unset;
+            }
+
+            .transaction-table thead {
+                display: none;
+            }
+
+            .transaction-table,
+            .transaction-table tbody,
+            .transaction-table tr,
+            .transaction-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .transaction-table tbody tr {
+                background: #fff;
+                border: 1px solid #e5edf5;
+                border-radius: 16px;
+                padding: 14px 16px;
+                margin-bottom: 12px;
+                box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+                transition: box-shadow 0.2s;
+            }
+
+            .transaction-table tbody tr:hover {
+                box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+            }
+
+            .transaction-table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 6px 0;
+                border: none;
+                border-bottom: 1px solid #f1f5f9;
+                white-space: normal;
+                text-align: right;
+                gap: 12px;
+            }
+
+            .transaction-table tbody td:last-child {
+                border-bottom: none;
+                padding-top: 10px;
+                justify-content: center;
+            }
+
+            .transaction-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                font-size: 0.72rem;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                flex-shrink: 0;
+                text-align: left;
+                min-width: 110px;
+            }
+
+            .transaction-table tbody td.text-center::before {
+                display: none;
+            }
+
+            .transaction-row-index {
+                display: none !important;
+            }
+
+            .transaction-table tbody td[data-label="#"] {
+                display: none !important;
+            }
+
+            .transaction-id-link,
+            .transaction-id-text {
+                font-size: 0.78rem;
+            }
+
+            .transaction-action {
+                min-width: auto;
+            }
+        }
+
+        html[data-theme="night"] .transaction-table tbody tr {
+            background: #1e293b;
+            border-color: rgba(148, 163, 184, 0.14);
+        }
+
+        html[data-theme="night"] .transaction-table tbody td {
+            border-bottom-color: rgba(148, 163, 184, 0.1);
+        }
+
+        html[data-theme="night"] .transaction-table tbody td::before {
+            color: #64748b;
+        }
+
+        @media (max-width: 991.98px) {
+            .transaction-panel-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .transaction-row-head {
+                padding: 10px 14px;
+            }
+
+            .transaction-row-head h6 {
+                font-size: 0.8rem;
+            }
+
+            .transaction-section-row .transaction-empty-state {
+                padding: 1rem 14px;
+            }
+        }
     </style>
 
     <div class="container applicant-wrapper py-0 px-md-4 px-xl-0">
@@ -1581,7 +2456,7 @@
                                 <h6 class="section-title">Personal Information</h6>
                                 <div class="row g-4">
                                     <div class="col-md-2">
-                                        <label class="form-label">First Time Jobseeker <span
+                                        <label class="form-label">First Time Jobseeker? <span
                                                 class="required-mark">*</span></label>
                                         <select name="first_time_job_seeker" class="form-select" required>
                                             <option value="NO"
@@ -1628,8 +2503,10 @@
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Birthdate</label>
-                                        <input type="date" name="birthdate" id="birthdate" class="form-control"
-                                            value="{{ old('birthdate', optional($applicant->birthdate)->format('Y-m-d')) }}">
+                                        <input type="text" name="birthdate" id="birthdate"
+                                            class="form-control flatpickr-input"
+                                            value="{{ old('birthdate', optional($applicant->birthdate)->format('Y-m-d')) }}"
+                                            placeholder="Select birthdate" readonly>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Age (Auto)</label>
@@ -1809,7 +2686,9 @@
 
                         @php
                             $permit = optional($applicant->permit);
-                            $isImusResident = stripos($applicant->city, 'IMUS CITY') !== false || stripos($applicant->city, 'CITY OF IMUS') !== false;
+                            $isImusResident =
+                                stripos($applicant->city, 'IMUS CITY') !== false ||
+                                stripos($applicant->city, 'CITY OF IMUS') !== false;
                             $selectedClearanceType = old(
                                 'clearance_type',
                                 $permit->clearance_type ??
@@ -1824,7 +2703,7 @@
                         <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-4">
                             <h6 class="section-title text-primary mb-1">Mayor’s Permit to Work Requirements</h6>
                             @if ($applicant->permit)
-                                <div class="d-flex flex-column align-items-end gap-1">
+                                <div class="d-flex flex-column align-items-end gap-1" style="text-transform: uppercase;">
                                     <span class="badge rounded-pill {{ $permit->approvalStatusClass() }}">
                                         {{ $permit->approvalStatusLabel() }}
                                     </span>
@@ -1878,15 +2757,9 @@
                                         </label>
 
                                         <small id="nbi_name" class="file-name-text">
-                                            {{ $isPermitRenewalDue ? 'Renewal due - upload a new file' : (!empty($permit->permit_nbi_clearance) ? basename($permit->permit_nbi_clearance) : 'No file selected') }}
+                                            {{ old('nbi_name', 'No file selected') }}
                                         </small>
 
-                                        @if (!empty($permit->permit_nbi_clearance) && !$isPermitRenewalDue)
-                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_nbi_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
 
 
@@ -1904,16 +2777,9 @@
 
                                         <!-- FILE NAME -->
                                         <small id="police_name" class="file-name-text">
-                                            {{ $isPermitRenewalDue ? 'Renewal due - upload a new file' : (!empty($permit->permit_police_clearance) ? basename($permit->permit_police_clearance) : 'No file selected') }}
+                                            {{ old('police_name', 'No file selected') }}
                                         </small>
 
-                                        <!-- VIEW FILE -->
-                                        @if (!empty($permit->permit_police_clearance) && !$isPermitRenewalDue)
-                                            <a href="{{ route('storage.view', ['filename' => $permit->permit_police_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
 
                                     </div>
                                 </div>
@@ -1932,14 +2798,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="health_card_name" class="file-name-text">
-                                            {{ !empty($permit->health_card) ? basename($permit->health_card) : 'No file selected' }}
+                                            {{ old('health_card_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($permit->health_card))
-                                            <a href="{{ route('storage.view', ['filename' => $permit->health_card]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -1957,14 +2817,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="cedula_name" class="file-name-text">
-                                            {{ !empty($permit->cedula) ? basename($permit->cedula) : 'No file selected' }}
+                                            {{ old('cedula_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($permit->cedula))
-                                            <a href="{{ route('storage.view', ['filename' => $permit->cedula]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -1992,16 +2846,8 @@
                                         </button>
 
                                         <small id="referral_name" class="file-name-text">
-                                            {{ !empty($permit->referral_letter) ? basename($permit->referral_letter) : 'No file selected' }}
+                                            {{ old('referral_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($permit->referral_letter))
-                                            <a id="referral_view_link"
-                                                href="{{ route('storage.view', ['filename' => $permit->referral_letter]) }}"
-                                                target="_blank"
-                                                class="btn btn-light btn-sm text-primary border {{ $isImusResident ? 'd-none' : '' }}">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
 
                                         <div id="referral_imus_badge"
                                             class="badge bg-success-soft text-success p-2 mt-1 {{ $isImusResident ? '' : 'd-none' }}"
@@ -2029,33 +2875,29 @@
                                     <label class="form-label">Peso ID No. (Auto Generate)<span
                                             class="required-mark">*</span></label>
                                     <input type="text" name="peso_id_no" class="form-control" style="text-align: center"
-                                        value="{{ $permit->peso_id_no ?? '' }}" placeholder="Auto generate when complete"
-                                        disabled>
+                                        value="{{ old('peso_id_no') }}" placeholder="Auto generate when complete" disabled>
                                 </div>
 
                                 {{-- OR NUMBER --}}
                                 <div class="col-md-2">
                                     <label class="form-label">O.R No. <span class="required-mark">*</span></label>
-                                    <input type="text" name="permit_or_no"
-                                        value="{{ old('permit_or_no', $isFirstTimeJobSeeker ? 'RA11261' : $permit->permit_or_no) }}"
-                                        class="form-control" {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
-                                    @if ($isFirstTimeJobSeeker)
-                                        <small class="text-muted">Auto-filled for first time job seekers.</small>
-                                    @endif
+                                    <input type="text" name="permit_or_no" value="{{ old('permit_or_no') }}"
+                                        class="form-control" placeholder="e.g. RA11261"
+                                        {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
                                 </div>
 
                                 {{-- Community Tax No --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Community Tax No.<span class="required-mark">*</span></label>
                                     <input type="text" name="community_tax_no" class="form-control"
-                                        value="{{ $permit->community_tax_no }}" required>
+                                        value="{{ old('community_tax_no') }}" placeholder="Enter community tax no." required>
                                 </div>
 
                                 {{-- Issued On --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Permit Issued On<span class="required-mark">*</span></label>
                                     <input type="date" name="permit_issued_on" class="form-control"
-                                        value="{{ $permit->permit_issued_on }}" required>
+                                        value="{{ old('permit_issued_on') }}" required>
                                 </div>
 
                                 {{-- Permit Issued At --}}
@@ -2064,9 +2906,7 @@
                                     <select type="text" name="permit_issued_at" id="permitIssuedAtSelect"
                                         class="form-select" required>
                                         @php
-                                            $permitIssuedAtValue = strtoupper(
-                                                trim((string) old('permit_issued_at', $permit->permit_issued_at ?? '')),
-                                            );
+                                            $permitIssuedAtValue = strtoupper(trim((string) old('permit_issued_at')));
                                             $permitIssuedAtOptions = collect(
                                                 config('permit_issued_at.city_governments', []),
                                             )
@@ -2090,14 +2930,14 @@
                                 <div class="col-md-2">
                                     <label class="form-label">Permit Date<span class="required-mark">*</span></label>
                                     <input type="date" id="permit_date" name="permit_date" class="form-control"
-                                        value="{{ $permit->permit_date }}" required>
+                                        value="{{ old('permit_date') }}" required>
                                 </div>
 
                                 {{-- Expiration --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Expires On<span class="required-mark">*</span></label>
                                     <input type="date" id="expires_on" name="expires_on" class="form-control"
-                                        value="{{ $permit->expires_on }}" readonly>
+                                        value="{{ old('expires_on') }}" readonly>
                                 </div>
 
                                 {{-- Documentary Stamp --}}
@@ -2105,17 +2945,14 @@
                                     <label class="form-label">Documentary Stamp Control No.<span
                                             class="required-mark">*</span></label>
                                     <input type="text" name="permit_doc_stamp_control_no" class="form-control"
-                                        value="{{ old('permit_doc_stamp_control_no', $isFirstTimeJobSeeker ? '-' : $permit->permit_doc_stamp_control_no) }}"
+                                        value="{{ old('permit_doc_stamp_control_no') }}" placeholder="e.g. DOC-001"
                                         {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
-                                    @if ($isFirstTimeJobSeeker)
-                                        <small class="text-muted">Auto-filled for first time job seekers.</small>
-                                    @endif
                                 </div>
                                 {{-- Date of Payment --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                     <input type="date" name="permit_date_of_payment" class="form-control"
-                                        value="{{ $permit->permit_date_of_payment }}" required>
+                                        value="{{ old('permit_date_of_payment') }}" required>
                                 </div>
                             </div>
                         @endunless
@@ -2156,31 +2993,6 @@
                                 @endif
                             @endunless
 
-                            @unless ($isApplicantUser)
-                                {{-- Action: Print/Generate --}}
-                                @if (auth()->user()->hasPermission('generate_permit') && $permit && $permit->isComplete())
-                                    <a href="{{ route('permits.printId', $applicant->id) }}" target="_blank"
-                                        class="btn btn-success px-4 shadow-sm">
-                                        <i class="fa-solid fa-id-card me-2"></i>View Permit to Work ID
-                                    </a>
-                                @else
-                                    @php
-                                        // Logic para sa error message
-                                        $reason = !auth()->user()->hasPermission('generate_permit')
-                                            ? 'No permission to generate ID'
-                                            : ($permit && !$permit->isApproved()
-                                                ? 'Awaiting admin or staff approval'
-                                                : 'Complete all requirements first');
-                                    @endphp
-
-                                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                        title="{{ $reason }}">
-                                        <button class="btn btn-outline-secondary px-4" disabled>
-                                            <i class="fa-solid fa-id-card me-2 text-muted"></i>View Permit to Work ID
-                                        </button>
-                                    </span>
-                                @endif
-                            @endunless
                         </div>
                     </form>
                     <form id="permit-approve-form-{{ $applicant->id }}"
@@ -2205,7 +3017,7 @@
                         <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-4">
                             <h6 class="section-title text-primary mb-1">Mayor's Clearance Requirements</h6>
                             @if ($applicant->clearance)
-                                <div class="d-flex flex-column align-items-end gap-1">
+                                <div class="d-flex flex-column align-items-end gap-1" style="text-transform: uppercase;">
                                     <span class="badge rounded-pill {{ $clearance->approvalStatusClass() }}">
                                         {{ $clearance->approvalStatusLabel() }}
                                     </span>
@@ -2237,14 +3049,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="prosecutor_name" class="file-name-text">
-                                            {{ !empty($clearance->prosecutor_clearance) ? basename($clearance->prosecutor_clearance) : 'No file selected' }}
+                                            {{ old('prosecutor_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($clearance->prosecutor_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->prosecutor_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2262,14 +3068,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="mtc_name" class="file-name-text">
-                                            {{ !empty($clearance->mtc_clearance) ? basename($clearance->mtc_clearance) : 'No file selected' }}
+                                            {{ old('mtc_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($clearance->mtc_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->mtc_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2287,14 +3087,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="rtc_name" class="file-name-text">
-                                            {{ !empty($clearance->rtc_clearance) ? basename($clearance->rtc_clearance) : 'No file selected' }}
+                                            {{ old('rtc_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($clearance->rtc_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->rtc_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2311,14 +3105,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="c_nbi_name" class="file-name-text">
-                                            {{ !empty($clearance->nbi_clearance) ? basename($clearance->nbi_clearance) : 'No file selected' }}
+                                            {{ old('c_nbi_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($clearance->nbi_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->nbi_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2336,14 +3124,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="brgy_name" class="file-name-text">
-                                            {{ !empty($clearance->barangay_clearance) ? basename($clearance->barangay_clearance) : 'No file selected' }}
+                                            {{ old('brgy_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($clearance->barangay_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $clearance->barangay_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2358,7 +3140,7 @@
                                     <label class="form-label">Peso Control No. (Auto Generate)<span
                                             class="required-mark">*</span></label>
                                     <input type="text" name="clearance_peso_control_no" class="form-control"
-                                        style="text-align: center" value="{{ $clearance->clearance_peso_control_no }}"
+                                        style="text-align: center" value="{{ old('clearance_peso_control_no') }}"
                                         placeholder="Auto generate when complete" readonly>
                                 </div>
 
@@ -2366,21 +3148,21 @@
                                 <div class="col-md-2">
                                     <label class="form-label">O.R. No.<span class="required-mark">*</span></label>
                                     <input type="text" name="clearance_or_no" class="form-control"
-                                        value="{{ $clearance->clearance_or_no }}" required>
+                                        value="{{ old('clearance_or_no') }}" required>
                                 </div>
 
                                 {{-- Hired Company --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Hired Company<span class="required-mark">*</span></label>
                                     <input type="text" name="clearance_hired_company" class="form-control"
-                                        value="{{ $clearance->clearance_hired_company }}" required>
+                                        value="{{ old('clearance_hired_company') }}" required>
                                 </div>
 
                                 {{-- Issued On --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Issued On<span class="required-mark">*</span></label>
                                     <input type="date" name="clearance_issued_on" class="form-control"
-                                        value="{{ $clearance->clearance_issued_on }}" required>
+                                        value="{{ old('clearance_issued_on') }}" required>
                                 </div>
 
                                 {{-- Documentary Stamp Control No --}}
@@ -2388,13 +3170,13 @@
                                     <label class="form-label">Documentary Stamp Control No.<span
                                             class="required-mark">*</span></label>
                                     <input type="text" name="clearance_doc_stamp_control_no" class="form-control"
-                                        value="{{ $clearance->clearance_doc_stamp_control_no }}" required>
+                                        value="{{ old('clearance_doc_stamp_control_no') }}" required>
                                 </div>
                                 {{-- Date of Payment --}}
                                 <div class="col-md-2">
                                     <label class="form-label">Date of Payment<span class="required-mark">*</span></label>
                                     <input type="date" name="clearance_date_of_payment" class="form-control"
-                                        value="{{ $clearance->clearance_date_of_payment }}" required>
+                                        value="{{ old('clearance_date_of_payment') }}" required>
                                 </div>
                             </div>
                         @endunless
@@ -2435,29 +3217,6 @@
                                 @endif
                             @endunless
 
-                            @unless ($isApplicantUser)
-                                {{-- Print Section --}}
-                                @if (auth()->user()->hasPermission('generate_clearance') && $clearance && $clearance->isComplete())
-                                    <a href="{{ route('clearances.printLetter', $applicant->id) }}" target="_blank"
-                                        class="btn btn-success px-4 shadow-sm">
-                                        <i class="fa-solid fa-print me-2"></i>View Clearance Letter
-                                    </a>
-                                @else
-                                    @php
-                                        $reason = !auth()->user()->hasPermission('generate_clearance')
-                                            ? 'No permission to generate letter'
-                                            : ($clearance && !$clearance->isApproved()
-                                                ? 'Awaiting admin or staff approval'
-                                                : 'Requirements incomplete');
-                                    @endphp
-
-                                    <span class="d-inline-block" data-bs-toggle="tooltip" title="{{ $reason }}">
-                                        <button class="btn btn-outline-secondary px-4" disabled>
-                                            <i class="fa-solid fa-print me-2 text-muted"></i>View Clearance Letter
-                                        </button>
-                                    </span>
-                                @endif
-                            @endunless
                         </div>
 
                     </form>
@@ -2493,7 +3252,7 @@
                         <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-4">
                             <h6 class="section-title text-primary mb-1">Mayor's Referral Requirements</h6>
                             @if ($applicant->referral)
-                                <div class="d-flex flex-column align-items-end gap-1">
+                                <div class="d-flex flex-column align-items-end gap-1" style="text-transform: uppercase;">
                                     <span class="badge rounded-pill {{ $referral->approvalStatusClass() }}">
                                         {{ $referral->approvalStatusLabel() }}
                                     </span>
@@ -2522,14 +3281,8 @@
                                         <i class="fas fa-upload me-1"></i> Upload File
                                     </button>
                                     <small id="resume_name" class="file-name-text">
-                                        {{ !empty($referral->resume) ? basename($referral->resume) : 'No file selected' }}
+                                        {{ old('resume_name', 'No file selected') }}
                                     </small>
-                                    @if (!empty($referral->resume))
-                                        <a href="{{ route('storage.view', ['filename' => $referral->resume]) }}"
-                                            target="_blank" class="btn btn-light btn-sm text-primary border">
-                                            <i class="fas fa-eye me-1"></i> View Current
-                                        </a>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -2549,15 +3302,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="ref_brgy_name" class="file-name-text">
-                                            {{ !empty($referral->ref_barangay_clearance) ? basename($referral->ref_barangay_clearance) : 'No file selected' }}
+                                            {{ old('ref_brgy_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($referral->ref_barangay_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_barangay_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border"
-                                                id="ref_brgy_current_link">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2574,15 +3320,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="ref_police_name" class="file-name-text">
-                                            {{ !empty($referral->ref_police_clearance) ? basename($referral->ref_police_clearance) : 'No file selected' }}
+                                            {{ old('ref_police_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($referral->ref_police_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_police_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border"
-                                                id="ref_police_current_link">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2599,15 +3338,8 @@
                                             <i class="fas fa-upload me-1"></i> Upload File
                                         </button>
                                         <small id="ref_nbi_name" class="file-name-text">
-                                            {{ !empty($referral->ref_nbi_clearance) ? basename($referral->ref_nbi_clearance) : 'No file selected' }}
+                                            {{ old('ref_nbi_name', 'No file selected') }}
                                         </small>
-                                        @if (!empty($referral->ref_nbi_clearance))
-                                            <a href="{{ route('storage.view', ['filename' => $referral->ref_nbi_clearance]) }}"
-                                                target="_blank" class="btn btn-light btn-sm text-primary border"
-                                                id="ref_nbi_current_link">
-                                                <i class="fas fa-eye me-1"></i> View Current
-                                            </a>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -2654,8 +3386,7 @@
                                                     <label class="form-label">Peso OCRL (Auto Generate)<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" name="ref_imus_ocrl" class="form-control"
-                                                        style="text-align: center"
-                                                        value="{{ old('ref_imus_ocrl', $referral->ref_imus_ocrl ?? '') }}"
+                                                        style="text-align: center" value="{{ old('ref_imus_ocrl') }}"
                                                         placeholder="Auto generate when complete" readonly>
                                                 </div>
 
@@ -2664,8 +3395,7 @@
                                                             class="required-mark">*</span></label>
                                                     <input type="text" name="ref_employer_name" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        value="{{ old('ref_employer_name', $referral->ref_employer_name ?? '') }}"
-                                                        required>
+                                                        value="{{ old('ref_employer_name') }}" required>
                                                 </div>
 
                                                 <div class="col-md-2">
@@ -2673,62 +3403,34 @@
                                                             class="required-mark">*</span></label>
                                                     <input type="text" name="ref_position" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        value="{{ old('ref_position', $referral->ref_position ?? '') }}"
-                                                        required>
+                                                        value="{{ old('ref_position') }}" required>
                                                 </div>
 
                                                 <div class="col-md-2">
                                                     <label class="form-label"> City Address<span
                                                             class="required-mark">*</span></label>
-                                                    <input type="text" name="ref_place" id="refPlaceInput"
-                                                        class="form-control" list="refPlaceOptions"
-                                                        value="{{ old('ref_place', $referral->ref_place ?? '') }}"
-                                                        oninput="this.value = this.value.toUpperCase()"
-                                                        placeholder="Search City Address" required>
-                                                    <datalist id="refPlaceOptions"></datalist>
+                                                    <select name="ref_place" id="refPlaceInput"
+                                                        class="form-select" required>
+                                                        <option value="">Select City Address</option>
+                                                    </select>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Province</label>
                                                     <input type="text" name="ref_province" id="refProvinceInput"
                                                         class="form-control" oninput="this.value = this.value.toUpperCase()"
-                                                        value="{{ old('ref_province', $referral->ref_province ?? '') }}"
-                                                        placeholder="Enter Province" required>
+                                                        value="{{ old('ref_province') }}" placeholder="Enter Province"
+                                                        required>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Hired Company<span
                                                             class="required-mark">*</span></label>
                                                     <input type="text" name="ref_hired_company" class="form-control"
                                                         oninput="this.value = this.value.toUpperCase()"
-                                                        value="{{ old('ref_hired_company', $referral->ref_hired_company ?? '') }}"
-                                                        required>
+                                                        value="{{ old('ref_hired_company') }}" required>
                                                 </div>
                                             </div>
-                                            @php
-                                                $pesoReferralReason = !auth()->user()->canViewReferralLetter()
-                                                    ? 'No permission to generate letter'
-                                                    : ($referral && !$referral->canPrint()
-                                                        ? 'Awaiting admin or staff approval'
-                                                        : null);
-                                            @endphp
-                                            <div class="mt-3">
-                                                @if (auth()->user()->canViewReferralLetter() && $referral && $referral->canPrint())
-                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE]) }}"
-                                                        id="printReferralPesoButton" class="btn btn-outline-primary px-4"
-                                                        target="_blank">
-                                                        <i class="fas fa-print me-1"></i> View Referral Letter Within Imus
-                                                    </a>
-                                                @else
-                                                    <button type="button" id="printReferralPesoButton"
-                                                        class="btn btn-outline-secondary justify-content-center px-4" disabled
-                                                        title="{{ $pesoReferralReason ?? 'Complete all requirements first' }}">
-                                                        <i class="fas fa-print me-1"></i> View Referral Letter Within Imus
-                                                    </button>
-                                                @endif
-                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="js-peso-extra-details mt-4 d-grid gap-3">
                                         @foreach ($pesoReferralDetails as $extraIndex => $extraDetail)
                                             <div
                                                 class="peso-extra-detail-card border rounded-4 p-3 bg-light js-peso-extra-detail">
@@ -2742,7 +3444,7 @@
                                                                 class="required-mark">*</span></label>
                                                         <input type="text" class="form-control" style="text-align: center"
                                                             name="referral_details[{{ $extraIndex }}][ref_imus_ocrl]"
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_imus_ocrl', $extraDetail['ref_imus_ocrl'] ?? '') }}"
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_imus_ocrl') }}"
                                                             placeholder="Auto generate when saved" readonly>
                                                     </div>
                                                     <div class="col-md-2">
@@ -2752,7 +3454,7 @@
                                                             oninput="this.value = this.value.toUpperCase()"
                                                             name="referral_details[{{ $extraIndex }}][ref_employer_name]"
                                                             required
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name', $extraDetail['ref_employer_name'] ?? '') }}">
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_employer_name') }}">
                                                     </div>
                                                     <div class="col-md-2">
                                                         <label class="form-label">Employer Position<span
@@ -2761,16 +3463,16 @@
                                                             oninput="this.value = this.value.toUpperCase()"
                                                             name="referral_details[{{ $extraIndex }}][ref_position]"
                                                             required
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_position', $extraDetail['ref_position'] ?? '') }}">
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_position') }}">
                                                     </div>
                                                     <div class="col-md-2">
                                                         <label class="form-label">City Address<span
                                                                 class="required-mark">*</span></label>
-                                                        <input type="text" class="form-control js-peso-ref-place-input"
+                                                        <select class="form-select js-peso-ref-place-select"
                                                             name="referral_details[{{ $extraIndex }}][ref_place]" required
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_place', $extraDetail['ref_place'] ?? '') }}"
-                                                            oninput="this.value = this.value.toUpperCase()"
-                                                            list="refPlaceOptions" placeholder="Search City Address">
+                                                            data-selected-value="{{ old('referral_details.' . $extraIndex . '.ref_place') }}">
+                                                            <option value="">Select City Address</option>
+                                                        </select>
                                                     </div>
                                                     <div class="col-md-2">
                                                         <label class="form-label">Province<span
@@ -2778,7 +3480,7 @@
                                                         <input type="text" class="form-control js-peso-ref-province-input"
                                                             name="referral_details[{{ $extraIndex }}][ref_province]"
                                                             required
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_province', $extraDetail['ref_province'] ?? '') }}"
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_province') }}"
                                                             oninput="this.value = this.value.toUpperCase()"
                                                             placeholder="Enter Province">
                                                     </div>
@@ -2789,25 +3491,10 @@
                                                             oninput="this.value = this.value.toUpperCase()"
                                                             name="referral_details[{{ $extraIndex }}][ref_hired_company]"
                                                             required
-                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company', $extraDetail['ref_hired_company'] ?? '') }}">
+                                                            value="{{ old('referral_details.' . $extraIndex . '.ref_hired_company') }}">
                                                     </div>
                                                 </div>
                                                 <div class="mt-3 d-flex flex-wrap gap-2">
-                                                    @if ($referral && $referral->isComplete() && \App\Models\MayorsReferral::hasPrintablePesoDetail($extraDetail))
-                                                        <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'detail' => $extraIndex]) }}"
-                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button"
-                                                            target="_blank">
-                                                            <i class="fas fa-print me-1"></i> View Employer Letter Detail
-                                                            {{ $extraIndex + 2 }}
-                                                        </a>
-                                                    @else
-                                                        <button type="button"
-                                                            class="btn btn-outline-primary px-4 js-peso-extra-print-button"
-                                                            disabled>
-                                                            <i class="fas fa-print me-1"></i> View Employer Letter Detail
-                                                            {{ $extraIndex + 2 }}
-                                                        </button>
-                                                    @endif
                                                     <button type="button"
                                                         class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
                                                         <i class="fas fa-trash-alt me-1"></i>Remove
@@ -2858,10 +3545,11 @@
                                                 <div class="col-md-2">
                                                     <label class="form-label">City Address<span
                                                             class="required-mark">*</span></label>
-                                                    <input type="text" class="form-control js-peso-ref-place-input"
+                                                    <select class="form-select js-peso-ref-place-select"
                                                         name="referral_details[__INDEX__][ref_place]"
-                                                        oninput="this.value = this.value.toUpperCase()" list="refPlaceOptions"
-                                                        required placeholder="Search City Address">
+                                                        required>
+                                                        <option value="">Select City Address</option>
+                                                    </select>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <label class="form-label">Province<span
@@ -2881,11 +3569,6 @@
                                             </div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
                                                 <button type="button"
-                                                    class="btn btn-outline-primary px-4 js-peso-extra-print-button" disabled
-                                                    title="{{ $referral && !$referral->isApproved() ? 'Awaiting admin or staff approval' : 'Complete the employer detail fields first' }}">
-                                                    <i class="fas fa-print me-1"></i> View Employer Letter Detail
-                                                </button>
-                                                <button type="button"
                                                     class="btn btn-link text-danger text-decoration-none p-0 js-remove-peso-detail">
                                                     <i class="fas fa-trash-alt me-1"></i>Remove
                                                 </button>
@@ -2901,8 +3584,7 @@
                                             <label class="form-label">Peso Imus OCRL (Auto Generate)<span
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_ocrl" class="form-control"
-                                                style="text-align: center"
-                                                value="{{ old('ref_ocrl', $referral->ref_ocrl ?? '') }}"
+                                                style="text-align: center" value="{{ old('ref_ocrl') }}"
                                                 placeholder="Auto generate when complete" readonly>
                                         </div>
                                         <div class="col-md-3">
@@ -2915,7 +3597,7 @@
                                                     <option value="{{ $mayor['recipient'] }}"
                                                         data-city-government="{{ $mayor['city_government'] }}"
                                                         data-company-address="{{ $mayor['company_address'] }}"
-                                                        {{ old('ref_recipient', $referral->ref_recipient ?? '') === $mayor['recipient'] ? 'selected' : '' }}>
+                                                        {{ old('ref_recipient') === $mayor['recipient'] ? 'selected' : '' }}>
                                                         {{ $mayor['recipient'] }}
                                                     </option>
                                                 @endforeach
@@ -2935,33 +3617,7 @@
                                                     class="required-mark">*</span></label>
                                             <input type="text" name="ref_company_address" id="refCompanyAddressInput"
                                                 class="form-control" list="refCompanyAddressList" autocomplete="off"
-                                                value="{{ old('ref_company_address', $referral->ref_company_address ?? '') }}"
                                                 required>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <div class="mt-3">
-                                                @php
-                                                    $referralReason = !auth()->user()->canViewReferralLetter()
-                                                        ? 'No permission to view referral letter'
-                                                        : ($referral && !$referral->canPrint()
-                                                            ? 'Awaiting admin or staff approval'
-                                                            : 'Complete all requirements first');
-                                                @endphp
-                                                @if (auth()->user()->canViewReferralLetter() && $referral && $referral->canPrint())
-                                                    <a href="{{ route('referrals.printLetter', ['id' => $applicant->id, 'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT]) }}"
-                                                        id="printReferralOtherCityButton"
-                                                        class="btn btn-outline-primary px-4" target="_blank">
-                                                        <i class="fas fa-print me-1"></i> View Referral Letter Outside Imus
-                                                    </a>
-                                                @else
-                                                    <button type="button" id="printReferralOtherCityButton"
-                                                        class="btn btn-outline-secondary px-4" disabled
-                                                        title="{{ $referralReason }}">
-                                                        <i class="fas fa-print me-1"></i> View Referral Letter Outside Imus
-                                                    </button>
-                                                @endif
-                                            </div>
                                         </div>
 
                                     </div>
@@ -3010,7 +3666,884 @@
                 </div>
             </div>
         </div>
+
+        @php
+            $allPermits = $applicant->permits->sortByDesc('id');
+            $allClearances = $applicant->clearances->sortByDesc('id');
+            $allReferrals = $applicant->referrals->sortByDesc('id');
+            $transactionClearance = $applicant->clearance;
+            $transactionReferral = $applicant->referral;
+            $transactionReferralExtraDetails =
+                $transactionReferral && is_array($transactionReferral->referral_details ?? null)
+                    ? array_values(array_slice($transactionReferral->referral_details, 1))
+                    : [];
+            $transactionReferralHasWithinImus =
+                $transactionReferral &&
+                collect([
+                    $transactionReferral->ref_imus_ocrl,
+                    $transactionReferral->ref_employer_name,
+                    $transactionReferral->ref_position,
+                    $transactionReferral->ref_place,
+                    $transactionReferral->ref_province,
+                    $transactionReferral->ref_hired_company,
+                ])->contains(fn($value) => trim((string) $value) !== '');
+            $transactionReferralHasOutsideImus =
+                $transactionReferral &&
+                collect([
+                    $transactionReferral->ref_ocrl,
+                    $transactionReferral->ref_recipient,
+                    $transactionReferral->ref_company_address,
+                    $transactionReferral->ref_city_gov,
+                ])->contains(fn($value) => trim((string) $value) !== '');
+            $referralControlSortValue = function ($value) {
+                if (preg_match('/(\d{4})-(\d{5})/', (string) $value, $matches)) {
+                    return (int) $matches[1] * 100000 + (int) $matches[2];
+                }
+
+                return 0;
+            };
+
+            $transactionReferralCount = 0;
+            $allReferralRows = collect();
+
+            foreach ($allReferrals as $refEntry) {
+                $refHasWithinImus = collect([
+                    $refEntry->ref_imus_ocrl,
+                    $refEntry->ref_employer_name,
+                    $refEntry->ref_position,
+                    $refEntry->ref_place,
+                    $refEntry->ref_province,
+                    $refEntry->ref_hired_company,
+                ])->contains(fn($value) => trim((string) $value) !== '');
+
+                $refHasOutsideImus = collect([
+                    $refEntry->ref_ocrl,
+                    $refEntry->ref_recipient,
+                    $refEntry->ref_company_address,
+                    $refEntry->ref_city_gov,
+                ])->contains(fn($value) => trim((string) $value) !== '');
+
+                $refExtraDetails = is_array($refEntry->referral_details ?? null)
+                    ? array_values(array_slice($refEntry->referral_details, 1))
+                    : [];
+
+                if ($refHasWithinImus) {
+                    $allReferralRows->push([
+                        'type' => 'Referral Within Imus',
+                        'control_no' => \App\Models\MayorsReferral::formatWithinImusControlNo($refEntry->ref_imus_ocrl),
+                        'raw_control_no' => $refEntry->ref_imus_ocrl,
+                        'employer_recipient' => $refEntry->ref_employer_name,
+                        'position_city_gov' => $refEntry->ref_position,
+                        'address' => $refEntry->ref_place,
+                        'province' => $refEntry->ref_province,
+                        'hired_company' => $refEntry->ref_hired_company,
+                        'status_class' => $refEntry->approvalStatusClass(),
+                        'status_label' => $refEntry->approvalStatusLabel(),
+                        'can_view' => $refEntry->canPrintType(\App\Models\MayorsReferral::TYPE_PESO_OFFICE),
+                        'route' => route('referrals.printLetter', [
+                            'id' => $applicant->id,
+                            'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE,
+                        ]),
+                        'referral_id' => $refEntry->id,
+                        'detail_index' => null,
+                        'sort_control' => $referralControlSortValue($refEntry->ref_imus_ocrl ?? ''),
+                        'ref_entry' => $refEntry,
+                        'resume' => $refEntry->resume ?? '',
+                        'brgy' => $refEntry->ref_barangay_clearance ?? '',
+                        'police' => $refEntry->ref_police_clearance ?? '',
+                        'nbi' => $refEntry->ref_nbi_clearance ?? '',
+                        'edit_data' => [
+                            'type' => 'peso_office',
+                            'employer-name' => $refEntry->ref_employer_name ?? '',
+                            'position' => $refEntry->ref_position ?? '',
+                            'place' => $refEntry->ref_place ?? '',
+                            'province' => $refEntry->ref_province ?? '',
+                            'hired-company' => $refEntry->ref_hired_company ?? '',
+                        ],
+                    ]);
+                }
+
+                foreach ($refExtraDetails as $detailIndex => $refExtraDetail) {
+                    $refExtraDetail = is_array($refExtraDetail) ? $refExtraDetail : [];
+                    $allReferralRows->push([
+                        'type' => 'Referral Within Imus',
+                        'control_no' => \App\Models\MayorsReferral::formatWithinImusControlNo(
+                            $refExtraDetail['ref_imus_ocrl'] ?? '',
+                        ),
+                        'raw_control_no' => $refExtraDetail['ref_imus_ocrl'] ?? '',
+                        'employer_recipient' => $refExtraDetail['ref_employer_name'] ?? '',
+                        'position_city_gov' => $refExtraDetail['ref_position'] ?? '',
+                        'address' => $refExtraDetail['ref_place'] ?? '',
+                        'province' => $refExtraDetail['ref_province'] ?? '',
+                        'hired_company' => $refExtraDetail['ref_hired_company'] ?? '',
+                        'status_class' => $refEntry->approvalStatusClass(),
+                        'status_label' => $refEntry->approvalStatusLabel(),
+                        'can_view' =>
+                            $refEntry->canPrintType(\App\Models\MayorsReferral::TYPE_PESO_OFFICE) &&
+                            \App\Models\MayorsReferral::hasPrintablePesoDetail($refExtraDetail),
+                        'route' => route('referrals.printLetter', [
+                            'id' => $applicant->id,
+                            'type' => \App\Models\MayorsReferral::TYPE_PESO_OFFICE,
+                            'detail' => $detailIndex,
+                        ]),
+                        'referral_id' => $refEntry->id,
+                        'detail_index' => $detailIndex,
+                        'sort_control' => $referralControlSortValue($refExtraDetail['ref_imus_ocrl'] ?? ''),
+                        'ref_entry' => $refEntry,
+                        'resume' => $refEntry->resume ?? '',
+                        'brgy' => $refEntry->ref_barangay_clearance ?? '',
+                        'police' => $refEntry->ref_police_clearance ?? '',
+                        'nbi' => $refEntry->ref_nbi_clearance ?? '',
+                        'edit_data' => [
+                            'type' => 'peso_office',
+                            'detail-index' => $detailIndex,
+                            'employer-name' => $refExtraDetail['ref_employer_name'] ?? '',
+                            'position' => $refExtraDetail['ref_position'] ?? '',
+                            'place' => $refExtraDetail['ref_place'] ?? '',
+                            'province' => $refExtraDetail['ref_province'] ?? '',
+                            'hired-company' => $refExtraDetail['ref_hired_company'] ?? '',
+                        ],
+                    ]);
+                }
+
+                if ($refHasOutsideImus) {
+                    $allReferralRows->push([
+                        'type' => 'Referral Outside Imus',
+                        'control_no' => \App\Models\MayorsReferral::formatOutsideImusControlNo($refEntry->ref_ocrl),
+                        'raw_control_no' => $refEntry->ref_ocrl,
+                        'employer_recipient' => $refEntry->ref_recipient,
+                        'position_city_gov' => $refEntry->ref_city_gov,
+                        'address' => $refEntry->ref_company_address,
+                        'province' => '',
+                        'hired_company' => '',
+                        'status_class' => $refEntry->approvalStatusClass(),
+                        'status_label' => $refEntry->approvalStatusLabel(),
+                        'can_view' => $refEntry->canPrintType(\App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT),
+                        'route' => route('referrals.printLetter', [
+                            'id' => $applicant->id,
+                            'type' => \App\Models\MayorsReferral::TYPE_OTHER_CITY_GOVERNMENT,
+                        ]),
+                        'referral_id' => $refEntry->id,
+                        'detail_index' => null,
+                        'sort_control' => $referralControlSortValue($refEntry->ref_ocrl ?? ''),
+                        'ref_entry' => $refEntry,
+                        'resume' => $refEntry->resume ?? '',
+                        'brgy' => $refEntry->ref_barangay_clearance ?? '',
+                        'police' => $refEntry->ref_police_clearance ?? '',
+                        'nbi' => $refEntry->ref_nbi_clearance ?? '',
+                        'edit_data' => [
+                            'type' => 'other_city_government',
+                            'recipient' => $refEntry->ref_recipient ?? '',
+                            'city-gov' => $refEntry->ref_city_gov ?? '',
+                            'company-address' => $refEntry->ref_company_address ?? '',
+                        ],
+                    ]);
+                }
+            }
+
+            $allReferralRows = $allReferralRows->sortByDesc('sort_control')->values();
+            $transactionReferralCount = $allReferralRows->count();
+            $transactionCount = $allPermits->count() + $allClearances->count() + $transactionReferralCount;
+        @endphp
+        @if ($transactionCount > 0)
+            <section class="transaction-panel">
+                <div class="transaction-panel-head">
+                    <div class="transaction-panel-title">
+                        <div>
+                            <h5 class="fw-bold" style="font-size: 20px;">Transaction Details</h5>
+                            <p>Permit, clearance, and referral document history</p>
+                        </div>
+                    </div>
+                    <span class="transaction-count-badge">
+                        <i class="fa-solid fa-layer-group"></i>
+                        {{ $transactionCount }} {{ \Illuminate\Support\Str::plural('transaction', $transactionCount) }}
+                    </span>
+                </div>
+
+                <div class="transaction-section-row">
+                    <div class="transaction-row-head" data-bs-toggle="collapse" data-bs-target="#permitCollapse"
+                        role="button" aria-expanded="false">
+                        <i class="bi bi-patch-check-fill text-primary"></i>
+                        <h6>Permit to Work ID</h6>
+                        <span class="transaction-row-count">{{ $allPermits->count() }}</span>
+                        <i class="bi bi-chevron-down ms-auto transaction-chevron"></i>
+                    </div>
+                    <div id="permitCollapse" class="collapse">
+                        @if ($allPermits->isNotEmpty())
+                            <div class="transaction-table-wrap">
+                                <table class="table transaction-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Permit to Work ID</th>
+                                            <th>O.R No.</th>
+                                            <th>Community Tax No.</th>
+                                            <th>Permit Issued On</th>
+                                            <th>Permit Issued At</th>
+                                            <th>Permit Date</th>
+                                            <th>Expires On</th>
+                                            <th>Doc Stamp Control No.</th>
+                                            <th>Date of Payment</th>
+                                            <th>Status</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($allPermits as $entry)
+                                            <tr data-transaction-sort="{{ $entry->id }}">
+                                                <td class="transaction-row-index" data-label="#">
+                                                    {{ $loop->iteration }}
+                                                </td>
+                                                <td data-label="Permit to Work ID">
+                                                    @if ($entry->peso_id_no)
+                                                        <span class="transaction-id-text">
+                                                            <i class="fa-solid fa-id-card"></i>
+                                                            {{ 'OP' . strtoupper($entry->peso_id_no) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="transaction-empty-value">—</span>
+                                                    @endif
+                                                </td>
+                                                <td data-label="O.R No.">{{ $entry->permit_or_no ?: '—' }}</td>
+                                                <td data-label="Community Tax No.">{{ $entry->community_tax_no ?: '—' }}
+                                                </td>
+                                                <td data-label="Permit Issued On">{{ $entry->permit_issued_on ?: '—' }}
+                                                </td>
+                                                <td data-label="Permit Issued At">{{ $entry->permit_issued_at ?: '—' }}
+                                                </td>
+                                                <td data-label="Permit Date">{{ $entry->permit_date ?: '—' }}</td>
+                                                <td data-label="Expires On">{{ $entry->expires_on ?: '—' }}</td>
+                                                <td data-label="Doc Stamp Control No.">
+                                                    {{ $entry->permit_doc_stamp_control_no ?: '—' }}</td>
+                                                <td data-label="Date of Payment">
+                                                    {{ $entry->permit_date_of_payment ?: '—' }}
+                                                </td>
+                                                <td data-label="Status" style="text-transform: uppercase;">
+                                                    <span class="badge {{ $entry->approvalStatusClass() }}">
+                                                        {{ $entry->approvalStatusLabel() }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center" data-label="Action">
+                                                    <div class="d-flex justify-content-center">
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm dropdown-toggle transaction-action"
+                                                                type="button" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                                                                style="min-width:170px;">
+                                                                @if ($isApplicantUser)
+                                                                    <li>
+                                                                        <button class="dropdown-item" type="button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#permitReqModal-{{ $entry->id }}">
+                                                                            <i
+                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item js-edit-permit-uploads-btn"
+                                                                            type="button"
+                                                                            data-permit-id="{{ $entry->id }}"
+                                                                            data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
+                                                                            data-police="{{ $entry->permit_police_clearance ?? '' }}"
+                                                                            data-health="{{ $entry->health_card ?? '' }}"
+                                                                            data-cedula="{{ $entry->cedula ?? '' }}"
+                                                                            data-referral="{{ $entry->referral_letter ?? '' }}"
+                                                                            data-clearance-type="{{ $entry->clearance_type ?? '' }}"
+                                                                            data-imus-resident="{{ $isImusResident ? '1' : '0' }}">
+                                                                            <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
+                                                                        </button>
+                                                                    </li>
+                                                                @else
+                                                                    <li>
+                                                                        <button class="dropdown-item" type="button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#permitReqModal-{{ $entry->id }}">
+                                                                            <i
+                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    @if (auth()->user()->hasPermission('generate_permit') && $entry->isComplete())
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="{{ route('permits.printId', ['id' => $applicant->id, 'permit' => $entry->id]) }}"
+                                                                                target="_blank">
+                                                                                <i
+                                                                                    class="bi bi-eye me-2 text-success"></i>View Permit to Work ID
+                                                                            </a>
+                                                                        </li>
+                                                                    @else
+                                                                        <li>
+                                                                            <span class="dropdown-item-text text-muted"
+                                                                                style="opacity:0.5;">
+                                                                                <i class="bi bi-eye-slash me-2"></i>View Permit to Work ID
+                                                                            </span>
+                                                                        </li>
+                                                                    @endif
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                     @if (auth()->user()->hasPermission('update_permit'))
+                                                                        <li>
+                                                                            <button class="dropdown-item js-edit-permit-btn"
+                                                                                type="button"
+                                                                                data-permit-id="{{ $entry->id }}"
+                                                                                data-or-no="{{ $entry->permit_or_no ?? '' }}"
+                                                                                data-community-tax-no="{{ $entry->community_tax_no ?? '' }}"
+                                                                                data-doc-stamp-no="{{ $entry->permit_doc_stamp_control_no ?? '' }}"
+                                                                                data-issued-on="{{ $entry->permit_issued_on ?? '' }}"
+                                                                                data-issued-at="{{ $entry->permit_issued_at ?? '' }}"
+                                                                                data-permit-date="{{ $entry->permit_date ?? '' }}"
+                                                                                data-expires-on="{{ $entry->expires_on ?? '' }}"
+                                                                                data-date-payment="{{ $entry->permit_date_of_payment ?? '' }}">
+                                                                                <i
+                                                                                    class="bi bi-pencil-square me-2 text-primary"></i>Edit Details
+                                                                            </button>
+                                                                        </li>
+                                                                        <li>
+                                                                            <button class="dropdown-item js-edit-permit-uploads-btn"
+                                                                                type="button"
+                                                                                data-permit-id="{{ $entry->id }}"
+                                                                                data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
+                                                                                data-police="{{ $entry->permit_police_clearance ?? '' }}"
+                                                                                data-health="{{ $entry->health_card ?? '' }}"
+                                                                                data-cedula="{{ $entry->cedula ?? '' }}"
+                                                                                data-referral="{{ $entry->referral_letter ?? '' }}"
+                                                                                data-clearance-type="{{ $entry->clearance_type ?? '' }}"
+                                                                                data-imus-resident="{{ $isImusResident ? '1' : '0' }}">
+                                                                                <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
+                                                                            </button>
+                                                                        </li>
+                                                                    @endif
+                                                                @endif
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="transaction-empty-state">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>No Permit to Work ID transaction yet.</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="transaction-section-row">
+                    <div class="transaction-row-head" data-bs-toggle="collapse" data-bs-target="#clearanceCollapse"
+                        role="button" aria-expanded="false">
+                        <i class="bi bi-shield-fill-check text-success"></i>
+                        <h6>Clearance Letter</h6>
+                        <span class="transaction-row-count">{{ $allClearances->count() }}</span>
+                        <i class="bi bi-chevron-down ms-auto transaction-chevron"></i>
+                    </div>
+                    <div id="clearanceCollapse" class="collapse">
+                        @if ($allClearances->isNotEmpty())
+                            <div class="transaction-table-wrap">
+                                <table class="table transaction-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>PESO Control No.</th>
+                                            <th>O.R No.</th>
+                                            <th>Issued On</th>
+                                            <th>Doc Stamp Control No.</th>
+                                            <th>Date of Payment</th>
+                                            <th>Hired Company</th>
+                                            <th>Status</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($allClearances as $transactionClearance)
+                                            <tr data-transaction-sort="{{ $transactionClearance->id }}">
+                                                <td class="transaction-row-index" data-label="#">
+                                                    {{ $loop->iteration }}</td>
+                                                <td data-label="PESO Control No.">
+                                                    <span class="transaction-id-text">
+                                                        <i class="fa-solid fa-file-lines"></i>
+                                                        PESO-OCMC{{ $transactionClearance->clearance_peso_control_no ?: '—' }}
+                                                    </span>
+                                                </td>
+                                                <td data-label="O.R No.">
+                                                    {{ $transactionClearance->clearance_or_no ?: '—' }}
+                                                </td>
+                                                <td data-label="Issued On">
+                                                    {{ $transactionClearance->clearance_issued_on ?: '—' }}</td>
+                                                <td data-label="Doc Stamp Control No.">
+                                                    {{ $transactionClearance->clearance_doc_stamp_control_no ?: '—' }}
+                                                </td>
+                                                <td data-label="Date of Payment">
+                                                    {{ $transactionClearance->clearance_date_of_payment ?: '—' }}</td>
+                                                <td data-label="Hired Company">
+                                                    {{ $transactionClearance->clearance_hired_company ?: '—' }}</td>
+                                                <td data-label="Status" style="text-transform: uppercase;">
+                                                    <span
+                                                        class="badge {{ $transactionClearance->approvalStatusClass() }}">
+                                                        {{ $transactionClearance->approvalStatusLabel() }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center" data-label="Action">
+                                                    <div class="d-flex justify-content-center">
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm dropdown-toggle transaction-action"
+                                                                type="button" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                                                                style="min-width:170px;">
+                                                                @if ($isApplicantUser)
+                                                                    <li>
+                                                                        <button class="dropdown-item" type="button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}">
+                                                                            <i
+                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item js-edit-clearance-uploads-btn"
+                                                                            type="button"
+                                                                            data-clearance-id="{{ $transactionClearance->id }}"
+                                                                            data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
+                                                                            data-mtc="{{ $transactionClearance->mtc_clearance ?? '' }}"
+                                                                            data-rtc="{{ $transactionClearance->rtc_clearance ?? '' }}"
+                                                                            data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
+                                                                            data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}">
+                                                                            <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
+                                                                        </button>
+                                                                    </li>
+                                                                @else
+                                                                    <li>
+                                                                        <button class="dropdown-item" type="button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}">
+                                                                            <i
+                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    @if (auth()->user()->hasPermission('generate_clearance') && $transactionClearance->isComplete())
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="{{ route('clearances.printLetter', $applicant->id) }}"
+                                                                                target="_blank">
+                                                                                <i
+                                                                                    class="bi bi-eye me-2 text-success"></i>View Clearance Letter
+                                                                            </a>
+                                                                        </li>
+                                                                    @else
+                                                                        <li>
+                                                                            <span class="dropdown-item-text text-muted"
+                                                                                style="opacity:0.5;">
+                                                                                <i class="bi bi-eye-slash me-2"></i>View Clearance Letter
+                                                                            </span>
+                                                                        </li>
+                                                                    @endif
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    @if (auth()->user()->hasPermission('update_clearance'))
+                                                                        <li>
+                                                                            <button
+                                                                                class="dropdown-item js-edit-clearance-btn"
+                                                                                type="button"
+                                                                                data-clearance-id="{{ $transactionClearance->id }}"
+                                                                                data-or-no="{{ $transactionClearance->clearance_or_no ?? '' }}"
+                                                                                data-issued-on="{{ $transactionClearance->clearance_issued_on ?? '' }}"
+                                                                                data-doc-stamp-no="{{ $transactionClearance->clearance_doc_stamp_control_no ?? '' }}"
+                                                                                data-date-payment="{{ $transactionClearance->clearance_date_of_payment ?? '' }}"
+                                                                                data-hired-company="{{ $transactionClearance->clearance_hired_company ?? '' }}">
+                                                                                <i
+                                                                                    class="bi bi-pencil-square me-2 text-primary"></i>Edit Details
+                                                                            </button>
+                                                                        </li>
+                                                                        <li>
+                                                                            <button class="dropdown-item js-edit-clearance-uploads-btn"
+                                                                                type="button"
+                                                                                data-clearance-id="{{ $transactionClearance->id }}"
+                                                                                data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
+                                                                                data-mtc="{{ $transactionClearance->mtc_clearance ?? '' }}"
+                                                                                data-rtc="{{ $transactionClearance->rtc_clearance ?? '' }}"
+                                                                                data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
+                                                                                data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}">
+                                                                                <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
+                                                                            </button>
+                                                                        </li>
+                                                                    @endif
+                                                                @endif
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="transaction-empty-state">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>No Clearance Letter transaction yet.</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="transaction-section-row">
+                    <div class="transaction-row-head" data-bs-toggle="collapse" data-bs-target="#referralCollapse"
+                        role="button" aria-expanded="false">
+                        <i class="bi bi-send-fill text-warning"></i>
+                        <h6>Referral Letter</h6>
+                        <span class="transaction-row-count">{{ $transactionReferralCount }}</span>
+                        <i class="bi bi-chevron-down ms-auto transaction-chevron"></i>
+                    </div>
+                    <div id="referralCollapse" class="collapse">
+                        @if ($allReferralRows->isNotEmpty())
+                            @php
+                                $referralTransactionRow = 1;
+                            @endphp
+                            <div class="transaction-table-wrap">
+                                <table class="table transaction-table">
+                                    <thead style="font-weight: 700">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Referral Type</th>
+                                            <th>Peso OCRL / Peso Imus OCRL</th>
+                                            <th>Employer / Recipient</th>
+                                            <th>Position / City Gov</th>
+                                            <th>City Address / Company Address</th>
+                                            <th>Province</th>
+                                            <th>Hired Company</th>
+                                            <th>Status</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($allReferralRows as $refRow)
+                                            <tr data-transaction-sort="{{ $refRow['sort_control'] }}">
+                                                <td class="transaction-row-index" data-label="#">
+                                                    {{ $referralTransactionRow++ }}</td>
+                                                <td data-label="Referral Type">{{ $refRow['type'] }}</td>
+                                                <td data-label="Peso OCRL">
+                                                    <span class="transaction-id-text">
+                                                        <i
+                                                            class="fa-solid fa-file-export"></i>{{ $refRow['control_no'] }}
+                                                    </span>
+                                                </td>
+                                                <td data-label="Employer / Recipient"
+                                                    style="text-transform: uppercase;">
+                                                    {{ $refRow['employer_recipient'] ?: '—' }}</td>
+                                                <td data-label="Position / City Gov" style="text-transform: uppercase;">
+                                                    {{ $refRow['position_city_gov'] ?: '—' }}</td>
+                                                <td data-label="Address" style="text-transform: uppercase;">
+                                                    {{ $refRow['address'] ?: '—' }}</td>
+                                                <td data-label="Province">{{ $refRow['province'] ?: '—' }}</td>
+                                                <td data-label="Hired Company">{{ $refRow['hired_company'] ?: '—' }}
+                                                </td>
+                                                <td data-label="Status" style="text-transform: uppercase;">
+                                                    <span class="badge {{ $refRow['status_class'] }}">
+                                                        {{ $refRow['status_label'] }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center" data-label="Action">
+                                                    <div class="d-flex justify-content-center">
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm dropdown-toggle transaction-action"
+                                                                type="button" data-bs-toggle="dropdown"
+                                                                aria-expanded="false">
+                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                                                                style="min-width:170px;">
+                                                                @if ($isApplicantUser)
+                                                                    <li>
+                                                                        <button class="dropdown-item" type="button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}">
+                                                                            <i
+                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    <li>
+                                                                        <button class="dropdown-item js-edit-referral-uploads-btn"
+                                                                            type="button"
+                                                                            data-referral-id="{{ $refRow['referral_id'] }}"
+                                                                            data-resume="{{ $refRow['resume'] ?? '' }}"
+                                                                            data-brgy="{{ $refRow['brgy'] ?? '' }}"
+                                                                            data-police="{{ $refRow['police'] ?? '' }}"
+                                                                            data-nbi="{{ $refRow['nbi'] ?? '' }}">
+                                                                            <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
+                                                                        </button>
+                                                                    </li>
+                                                                @else
+                                                                    <li>
+                                                                        <button class="dropdown-item" type="button"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}">
+                                                                            <i
+                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
+                                                                        </button>
+                                                                    </li>
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    @if (auth()->user()->canViewReferralLetter() && $refRow['can_view'])
+                                                                        <li>
+                                                                            <a class="dropdown-item"
+                                                                                href="{{ $refRow['route'] }}"
+                                                                                target="_blank">
+                                                                                <i
+                                                                                    class="bi bi-eye me-2 text-success"></i>View Referral Letter
+                                                                            </a>
+                                                                        </li>
+                                                                    @else
+                                                                        <li>
+                                                                            <span class="dropdown-item-text text-muted"
+                                                                                style="opacity:0.5;">
+                                                                                <i class="bi bi-eye-slash me-2"></i>View Referral Letter
+                                                                            </span>
+                                                                        </li>
+                                                                    @endif
+                                                                    <li>
+                                                                        <hr class="dropdown-divider">
+                                                                    </li>
+                                                                    @if (auth()->user()->hasPermission('update_referral'))
+                                                                        <li>
+                                                                            <button class="dropdown-item js-edit-referral-btn"
+                                                                                type="button"
+                                                                                data-referral-id="{{ $refRow['referral_id'] }}"
+                                                                                @foreach ($refRow['edit_data'] as $editKey => $editVal)
+                                                                                data-{{ $editKey }}="{{ $editVal }}" @endforeach>
+                                                                                <i
+                                                                                    class="bi bi-pencil-square me-2 text-primary"></i>Edit Details
+                                                                            </button>
+                                                                        </li>
+                                                                        <li>
+                                                                            <button class="dropdown-item js-edit-referral-uploads-btn"
+                                                                                type="button"
+                                                                                data-referral-id="{{ $refRow['referral_id'] }}"
+                                                                                data-resume="{{ $refRow['resume'] ?? '' }}"
+                                                                                data-brgy="{{ $refRow['brgy'] ?? '' }}"
+                                                                                data-police="{{ $refRow['police'] ?? '' }}"
+                                                                                data-nbi="{{ $refRow['nbi'] ?? '' }}">
+                                                                                <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
+                                                                            </button>
+                                                                        </li>
+                                                                    @endif
+                                                                @endif
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="transaction-empty-state">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span>No Referral Letter transaction yet.</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </section>
+        @endif
     </div>
+
+    @foreach ($allPermits as $permitReq)
+        <div class="modal fade" id="permitReqModal-{{ $permitReq->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-paperclip me-2"></i>Permit Requirements</h5>
+                            <div class="small" style="opacity:0.85;">
+                                {{ 'OP' . strtoupper($permitReq->peso_id_no ?? '—') }}</div>
+                            <div class="small" style="opacity:0.7;"><i class="bi bi-date me-1"></i>Uploaded:
+                                {{ $permitReq->created_at ? $permitReq->created_at->format('M d, Y h:i A') : '—' }}
+                                <span class="text-muted">({{ $permitReq->created_at->diffForHumans() }})</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="filter: brightness(0) invert(1); opacity: 0.7;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group list-group-flush">
+                            @php
+                                $permitFiles = [
+                                    'Health Card' => $permitReq->health_card,
+                                    'NBI Clearance' => $permitReq->permit_nbi_clearance,
+                                    'Police Clearance' => $permitReq->permit_police_clearance,
+                                    'Cedula' => $permitReq->cedula,
+                                    'Referral Letter' => $permitReq->referral_letter,
+                                ];
+                            @endphp
+                            @foreach ($permitFiles as $label => $file)
+                                <div class="list-group-item d-flex align-items-center justify-content-between py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div
+                                            style="width:36px;height:36px;border-radius:10px;background:{{ $file ? 'linear-gradient(135deg,#d1fae5,#a7f3d0)' : '#f1f5f9' }};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i
+                                                class="bi {{ $file ? 'bi-check-circle-fill text-success' : 'bi-x-circle text-muted' }}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold" style="font-size:0.9rem;">{{ $label }}</div>
+                                            <div class="text-muted" style="font-size:0.78rem;">
+                                                {{ $file ? basename($file) : 'Not uploaded' }}</div>
+                                        </div>
+                                    </div>
+                                    @if ($file)
+                                        <a href="{{ route('storage.view', ['filename' => $file]) }}" target="_blank"
+                                            class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    @foreach ($allClearances as $clearanceReq)
+        <div class="modal fade" id="clearanceReqModal-{{ $clearanceReq->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-paperclip me-2"></i>Clearance Requirements</h5>
+                            <div class="small" style="opacity:0.85;">
+                                PESO-OCMC{{ $clearanceReq->clearance_peso_control_no ?? '—' }}</div>
+                            <div class="small" style="opacity:0.7;"><i class="bi bi-clock me-1"></i>Uploaded:
+                                {{ $clearanceReq->created_at ? $clearanceReq->created_at->format('M d, Y h:i A') : '—' }}
+                                <span class="text-muted">({{ $clearanceReq->created_at->diffForHumans() }})</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="filter: brightness(0) invert(1); opacity: 0.7;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group list-group-flush">
+                            @php
+                                $clearanceFiles = [
+                                    'Prosecutor Clearance' => $clearanceReq->prosecutor_clearance,
+                                    'MTC Clearance' => $clearanceReq->mtc_clearance,
+                                    'RTC Clearance' => $clearanceReq->rtc_clearance,
+                                    'NBI Clearance' => $clearanceReq->nbi_clearance,
+                                    'Barangay Clearance' => $clearanceReq->barangay_clearance,
+                                ];
+                            @endphp
+                            @foreach ($clearanceFiles as $label => $file)
+                                <div class="list-group-item d-flex align-items-center justify-content-between py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div
+                                            style="width:36px;height:36px;border-radius:10px;background:{{ $file ? 'linear-gradient(135deg,#d1fae5,#a7f3d0)' : '#f1f5f9' }};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i
+                                                class="bi {{ $file ? 'bi-check-circle-fill text-success' : 'bi-x-circle text-muted' }}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold" style="font-size:0.9rem;">{{ $label }}</div>
+                                            <div class="text-muted" style="font-size:0.78rem;">
+                                                {{ $file ? basename($file) : 'Not uploaded' }}</div>
+                                        </div>
+                                    </div>
+                                    @if ($file)
+                                        <a href="{{ route('storage.view', ['filename' => $file]) }}" target="_blank"
+                                            class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    @foreach ($allReferrals as $referralReq)
+        <div class="modal fade" id="referralReqModal-{{ $referralReq->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-paperclip me-2"></i>Referral Requirements</h5>
+                            <div class="small" style="opacity:0.85;">
+                                {{ $referralReq->referral_type === 'peso_office' ? 'Within Imus' : 'Outside Imus' }}</div>
+                            <div class="small" style="opacity:0.7;"><i class="bi bi-clock me-1"></i>Uploaded:
+                                {{ $referralReq->created_at ? $referralReq->created_at->format('M d, Y h:i A') : '—' }}
+                                <span class="text-muted">({{ $referralReq->created_at->diffForHumans() }})</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="filter: brightness(0) invert(1); opacity: 0.7;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group list-group-flush">
+                            @php
+                                $referralFiles = [
+                                    'Resume / Bio-data' => $referralReq->resume,
+                                    'Barangay Clearance' => $referralReq->ref_barangay_clearance,
+                                    'Police Clearance' => $referralReq->ref_police_clearance,
+                                    'NBI Clearance' => $referralReq->ref_nbi_clearance,
+                                ];
+                            @endphp
+                            @foreach ($referralFiles as $label => $file)
+                                <div class="list-group-item d-flex align-items-center justify-content-between py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div
+                                            style="width:36px;height:36px;border-radius:10px;background:{{ $file ? 'linear-gradient(135deg,#d1fae5,#a7f3d0)' : '#f1f5f9' }};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i
+                                                class="bi {{ $file ? 'bi-check-circle-fill text-success' : 'bi-x-circle text-muted' }}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold" style="font-size:0.9rem;">{{ $label }}</div>
+                                            <div class="text-muted" style="font-size:0.78rem;">
+                                                {{ $file ? basename($file) : 'Not uploaded' }}</div>
+                                        </div>
+                                    </div>
+                                    @if ($file)
+                                        <a href="{{ route('storage.view', ['filename' => $file]) }}" target="_blank"
+                                            class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
     <div class="modal fade" id="disapprovePermitModal-{{ $applicant->id }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -3149,8 +4682,598 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="editPermitDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form id="editPermitDetailsForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-pencil-square me-2"></i>Edit Permit to Work ID
+                                Details</h5>
+                            <div class="small" style="opacity:0.85;">Update the transaction details for this permit
+                                record</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color: #2c2c2c;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">O.R No. <span class="text-danger">*</span></label>
+                                <input type="text" name="permit_or_no" id="modal_permit_or_no"
+                                    class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Community Tax No. <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="community_tax_no" id="modal_community_tax_no"
+                                    class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Permit Issued On <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" name="permit_issued_on" id="modal_permit_issued_on"
+                                    class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Permit Issued At <span
+                                        class="text-danger">*</span></label>
+                                <select name="permit_issued_at" id="modal_permit_issued_at" class="form-select"
+                                    required>
+                                    <option value="">Select City</option>
+                                    @foreach (config('permit_issued_at.city_governments', []) as $city)
+                                        <option value="{{ $city }}">{{ $city }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Permit Date <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" name="permit_date" id="modal_permit_date" class="form-control"
+                                    required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Expires On <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" name="expires_on" id="modal_expires_on" class="form-control"
+                                    required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Doc Stamp Control No. <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="permit_doc_stamp_control_no"
+                                    id="modal_permit_doc_stamp_control_no" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Date of Payment <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" name="permit_date_of_payment" id="modal_permit_date_of_payment"
+                                    class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" id="btnSavePermitDetails">
+                            <i class="bi bi-check-circle-fill me-1"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editClearanceDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form id="editClearanceDetailsForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-pencil-square me-2"></i>Edit Clearance Letter
+                                Details</h5>
+                            <div class="small" style="opacity:0.85;">Update the clearance transaction details</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color: #2c2c2c;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">O.R. No. <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="clearance_or_no" id="modal_clearance_or_no"
+                                    class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Issued On <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" name="clearance_issued_on" id="modal_clearance_issued_on"
+                                    class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Doc Stamp Control No. <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="clearance_doc_stamp_control_no"
+                                    id="modal_clearance_doc_stamp_control_no" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Date of Payment <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" name="clearance_date_of_payment"
+                                    id="modal_clearance_date_of_payment" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Hired Company <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="clearance_hired_company"
+                                    id="modal_clearance_hired_company" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle-fill me-1"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editReferralDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form id="editReferralDetailsForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="referral_type" id="modal_referral_type" value="peso_office">
+                    <input type="hidden" name="detail_index" id="modal_referral_detail_index" value="">
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-pencil-square me-2"></i>Edit Referral Letter
+                                Details</h5>
+                            <div class="small" style="opacity:0.85;" id="modalReferralTypeLabel">Referral Within Imus
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color: #2c2c2c;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modalPesoOfficeFields">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Employer Name <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="ref_employer_name" id="modal_ref_employer_name"
+                                        class="form-control text-uppercase" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Position <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="ref_position" id="modal_ref_position"
+                                        class="form-control text-uppercase" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">City Address <span
+                                            class="text-danger">*</span></label>
+                                    <select name="ref_place" id="modal_ref_place"
+                                        class="form-select" required>
+                                        <option value="">Select City Address</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Province <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="ref_province" id="modal_ref_province"
+                                        class="form-control text-uppercase" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Hired Company <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="ref_hired_company" id="modal_ref_hired_company"
+                                        class="form-control text-uppercase" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="modalOtherCityFields" style="display:none;">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Mayor's Name <span
+                                            class="text-danger">*</span></label>
+                                    <select name="ref_recipient" id="modal_ref_recipient" class="form-select"
+                                        required>
+                                        <option value="">Select City Mayor</option>
+                                        @foreach (config('philippine_mayors', []) as $mayor)
+                                            <option value="{{ $mayor['recipient'] }}"
+                                                data-city-government="{{ $mayor['city_government'] }}"
+                                                data-company-address="{{ $mayor['company_address'] }}">
+                                                {{ $mayor['recipient'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">City Government <span
+                                            class="text-danger">*</span></label>
+                                    <select name="ref_city_gov" id="modal_ref_city_gov" class="form-select" required>
+                                        <option value="">Select City Government</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">City Address <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="ref_company_address" id="modal_ref_company_address"
+                                        class="form-control text-uppercase" list="modalRefCompanyAddressList"
+                                        autocomplete="off" required>
+                                    <datalist id="modalRefCompanyAddressList"></datalist>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle-fill me-1"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editPermitUploadsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form id="editPermitUploadsForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-upload me-2"></i>Edit Permit Uploads</h5>
+                            <div class="small" style="opacity:0.85;">Replace uploaded files for this permit record</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color: #2c2c2c;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class="section-title text-primary mb-1">Mayor’s Permit to Work Requirements</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Clearance Type</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="clearance_type"
+                                        id="modal_permit_ct_nbi" value="nbi" checked>
+                                    <label class="form-check-label" for="modal_permit_ct_nbi">NBI</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="clearance_type"
+                                        id="modal_permit_ct_police" value="police">
+                                    <label class="form-check-label" for="modal_permit_ct_police">Police</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6" id="modal_permit_nbi_group">
+                                <div class="document-upload-card">
+                                    <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="permit_nbi_clearance" class="d-none"
+                                            id="modal_permit_nbi_file"
+                                            onchange="showFileName(this, 'modal_permit_nbi_name')">
+                                        <label for="modal_permit_nbi_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_permit_nbi_name" class="file-name-text">
+                                            {{ old('modal_permit_nbi_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_permit_nbi_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" id="modal_permit_police_group">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Police Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="permit_police_clearance" class="d-none"
+                                            id="modal_permit_police_file"
+                                            onchange="showFileName(this, 'modal_permit_police_name')">
+                                        <label for="modal_permit_police_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_permit_police_name" class="file-name-text">
+                                            {{ old('modal_permit_police_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_permit_police_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Health Card<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="health_card" class="d-none"
+                                            id="modal_permit_health_file"
+                                            onchange="showFileName(this, 'modal_permit_health_name')">
+                                        <label for="modal_permit_health_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_permit_health_name" class="file-name-text">
+                                            {{ old('modal_permit_health_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_permit_health_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Cedula<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="cedula" class="d-none"
+                                            id="modal_permit_cedula_file"
+                                            onchange="showFileName(this, 'modal_permit_cedula_name')">
+                                        <label for="modal_permit_cedula_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_permit_cedula_name" class="file-name-text">
+                                            {{ old('modal_permit_cedula_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_permit_cedula_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" id="modal_permit_referral_group">
+                                <div class="document-upload-card" id="modal_permit_referral_card">
+                                    <label class="form-label">Referral Letter<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="referral_letter" class="d-none"
+                                            id="modal_permit_referral_file"
+                                            onchange="showFileName(this, 'modal_permit_referral_name')">
+                                        <label for="modal_permit_referral_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_permit_referral_name" class="file-name-text">
+                                            {{ old('modal_permit_referral_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_permit_referral_status"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle-fill me-1"></i>Save Uploads
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editClearanceUploadsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form id="editClearanceUploadsForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-upload me-2"></i>Edit Clearance Uploads</h5>
+                            <div class="small" style="opacity:0.85;">Replace uploaded files for this clearance record</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color: #2c2c2c;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class="section-title text-primary mb-1">Mayor's Clearance Requirements</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Prosecutor Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="prosecutor_clearance" class="d-none"
+                                            id="modal_cl_prosecutor_file"
+                                            onchange="showFileName(this, 'modal_cl_prosecutor_name')">
+                                        <label for="modal_cl_prosecutor_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_cl_prosecutor_name" class="file-name-text">
+                                            {{ old('modal_cl_prosecutor_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_cl_prosecutor_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="document-upload-card">
+                                    <label class="form-label">MTC Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="mtc_clearance" class="d-none"
+                                            id="modal_cl_mtc_file"
+                                            onchange="showFileName(this, 'modal_cl_mtc_name')">
+                                        <label for="modal_cl_mtc_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_cl_mtc_name" class="file-name-text">
+                                            {{ old('modal_cl_mtc_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_cl_mtc_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="document-upload-card">
+                                    <label class="form-label">RTC Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="rtc_clearance" class="d-none"
+                                            id="modal_cl_rtc_file"
+                                            onchange="showFileName(this, 'modal_cl_rtc_name')">
+                                        <label for="modal_cl_rtc_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_cl_rtc_name" class="file-name-text">
+                                            {{ old('modal_cl_rtc_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_cl_rtc_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="document-upload-card">
+                                    <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="nbi_clearance" class="d-none"
+                                            id="modal_cl_nbi_file"
+                                            onchange="showFileName(this, 'modal_cl_nbi_name')">
+                                        <label for="modal_cl_nbi_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_cl_nbi_name" class="file-name-text">
+                                            {{ old('modal_cl_nbi_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_cl_nbi_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="barangay_clearance" class="d-none"
+                                            id="modal_cl_brgy_file"
+                                            onchange="showFileName(this, 'modal_cl_brgy_name')">
+                                        <label for="modal_cl_brgy_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_cl_brgy_name" class="file-name-text">
+                                            {{ old('modal_cl_brgy_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_cl_brgy_status"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle-fill me-1"></i>Save Uploads
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editReferralUploadsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <form id="editReferralUploadsForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header" style="background:#d3d3d3; color: #2c2c2c;">
+                        <div>
+                            <h5 class="modal-title mb-1"><i class="bi bi-upload me-2"></i>Edit Referral Uploads</h5>
+                            <div class="small" style="opacity:0.85;">Replace uploaded files for this referral record</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            style="color: #2c2c2c;"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6 class="section-title text-primary mb-1">Mayor's Referral Requirements</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <div class="document-upload-card-resume">
+                                    <label class="form-label">Resume</label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="resume" class="d-none"
+                                            id="modal_ref_resume_file"
+                                            onchange="showFileName(this, 'modal_ref_resume_name')">
+                                        <label for="modal_ref_resume_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_ref_resume_name" class="file-name-text">
+                                            {{ old('modal_ref_resume_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_ref_resume_status"></div>
+                                </div>
+                            </div>
+                            <h4 class="section-title-d text-primary">Choose at least one of the following:</h4>
+                            <div class="col-md-4">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Barangay Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="ref_barangay_clearance" class="d-none"
+                                            id="modal_ref_brgy_file"
+                                            onchange="showFileName(this, 'modal_ref_brgy_name')">
+                                        <label for="modal_ref_brgy_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_ref_brgy_name" class="file-name-text">
+                                            {{ old('modal_ref_brgy_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_ref_brgy_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="document-upload-card">
+                                    <label class="form-label">Police Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="ref_police_clearance" class="d-none"
+                                            id="modal_ref_police_file"
+                                            onchange="showFileName(this, 'modal_ref_police_name')">
+                                        <label for="modal_ref_police_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_ref_police_name" class="file-name-text">
+                                            {{ old('modal_ref_police_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_ref_police_status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="document-upload-card">
+                                    <label class="form-label">NBI Clearance<span class="required-mark">*</span></label>
+                                    <div class="d-grid gap-2">
+                                        <input type="file" name="ref_nbi_clearance" class="d-none"
+                                            id="modal_ref_nbi_file"
+                                            onchange="showFileName(this, 'modal_ref_nbi_name')">
+                                        <label for="modal_ref_nbi_file" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i> Upload File
+                                        </label>
+                                        <small id="modal_ref_nbi_name" class="file-name-text">
+                                            {{ old('modal_ref_nbi_name', 'No file selected') }}
+                                        </small>
+                                    </div>
+                                    <div class="small mt-2" id="modal_ref_nbi_status"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle-fill me-1"></i>Save Uploads
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
-{{-- City Government --}}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const referralTypeSelect = document.getElementById("referralTypeSelect");
@@ -3160,8 +5283,6 @@
         const pesoDetailTemplate = document.getElementById("pesoDetailTemplate");
         const pesoExtraDetails = pesoOfficeFields ? pesoOfficeFields.querySelector(".js-peso-extra-details") :
             null;
-        const printReferralPesoButton = document.getElementById("printReferralPesoButton");
-        const printReferralOtherCityButton = document.getElementById("printReferralOtherCityButton");
         const referralForm = referralTypeSelect ? referralTypeSelect.closest("form") : null;
         let nextPesoDetailIndex = pesoExtraDetails ? pesoExtraDetails.querySelectorAll(".js-peso-extra-detail")
             .length : 0;
@@ -3181,6 +5302,239 @@
         activateTabFromHash("#referral");
         activateTabFromHash("#clearance");
         activateTabFromHash("#permit");
+
+        document.querySelectorAll('.js-edit-permit-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var d = btn.dataset;
+                document.getElementById('editPermitDetailsForm').action =
+                    '{{ url('permits') }}/' + d.permitId + '/details';
+                document.getElementById('modal_permit_or_no').value = d.orNo;
+                document.getElementById('modal_community_tax_no').value = d.communityTaxNo;
+                document.getElementById('modal_permit_doc_stamp_control_no').value = d
+                    .docStampNo;
+                document.getElementById('modal_permit_issued_on').value = d.issuedOn;
+                document.getElementById('modal_permit_issued_at').value = d.issuedAt;
+                document.getElementById('modal_permit_date').value = d.permitDate;
+                document.getElementById('modal_expires_on').value = d.expiresOn;
+                document.getElementById('modal_permit_date_of_payment').value = d.datePayment;
+                var modal = new bootstrap.Modal(document.getElementById(
+                    'editPermitDetailsModal'));
+                modal.show();
+            });
+        });
+
+        document.querySelectorAll('.js-edit-clearance-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var d = btn.dataset;
+                document.getElementById('editClearanceDetailsForm').action =
+                    '{{ url('clearances') }}/' + d.clearanceId + '/details';
+                document.getElementById('modal_clearance_or_no').value = d.orNo;
+                document.getElementById('modal_clearance_issued_on').value = d.issuedOn;
+                document.getElementById('modal_clearance_doc_stamp_control_no').value = d
+                    .docStampNo;
+                document.getElementById('modal_clearance_date_of_payment').value = d
+                    .datePayment;
+                document.getElementById('modal_clearance_hired_company').value = d.hiredCompany;
+                var modal = new bootstrap.Modal(document.getElementById(
+                    'editClearanceDetailsModal'));
+                modal.show();
+            });
+        });
+
+        document.querySelectorAll('.js-edit-referral-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var d = btn.dataset;
+                var type = d.type;
+                document.getElementById('editReferralDetailsForm').action =
+                    '{{ url('referrals') }}/' + d.referralId + '/details';
+                document.getElementById('modal_referral_type').value = type;
+                document.getElementById('modal_referral_detail_index').value = d.detailIndex ||
+                    '';
+                var pesoFields = document.getElementById('modalPesoOfficeFields');
+                var otherFields = document.getElementById('modalOtherCityFields');
+                var typeLabel = document.getElementById('modalReferralTypeLabel');
+                var setModalReferralGroupState = function(activeGroup) {
+                    [pesoFields, otherFields].forEach(function(group) {
+                        if (!group) {
+                            return;
+                        }
+
+                        var isActive = group === activeGroup;
+                        group.querySelectorAll('input, select, textarea').forEach(
+                            function(field) {
+                                field.disabled = !isActive;
+                                field.required = isActive && field.hasAttribute(
+                                    'data-required');
+                            });
+                    });
+                };
+
+                [pesoFields, otherFields].forEach(function(group) {
+                    if (!group) {
+                        return;
+                    }
+
+                    group.querySelectorAll('[required]').forEach(function(field) {
+                        field.dataset.required = 'true';
+                    });
+                });
+
+                if (type === 'peso_office') {
+                    pesoFields.style.display = '';
+                    otherFields.style.display = 'none';
+                    typeLabel.textContent = 'Referral Within Imus';
+                    document.getElementById('modal_ref_employer_name').value = d.employerName;
+                    document.getElementById('modal_ref_position').value = d.position;
+                    document.getElementById('modal_ref_province').value = d.province;
+                    document.getElementById('modal_ref_hired_company').value = d.hiredCompany;
+                    ensurePsgcCityData().then(function(cities) {
+                        var modalSelect = document.getElementById('modal_ref_place');
+                        populateCityAddressOptions(modalSelect, cities, d.place || '');
+                    });
+                    setModalReferralGroupState(pesoFields);
+                } else {
+                    pesoFields.style.display = 'none';
+                    otherFields.style.display = '';
+                    typeLabel.textContent = 'Referral Outside Imus';
+                    setModalReferralGroupState(otherFields);
+                    if (typeof populateModalOtherCityReferralFields === 'function') {
+                        populateModalOtherCityReferralFields(d.recipient, d.cityGov, d
+                            .companyAddress);
+                    }
+                }
+                var modal = new bootstrap.Modal(document.getElementById(
+                    'editReferralDetailsModal'));
+                modal.show();
+            });
+        });
+
+        function getFileName(path) {
+            if (!path) return 'No file uploaded';
+            return path.split('/').pop();
+        }
+
+        document.querySelectorAll('.js-edit-permit-uploads-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var d = btn.dataset;
+                document.getElementById('editPermitUploadsForm').action =
+                    '{{ url('permits') }}/' + d.permitId + '/files';
+                var ct = d.clearanceType || 'nbi';
+                document.getElementById('modal_permit_ct_nbi').checked = ct === 'nbi';
+                document.getElementById('modal_permit_ct_police').checked = ct === 'police';
+                document.getElementById('modal_permit_nbi_group').style.display = ct === 'nbi' ? '' : 'none';
+                document.getElementById('modal_permit_police_group').style.display = ct === 'police' ? '' : 'none';
+                document.getElementById('modal_permit_nbi_name').textContent = 'No file selected';
+                document.getElementById('modal_permit_police_name').textContent = 'No file selected';
+                document.getElementById('modal_permit_health_name').textContent = 'No file selected';
+                document.getElementById('modal_permit_cedula_name').textContent = 'No file selected';
+                document.getElementById('modal_permit_referral_name').textContent = 'No file selected';
+                document.getElementById('modal_permit_nbi_status').innerHTML = d.nbi
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.nbi)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_permit_police_status').innerHTML = d.police
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.police)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_permit_health_status').innerHTML = d.health
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.health)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_permit_cedula_status').innerHTML = d.cedula
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.cedula)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_permit_referral_status').innerHTML = d.referral
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.referral)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                var radios = document.querySelectorAll('input[name="clearance_type"]');
+                radios.forEach(function(radio) {
+                    radio.addEventListener('change', function() {
+                        document.getElementById('modal_permit_nbi_group').style.display =
+                            this.value === 'nbi' ? '' : 'none';
+                        document.getElementById('modal_permit_police_group').style.display =
+                            this.value === 'police' ? '' : 'none';
+                    });
+                });
+                document.getElementById('editPermitUploadsModal').querySelectorAll('input[type="file"]').forEach(function(f) {
+                    f.value = '';
+                });
+                var isImus = d.imusResident === '1';
+                var referralCard = document.getElementById('modal_permit_referral_card');
+                var referralFile = document.getElementById('modal_permit_referral_file');
+                var referralLabel = document.querySelector('label[for="modal_permit_referral_file"]');
+                var referralStatus = document.getElementById('modal_permit_referral_status');
+                if (isImus) {
+                    referralCard.classList.add('upload-disabled');
+                    referralFile.disabled = true;
+                    referralFile.value = '';
+                    if (referralLabel) referralLabel.classList.add('d-none');
+                    referralStatus.innerHTML = '<i class="bi bi-info-circle text-muted me-1"></i>Not required for Imus residents';
+                } else {
+                    referralCard.classList.remove('upload-disabled');
+                    referralFile.disabled = false;
+                    if (referralLabel) referralLabel.classList.remove('d-none');
+                }
+                new bootstrap.Modal(document.getElementById('editPermitUploadsModal')).show();
+            });
+        });
+
+        document.querySelectorAll('.js-edit-clearance-uploads-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var d = btn.dataset;
+                document.getElementById('editClearanceUploadsForm').action =
+                    '{{ url('clearances') }}/' + d.clearanceId + '/files';
+                document.getElementById('modal_cl_prosecutor_name').textContent = 'No file selected';
+                document.getElementById('modal_cl_mtc_name').textContent = 'No file selected';
+                document.getElementById('modal_cl_rtc_name').textContent = 'No file selected';
+                document.getElementById('modal_cl_nbi_name').textContent = 'No file selected';
+                document.getElementById('modal_cl_brgy_name').textContent = 'No file selected';
+                document.getElementById('modal_cl_prosecutor_status').innerHTML = d.prosecutor
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.prosecutor)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_cl_mtc_status').innerHTML = d.mtc
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.mtc)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_cl_rtc_status').innerHTML = d.rtc
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.rtc)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_cl_nbi_status').innerHTML = d.nbi
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.nbi)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_cl_brgy_status').innerHTML = d.barangay
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.barangay)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('editClearanceUploadsModal').querySelectorAll('input[type="file"]').forEach(function(f) {
+                    f.value = '';
+                });
+                new bootstrap.Modal(document.getElementById('editClearanceUploadsModal')).show();
+            });
+        });
+
+        document.querySelectorAll('.js-edit-referral-uploads-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var d = btn.dataset;
+                document.getElementById('editReferralUploadsForm').action =
+                    '{{ url('referrals') }}/' + d.referralId + '/files';
+                document.getElementById('modal_ref_resume_name').textContent = 'No file selected';
+                document.getElementById('modal_ref_brgy_name').textContent = 'No file selected';
+                document.getElementById('modal_ref_police_name').textContent = 'No file selected';
+                document.getElementById('modal_ref_nbi_name').textContent = 'No file selected';
+                document.getElementById('modal_ref_resume_status').innerHTML = d.resume
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.resume)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_ref_brgy_status').innerHTML = d.brgy
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.brgy)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_ref_police_status').innerHTML = d.police
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.police)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('modal_ref_nbi_status').innerHTML = d.nbi
+                    ? '<i class="bi bi-check-circle-fill text-success me-1"></i>' + getFileName(d.nbi)
+                    : '<i class="bi bi-x-circle text-muted me-1"></i>No file uploaded';
+                document.getElementById('editReferralUploadsModal').querySelectorAll('input[type="file"]').forEach(function(f) {
+                    f.value = '';
+                });
+                new bootstrap.Modal(document.getElementById('editReferralUploadsModal')).show();
+            });
+        });
+
         if (referralTypeSelect && pesoOfficeFields && otherCityFields) {
             const setGroupDisabledState = (container, shouldDisable) => {
                 container.querySelectorAll("input, select, textarea").forEach(field => {
@@ -3274,7 +5628,7 @@
 
                 addPesoDetailButton.addEventListener("click", addPesoDetail);
 
-                pesoExtraDetails.addEventListener("click", function(event) {
+                pesoOfficeFields.addEventListener("click", function(event) {
                     const removeButton = event.target.closest(".js-remove-peso-detail");
 
                     if (!removeButton) {
@@ -3294,18 +5648,20 @@
         const permitIssuedAtDropdown = document.getElementById("permitIssuedAtSelect");
         const refRecipientDropdown = document.getElementById("refRecipientSelect");
         const refPlaceInput = document.getElementById("refPlaceInput");
-        const refPlaceOptions = document.getElementById("refPlaceOptions");
         const refProvinceInput = document.getElementById("refProvinceInput");
         const refCompanyAddressInput = document.getElementById("refCompanyAddressInput");
         const refCompanyAddressList = document.getElementById("refCompanyAddressList");
-        const selectedPermitIssuedAt =
-            `{{ strtoupper(trim((string) old('permit_issued_at', $permit->permit_issued_at ?? ''))) }}`;
+        const modalRefRecipientDropdown = document.getElementById("modal_ref_recipient");
+        const modalCityDropdown = document.getElementById("modal_ref_city_gov");
+        const modalRefCompanyAddressInput = document.getElementById("modal_ref_company_address");
+        const modalRefCompanyAddressList = document.getElementById("modalRefCompanyAddressList");
+        const editReferralDetailsModal = document.getElementById("editReferralDetailsModal");
+        const selectedPermitIssuedAt = `{{ old('permit_issued_at') }}`;
         const permitIssuedAtApiUrl = `{{ route('api.permit-issued-at.city-governments') }}`;
-        const selectedCityGovernment = `{{ old('ref_city_gov', $referral->ref_city_gov ?? '') }}`;
-        const selectedRefRecipient = `{{ old('ref_recipient', $referral->ref_recipient ?? '') }}`;
+        const selectedCityGovernment = `{{ old('ref_city_gov') }}`;
+        const selectedRefRecipient = `{{ old('ref_recipient') }}`;
         const selectedRefPlace = `{{ old('ref_place', $referral->ref_place ?? '') }}`;
-        const selectedRefCompanyAddress =
-            `{{ old('ref_company_address', $referral->ref_company_address ?? '') }}`;
+        const selectedRefCompanyAddress = `{{ old('ref_company_address') }}`;
         const referralRecipientSearchUrl = `{{ route('referrals.recipients.search') }}`;
         const configuredMayors = @json(config('philippine_mayors', []));
         let permitIssuedAtOptionsPromise = null;
@@ -3370,15 +5726,24 @@
             return permitIssuedAtOptionsPromise;
         };
 
-        const populateCityAddressOptions = (datalist, cities, currentValue = "") => {
-            if (!datalist) {
+        const populateCityAddressOptions = (selectEl, cities, currentValue = "") => {
+            if (!selectEl) {
                 return;
             }
 
             const normalizePlaceValue = value => String(value || "").toUpperCase().trim();
             const selectedValue = normalizePlaceValue(currentValue);
 
-            datalist.innerHTML = "";
+            const defaultOption = selectEl.querySelector('option[value=""]');
+            selectEl.innerHTML = "";
+            if (defaultOption) {
+                selectEl.appendChild(defaultOption);
+            } else {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Select City Address";
+                selectEl.appendChild(opt);
+            }
 
             cities.forEach(city => {
                 const rawName = city.name || city.description || "";
@@ -3390,27 +5755,40 @@
                 const provinceName = city.province?.name || city.province?.description || (
                     typeof city.province === "string" ? city.province : "");
 
-                if (isCity && !/\bCITY$/.test(name)) {
-                    name = (name + " CITY").trim();
+                if (isCity && !/^CITY\s+OF\s+/.test(name)) {
+                    name = ("CITY OF " + name).trim();
                 }
 
                 const option = document.createElement("option");
                 option.value = name;
+                option.textContent = name;
                 if (provinceCode) {
                     option.dataset.provinceCode = provinceCode;
                 }
                 if (provinceName) {
                     option.dataset.provinceName = String(provinceName).toUpperCase().trim();
                 }
-                datalist.appendChild(option);
+                selectEl.appendChild(option);
             });
 
-            if (selectedValue && !Array.from(datalist.options).some(option => option.value ===
-                    selectedValue)) {
-                const currentOption = document.createElement("option");
-                currentOption.value = selectedValue;
-                datalist.appendChild(currentOption);
+            if (selectedValue) {
+                const hasMatch = Array.from(selectEl.options).some(option => option.value === selectedValue);
+                if (!hasMatch) {
+                    const extra = document.createElement("option");
+                    extra.value = selectedValue;
+                    extra.textContent = selectedValue;
+                    selectEl.appendChild(extra);
+                }
+                selectEl.value = selectedValue;
             }
+        };
+
+        const populateModalCityAddressOptions = (cities) => {
+            const modalSelect = document.getElementById("modal_ref_place");
+            if (!modalSelect) {
+                return;
+            }
+            populateCityAddressOptions(modalSelect, cities, modalSelect.value || "");
         };
 
         const ensurePsgcProvinceData = (() => {
@@ -3458,13 +5836,13 @@
         };
 
         const getCityOptionFromValue = (value) => {
-            if (!refPlaceOptions) {
+            if (!refPlaceInput) {
                 return null;
             }
 
             const normalizedValue = String(value || "").toUpperCase().trim();
 
-            return Array.from(refPlaceOptions.options).find(option => option.value === normalizedValue) ||
+            return Array.from(refPlaceInput.options).find(option => option.value === normalizedValue) ||
                 null;
         };
 
@@ -3538,7 +5916,7 @@
             }
 
             const selectedRecipientOption = refRecipientDropdown.options[refRecipientDropdown
-            .selectedIndex];
+                .selectedIndex];
 
             if (!selectedRecipientOption) {
                 return;
@@ -3593,6 +5971,25 @@
             );
         };
 
+        function initSelect2PesoRefPlace(selectEl, isModal) {
+            if (!selectEl || window.jQuery(selectEl).data('select2')) return;
+            var opts = {
+                placeholder: "Search City Address",
+                allowClear: true,
+                width: "100%",
+                dropdownAutoWidth: true,
+                minimumResultsForSearch: 0
+            };
+            if (isModal) {
+                opts.dropdownParent = editReferralDetailsModal ?
+                    window.jQuery(editReferralDetailsModal) :
+                    window.jQuery(document.body);
+            }
+            window.jQuery(selectEl).select2(opts);
+        }
+
+        var modalRefPlaceSelect = document.getElementById("modal_ref_place");
+
         if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
             if (permitIssuedAtDropdown) {
                 window.jQuery(permitIssuedAtDropdown).select2({
@@ -3632,8 +6029,7 @@
                                 q: params.term || "",
                                 city_government: cityGovernmentValue && cityGovernmentValue !==
                                     "Select City Government" ?
-                                    cityGovernmentValue :
-                                    ""
+                                    cityGovernmentValue : ""
                             };
                         },
                         processResults: data => ({
@@ -3721,7 +6117,222 @@
                 option.value = companyAddressValue;
                 refCompanyAddressList.appendChild(option);
             }
+
+            if (modalRefCompanyAddressList && !Array.from(modalRefCompanyAddressList.options).some(
+                    option =>
+                    option.value === companyAddressValue)) {
+                const option = document.createElement("option");
+                option.value = companyAddressValue;
+                modalRefCompanyAddressList.appendChild(option);
+            }
         });
+
+        const setModalRecipientDetails = (cityGovernment, companyAddress) => {
+            if (modalCityDropdown && cityGovernment) {
+                appendOptionIfMissing(
+                    modalCityDropdown,
+                    cityGovernment,
+                    formatCityGovernmentLabel(cityGovernment)
+                );
+                modalCityDropdown.value = cityGovernment;
+
+                if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                    window.jQuery(modalCityDropdown).trigger("change.select2");
+                }
+            }
+
+            if (modalRefCompanyAddressInput && companyAddress) {
+                modalRefCompanyAddressInput.value = companyAddress;
+            }
+        };
+
+        const populateModalOtherCityReferralFields = (recipient, cityGov, companyAddress) => {
+            if (!modalRefRecipientDropdown || !modalCityDropdown) {
+                return;
+            }
+
+            appendOptionIfMissing(modalRefRecipientDropdown, recipient, recipient, {
+                cityGovernment: cityGov,
+                companyAddress: companyAddress
+            });
+            appendOptionIfMissing(
+                modalCityDropdown,
+                cityGov,
+                formatCityGovernmentLabel(cityGov)
+            );
+
+            modalRefRecipientDropdown.value = recipient || "";
+            modalCityDropdown.value = cityGov || "";
+
+            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                window.jQuery(modalRefRecipientDropdown).val(recipient || null).trigger("change.select2");
+                window.jQuery(modalCityDropdown).val(cityGov || null).trigger("change.select2");
+            }
+
+            if (modalRefCompanyAddressInput) {
+                modalRefCompanyAddressInput.value = companyAddress || "";
+            }
+        };
+
+        const syncModalRecipientDetailsFromSelectedOption = () => {
+            if (!modalRefRecipientDropdown) {
+                return;
+            }
+
+            const selectedRecipientOption = modalRefRecipientDropdown.options[modalRefRecipientDropdown
+                .selectedIndex];
+
+            if (!selectedRecipientOption) {
+                return;
+            }
+
+            setModalRecipientDetails(
+                selectedRecipientOption.dataset.cityGovernment || "",
+                selectedRecipientOption.dataset.companyAddress || ""
+            );
+        };
+
+        const syncModalRecipientFromCityGovernment = () => {
+            if (!modalCityDropdown || !modalRefRecipientDropdown) {
+                return;
+            }
+
+            const normalizedSelectedCity = normalizeCityGovernmentValue(modalCityDropdown.value);
+
+            if (!normalizedSelectedCity) {
+                modalRefRecipientDropdown.value = "";
+
+                if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                    window.jQuery(modalRefRecipientDropdown).val(null).trigger("change");
+                }
+
+                if (modalRefCompanyAddressInput) {
+                    modalRefCompanyAddressInput.value = "";
+                }
+
+                return;
+            }
+
+            const matchingMayorOption = Array.from(modalRefRecipientDropdown.options).find(option =>
+                normalizeCityGovernmentValue(option.dataset.cityGovernment || "") ===
+                normalizedSelectedCity
+            );
+
+            if (!matchingMayorOption) {
+                return;
+            }
+
+            matchingMayorOption.selected = true;
+            modalRefRecipientDropdown.value = matchingMayorOption.value;
+
+            if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+                window.jQuery(modalRefRecipientDropdown).trigger("change.select2");
+            }
+
+            setModalRecipientDetails(
+                matchingMayorOption.dataset.cityGovernment || "",
+                matchingMayorOption.dataset.companyAddress || ""
+            );
+        };
+
+        configuredCityGovernments.forEach(cityGovernmentValue => {
+            if (modalCityDropdown && !Array.from(modalCityDropdown.options).some(option => option
+                    .value ===
+                    cityGovernmentValue)) {
+                const option = document.createElement("option");
+                option.value = cityGovernmentValue;
+                option.text = cityGovernmentValue;
+                modalCityDropdown.appendChild(option);
+            }
+        });
+
+        if (modalRefRecipientDropdown) {
+            modalRefRecipientDropdown.addEventListener("change", syncModalRecipientDetailsFromSelectedOption);
+        }
+
+        if (modalCityDropdown) {
+            modalCityDropdown.addEventListener("change", syncModalRecipientFromCityGovernment);
+        }
+
+        if (window.jQuery && typeof window.jQuery.fn.select2 === "function") {
+            const modalDropdownParent = editReferralDetailsModal ?
+                window.jQuery(editReferralDetailsModal) :
+                window.jQuery(document.body);
+
+            if (modalCityDropdown) {
+                window.jQuery(modalCityDropdown).select2({
+                    placeholder: "Select City Government",
+                    allowClear: true,
+                    width: "100%",
+                    dropdownAutoWidth: true,
+                    minimumResultsForSearch: 0,
+                    dropdownParent: modalDropdownParent
+                });
+            }
+
+            if (modalRefRecipientDropdown) {
+                window.jQuery(modalRefRecipientDropdown).select2({
+                    placeholder: "Search or type mayor's name",
+                    allowClear: true,
+                    width: "100%",
+                    dropdownAutoWidth: true,
+                    minimumInputLength: 0,
+                    dropdownParent: modalDropdownParent,
+                    ajax: {
+                        url: referralRecipientSearchUrl,
+                        dataType: "json",
+                        delay: 250,
+                        data: params => {
+                            const cityGovernmentValue = modalCityDropdown ? modalCityDropdown
+                                .value : "";
+
+                            return {
+                                q: params.term || "",
+                                city_government: cityGovernmentValue && cityGovernmentValue !==
+                                    "Select City Government" ?
+                                    cityGovernmentValue : ""
+                            };
+                        },
+                        processResults: data => ({
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text,
+                                city_government: item.city_government,
+                                company_address: item.company_address
+                            }))
+                        })
+                    },
+                    templateSelection: item => item.text || item.id || ""
+                });
+
+                window.jQuery(modalRefRecipientDropdown).on("select2:select", function(event) {
+                    const selectedMayor = event.params.data;
+                    const selectedOption = modalRefRecipientDropdown.options[modalRefRecipientDropdown
+                        .selectedIndex];
+
+                    if (selectedOption) {
+                        if (selectedMayor.city_government) {
+                            selectedOption.dataset.cityGovernment = selectedMayor.city_government;
+                        }
+
+                        if (selectedMayor.company_address) {
+                            selectedOption.dataset.companyAddress = selectedMayor.company_address;
+                        }
+                    }
+
+                    setModalRecipientDetails(
+                        selectedMayor.city_government || "",
+                        selectedMayor.company_address || ""
+                    );
+                });
+
+                window.jQuery(modalRefRecipientDropdown).on("select2:clear", function() {
+                    if (modalRefCompanyAddressInput) {
+                        modalRefCompanyAddressInput.value = "";
+                    }
+                });
+            }
+        }
 
         if (refCompanyAddressInput && selectedRefCompanyAddress) {
             refCompanyAddressInput.value = selectedRefCompanyAddress;
@@ -3775,22 +6386,26 @@
             Promise.all([ensurePsgcCityData(), ensurePsgcProvinceData()]).then(([cities, provinces]) => {
                 populatePermitIssuedAtOptions();
 
-                if (refPlaceOptions) {
-                    populateCityAddressOptions(refPlaceOptions, cities, refPlaceInput ?
-                        refPlaceInput.value : selectedRefPlace || "");
-                    syncProvinceInputFromCityValue(refPlaceInput ? refPlaceInput.value :
+                if (refPlaceInput) {
+                    populateCityAddressOptions(refPlaceInput, cities, selectedRefPlace || "");
+                    syncProvinceInputFromCityValue(refPlaceInput.value ||
                         selectedRefPlace || "", refProvinceInput, provinces);
+                    initSelect2PesoRefPlace(refPlaceInput);
                 }
 
-                document.querySelectorAll(".js-peso-ref-place-input").forEach(input => {
-                    syncProvinceInputFromCityValue(input.value || "", input.closest(
+                document.querySelectorAll(".js-peso-ref-place-select").forEach(select => {
+                    const savedVal = select.dataset.selectedValue || select.value || "";
+                    populateCityAddressOptions(select, cities, savedVal);
+                    syncProvinceInputFromCityValue(select.value || "", select.closest(
                         ".peso-extra-detail-card")?.querySelector(
                         ".js-peso-ref-province-input"), provinces);
-
-                    if (input.value) {
-                        input.value = input.value.toUpperCase();
-                    }
+                    initSelect2PesoRefPlace(select);
                 });
+
+                populateModalCityAddressOptions(cities);
+                if (modalRefPlaceSelect) {
+                    initSelect2PesoRefPlace(modalRefPlaceSelect, true);
+                }
             });
         };
 
@@ -3803,15 +6418,6 @@
         }
 
         if (refPlaceInput) {
-            refPlaceInput.addEventListener("focus", populatePsgcCityData, {
-                once: true
-            });
-            refPlaceInput.addEventListener("input", function() {
-                this.value = this.value.toUpperCase();
-                ensurePsgcProvinceData().then(provinces => {
-                    syncProvinceInputFromCityValue(this.value, refProvinceInput, provinces);
-                });
-            });
             refPlaceInput.addEventListener("change", function() {
                 ensurePsgcProvinceData().then(provinces => {
                     syncProvinceInputFromCityValue(this.value, refProvinceInput, provinces);
@@ -3820,25 +6426,21 @@
         }
 
         document.addEventListener("change", function(event) {
-            const cityInput = event.target.closest(".js-peso-ref-place-input");
+            const citySelect = event.target.closest(".js-peso-ref-place-select");
 
-            if (!cityInput) {
+            if (!citySelect) {
                 return;
             }
 
-            const provinceInput = cityInput.closest(".peso-extra-detail-card")?.querySelector(
+            const provinceInput = citySelect.closest(".peso-extra-detail-card")?.querySelector(
                 ".js-peso-ref-province-input");
 
             ensurePsgcProvinceData().then(provinces => {
-                syncProvinceInputFromCityValue(cityInput.value, provinceInput, provinces);
+                syncProvinceInputFromCityValue(citySelect.value, provinceInput, provinces);
             });
         });
 
-        if (
-            selectedPermitIssuedAt ||
-            selectedRefPlace ||
-            document.querySelector(".js-peso-ref-place-input")
-        ) {
+        if (refPlaceInput || document.querySelector(".js-peso-ref-place-select") || modalRefPlaceSelect) {
             populatePsgcCityData();
         }
 
@@ -3919,7 +6521,8 @@
                 'POBLACION III-A', 'POBLACION III-B',
                 'POBLACION IV-A', 'POBLACION IV-B', 'POBLACION IV-C', 'POBLACION IV-D',
                 'TOCLONG I-A', 'TOCLONG I-B', 'TOCLONG I-C', 'TOCLONG II-A', 'TOCLONG II-B',
-                'ANABU I-A', 'ANABU I-B', 'ANABU I-C', 'ANABU I-D', 'ANABU I-E', 'ANABU I-F', 'ANABU I-G',
+                'ANABU I-A', 'ANABU I-B', 'ANABU I-C', 'ANABU I-D', 'ANABU I-E', 'ANABU I-F',
+                'ANABU I-G',
                 'ANABU II-A', 'ANABU II-B', 'ANABU II-C', 'ANABU II-D', 'ANABU II-E', 'ANABU II-F',
                 'BAGONG SILANG', 'BAYAN LUMA I', 'BAYAN LUMA II', 'BAYAN LUMA III',
                 'BAYAN LUMA IV', 'BAYAN LUMA V', 'BAYAN LUMA VI', 'BAYAN LUMA VII',
@@ -3980,11 +6583,14 @@
         function setBarangayOptions(items, selectedBarangay = '', cityName = '') {
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
             const normalizedSelectedBarangay = String(selectedBarangay || '').toUpperCase();
-            items.slice().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })).forEach(item => {
+            items.slice().sort((a, b) => a.localeCompare(b, undefined, {
+                sensitivity: 'base'
+            })).forEach(item => {
                 const option = document.createElement('option');
                 option.value = item;
                 option.textContent = item;
-                if (normalizedSelectedBarangay && isBarangayMatch(normalizedSelectedBarangay, item, cityName)) {
+                if (normalizedSelectedBarangay && isBarangayMatch(normalizedSelectedBarangay, item,
+                        cityName)) {
                     option.selected = true;
                 }
                 barangaySelect.appendChild(option);
@@ -4004,13 +6610,16 @@
             citySelect.innerHTML = '<option value="">Select City</option>';
             const normalizedSelected = String(selectedCity || '').toUpperCase();
             const selectedBase = normalizeName(normalizedSelected).replace(/\s*CITY\s*$/, '');
-            items.slice().sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })).forEach(item => {
+            items.slice().sort((a, b) => a.localeCompare(b, undefined, {
+                sensitivity: 'base'
+            })).forEach(item => {
                 const option = document.createElement('option');
                 option.value = item;
                 option.textContent = item;
                 if (normalizedSelected && String(item).toUpperCase() === normalizedSelected) {
                     option.selected = true;
-                } else if (selectedBase && normalizeName(item).replace(/\s*CITY\s*$/, '') === selectedBase) {
+                } else if (selectedBase && normalizeName(item).replace(/\s*CITY\s*$/, '') ===
+                    selectedBase) {
                     option.selected = true;
                 }
                 citySelect.appendChild(option);
@@ -4019,6 +6628,7 @@
 
         function loadLocalCities(provinceIdentifier) {
             const normalized = normalizeName(provinceIdentifier);
+
             function loadSelectedCityBarangays() {
                 const selectedCity = citySelect.options[citySelect.selectedIndex];
                 if (selectedCity && selectedCity.value) {
@@ -4030,7 +6640,8 @@
                 loadSelectedCityBarangays();
                 return true;
             }
-            const ncrCode = window._provinceCodeMap && (window._provinceCodeMap['NCR'] || window._provinceCodeMap['METRO MANILA']);
+            const ncrCode = window._provinceCodeMap && (window._provinceCodeMap['NCR'] || window
+                ._provinceCodeMap['METRO MANILA']);
             if (ncrCode && String(provinceIdentifier) === String(ncrCode)) {
                 setCityOptions(localCities['NCR'], savedCity);
                 loadSelectedCityBarangays();
@@ -4057,7 +6668,9 @@
                     provinces.sort((a, b) => {
                         const an = (a.name || a.province || a.description || '').toString();
                         const bn = (b.name || b.province || b.description || '').toString();
-                        return an.localeCompare(bn, undefined, { sensitivity: 'base' });
+                        return an.localeCompare(bn, undefined, {
+                            sensitivity: 'base'
+                        });
                     });
 
                     provinces.forEach(p => {
@@ -4094,15 +6707,19 @@
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
             let provinceCode = provinceIdentifier;
-            if (isNaN(Number(provinceCode))) provinceCode = window._provinceCodeMap && window._provinceCodeMap[provinceCode] ? window._provinceCodeMap[provinceCode] : provinceCode;
+            if (isNaN(Number(provinceCode))) provinceCode = window._provinceCodeMap && window
+                ._provinceCodeMap[provinceCode] ? window._provinceCodeMap[provinceCode] : provinceCode;
 
-            if (loadLocalCities(provinceIdentifier) || (provinceCode && window._provinceCodeMap && window._provinceCodeMap['NCR'] && String(provinceCode) === String(window._provinceCodeMap['NCR']))) {
+            if (loadLocalCities(provinceIdentifier) || (provinceCode && window._provinceCodeMap && window
+                    ._provinceCodeMap['NCR'] && String(provinceCode) === String(window._provinceCodeMap[
+                        'NCR']))) {
                 return;
             }
 
             try {
                 const res = await fetch(
-                    `https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`);
+                    `https://psgc.gitlab.io/api/provinces/${encodeURIComponent(provinceCode)}/cities-municipalities/`
+                );
                 if (!res.ok) throw new Error('no-cities');
                 const data = await res.json();
                 citySelect.innerHTML = '<option value="">Select City</option>';
@@ -4133,7 +6750,8 @@
                 // Batangas extras
                 (function appendBatangasExtras() {
                     let provinceNameUpper = '';
-                    if (isNaN(Number(provinceIdentifier))) provinceNameUpper = String(provinceIdentifier).toUpperCase();
+                    if (isNaN(Number(provinceIdentifier))) provinceNameUpper = String(
+                        provinceIdentifier).toUpperCase();
                     else if (window._provinceCodeMap) {
                         for (const k in window._provinceCodeMap) {
                             if (window._provinceCodeMap[k] === provinceCode) {
@@ -4145,7 +6763,8 @@
 
                     if (provinceNameUpper && provinceNameUpper.includes('BATANGAS')) {
                         const extras = ['BATANGAS PROVINCE', 'BATANGAS STATE UNIVERSITY',
-                            'UNIVERSITY OF BATANGAS-MAIN', 'RIZAL COLLEGE OF TAAL'];
+                            'UNIVERSITY OF BATANGAS-MAIN', 'RIZAL COLLEGE OF TAAL'
+                        ];
                         extras.forEach(raw => {
                             const name = String(raw).toUpperCase().trim();
                             if (!Array.from(citySelect.options).some(o => o.value === name)) {
@@ -4154,8 +6773,10 @@
                                 option.textContent = name;
                                 option.dataset.code = '';
                                 if (savedCity) {
-                                    const savedNorm = normalizeName(savedCity).replace(/\s*CITY\s*$/, '');
-                                    const optionNorm = normalizeName(name).replace(/\s*CITY\s*$/, '');
+                                    const savedNorm = normalizeName(savedCity).replace(
+                                        /\s*CITY\s*$/, '');
+                                    const optionNorm = normalizeName(name).replace(
+                                        /\s*CITY\s*$/, '');
                                     if (savedNorm === optionNorm) option.selected = true;
                                 }
                                 citySelect.appendChild(option);
@@ -4175,15 +6796,18 @@
                         caviteExtras.forEach(raw => {
                             const cleaned = normalizeName(raw);
                             const isCityExtra = /city/i.test(raw);
-                            const name = isCityExtra ? `CITY OF ${cleaned.replace(/\s*CITY\s*$/, '')}` : cleaned;
+                            const name = isCityExtra ?
+                                `CITY OF ${cleaned.replace(/\s*CITY\s*$/, '')}` : cleaned;
                             if (!Array.from(citySelect.options).some(o => o.value === name)) {
                                 const option = document.createElement('option');
                                 option.value = name;
                                 option.textContent = name;
                                 option.dataset.code = '';
                                 if (savedCity) {
-                                    const savedNorm = normalizeName(savedCity).replace(/\s*CITY\s*$/, '');
-                                    const optionNorm = normalizeName(name).replace(/\s*CITY\s*$/, '');
+                                    const savedNorm = normalizeName(savedCity).replace(
+                                        /\s*CITY\s*$/, '');
+                                    const optionNorm = normalizeName(name).replace(
+                                        /\s*CITY\s*$/, '');
                                     if (savedNorm === optionNorm) option.selected = true;
                                 }
                                 citySelect.appendChild(option);
@@ -4214,12 +6838,15 @@
                 const selectedProvince = normalizeName(rawProvince);
                 const knownNcrCodes = [];
                 if (window._provinceCodeMap) {
-                    if (window._provinceCodeMap['NCR']) knownNcrCodes.push(String(window._provinceCodeMap['NCR']));
-                    if (window._provinceCodeMap['METRO MANILA']) knownNcrCodes.push(String(window._provinceCodeMap['METRO MANILA']));
+                    if (window._provinceCodeMap['NCR']) knownNcrCodes.push(String(window._provinceCodeMap[
+                        'NCR']));
+                    if (window._provinceCodeMap['METRO MANILA']) knownNcrCodes.push(String(window
+                        ._provinceCodeMap['METRO MANILA']));
                 }
                 knownNcrCodes.push('130000000');
                 const selectedOption = provinceSelect.options[provinceSelect.selectedIndex];
-                const selectedOptionCode = selectedOption && selectedOption.dataset ? String(selectedOption.dataset.code || '') : '';
+                const selectedOptionCode = selectedOption && selectedOption.dataset ? String(selectedOption
+                    .dataset.code || '') : '';
                 const provinceIsNcr = (
                     selectedProvince === 'NCR' ||
                     selectedProvince.includes('NATIONAL CAPITAL') ||
@@ -4255,7 +6882,8 @@
                         const option = document.createElement('option');
                         option.value = name;
                         option.textContent = name;
-                        if (savedBarangay && isBarangayMatch(savedBarangay, name, normalizeName(cityName)))
+                        if (savedBarangay && isBarangayMatch(savedBarangay, name, normalizeName(
+                                cityName)))
                             option.selected = true;
                         barangaySelect.appendChild(option);
                     });
@@ -4372,6 +7000,22 @@
 </script>
 
 <script>
+    function clearAllUploadLabels() {
+        const allFileLabels = [
+            'nbi_name', 'police_name', 'health_card_name', 'cedula_name', 'referral_name',
+            'prosecutor_name', 'mtc_name', 'rtc_name', 'c_nbi_name', 'brgy_name',
+            'resume_name', 'ref_brgy_name', 'ref_police_name', 'ref_nbi_name'
+        ];
+        allFileLabels.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = 'No file selected';
+        });
+
+        document.querySelectorAll('.file-name-text + a.btn').forEach(function(link) {
+            if (link.textContent.includes('View Current')) link.style.display = 'none';
+        });
+    }
+
     function showFileName(input, displayId) {
         const fileName = input.files.length ? input.files[0].name : '';
         document.getElementById(displayId).textContent = fileName;
@@ -4434,35 +7078,36 @@
         const birthdateInput = document.getElementById('birthdate');
         const ageInput = document.getElementById('age');
 
-        if (!birthdateInput || !ageInput) {
-            return;
-        }
+        if (!birthdateInput) return;
 
-        const updateAge = () => {
-            const birthdate = birthdateInput.value;
-
-            if (!birthdate) {
-                ageInput.value = '';
-                return;
-            }
-
-            const birthDate = new Date(`${birthdate}T00:00:00`);
+        function calcAge(dateStr) {
+            if (!dateStr) return '';
+            const birthDate = new Date(dateStr + 'T00:00:00');
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
-
             const monthDiff = today.getMonth() - birthDate.getMonth();
             const dayDiff = today.getDate() - birthDate.getDate();
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
+            return age >= 0 ? age : '';
+        }
 
-            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-                age -= 1;
+        flatpickr(birthdateInput, {
+            dateFormat: 'Y-m-d',
+            maxDate: 'today',
+            minDate: '1920-01-01',
+            defaultDate: birthdateInput.value || null,
+            disableMobile: true,
+            weekNumbers: true,
+            monthSelector: 'dropdown',
+            yearSelector: 'dropdown',
+            onChange: function(selectedDates, dateStr) {
+                if (ageInput) ageInput.value = calcAge(dateStr);
             }
+        });
 
-            ageInput.value = age >= 0 ? age : '';
-        };
-
-        birthdateInput.addEventListener('change', updateAge);
-        birthdateInput.addEventListener('input', updateAge);
-        updateAge();
+        if (ageInput && birthdateInput.value) {
+            ageInput.value = calcAge(birthdateInput.value);
+        }
     });
 </script>
 

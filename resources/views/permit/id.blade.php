@@ -234,7 +234,7 @@
 
 <body>
     @php
-        $permit = optional($applicant->permit);
+        $permit = optional($permit);
         $fullName = strtoupper(
             trim(
                 collect([

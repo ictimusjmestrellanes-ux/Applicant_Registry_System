@@ -62,6 +62,75 @@ class ApplicantController extends Controller
             ->with('applicant_id', $applicant->id);
     }
 
+    public function checkDuplicates(Request $request)
+    {
+        $firstName = trim($request->query('first_name', ''));
+        $lastName = trim($request->query('last_name', ''));
+
+        if ($firstName === '' || $lastName === '') {
+            return response()->json(['duplicates' => []]);
+        }
+
+        $duplicates = Applicant::query()
+            ->whereRaw('LOWER(TRIM(first_name)) = ?', [mb_strtolower($firstName)])
+            ->whereRaw('LOWER(TRIM(last_name)) = ?', [mb_strtolower($lastName)])
+            ->select('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'birthdate', 'gender', 'civil_status', 'contact_no', 'city', 'barangay')
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get();
+
+        return response()->json(['duplicates' => $duplicates]);
+    }
+
+    public function duplicate(Request $request, $id)
+    {
+        $source = Applicant::findOrFail($id);
+
+        $data = $source->only([
+            'first_name',
+            'middle_name',
+            'last_name',
+            'suffix',
+            'birthdate',
+            'age',
+            'email',
+            'contact_no',
+            'gender',
+            'civil_status',
+            'pwd',
+            'four_ps',
+            'address_line',
+            'province',
+            'city',
+            'barangay',
+            'educational_attainment',
+            'hiring_company',
+            'position_hired',
+            'first_time_job_seeker',
+        ]);
+
+        $data['age'] = $this->calculateAgeFromBirthdate($data['birthdate'] ?? null);
+
+        $applicant = Applicant::create($data);
+        $applicant->forceFill([
+            'profile_completed' => true,
+        ])->saveQuietly();
+
+        ActivityLogger::log(
+            'applicant',
+            'created',
+            'Duplicated from applicant #' . $source->id . '.',
+            $applicant,
+            ActivityLogger::diff([], $applicant->only($applicant->getFillable())),
+            $request->user()
+        );
+
+        return redirect()
+            ->route('applicants.edit', $applicant->id)
+            ->with('created_success', true)
+            ->with('applicant_id', $applicant->id);
+    }
+
     public function index(Request $request)
     {
         $filters = $this->getApplicantFilters($request);
@@ -181,7 +250,7 @@ class ApplicantController extends Controller
             abort_if((int) $id !== (int) $linkedApplicantId, 403, 'You can only view your own applicant record.');
         }
 
-        $applicant = Applicant::with(['permit', 'clearance', 'referral'])->findOrFail($id);
+        $applicant = Applicant::with(['permit', 'permits', 'clearance', 'referral'])->findOrFail($id);
         $activityLogs = $applicant->activityLogs()
             ->with('causer')
             ->paginate(10, ['*'], 'activity_page')
@@ -346,6 +415,62 @@ class ApplicantController extends Controller
 
         return redirect()->route('applicants.index')
             ->with('success', 'Applicant restored successfully.');
+    }
+
+    public function duplicates(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        $duplicateGroups = Applicant::query()
+            ->selectRaw("
+                LOWER(TRIM(COALESCE(first_name, ''))) as fn,
+                LOWER(TRIM(COALESCE(last_name, ''))) as ln,
+                COUNT(*) as total
+            ")
+            ->whereNull('deleted_at')
+            ->groupByRaw("LOWER(TRIM(COALESCE(first_name, ''))), LOWER(TRIM(COALESCE(last_name, '')))")
+            ->having('total', '>', 1)
+            ->orderByDesc('total')
+            ->get()
+            ->map(function ($group) use ($search) {
+                $applicants = Applicant::whereNull('deleted_at')
+                    ->whereRaw("LOWER(TRIM(COALESCE(first_name, ''))) = ?", [$group->fn])
+                    ->whereRaw("LOWER(TRIM(COALESCE(last_name, ''))) = ?", [$group->ln])
+                    ->when($search !== '', function ($q) use ($search) {
+                        $q->where(function ($inner) use ($search) {
+                            $inner->where('first_name', 'like', "%{$search}%")
+                                ->orWhere('last_name', 'like', "%{$search}%")
+                                ->orWhere('contact_no', 'like', "%{$search}%")
+                                ->orWhere('city', 'like', "%{$search}%")
+                                ->orWhere('barangay', 'like', "%{$search}%");
+                        });
+                    })
+                    ->with(['permit', 'clearance', 'referral'])
+                    ->orderBy('id')
+                    ->get();
+
+                return [
+                    'first_name' => $applicants->first()->first_name,
+                    'last_name' => $applicants->first()->last_name,
+                    'count' => $applicants->count(),
+                    'applicants' => $applicants,
+                ];
+            })
+            ->filter(fn ($group) => $group['count'] > 1)
+            ->values();
+
+        $totalDuplicates = $duplicateGroups->sum('count');
+        $totalGroups = $duplicateGroups->count();
+
+        $isApplicantUser = auth()->check() && auth()->user()->role === 'user';
+
+        return view('applicants.duplicates', compact(
+            'duplicateGroups',
+            'totalDuplicates',
+            'totalGroups',
+            'search',
+            'isApplicantUser'
+        ));
     }
 
     private function buildApplicantSearchQuery(array $filters)

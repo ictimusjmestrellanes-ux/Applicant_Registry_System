@@ -400,6 +400,456 @@
         html[data-theme="night"] .btn-save:hover {
             color: #ffffff;
         }
+
+        /* Duplicate Check Modal */
+        .dup-modal .modal-content {
+            border: none;
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        .dup-modal .modal-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            color: #fff;
+            border: none;
+            padding: 22px 26px;
+        }
+
+        .dup-modal .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.7;
+        }
+
+        .dup-modal .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+
+        .dup-modal .modal-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .dup-modal .modal-body {
+            padding: 24px 26px;
+        }
+
+        .dup-modal .dup-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            margin-bottom: 18px;
+        }
+
+        .dup-modal .dup-banner-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #f59e0b;
+            color: #fff;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .dup-modal .dup-banner-text strong {
+            color: #92400e;
+            font-size: 0.92rem;
+        }
+
+        .dup-modal .dup-banner-text {
+            color: #b45309;
+            font-size: 0.82rem;
+        }
+
+        .dup-modal .dup-match-list {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .dup-modal .dup-match-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid #e5edf5;
+            background: #f8fbff;
+            margin-bottom: 10px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .dup-modal .dup-match-card:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.1);
+        }
+
+        .dup-modal .dup-avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .dup-modal .dup-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .dup-modal .dup-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.92rem;
+            margin-bottom: 2px;
+        }
+
+        .dup-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        .dup-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dup-modal .modal-footer {
+            border-top: 1px solid #f1f5f9;
+            padding: 16px 26px;
+        }
+
+        .dup-modal .btn-proceed {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.28);
+        }
+
+        .dup-modal .btn-proceed:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+            color: #fff;
+        }
+
+        .dup-modal .btn-cancel-dup {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-weight: 700;
+        }
+
+        .dup-modal .btn-cancel-dup:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .dup-modal .btn-save-anyway {
+            background: #1d4ed8;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.24);
+        }
+
+        .dup-modal .btn-save-anyway:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(29, 78, 216, 0.3);
+            color: #fff;
+        }
+
+        html[data-theme="night"] .dup-modal .dup-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        html[data-theme="night"] .dup-modal .dup-banner-icon {
+            background: rgba(245, 158, 11, 0.85);
+        }
+
+        html[data-theme="night"] .dup-modal .dup-banner-text strong {
+            color: #fde68a;
+        }
+
+        html[data-theme="night"] .dup-modal .dup-banner-text {
+            color: #fbbf24;
+        }
+
+        html[data-theme="night"] .dup-modal .dup-match-card {
+            background: #1e293b;
+            border-color: rgba(148, 163, 184, 0.14);
+        }
+
+        html[data-theme="night"] .dup-modal .dup-match-card:hover {
+            border-color: rgba(245, 158, 11, 0.35);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        html[data-theme="night"] .dup-modal .dup-name {
+            color: #f1f5f9;
+        }
+
+        html[data-theme="night"] .dup-modal .dup-meta {
+            color: #94a3b8;
+        }
+
+        html[data-theme="night"] .dup-modal .modal-footer {
+            border-top-color: rgba(148, 163, 184, 0.14);
+        }
+
+        html[data-theme="night"] .dup-modal .btn-cancel-dup {
+            background: #1e293b;
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .dup-modal .btn-cancel-dup:hover {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        /* Flatpickr Theme */
+        .flatpickr-calendar {
+            border: 1px solid #e5edf5;
+            border-radius: 16px;
+            box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        .flatpickr-months {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .flatpickr-months .flatpickr-month {
+            background: transparent;
+            color: #fff;
+            height: 44px;
+            fill: #fff;
+        }
+
+        .flatpickr-current-month {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.92rem;
+            padding-top: 6px;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-weight: 700;
+            border: none;
+            appearance: auto;
+            -webkit-appearance: auto;
+            padding: 2px 22px 2px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months option {
+            background: #1d4ed8;
+            color: #000000;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .flatpickr-current-month input.cur-year {
+            color: #fff;
+            font-weight: 800;
+            background: transparent;
+            border: none;
+            appearance: auto;
+            -webkit-appearance: auto;
+        }
+
+        .flatpickr-current-month input.cur-year option {
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+        .flatpickr-current-month .flatpickr-next-month,
+        .flatpickr-current-month .flatpickr-prev-month {
+            color: #202020;
+            fill: #fff;
+            height: 44px;
+            top: 0;
+        }
+
+        .flatpickr-current-month .flatpickr-next-month:hover,
+        .flatpickr-current-month .flatpickr-prev-month:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .flatpickr-current-month .flatpickr-next-month svg,
+        .flatpickr-current-month .flatpickr-prev-month svg {
+            fill: #fff;
+        }
+
+        span.flatpickr-weekday {
+            color: #1d4ed8;
+            font-weight: 800;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: #f0f4ff;
+            padding: 8px 0;
+        }
+
+        .flatpickr-day {
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            height: 38px;
+            line-height: 38px;
+            margin: 1px;
+            border: none;
+            color: #334155;
+            transition: all 0.15s ease;
+        }
+
+        .flatpickr-day:hover {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.1);
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.selected:hover {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+        }
+
+        .flatpickr-day.today {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: transparent;
+        }
+
+        .flatpickr-day.today:hover {
+            background: #fde68a;
+        }
+
+        .flatpickr-day.today.selected {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #fff;
+        }
+
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled:hover {
+            color: #cbd5e1;
+            background: transparent;
+        }
+
+        span.flatpickr-weekNumber {
+            color: #94a3b8;
+            font-weight: 600;
+            border-right: 1px solid #e5edf5;
+        }
+
+        .flatpickr-day.inRange {
+            background: #dbeafe;
+            box-shadow: none;
+            color: #1d4ed8;
+            border-color: transparent;
+        }
+
+        html[data-theme="night"] .flatpickr-calendar {
+            background: #1e293b;
+            border-color: rgba(148, 163, 184, 0.18);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+        }
+
+        html[data-theme="night"] .flatpickr-months {
+            background: linear-gradient(135deg, #1e40af, #1d4ed8);
+        }
+
+        html[data-theme="night"] .flatpickr-current-month .flatpickr-monthDropdown-months {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        html[data-theme="night"] .flatpickr-current-month .flatpickr-monthDropdown-months option {
+            background: #1e40af;
+            color: #fff;
+        }
+
+        html[data-theme="night"] .flatpickr-current-month input.cur-year {
+            color: #fff;
+        }
+
+        html[data-theme="night"] .flatpickr-current-month input.cur-year option {
+            background: #1e40af;
+            color: #fff;
+        }
+
+        html[data-theme="night"] span.flatpickr-weekday {
+            background: rgba(30, 64, 175, 0.12);
+            color: #60a5fa;
+        }
+
+        html[data-theme="night"] .flatpickr-day {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="night"] .flatpickr-day:hover {
+            background: rgba(59, 130, 246, 0.18);
+            color: #93bbfd;
+        }
+
+        html[data-theme="night"] .flatpickr-day.selected,
+        html[data-theme="night"] .flatpickr-day.selected:hover {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #fff;
+        }
+
+        html[data-theme="night"] .flatpickr-day.today {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+        }
+
+        html[data-theme="night"] .flatpickr-day.today:hover {
+            background: rgba(245, 158, 11, 0.28);
+        }
+
+        html[data-theme="night"] span.flatpickr-weekNumber {
+            color: #64748b;
+            border-right-color: rgba(148, 163, 184, 0.18);
+        }
+
+        html[data-theme="night"] .flatpickr-day.inRange {
+            background: rgba(59, 130, 246, 0.18);
+            color: #93bbfd;
+            box-shadow: none;
+        }
     </style>
 
     <div class="container-fluid applicant-create-page py-0 px-md-4 px-xl-0">
@@ -428,7 +878,7 @@
 
         <div class="form-layout">
             <div class="form-shell">
-                <form action="{{ route('applicants.store') }}" method="POST" onsubmit="document.querySelector('.btn-save').disabled = true; this.querySelector('.btn-save').innerHTML = '<span class=\'spinner-border spinner-border-sm me-2\'></span>Saving...';">
+                <form action="{{ route('applicants.store') }}" method="POST" id="createApplicantForm" novalidate>
                     @csrf
 
                     <div class="form-stack">
@@ -436,7 +886,7 @@
                             <h2 class="section-title">Personal Information</h2>
                             <div class="row g-4">
                                 <div class="col-md-2">
-                                    <label class="form-label">First Time Jobseeker <span
+                                    <label class="form-label">First Time Jobseeker? <span
                                             class="required-mark">*</span></label>
                                     <select name="first_time_job_seeker" class="form-select" required>
                                         <option value="NO"
@@ -477,8 +927,8 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Birthdate <span class="required-mark">*</span></label>
-                                    <input type="date" name="birthdate" id="birthdate" class="form-control"
-                                        value="{{ old('birthdate') }}" required>
+                                    <input type="text" name="birthdate" id="birthdate" class="form-control flatpickr-input"
+                                        value="{{ old('birthdate') }}" placeholder="Select birthdate" readonly required>
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label">Age (Auto)</label>
@@ -613,7 +1063,7 @@
 
                     <div class="form-footer">
                         <a href="{{ route('applicants.index') }}" class="btn btn-cancel">Cancel</a>
-                        <button type="submit" class="btn btn-save">
+                        <button type="button" class="btn btn-save" id="btnSaveApplicant" onclick="checkForDuplicates()">
                             <i class="bi bi-check-circle-fill me-2"></i>Save Applicant
                         </button>
                     </div>
@@ -644,35 +1094,43 @@
             const birthdateInput = document.getElementById('birthdate');
             const ageInput = document.getElementById('age');
 
-            if (!birthdateInput || !ageInput) {
-                return;
-            }
+            if (!birthdateInput) return;
 
-            const updateAge = () => {
-                const birthdate = birthdateInput.value;
+            const isNight = document.documentElement.dataset.theme === 'night';
 
-                if (!birthdate) {
-                    ageInput.value = '';
-                    return;
+            flatpickr(birthdateInput, {
+                dateFormat: 'Y-m-d',
+                maxDate: 'today',
+                minDate: '1920-01-01',
+                defaultDate: birthdateInput.value || null,
+                disableMobile: true,
+                weekNumbers: true,
+                monthSelector: 'dropdown',
+                yearSelector: 'dropdown',
+                onChange: function(selectedDates, dateStr) {
+                    if (!ageInput || !dateStr) {
+                        if (ageInput) ageInput.value = '';
+                        return;
+                    }
+                    const birthDate = new Date(dateStr + 'T00:00:00');
+                    const today = new Date();
+                    let age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
+                    const dayDiff = today.getDate() - birthDate.getDate();
+                    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
+                    ageInput.value = age >= 0 ? age : '';
                 }
+            });
 
-                const birthDate = new Date(`${birthdate}T00:00:00`);
+            if (ageInput && birthdateInput.value) {
+                const birthDate = new Date(birthdateInput.value + 'T00:00:00');
                 const today = new Date();
                 let age = today.getFullYear() - birthDate.getFullYear();
-
                 const monthDiff = today.getMonth() - birthDate.getMonth();
                 const dayDiff = today.getDate() - birthDate.getDate();
-
-                if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-                    age -= 1;
-                }
-
+                if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
                 ageInput.value = age >= 0 ? age : '';
-            };
-
-            birthdateInput.addEventListener('change', updateAge);
-            birthdateInput.addEventListener('input', updateAge);
-            updateAge();
+            }
         });
     </script>
 
@@ -1145,6 +1603,148 @@
             });
 
             loadProvinces();
+        });
+    </script>
+
+    <div class="modal fade dup-modal" id="duplicateCheckModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Possible Duplicate Found</h5>
+                        <div class="small" style="opacity:0.85;">Similar applicant(s) already exist in the system</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="dup-banner" id="dupBanner" style="display:none;">
+                        <div class="dup-banner-icon"><i class="bi bi-search"></i></div>
+                        <div class="dup-banner-text">
+                            <strong id="dupBannerCount"></strong>
+                            <div id="dupBannerHint"></div>
+                        </div>
+                    </div>
+                    <div class="dup-match-list" id="dupMatchList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel-dup" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-save-anyway" id="btnSaveAnyway">
+                        <i class="bi bi-arrow-right-circle-fill me-1"></i>Save Anyway
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkForDuplicates() {
+            const form = document.getElementById('createApplicantForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const firstName = (document.querySelector('[name="first_name"]').value || '').trim();
+            const lastName = (document.querySelector('[name="last_name"]').value || '').trim();
+
+            if (!firstName || !lastName) {
+                submitForm();
+                return;
+            }
+
+            const btn = document.getElementById('btnSaveApplicant');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Checking...';
+
+            fetch('{{ route("applicants.check-duplicates") }}?first_name=' + encodeURIComponent(firstName) + '&last_name=' + encodeURIComponent(lastName))
+                .then(res => res.json())
+                .then(data => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Save Applicant';
+
+                    if (data.duplicates && data.duplicates.length > 0) {
+                        showDuplicateModal(data.duplicates);
+                    } else {
+                        submitForm();
+                    }
+                })
+                .catch(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Save Applicant';
+                    submitForm();
+                });
+        }
+
+        function showDuplicateModal(duplicates) {
+            const banner = document.getElementById('dupBanner');
+            const bannerCount = document.getElementById('dupBannerCount');
+            const bannerHint = document.getElementById('dupBannerHint');
+            const list = document.getElementById('dupMatchList');
+
+            banner.style.display = 'flex';
+            bannerCount.textContent = duplicates.length + ' potential duplicate' + (duplicates.length > 1 ? 's' : '') + ' found';
+            bannerHint.textContent = 'Review the matches below. You can still save this record if you are sure it is a new applicant.';
+
+            const firstNameInput = (document.querySelector('[name="first_name"]').value || '').trim().toUpperCase();
+            const middleNameInput = (document.querySelector('[name="middle_name"]').value || '').trim().toUpperCase();
+            const lastNameInput = (document.querySelector('[name="last_name"]').value || '').trim().toUpperCase();
+
+            list.innerHTML = duplicates.map(d => {
+                const initials = ((d.first_name || '').charAt(0) + (d.last_name || '').charAt(0)).toUpperCase();
+                const fullName = [d.first_name, d.middle_name, d.last_name, d.suffix].filter(Boolean).join(' ');
+                const parts = [];
+
+                if (d.birthdate) {
+                    const bday = new Date(d.birthdate + 'T00:00:00');
+                    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    parts.push('<span><i class="bi bi-calendar3"></i> ' + months[bday.getMonth()] + ' ' + bday.getDate() + ', ' + bday.getFullYear() + '</span>');
+                }
+                if (d.gender) parts.push('<span><i class="bi bi-person"></i> ' + d.gender + '</span>');
+                if (d.civil_status) parts.push('<span><i class="bi bi-heart"></i> ' + d.civil_status + '</span>');
+                if (d.city) parts.push('<span><i class="bi bi-geo-alt"></i> ' + d.city + '</span>');
+                if (d.barangay) parts.push('<span><i class="bi bi-pin-map"></i> ' + d.barangay + '</span>');
+                if (d.contact_no) parts.push('<span><i class="bi bi-telephone"></i> ' + d.contact_no + '</span>');
+
+                const matchTypes = [];
+                if (d.first_name && d.first_name.toUpperCase() === firstNameInput) matchTypes.push('First Name');
+                if (d.last_name && d.last_name.toUpperCase() === lastNameInput) matchTypes.push('Last Name');
+                if (d.middle_name && d.middle_name.toUpperCase() === middleNameInput) matchTypes.push('Middle Name');
+
+                let badgeHtml = '';
+                if (matchTypes.length > 0) {
+                    badgeHtml = '<div class="mt-2" style="display:flex;gap:5px;flex-wrap:wrap;">' +
+                        matchTypes.map(t => '<span style="display:inline-block;padding:2px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:0.7rem;font-weight:700;">' + t + ' Match</span>').join('') +
+                        '</div>';
+                }
+
+                return '<div class="dup-match-card">' +
+                    '<div class="dup-avatar">' + initials + '</div>' +
+                    '<div class="dup-info">' +
+                        '<div class="dup-name">' + fullName + '</div>' +
+                        '<div class="dup-meta">' + parts.join('') + '</div>' +
+                        badgeHtml +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            const modal = new bootstrap.Modal(document.getElementById('duplicateCheckModal'));
+            modal.show();
+        }
+
+        function submitForm() {
+            const form = document.getElementById('createApplicantForm');
+            const btn = document.getElementById('btnSaveApplicant');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+            form.submit();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('btnSaveAnyway').addEventListener('click', function() {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateCheckModal'));
+                modal.hide();
+                setTimeout(submitForm, 300);
+            });
         });
     </script>
 @endsection

@@ -20,7 +20,7 @@ class DashboardController extends Controller
 
             abort_if(! $applicant, 403, 'Your account is not linked to an applicant record.');
 
-            $applicant->loadMissing(['permit', 'clearance', 'referral']);
+            $applicant->loadMissing(['permit', 'permits', 'clearance', 'referral']);
 
             return view('applicants.edit', compact('applicant'));
         }

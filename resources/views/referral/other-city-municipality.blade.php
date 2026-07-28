@@ -256,7 +256,7 @@
         $recipientOffice = 'City Mayor';
         $recipientCityGov = $referral->ref_city_gov;
         $recipientAddress = $referral->ref_company_address;
-        $orcl = $referral->ref_ocrl;
+        $orcl = \App\Models\MayorsReferral::formatOutsideImusControlNo($referral->ref_ocrl);
         $letterDate = now()->format('F d, Y');
         $residentName = strtoupper($applicantName);
         $residentAddress = $applicantAddress;
@@ -272,7 +272,7 @@
     <div class="page">
         <div class="content">
             <div class="letter">
-                <u class="ref-no">PESO-IMUS-OCRL{{ $orcl }}</u>
+                <u class="ref-no">{{ $orcl }}</u>
 
                 <p class="date-line">{{ $letterDate }}</p>
 

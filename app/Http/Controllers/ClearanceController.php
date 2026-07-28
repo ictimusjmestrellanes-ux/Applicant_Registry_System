@@ -39,11 +39,27 @@ class ClearanceController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $clearance = MayorsClearance::firstOrNew([
-            'applicant_id' => $applicant->id,
-        ]);
-        $wasRecentlyCreated = ! $clearance->exists;
-        $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
+        if ($isApplicantUser) {
+            $clearance = MayorsClearance::firstOrNew([
+                'applicant_id' => $applicant->id,
+            ]);
+            $wasRecentlyCreated = ! $clearance->exists;
+            $before = $clearance->exists ? $clearance->only($clearance->getFillable()) : [];
+        } else {
+            $latestClearance = MayorsClearance::where('applicant_id', $applicant->id)->latest()->first();
+            $clearance = new MayorsClearance(['applicant_id' => $applicant->id]);
+            $wasRecentlyCreated = true;
+            $before = [];
+
+            if ($latestClearance) {
+                $clearance->prosecutor_clearance = $latestClearance->prosecutor_clearance;
+                $clearance->mtc_clearance = $latestClearance->mtc_clearance;
+                $clearance->rtc_clearance = $latestClearance->rtc_clearance;
+                $clearance->nbi_clearance = $latestClearance->nbi_clearance;
+                $clearance->barangay_clearance = $latestClearance->barangay_clearance;
+                $clearance->approval_status = $latestClearance->approval_status;
+            }
+        }
         $approvalStatus = $isApplicantUser
             ? MayorsClearance::APPROVAL_PENDING
             : ($request->user()?->canAutoApproveUploadedFiles()
@@ -261,7 +277,11 @@ class ClearanceController extends Controller
 
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#clearance')
-            ->with('success', 'Clearance updated successfully.');
+            ->with('success', 'Clearance updated successfully.')
+            ->with('clearance_saved_prompt', [
+                'can_view' => $clearance->isComplete(),
+                'view_url' => route('clearances.printLetter', $applicant->id),
+            ]);
     }
 
     public function approve(Request $request, $id)
@@ -372,6 +392,64 @@ class ClearanceController extends Controller
         return redirect()
             ->to(route('applicants.edit', $applicant->id).'#clearance')
             ->with('success', 'Clearance disapproved successfully.');
+    }
+
+    public function updateDetails(Request $request, $clearanceId)
+    {
+        $clearance = MayorsClearance::findOrFail($clearanceId);
+
+        $validated = $request->validate([
+            'clearance_or_no' => 'required|string|max:255',
+            'clearance_issued_on' => 'required|string|max:255',
+            'clearance_doc_stamp_control_no' => 'required|string|max:255',
+            'clearance_date_of_payment' => 'required|string|max:255',
+            'clearance_hired_company' => 'required|string|max:255',
+        ]);
+
+        $clearance->update($validated);
+
+        return redirect()
+            ->to(route('applicants.edit', $clearance->applicant_id))
+            ->with('success', 'Clearance details updated successfully.');
+    }
+
+    public function updateFiles(Request $request, $id)
+    {
+        $clearance = MayorsClearance::findOrFail($id);
+
+        $fileFields = [
+            'prosecutor_clearance' => 'clearances/prosecutor',
+            'mtc_clearance' => 'clearances/mtc',
+            'rtc_clearance' => 'clearances/rtc',
+            'nbi_clearance' => 'clearances/nbi',
+            'barangay_clearance' => 'clearances/barangay',
+        ];
+
+        foreach ($fileFields as $field => $directory) {
+            if (! $request->hasFile($field)) {
+                continue;
+            }
+
+            $file = $request->file($field);
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileName = Str::slug($originalName, '_').'.'.$extension;
+
+            if ($clearance->{$field}) {
+                Storage::disk('azure')->delete($clearance->{$field});
+            }
+
+            $clearance->{$field} = $file->storeAs($directory, $fileName, 'azure');
+        }
+
+        $isStaffOrAdmin = auth()->user() && auth()->user()->role !== \App\Models\User::ROLE_USER;
+        $clearance->approval_status = $isStaffOrAdmin ? MayorsClearance::APPROVAL_APPROVED : MayorsClearance::APPROVAL_PENDING;
+        $clearance->disapproval_reason = null;
+        $clearance->save();
+
+        return redirect()
+            ->to(route('applicants.edit', $clearance->applicant_id).'#clearance')
+            ->with('success', 'Clearance uploads updated successfully.');
     }
 
     public function printLetter($id)
