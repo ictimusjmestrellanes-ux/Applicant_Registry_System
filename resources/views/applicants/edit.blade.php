@@ -2462,7 +2462,7 @@
                                     <div class="col-md-2">
                                         <label class="form-label">First Time Jobseeker? <span
                                                 class="required-mark">*</span></label>
-                                        <select name="first_time_job_seeker" class="form-select" required>
+                                        <select name="first_time_job_seeker" id="firstTimeJobSeekerSelect" class="form-select" required>
                                             <option value="NO"
                                                 {{ $applicant->first_time_job_seeker == 'NO' ? 'selected' : '' }}>NO
                                             </option>
@@ -2885,7 +2885,8 @@
                                 {{-- OR NUMBER --}}
                                 <div class="col-md-2">
                                     <label class="form-label">O.R No. <span class="required-mark">*</span></label>
-                                    <input type="text" name="permit_or_no" value="{{ old('permit_or_no') }}"
+                                    <input type="text" name="permit_or_no" id="permitOrNoInput"
+                                        value="{{ old('permit_or_no', $isFirstTimeJobSeeker ? 'RA11261' : '') }}"
                                         class="form-control" placeholder="e.g. RA11261"
                                         {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
                                 </div>
@@ -2948,8 +2949,10 @@
                                 <div class="col-md-2">
                                     <label class="form-label">Documentary Stamp Control No.<span
                                             class="required-mark">*</span></label>
-                                    <input type="text" name="permit_doc_stamp_control_no" class="form-control"
-                                        value="{{ old('permit_doc_stamp_control_no') }}" placeholder="e.g. DOC-001"
+                                    <input type="text" name="permit_doc_stamp_control_no" id="permitDocStampInput"
+                                        class="form-control"
+                                        value="{{ old('permit_doc_stamp_control_no', $isFirstTimeJobSeeker ? '-' : '') }}"
+                                        placeholder="e.g. DOC-001"
                                         {{ $isFirstTimeJobSeeker ? 'readonly' : 'required' }}>
                                 </div>
                                 {{-- Date of Payment --}}
@@ -7073,6 +7076,30 @@
             dropdownAutoWidth: true,
             minimumResultsForSearch: 0
         });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ftjsSelect = document.getElementById('firstTimeJobSeekerSelect');
+        const permitOrNo = document.getElementById('permitOrNoInput');
+        const permitDocStamp = document.getElementById('permitDocStampInput');
+
+        if (ftjsSelect) {
+            ftjsSelect.addEventListener('change', function() {
+                const isFTJS = this.value === 'YES';
+                if (permitOrNo) {
+                    permitOrNo.value = isFTJS ? 'RA11261' : '';
+                    permitOrNo.readOnly = isFTJS;
+                    permitOrNo.required = !isFTJS;
+                }
+                if (permitDocStamp) {
+                    permitDocStamp.value = isFTJS ? '-' : '';
+                    permitDocStamp.readOnly = isFTJS;
+                    permitDocStamp.required = !isFTJS;
+                }
+            });
+        }
     });
 </script>
 
