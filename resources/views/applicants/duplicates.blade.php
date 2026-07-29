@@ -304,6 +304,10 @@
             overflow-x: auto;
         }
 
+        .dup-table-wrap table {
+            min-width: 600px;
+        }
+
         .dup-table {
             margin-bottom: 0;
             font-size: 0.85rem;
@@ -383,7 +387,8 @@
             color: #475569;
             font-size: 0.82rem;
             font-weight: 600;
-            white-space: nowrap;
+            word-break: break-word;
+            max-width: 100%;
         }
 
         .btn-edit-sm {
@@ -514,14 +519,18 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .dup-hero,
-            .dup-table-shell {
-                padding: 18px;
+        @media (max-width: 991.98px) {
+            .container-fluid.dup-page {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .dup-hero {
+                padding: 20px;
             }
 
             .dup-hero h2 {
-                font-size: 1.55rem;
+                font-size: 1.6rem;
             }
 
             .hero-top,
@@ -545,11 +554,71 @@
 
             .mobile-dup-list {
                 display: grid;
+                grid-template-columns: 1fr 1fr;
             }
 
             .group-card-header {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            .group-card-header-left {
+                width: 100%;
+            }
+
+            .group-count-badge {
+                align-self: flex-start;
+            }
+
+            .group-card {
+                border-radius: 18px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .mobile-dup-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .dup-hero h2 {
+                font-size: 1.35rem;
+            }
+
+            .dup-hero {
+                padding: 16px;
+                border-radius: 18px;
+            }
+
+            .metric-card {
+                padding: 14px;
+            }
+
+            .mobile-dup-card {
+                padding: 0.85rem;
+                border-radius: 16px;
+            }
+
+            .mobile-dup-head {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .mobile-dup-actions {
+                flex-direction: column;
+            }
+
+            .mobile-dup-actions .btn {
+                width: 100%;
+            }
+
+            .group-card-header {
+                padding: 14px 16px;
+            }
+
+            .dup-table-shell {
+                padding: 14px;
             }
         }
 
