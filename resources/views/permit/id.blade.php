@@ -96,9 +96,14 @@
 
         .front-name {
             left: 15.6%;
-            top: 55.7%;
+            top: 55%;
             width: 32%;
+            height: 6%;
             font-size: 10pt;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .employer {
@@ -109,10 +114,15 @@
         }
 
         .address_line {
-            left: 53.6%;
-            top: 30.8%;
-            width: 42%;
+            left: 53%;
+            top: 29.5%;
+            width: 44%;
+            height: 6%;
             font-size: 8pt;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .address {
@@ -301,6 +311,27 @@
     </div>
 
 
+    <script>
+        function autoResize(el) {
+            var style = window.getComputedStyle(el);
+            var maxWidth = parseFloat(style.width);
+            var fontSize = parseFloat(style.fontSize);
+            var minFontSize = 4;
+            var text = el.textContent || el.innerText;
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            ctx.font = fontSize + 'px ' + style.fontFamily;
+            while (ctx.measureText(text).width > maxWidth && fontSize > minFontSize) {
+                fontSize -= 0.4;
+                ctx.font = fontSize + 'px ' + style.fontFamily;
+            }
+            el.style.fontSize = fontSize + 'px';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            autoResize(document.querySelector('.front-name'));
+            autoResize(document.querySelector('.address_line'));
+        });
+    </script>
 </body>
 
 </html>

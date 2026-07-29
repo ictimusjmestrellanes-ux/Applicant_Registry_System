@@ -370,18 +370,6 @@
                     </span>
                 </div>
 
-                <div class="form-helper-grid">
-                    <article class="helper-card">
-                        <div class="helper-title">Role behavior</div>
-                        <p class="helper-copy">Selecting the admin role grants full permission coverage and disables the document permission checkboxes automatically. Staff roles can be assigned individual document permissions, while user roles do not receive document permissions.</p>
-                    </article>
-
-                    <article class="helper-card">
-                        <div class="helper-title">Password update</div>
-                        <p class="helper-copy">Leave the password fields blank if you want to keep the user’s current password unchanged.</p>
-                    </article>
-                </div>
-
                 <div class="edit-form-shell">
                     <form method="POST" action="{{ route('users.update', $user) }}">
                         @csrf

@@ -230,7 +230,7 @@
         .btn-primary-soft,
         .btn-edit-user {
             border-radius: 14px;
-            padding: 10px 18px;
+            padding: 2px 10px;
             font-weight: 700;
             transition: all 0.2s ease;
         }
@@ -262,7 +262,7 @@
 
         .btn-delete-user {
             border-radius: 14px;
-            padding: 10px 18px;
+            padding: 2px 10px;
             font-weight: 700;
             border: 1px solid #fecaca;
             color: #dc2626;
@@ -313,13 +313,13 @@
             display: flex;
             align-items: center;
             gap: 0.9rem;
-            min-width: 0;
+            max-width: 100%;
         }
 
         .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -335,23 +335,34 @@
             color: var(--users-ink);
             font-weight: 700;
             word-break: break-word;
+            font-size: 10px;
         }
 
         .user-meta,
         .provider-meta {
             color: var(--users-slate);
-            font-size: 0.83rem;
+            font-size: 10px;
             word-break: break-word;
         }
 
-        .role-pill,
+        .role-pills{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+
         .permission-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.42rem 0.72rem;
             border-radius: 999px;
-            font-size: 0.74rem;
+            font-size: 8px;
             font-weight: 800;
             letter-spacing: 0.04em;
         }
@@ -418,13 +429,14 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.45rem;
+            font-size: 8px;
         }
 
         .permission-pill {
             background: #f8fbff;
             color: #42566f;
             border: 1px solid #dbe6f2;
-            font-size: 0.72rem;
+            font-size: 8px;
             text-transform: uppercase;
         }
 
@@ -584,11 +596,31 @@
             }
 
             .users-table-wrap {
-                display: none;
+                overflow-x: auto;
+            }
+
+            .users-table thead th {
+                white-space: nowrap;
+            }
+
+            .users-table tbody td {
+                min-width: 120px;
+            }
+
+            .users-table tbody td:last-child {
+                min-width: 100px;
+            }
+
+            .users-table tbody td:nth-child(3) {
+                min-width: 200px;
             }
 
             .mobile-user-list {
                 display: grid;
+            }
+
+            .users-table-wrap {
+                display: none;
             }
         }
 
@@ -622,6 +654,10 @@
 
             .pagination-wrap .pagination {
                 flex-wrap: wrap;
+            }
+
+            .mobile-user-grid {
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -672,6 +708,18 @@
             .pagination-wrap .page-link {
                 min-width: 36px;
                 height: 36px;
+            }
+
+            .mobile-user-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mobile-user-head .d-flex.gap-2 {
+                flex-direction: column;
+            }
+
+            .mobile-user-head .d-flex.gap-2 .btn {
+                width: 100%;
             }
         }
         html[data-theme="night"] body {
@@ -882,7 +930,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="role-pill {{ $user->roleBadgeClass() }}">
+                                            <span class="role-pills {{ $user->roleBadgeClass() }}">
                                                 {{ $user->roleLabel() }}
                                             </span>
                                         </td>
@@ -910,7 +958,7 @@
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <div class="d-inline-flex justify-content-center gap-2 flex-wrap">
+                                            <div class="d-inline-flex justify-content-center gap-2">
                                                 @if(auth()->user()?->isAdmin())
                                                     <a href="{{ route('users.edit', $user) }}" class="btn btn-edit-user" title="Edit user">
                                                         <i class="bi bi-pencil-square"></i>

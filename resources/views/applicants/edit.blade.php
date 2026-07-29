@@ -3891,7 +3891,7 @@
                                             <th>Expires On</th>
                                             <th>Doc Stamp Control No.</th>
                                             <th>Date of Payment</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Status</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -3924,7 +3924,7 @@
                                                 <td data-label="Date of Payment">
                                                     {{ $entry->permit_date_of_payment ?: '—' }}
                                                 </td>
-                                                <td data-label="Status" style="text-transform: uppercase;">
+                                                <td data-label="Status" style="text-transform: uppercase; font-size: 10px;" class="text-center">
                                                     <span class="badge {{ $entry->approvalStatusClass() }}">
                                                         {{ $entry->approvalStatusLabel() }}
                                                     </span>
@@ -3932,13 +3932,13 @@
                                                 <td class="text-center" data-label="Action">
                                                     <div class="d-flex justify-content-center gap-1 flex-wrap" style="min-width:140px;">
                                                         @if ($isApplicantUser)
-                                                            <button class="btn btn-sm btn-info bg-light text-dark" type="button"
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#permitReqModal-{{ $entry->id }}"
                                                                 title="View Requirements">
-                                                                <i class="bi bi-paperclip text-info"></i>
+                                                                <i class="fa-solid fa-paperclip text-info"></i>
                                                             </button>
-                                                            <button class="btn btn-sm btn-warning text-white js-edit-permit-uploads-btn"
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark js-edit-permit-uploads-btn"
                                                                 type="button"
                                                                 data-permit-id="{{ $entry->id }}"
                                                                 data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
@@ -3949,7 +3949,7 @@
                                                                 data-clearance-type="{{ $entry->clearance_type ?? '' }}"
                                                                 data-imus-resident="{{ $isImusResident ? '1' : '0' }}"
                                                                 title="Edit Uploads">
-                                                                <i class="bi bi-upload text-warning"></i>
+                                                                <i class="fas fa-upload text-warning"></i>
                                                             </button>
                                                         @else
                                                             @if (auth()->user()->hasPermission('generate_permit') && $entry->isComplete())
@@ -3957,20 +3957,20 @@
                                                                     href="{{ route('permits.printId', ['id' => $applicant->id, 'permit' => $entry->id]) }}"
                                                                     target="_blank"
                                                                     title="View Permit to Work ID">
-                                                                    <i class="bi bi-person-vcard-fill text-success"></i>
+                                                                    <i class="fa-solid fa-id-card text-success"></i>
                                                                 </a>
                                                             @elseif (auth()->user()->hasPermission('generate_permit'))
                                                                 <span class="btn btn-sm btn-outline-secondary"
                                                                     title="View Permit to Work ID (not available)"
                                                                     style="opacity:0.5; cursor:not-allowed;">
-                                                                    <i class="bi bi-person-vcard-fill text-success"></i>
+                                                                    <i class="fa-solid fa-id-card text-success"></i>
                                                                 </span>
                                                             @endif
                                                             <button class="btn btn-sm btn-success bg-light text-black" type="button"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#permitReqModal-{{ $entry->id }}"
                                                                 title="View Requirements">
-                                                                <i class="bi bi-paperclip text-info"></i>
+                                                                <i class="fa-solid fa-paperclip text-info"></i>
                                                             </button>
                                                             @if (auth()->user()->hasPermission('update_permit'))
                                                                 <button class="btn btn-sm btn-primary text-white js-edit-permit-btn"
@@ -3985,7 +3985,7 @@
                                                                     data-expires-on="{{ $entry->expires_on ?? '' }}"
                                                                     data-date-payment="{{ $entry->permit_date_of_payment ?? '' }}"
                                                                     title="Edit Details">
-                                                                    <i class="bi bi-pencil-square"></i>
+                                                                    <i class="fa-solid fa-pen-to-square"></i>
                                                                 </button>
                                                                 <button class="btn btn-sm btn-success text-white js-edit-permit-uploads-btn"
                                                                     type="button"
@@ -3998,7 +3998,7 @@
                                                                     data-clearance-type="{{ $entry->clearance_type ?? '' }}"
                                                                     data-imus-resident="{{ $isImusResident ? '1' : '0' }}"
                                                                     title="Edit Uploads">
-                                                                    <i class="bi bi-upload text-warning"></i>
+                                                                    <i class="fas fa-upload text-warning"></i>
                                                                 </button>
                                                             @endif
                                                         @endif
@@ -4039,7 +4039,7 @@
                                             <th>Doc Stamp Control No.</th>
                                             <th>Date of Payment</th>
                                             <th>Hired Company</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Status</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -4065,7 +4065,7 @@
                                                     {{ $transactionClearance->clearance_date_of_payment ?: '—' }}</td>
                                                 <td data-label="Hired Company">
                                                     {{ $transactionClearance->clearance_hired_company ?: '—' }}</td>
-                                                <td data-label="Status" style="text-transform: uppercase;">
+                                                <td data-label="Status" style="text-transform: uppercase; font-size: 10px;" class="text-center">
                                                     <span
                                                         class="badge {{ $transactionClearance->approvalStatusClass() }}">
                                                         {{ $transactionClearance->approvalStatusLabel() }}
@@ -4074,13 +4074,13 @@
                                                 <td class="text-center" data-label="Action">
                                                     <div class="d-flex justify-content-center gap-1 flex-wrap" style="min-width:140px;">
                                                         @if ($isApplicantUser)
-                                                            <button class="btn btn-sm text-primary bg-light text-dark" type="button"
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}"
                                                                 title="View Requirements">
-                                                                <i class="bi bi-paperclip text-info"></i>
+                                                                <i class="fa-solid fa-paperclip text-info"></i>
                                                             </button>
-                                                            <button class="btn btn-sm bg-light text-dark js-edit-clearance-uploads-btn"
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark js-edit-clearance-uploads-btn"
                                                                 type="button"
                                                                 data-clearance-id="{{ $transactionClearance->id }}"
                                                                 data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
@@ -4089,7 +4089,7 @@
                                                                 data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
                                                                 data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}"
                                                                 title="Edit Uploads">
-                                                                <i class="bi bi-upload text-warning"></i>
+                                                                <i class="fas fa-upload text-warning"></i>
                                                             </button>
                                                         @else
                                                             @if (auth()->user()->hasPermission('generate_clearance') && $transactionClearance->isComplete())
@@ -4110,7 +4110,7 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}"
                                                                 title="View Requirements">
-                                                                <i class="bi bi-paperclip text-info"></i>
+                                                                <i class="fa-solid fa-paperclip text-info"></i>
                                                             </button>
                                                             @if (auth()->user()->hasPermission('update_clearance'))
                                                                 <button class="btn btn-sm btn-primary text-white js-edit-clearance-btn"
@@ -4122,7 +4122,7 @@
                                                                     data-date-payment="{{ $transactionClearance->clearance_date_of_payment ?? '' }}"
                                                                     data-hired-company="{{ $transactionClearance->clearance_hired_company ?? '' }}"
                                                                     title="Edit Details">
-                                                                    <i class="bi bi-pencil-square"></i>
+                                                                    <i class="fa-solid fa-pen-to-square"></i>
                                                                 </button>
                                                                 <button class="btn btn-sm btn-primary text-white js-edit-clearance-uploads-btn"
                                                                     type="button"
@@ -4133,7 +4133,7 @@
                                                                     data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
                                                                     data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}"
                                                                     title="Edit Uploads">
-                                                                    <i class="bi bi-upload text-warning"></i>
+                                                                    <i class="fas fa-upload text-warning"></i>
                                                                 </button>
                                                             @endif
                                                         @endif
@@ -4178,7 +4178,7 @@
                                             <th>City Address / Company Address</th>
                                             <th>Province</th>
                                             <th>Hired Company</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Status</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -4202,7 +4202,7 @@
                                                 <td data-label="Province">{{ $refRow['province'] ?: '—' }}</td>
                                                 <td data-label="Hired Company">{{ $refRow['hired_company'] ?: '—' }}
                                                 </td>
-                                                <td data-label="Status" style="text-transform: uppercase;">
+                                                <td data-label="Status" style="text-transform: uppercase; font-size: 10px;" class="text-center">
                                                     <span class="badge {{ $refRow['status_class'] }}">
                                                         {{ $refRow['status_label'] }}
                                                     </span>
@@ -4214,9 +4214,9 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}"
                                                                 title="View Requirements">
-                                                                <i class="bi bi-paperclip text-info"></i>
+                                                                <i class="fa-solid fa-paperclip text-info"></i>
                                                             </button>
-                                                            <button class="btn btn-sm btn-warning text-white js-edit-referral-uploads-btn"
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark js-edit-referral-uploads-btn"
                                                                 type="button"
                                                                 data-referral-id="{{ $refRow['referral_id'] }}"
                                                                 data-resume="{{ $refRow['resume'] ?? '' }}"
@@ -4224,7 +4224,7 @@
                                                                 data-police="{{ $refRow['police'] ?? '' }}"
                                                                 data-nbi="{{ $refRow['nbi'] ?? '' }}"
                                                                 title="Edit Uploads">
-                                                                <i class="bi bi-upload"></i>
+                                                                <i class="fas fa-upload text-warning"></i>
                                                             </button>
                                                         @else
                                                             @if (auth()->user()->canViewReferralLetter() && $refRow['can_view'])
@@ -4245,7 +4245,7 @@
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}"
                                                                 title="View Requirements">
-                                                                <i class="bi bi-paperclip text-info"></i>
+                                                                <i class="fa-solid fa-paperclip text-info"></i>
                                                             </button>
                                                             @if (auth()->user()->hasPermission('update_referral'))
                                                                 <button class="btn btn-sm btn-primary text-white js-edit-referral-btn"
@@ -4254,7 +4254,7 @@
                                                                     @foreach ($refRow['edit_data'] as $editKey => $editVal)
                                                                     data-{{ $editKey }}="{{ $editVal }}" @endforeach
                                                                     title="Edit Details">
-                                                                    <i class="bi bi-pencil-square"></i>
+                                                                    <i class="fa-solid fa-pen-to-square"></i>
                                                                 </button>
                                                                 <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
                                                                     type="button"
@@ -4264,7 +4264,7 @@
                                                                     data-police="{{ $refRow['police'] ?? '' }}"
                                                                     data-nbi="{{ $refRow['nbi'] ?? '' }}"
                                                                     title="Edit Uploads">
-                                                                    <i class="bi bi-upload text-warning"></i>
+                                                                    <i class="fas fa-upload text-warning"></i>
                                                                 </button>
                                                             @endif
                                                         @endif
@@ -5377,7 +5377,7 @@
                     referralFile.disabled = true;
                     referralFile.value = '';
                     if (referralLabel) referralLabel.classList.add('d-none');
-                    referralStatus.innerHTML = '<i class="bi bi-info-circle text-muted me-1"></i>Not required for Imus residents';
+                    referralStatus.innerHTML = '<i class="bi bi-info-circle me-1 text-success"></i><span class="text-success">Not required for Imus residents</span>';
                 } else {
                     referralCard.classList.remove('upload-disabled');
                     referralFile.disabled = false;

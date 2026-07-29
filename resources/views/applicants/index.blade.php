@@ -494,7 +494,7 @@
                                 <div class="contact-line"></i>{{ $applicant->contact_no ?: 'No contact number' }}</div>
                             </td>
                             <td class="location-cell">
-                                <div>{{ $applicant->address_line ?: 'Address line not set' }}</div>
+                                {{-- <div>{{ $applicant->address_line ?: 'Address line not set' }}</div> --}}
                                 <div class="applicant-meta mt-1">{{ $applicant->barangay ?: 'Barangay not set' }},
                                     {{ $applicant->city ?: 'City not set' }}
                                 </div>
@@ -515,7 +515,7 @@
                                         <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The permit is expired</div>
                                     @endif
                                     <div class="small" style="opacity:0.7;">
-                                        <i class="bi bi-calendar-date me-1"></i>
+                                        <i class="bi bi-calendar-date"></i>
                                         @if ($permit->created_at)
                                             {{ $permit->created_at->isToday() ? 'Latest Upload:' : 'Last Upload:' }}
                                             {{ $permit->created_at->format('M d, Y') }}
@@ -541,7 +541,7 @@
                                         <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The clearance is expired</div>
                                     @endif
                                     <div class="small" style="opacity:0.7;">
-                                        <i class="bi bi-calendar-date me-1"></i>
+                                        <i class="bi bi-calendar-date"></i>
                                         @if ($clearance->created_at)
                                             {{ $clearance->created_at->isToday() ? 'Latest Upload:' : 'Last Upload:' }}
                                             {{ $clearance->created_at->format('M d, Y') }}
@@ -568,7 +568,7 @@
                                         <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The referral is expired</div>
                                     @endif
                                     <div class="small" style="opacity:0.7;">
-                                        <i class="bi bi-calendar-date me-1"></i>
+                                        <i class="bi bi-calendar-date"></i>
                                         @if ($referral->created_at)
                                             {{ $referral->created_at->isToday() ? 'Latest Upload:' : 'Last Upload:' }}
                                             {{ $referral->created_at->format('M d, Y ') }}
