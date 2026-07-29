@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Applicant;
 use App\Models\MayorsPermit;
+use App\Models\MayorsClearance;
+use App\Models\MayorsReferral;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
@@ -234,6 +237,9 @@ class DashboardController extends Controller
             'totalReferrals' => $totalReferrals,
             'fullyReadyCount' => $fullyReadyCount,
             'totalUsers' => User::count(),
+            'permitsToday' => MayorsPermit::whereDate('created_at', today())->count(),
+            'clearancesToday' => \App\Models\MayorsClearance::whereDate('created_at', today())->count(),
+            'referralsToday' => \App\Models\MayorsReferral::whereDate('created_at', today())->count(),
         ];
 
         $recentApplicants = $applicants->take(5);
@@ -285,5 +291,143 @@ class DashboardController extends Controller
             'recentApplicants',
             'recentActivity'
         ));
+    }
+
+    public function todayRecords(Request $request, string $type)
+    {
+        $user = Auth::user();
+        if ($user?->role === User::ROLE_USER) {
+            abort(403);
+        }
+
+        $today = today();
+
+        return match ($type) {
+            'archive' => $this->todayArchive($today),
+            'permit' => $this->todayPermits($today),
+            'clearance' => $this->todayClearances($today),
+            'referral' => $this->todayReferrals($today),
+            default => abort(404),
+        };
+    }
+
+    public function allRecords(Request $request, string $type)
+    {
+        $user = Auth::user();
+        if ($user?->role === User::ROLE_USER) {
+            abort(403);
+        }
+
+        return match ($type) {
+            'archive' => $this->allArchive(),
+            'permit' => $this->allPermits(),
+            'clearance' => $this->allClearances(),
+            'referral' => $this->allReferrals(),
+            'applicants' => $this->allApplicants(),
+            default => abort(404),
+        };
+    }
+
+    protected function todayArchive($today)
+    {
+        $records = Applicant::onlyTrashed()
+            ->whereDate('deleted_at', $today)
+            ->latest('deleted_at')
+            ->get();
+
+        $html = view('dashboard._today_archive', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function todayPermits($today)
+    {
+        $records = MayorsPermit::with('applicant')
+            ->whereDate('created_at', $today)
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._today_permits', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function todayClearances($today)
+    {
+        $records = MayorsClearance::with('applicant')
+            ->whereDate('created_at', $today)
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._today_clearances', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function todayReferrals($today)
+    {
+        $records = MayorsReferral::with('applicant')
+            ->whereDate('created_at', $today)
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._today_referrals', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function allArchive()
+    {
+        $records = Applicant::onlyTrashed()
+            ->latest('deleted_at')
+            ->get();
+
+        $html = view('dashboard._all_archive', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function allPermits()
+    {
+        $records = MayorsPermit::with('applicant')
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._all_permits', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function allClearances()
+    {
+        $records = MayorsClearance::with('applicant')
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._all_clearances', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function allReferrals()
+    {
+        $records = MayorsReferral::with('applicant')
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._all_referrals', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    protected function allApplicants()
+    {
+        $records = Applicant::withoutTrashed()
+            ->latest()
+            ->get();
+
+        $html = view('dashboard._all_applicants', compact('records'))->render();
+
+        return response()->json(['html' => $html]);
     }
 }

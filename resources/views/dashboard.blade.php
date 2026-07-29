@@ -19,8 +19,14 @@
         $monthlyRegistrationLabels = $trendMonths ?? [];
         $yearlyApplicantTrendLabels = $trendMonths ?? [];
         $yearlyApplicantTrendDatasets = $yearlyApplicantTrendDatasets ?? [];
-        $timeGreeting = (now()->hour >= 0 && now()->hour <= 11) ? 'Good Morning' : ((now()->hour >= 12 && now()->hour <= 17) ? 'Good Afternoon' : 'Good Evening');
+        $timeGreeting =
+            now()->hour >= 0 && now()->hour <= 11
+                ? 'Good Morning'
+                : (now()->hour >= 12 && now()->hour <= 17
+                    ? 'Good Afternoon'
+                    : 'Good Evening');
         $isAdminOrStaff = auth()->check() && auth()->user()?->role !== \App\Models\User::ROLE_USER;
+        $isStaff = auth()->user()?->role === \App\Models\User::ROLE_STAFF;
     @endphp
 
     <div class="dashboard-page container-fluid py-0 px-md-4 px-xl-0">
@@ -34,7 +40,7 @@
                         attention today.
                     </p>
                 </div>
-                @if($isAdminOrStaff)
+                @if ($isAdminOrStaff)
                     <div class="col-lg-4 d-flex justify-content-lg-end align-items-start">
                         <button type="button" id="exportChartsButton" class="btn btn-light fw-bold px-4">
                             <i class="bi bi-download me-2"></i>Export Charts
@@ -44,181 +50,269 @@
             </div>
         </section>
 
-        <section class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3 mb-4">
-            <div class="col">
-                <div class="metric-card h-100">
-                    <div class="metric-icon icon-blue">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <div>
-                        <div class="metric-label">Total Applicants</div>
-                        <div class="metric-value">{{ number_format($totalApplicants) }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="metric-card h-100">
-                    <div class="metric-icon icon-slate">
-                        <i class="bi bi-archive-fill"></i>
-                    </div>
-                    <div>
-                        <div class="metric-label">Total Archive</div>
-                        <div class="metric-value">{{ number_format($totalArchivedApplicants) }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="metric-card h-100">
-                    <div class="metric-icon icon-emerald">
-                        <i class="bi bi-patch-check-fill"></i>
-                    </div>
-                    <div>
-                        <div class="metric-label">Total Permit</div>
-                        <div class="metric-value">{{ number_format($totalPermits) }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="metric-card h-100">
-                    <div class="metric-icon icon-slate">
-                        <i class="bi bi-person-badge-fill"></i>
-                    </div>
-                    <div>
-                        <div class="metric-label">Total Clearance</div>
-                        <div class="metric-value">{{ number_format($totalClearances) }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="metric-card h-100">
-                    <div class="metric-icon icon-amber">
-                        <i class="bi bi-folder2-open"></i>
-                    </div>
-                    <div>
-                        <div class="metric-label">Total Referral</div>
-                        <div class="metric-value">{{ number_format($totalReferrals) }}</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        @unless(auth()->user()?->role === 'user')
-            <section class="row g-4 mb-4">
-                <div class="col-12">
-                    <div class="dashboard-card monthly-registration-card">
-                        <div class="section-header">
-                            <div>
-                                <h5 class="section-title mb-1">Monthly Registration</h5>
-                            </div>
-                            <div class="year-filter-wrap">
-                                <label for="trendYearFilter" class="visually-hidden">Filter by year</label>
-                                <select id="trendYearFilter" class="form-select form-select-sm year-filter">
-                                    <option value="all">All years</option>
-                                    @foreach($trendYears as $trendYear)
-                                        <option value="{{ $trendYear }}">{{ $trendYear }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+        @if ($isStaff)
+            <section class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3 mb-4">
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-all="applicants" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-blue">
+                            <i class="bi bi-people-fill"></i>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-canvas-wrap chart-canvas-wrap--line">
-                                <canvas id="monthlyRegistrationChart"></canvas>
-                            </div>
+                        <div>
+                            <div class="metric-label">Total Applicants</div>
+                            <div class="metric-value">{{ number_format($totalApplicants) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-today="archive" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-slate">
+                            <i class="bi bi-archive-fill"></i>
+                        </div>
+                        <div>
+                            <div class="metric-label">Total Archive</div>
+                            <div class="metric-value">{{ number_format(data_get($summary, 'archivedToday', 0)) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-today="permit" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-emerald">
+                            <i class="bi bi-patch-check-fill"></i>
+                        </div>
+                        <div>
+                            <div class="metric-label">Permit Today</div>
+                            <div class="metric-value">{{ number_format(data_get($summary, 'permitsToday', 0)) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-today="clearance" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-slate">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                        <div>
+                            <div class="metric-label">Clearance Today</div>
+                            <div class="metric-value">{{ number_format(data_get($summary, 'clearancesToday', 0)) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-today="referral" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-amber">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+                        <div>
+                            <div class="metric-label">Referral Today</div>
+                            <div class="metric-value">{{ number_format(data_get($summary, 'referralsToday', 0)) }}</div>
                         </div>
                     </div>
                 </div>
             </section>
-
-            <section class="row g-4 mb-4">
-                <div class="col-xl-4">
-                    <div class="dashboard-card h-100">
-                        <div class="section-header">
-                            <div>
-                                <h5 class="section-title mb-1">Male and Female Summary</h5>
-                                <p class="section-copy mb-0">Applicant gender breakdown.</p>
-                            </div>
+        @else
+            <section class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-3 mb-4">
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-all="applicants" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-blue">
+                            <i class="bi bi-people-fill"></i>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                                <canvas id="sexPolarChart"></canvas>
-                            </div>
+                        <div>
+                            <div class="metric-label">Total Applicants</div>
+                            <div class="metric-value">{{ number_format($totalApplicants) }}</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-4">
-                    <div class="dashboard-card h-100">
-                        <div class="section-header">
-                            <div>
-                                <h5 class="section-title mb-1">PWD Summary</h5>
-                                <p class="section-copy mb-0">Applicant mark as PWD.</p>
-                            </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-all="archive" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-slate">
+                            <i class="bi bi-archive-fill"></i>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                                <canvas id="pwdPolarChart"></canvas>
-                            </div>
+                        <div>
+                            <div class="metric-label">Total Archive</div>
+                            <div class="metric-value">{{ number_format($totalArchivedApplicants) }}</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4">
-                    <div class="dashboard-card h-100">
-                        <div class="section-header">
-                            <div>
-                                <h5 class="section-title mb-1">4Ps Summary</h5>
-                                <p class="section-copy mb-0">Applicants marked as 4Ps.</p>
-                            </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-all="permit" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-emerald">
+                            <i class="bi bi-patch-check-fill"></i>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-canvas-wrap chart-canvas-wrap--pie">
-                                <canvas id="fourPsPolarChart"></canvas>
-                            </div>
+                        <div>
+                            <div class="metric-label">Total Permit</div>
+                            <div class="metric-value">{{ number_format($totalPermits) }}</div>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <section class="row g-4 mb-4">
-                <div class="col-xl-6">
-                    <div class="dashboard-card h-100">
-                        <div class="section-header">
-                            <div>
-                                <h5 class="section-title mb-1">City Summary</h5>
-                                <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
-                            </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-all="clearance" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-slate">
+                            <i class="bi bi-person-badge-fill"></i>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-canvas-wrap">
-                                <canvas id="cityColumnChart"></canvas>
-                            </div>
+                        <div>
+                            <div class="metric-label">Total Clearance</div>
+                            <div class="metric-value">{{ number_format($totalClearances) }}</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-6">
-                    <div class="dashboard-card h-100">
-                        <div class="section-header">
-                            <div>
-                                <h5 class="section-title mb-1">Province Summary</h5>
-                                <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
-                            </div>
+                <div class="col">
+                    <div class="metric-card h-100" role="button" data-all="referral" data-bs-toggle="modal" data-bs-target="#todayRecordsModal" style="cursor:pointer;">
+                        <div class="metric-icon icon-amber">
+                            <i class="bi bi-folder2-open"></i>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-canvas-wrap">
-                                <canvas id="provinceColumnChart"></canvas>
-                            </div>
+                        <div>
+                            <div class="metric-label">Total Referral</div>
+                            <div class="metric-value">{{ number_format($totalReferrals) }}</div>
                         </div>
                     </div>
                 </div>
             </section>
+        @endif
+
+        @unless (auth()->user()?->role === 'user')
+            @unless ($isStaff)
+                <section class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="dashboard-card monthly-registration-card">
+                            <div class="section-header">
+                                <div>
+                                    <h5 class="section-title mb-1">Monthly Registration</h5>
+                                </div>
+                                <div class="year-filter-wrap">
+                                    <label for="trendYearFilter" class="visually-hidden">Filter by year</label>
+                                    <select id="trendYearFilter" class="form-select form-select-sm year-filter">
+                                        <option value="all">All years</option>
+                                        @foreach ($trendYears as $trendYear)
+                                            <option value="{{ $trendYear }}">{{ $trendYear }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <div class="chart-canvas-wrap chart-canvas-wrap--line">
+                                    <canvas id="monthlyRegistrationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <section class="row g-4 mb-4">
+                    <div class="col-xl-4">
+                        <div class="dashboard-card h-100">
+                            <div class="section-header">
+                                <div>
+                                    <h5 class="section-title mb-1">Male and Female Summary</h5>
+                                    <p class="section-copy mb-0">Applicant gender breakdown.</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                                    <canvas id="sexPolarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4">
+                        <div class="dashboard-card h-100">
+                            <div class="section-header">
+                                <div>
+                                    <h5 class="section-title mb-1">PWD Summary</h5>
+                                    <p class="section-copy mb-0">Applicant mark as PWD.</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                                    <canvas id="pwdPolarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-4">
+                        <div class="dashboard-card h-100">
+                            <div class="section-header">
+                                <div>
+                                    <h5 class="section-title mb-1">4Ps Summary</h5>
+                                    <p class="section-copy mb-0">Applicants marked as 4Ps.</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <div class="chart-canvas-wrap chart-canvas-wrap--pie">
+                                    <canvas id="fourPsPolarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="row g-4 mb-4">
+                    <div class="col-xl-6">
+                        <div class="dashboard-card h-100">
+                            <div class="section-header">
+                                <div>
+                                    <h5 class="section-title mb-1">City Summary</h5>
+                                    <p class="section-copy mb-0">Top 10 cities or municipalities based on applicant count.</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <div class="chart-canvas-wrap">
+                                    <canvas id="cityColumnChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-6">
+                        <div class="dashboard-card h-100">
+                            <div class="section-header">
+                                <div>
+                                    <h5 class="section-title mb-1">Province Summary</h5>
+                                    <p class="section-copy mb-0">Top 10 provinces based on applicant count.</p>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <div class="chart-canvas-wrap">
+                                    <canvas id="provinceColumnChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            @endunless
         @endunless
+
+        <div class="modal fade" id="todayRecordsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                    <div class="modal-header border-0" style="background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+                        <div>
+                            <h5 class="modal-title fw-bold text-white" id="todayRecordsModalLabel">
+                                <i class="bi bi-calendar-check me-2"></i>Records Today
+                            </h5>
+                            <small class="text-white-50">{{ now()->format('F d, Y') }}</small>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-0" id="todayRecordsModalBody">
+                        <div class="text-center py-5 text-muted">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Loading...
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 bg-light" style="border-radius: 0 0 20px 20px;">
+                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Records created today</small>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <style>
@@ -783,13 +877,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const exportChartsButton = document.getElementById('exportChartsButton');
             const monthlyRegistrationLabels = @json($monthlyRegistrationLabels);
             const yearlyTrendDatasets = @json($yearlyApplicantTrendDatasets);
             const trendYearFilter = document.getElementById('trendYearFilter');
 
-            const chartMaxForDatasets = (datasets) => Math.max(...datasets.flatMap((dataset) => dataset.data), 0) + 2;
+            const chartMaxForDatasets = (datasets) => Math.max(...datasets.flatMap((dataset) => dataset.data), 0) +
+                2;
             const getDatasetsForYear = (year) => {
                 if (year === 'all') {
                     return yearlyTrendDatasets;
@@ -822,13 +917,30 @@
             const provinceLabels = @json($provinceBreakdown->pluck('label')->values());
             const provinceData = @json($provinceBreakdown->pluck('count')->values());
 
-            const chartExportItems = [
-                { id: 'monthlyRegistrationChart', title: 'Monthly Registration' },
-                { id: 'sexPolarChart', title: 'Male and Female Summary' },
-                { id: 'pwdPolarChart', title: 'PWD Summary' },
-                { id: 'fourPsPolarChart', title: '4Ps Summary' },
-                { id: 'cityColumnChart', title: 'City Summary' },
-                { id: 'provinceColumnChart', title: 'Province Summary' },
+            const chartExportItems = [{
+                    id: 'monthlyRegistrationChart',
+                    title: 'Monthly Registration'
+                },
+                {
+                    id: 'sexPolarChart',
+                    title: 'Male and Female Summary'
+                },
+                {
+                    id: 'pwdPolarChart',
+                    title: 'PWD Summary'
+                },
+                {
+                    id: 'fourPsPolarChart',
+                    title: '4Ps Summary'
+                },
+                {
+                    id: 'cityColumnChart',
+                    title: 'City Summary'
+                },
+                {
+                    id: 'provinceColumnChart',
+                    title: 'Province Summary'
+                },
             ];
 
             const getCanvasDataUrl = (canvas) => {
@@ -845,7 +957,9 @@
                     return;
                 }
 
-                const { jsPDF } = window.jspdf;
+                const {
+                    jsPDF
+                } = window.jspdf;
                 const pdf = new jsPDF('l', 'mm', 'a4');
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 const pageHeight = pdf.internal.pageSize.getHeight();
@@ -990,12 +1104,13 @@
                 });
 
                 if (trendYearFilter) {
-                    trendYearFilter.addEventListener('change', function () {
+                    trendYearFilter.addEventListener('change', function() {
                         const selectedYear = this.value;
                         const datasets = getDatasetsForYear(selectedYear);
 
                         monthlyRegistrationChart.data.datasets = datasets;
-                        monthlyRegistrationChart.options.scales.y.suggestedMax = chartMaxForDatasets(datasets);
+                        monthlyRegistrationChart.options.scales.y.suggestedMax = chartMaxForDatasets(
+                            datasets);
                         monthlyRegistrationChart.update();
                     });
                 }
@@ -1206,6 +1321,25 @@
                     },
                 },
             });
+
+            const todayModal = document.getElementById('todayRecordsModal');
+            if (todayModal) {
+                todayModal.addEventListener('show.bs.modal', function (event) {
+                    const btn = event.relatedTarget;
+                    const type = btn.getAttribute('data-today') || btn.getAttribute('data-all');
+                    const isAll = btn.hasAttribute('data-all');
+                    const prefix = isAll ? '' : 'Today';
+                    var labels = { archive: 'Archived ' + prefix, permit: 'Permits ' + prefix, clearance: 'Clearances ' + prefix, referral: 'Referrals ' + prefix, applicants: 'All Applicants' };
+                    document.getElementById('todayRecordsModalLabel').innerHTML = '<i class="bi bi-calendar-check me-2"></i>' + (labels[type] || 'Records');
+                    const body = document.getElementById('todayRecordsModalBody');
+                    body.innerHTML = '<div class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading...</div>';
+                    var endpoint = isAll ? '/dashboard/all/' : '/dashboard/today/';
+                    fetch(endpoint + type)
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) { body.innerHTML = data.html; })
+                        .catch(function () { body.innerHTML = '<div class="text-center py-5 text-muted">Failed to load records.</div>'; });
+                });
+            }
         });
     </script>
 @endsection

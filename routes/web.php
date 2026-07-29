@@ -34,6 +34,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/today/{type}', [App\Http\Controllers\DashboardController::class, 'todayRecords'])->name('dashboard.today');
+    Route::get('/dashboard/all/{type}', [App\Http\Controllers\DashboardController::class, 'allRecords'])->name('dashboard.all');
     Route::get('/profile', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
     Route::get('/notifications/{notification}/read', function (string $notification) {
