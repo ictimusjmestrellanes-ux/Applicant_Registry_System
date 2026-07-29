@@ -585,14 +585,14 @@
                             <td class="text-center">
                                 <div class="action-stack">
                                     <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-sm btn-view"
-                                        title="View Applicant"><i class="bi bi-eye-fill"></i></a>
+                                        title="View Applicant"><i class="fa-solid fa-eye"></i></a>
                                     @if (!$isApplicantUser)
                                         <form action="{{ route('applicants.destroy', $applicant->id) }}" method="POST"
                                             onsubmit="return confirm('Are you sure you want to archive this applicant?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-archive"
-                                                title="Archive Applicant"><i class="bi bi-archive-fill"></i></button>
+                                                title="Archive Applicant"><i class="fa-solid fa-box-archive"></i></button>
                                         </form>
                                     @endif
                                 </div>
@@ -1392,9 +1392,9 @@
         .btn-view,
         .btn-duplicate,
         .btn-archive {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
