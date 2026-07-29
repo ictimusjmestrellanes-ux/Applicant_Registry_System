@@ -510,7 +510,7 @@
                                             style="width: {{ $permitPercent }}%;"></div>
                                     </div>
                                     @if ($permitBarColor === 'bg-warning')
-                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Need to renew the permit</div>
+                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Permit almost expired</div>
                                     @elseif ($permitBarColor === 'bg-danger' && $permitPercent > 0)
                                         <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The permit is expired</div>
                                     @endif
@@ -536,7 +536,7 @@
                                             style="width: {{ $clearancePercent }}%;"></div>
                                     </div>
                                     @if ($clearanceBarColor === 'bg-warning')
-                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Need to renew the clearance</div>
+                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Clearance almost expired</div>
                                     @elseif ($clearanceBarColor === 'bg-danger' && $clearancePercent > 0)
                                         <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The clearance is expired</div>
                                     @endif
@@ -563,7 +563,7 @@
                                             style="width: {{ $referralPercent }}%;"></div>
                                     </div>
                                     @if ($referralBarColor === 'bg-warning')
-                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Need to renew the referral</div>
+                                        <div class="small text-warning fw-semibold mt-1"><i class="bi bi-exclamation-triangle me-1"></i>Referral almost expired</div>
                                     @elseif ($referralBarColor === 'bg-danger' && $referralPercent > 0)
                                         <div class="small text-danger fw-semibold mt-1"><i class="bi bi-x-circle me-1"></i>The referral is expired</div>
                                     @endif

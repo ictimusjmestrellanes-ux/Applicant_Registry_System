@@ -755,8 +755,8 @@
             background: #ecfdf5;
             border: 1px solid #a7f3d0;
             color: #065f46;
-            font-weight: 700;
-            font-size: 0.8rem;
+            font-weight: 800;
+            font-size: 11px;
             text-decoration: none;
             transition: all 0.15s;
         }
@@ -2303,12 +2303,12 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 6px 0;
+                padding: 3px 0;
                 border: none;
                 border-bottom: 1px solid #f1f5f9;
                 white-space: normal;
                 text-align: right;
-                gap: 12px;
+                gap: 8px;
             }
 
             .transaction-table tbody td:last-child {
@@ -2343,7 +2343,7 @@
 
             .transaction-id-link,
             .transaction-id-text {
-                font-size: 0.78rem;
+                font-size: 10px;
             }
 
             .transaction-action {
@@ -3875,7 +3875,7 @@
                         <span class="transaction-row-count">{{ $allPermits->count() }}</span>
                         <i class="bi bi-chevron-down ms-auto transaction-chevron"></i>
                     </div>
-                    <div id="permitCollapse" class="collapse">
+                    <div id="permitCollapse" class="collapse" data-bs-parent=".transaction-panel">
                         @if ($allPermits->isNotEmpty())
                             <div class="transaction-table-wrap">
                                 <table class="table transaction-table">
@@ -3904,7 +3904,6 @@
                                                 <td data-label="Permit to Work ID">
                                                     @if ($entry->peso_id_no)
                                                         <span class="transaction-id-text">
-                                                            <i class="fa-solid fa-id-card"></i>
                                                             {{ 'OP' . strtoupper($entry->peso_id_no) }}
                                                         </span>
                                                     @else
@@ -3931,108 +3930,78 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center" data-label="Action">
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-sm dropdown-toggle transaction-action"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                    <div class="d-flex justify-content-center gap-1 flex-wrap" style="min-width:140px;">
+                                                        @if ($isApplicantUser)
+                                                            <button class="btn btn-sm btn-info bg-light text-dark" type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#permitReqModal-{{ $entry->id }}"
+                                                                title="View Requirements">
+                                                                <i class="bi bi-paperclip text-info"></i>
                                                             </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                                                                style="min-width:170px;">
-                                                                @if ($isApplicantUser)
-                                                                    <li>
-                                                                        <button class="dropdown-item" type="button"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#permitReqModal-{{ $entry->id }}">
-                                                                            <i
-                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item js-edit-permit-uploads-btn"
-                                                                            type="button"
-                                                                            data-permit-id="{{ $entry->id }}"
-                                                                            data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
-                                                                            data-police="{{ $entry->permit_police_clearance ?? '' }}"
-                                                                            data-health="{{ $entry->health_card ?? '' }}"
-                                                                            data-cedula="{{ $entry->cedula ?? '' }}"
-                                                                            data-referral="{{ $entry->referral_letter ?? '' }}"
-                                                                            data-clearance-type="{{ $entry->clearance_type ?? '' }}"
-                                                                            data-imus-resident="{{ $isImusResident ? '1' : '0' }}">
-                                                                            <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
-                                                                        </button>
-                                                                    </li>
-                                                                @else
-                                                                    <li>
-                                                                        <button class="dropdown-item" type="button"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#permitReqModal-{{ $entry->id }}">
-                                                                            <i
-                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    @if (auth()->user()->hasPermission('generate_permit') && $entry->isComplete())
-                                                                        <li>
-                                                                            <a class="dropdown-item"
-                                                                                href="{{ route('permits.printId', ['id' => $applicant->id, 'permit' => $entry->id]) }}"
-                                                                                target="_blank">
-                                                                                <i
-                                                                                    class="bi bi-eye me-2 text-success"></i>View Permit to Work ID
-                                                                            </a>
-                                                                        </li>
-                                                                    @else
-                                                                        <li>
-                                                                            <span class="dropdown-item-text text-muted"
-                                                                                style="opacity:0.5;">
-                                                                                <i class="bi bi-eye-slash me-2"></i>View Permit to Work ID
-                                                                            </span>
-                                                                        </li>
-                                                                    @endif
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                     @if (auth()->user()->hasPermission('update_permit'))
-                                                                        <li>
-                                                                            <button class="dropdown-item js-edit-permit-btn"
-                                                                                type="button"
-                                                                                data-permit-id="{{ $entry->id }}"
-                                                                                data-or-no="{{ $entry->permit_or_no ?? '' }}"
-                                                                                data-community-tax-no="{{ $entry->community_tax_no ?? '' }}"
-                                                                                data-doc-stamp-no="{{ $entry->permit_doc_stamp_control_no ?? '' }}"
-                                                                                data-issued-on="{{ $entry->permit_issued_on ?? '' }}"
-                                                                                data-issued-at="{{ $entry->permit_issued_at ?? '' }}"
-                                                                                data-permit-date="{{ $entry->permit_date ?? '' }}"
-                                                                                data-expires-on="{{ $entry->expires_on ?? '' }}"
-                                                                                data-date-payment="{{ $entry->permit_date_of_payment ?? '' }}">
-                                                                                <i
-                                                                                    class="bi bi-pencil-square me-2 text-primary"></i>Edit Details
-                                                                            </button>
-                                                                        </li>
-                                                                        <li>
-                                                                            <button class="dropdown-item js-edit-permit-uploads-btn"
-                                                                                type="button"
-                                                                                data-permit-id="{{ $entry->id }}"
-                                                                                data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
-                                                                                data-police="{{ $entry->permit_police_clearance ?? '' }}"
-                                                                                data-health="{{ $entry->health_card ?? '' }}"
-                                                                                data-cedula="{{ $entry->cedula ?? '' }}"
-                                                                                data-referral="{{ $entry->referral_letter ?? '' }}"
-                                                                                data-clearance-type="{{ $entry->clearance_type ?? '' }}"
-                                                                                data-imus-resident="{{ $isImusResident ? '1' : '0' }}">
-                                                                                <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
-                                                                            </button>
-                                                                        </li>
-                                                                    @endif
-                                                                @endif
-                                                            </ul>
-                                                        </div>
+                                                            <button class="btn btn-sm btn-warning text-white js-edit-permit-uploads-btn"
+                                                                type="button"
+                                                                data-permit-id="{{ $entry->id }}"
+                                                                data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
+                                                                data-police="{{ $entry->permit_police_clearance ?? '' }}"
+                                                                data-health="{{ $entry->health_card ?? '' }}"
+                                                                data-cedula="{{ $entry->cedula ?? '' }}"
+                                                                data-referral="{{ $entry->referral_letter ?? '' }}"
+                                                                data-clearance-type="{{ $entry->clearance_type ?? '' }}"
+                                                                data-imus-resident="{{ $isImusResident ? '1' : '0' }}"
+                                                                title="Edit Uploads">
+                                                                <i class="bi bi-upload text-warning"></i>
+                                                            </button>
+                                                        @else
+                                                            @if (auth()->user()->hasPermission('generate_permit') && $entry->isComplete())
+                                                                <a class="btn btn-sm btn-success text-white"
+                                                                    href="{{ route('permits.printId', ['id' => $applicant->id, 'permit' => $entry->id]) }}"
+                                                                    target="_blank"
+                                                                    title="View Permit to Work ID">
+                                                                    <i class="bi bi-person-vcard-fill text-success"></i>
+                                                                </a>
+                                                            @elseif (auth()->user()->hasPermission('generate_permit'))
+                                                                <span class="btn btn-sm btn-outline-secondary"
+                                                                    title="View Permit to Work ID (not available)"
+                                                                    style="opacity:0.5; cursor:not-allowed;">
+                                                                    <i class="bi bi-person-vcard-fill text-success"></i>
+                                                                </span>
+                                                            @endif
+                                                            <button class="btn btn-sm btn-success bg-light text-black" type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#permitReqModal-{{ $entry->id }}"
+                                                                title="View Requirements">
+                                                                <i class="bi bi-paperclip text-info"></i>
+                                                            </button>
+                                                            @if (auth()->user()->hasPermission('update_permit'))
+                                                                <button class="btn btn-sm btn-primary text-white js-edit-permit-btn"
+                                                                    type="button"
+                                                                    data-permit-id="{{ $entry->id }}"
+                                                                    data-or-no="{{ $entry->permit_or_no ?? '' }}"
+                                                                    data-community-tax-no="{{ $entry->community_tax_no ?? '' }}"
+                                                                    data-doc-stamp-no="{{ $entry->permit_doc_stamp_control_no ?? '' }}"
+                                                                    data-issued-on="{{ $entry->permit_issued_on ?? '' }}"
+                                                                    data-issued-at="{{ $entry->permit_issued_at ?? '' }}"
+                                                                    data-permit-date="{{ $entry->permit_date ?? '' }}"
+                                                                    data-expires-on="{{ $entry->expires_on ?? '' }}"
+                                                                    data-date-payment="{{ $entry->permit_date_of_payment ?? '' }}"
+                                                                    title="Edit Details">
+                                                                    <i class="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-success text-white js-edit-permit-uploads-btn"
+                                                                    type="button"
+                                                                    data-permit-id="{{ $entry->id }}"
+                                                                    data-nbi="{{ $entry->permit_nbi_clearance ?? '' }}"
+                                                                    data-police="{{ $entry->permit_police_clearance ?? '' }}"
+                                                                    data-health="{{ $entry->health_card ?? '' }}"
+                                                                    data-cedula="{{ $entry->cedula ?? '' }}"
+                                                                    data-referral="{{ $entry->referral_letter ?? '' }}"
+                                                                    data-clearance-type="{{ $entry->clearance_type ?? '' }}"
+                                                                    data-imus-resident="{{ $isImusResident ? '1' : '0' }}"
+                                                                    title="Edit Uploads">
+                                                                    <i class="bi bi-upload text-warning"></i>
+                                                                </button>
+                                                            @endif
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -4057,7 +4026,7 @@
                         <span class="transaction-row-count">{{ $allClearances->count() }}</span>
                         <i class="bi bi-chevron-down ms-auto transaction-chevron"></i>
                     </div>
-                    <div id="clearanceCollapse" class="collapse">
+                    <div id="clearanceCollapse" class="collapse" data-bs-parent=".transaction-panel">
                         @if ($allClearances->isNotEmpty())
                             <div class="transaction-table-wrap">
                                 <table class="table transaction-table">
@@ -4081,7 +4050,6 @@
                                                     {{ $loop->iteration }}</td>
                                                 <td data-label="PESO Control No.">
                                                     <span class="transaction-id-text">
-                                                        <i class="fa-solid fa-file-lines"></i>
                                                         PESO-OCMC{{ $transactionClearance->clearance_peso_control_no ?: '—' }}
                                                     </span>
                                                 </td>
@@ -4104,101 +4072,71 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center" data-label="Action">
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-sm dropdown-toggle transaction-action"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                    <div class="d-flex justify-content-center gap-1 flex-wrap" style="min-width:140px;">
+                                                        @if ($isApplicantUser)
+                                                            <button class="btn btn-sm text-primary bg-light text-dark" type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}"
+                                                                title="View Requirements">
+                                                                <i class="bi bi-paperclip text-info"></i>
                                                             </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                                                                style="min-width:170px;">
-                                                                @if ($isApplicantUser)
-                                                                    <li>
-                                                                        <button class="dropdown-item" type="button"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}">
-                                                                            <i
-                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item js-edit-clearance-uploads-btn"
-                                                                            type="button"
-                                                                            data-clearance-id="{{ $transactionClearance->id }}"
-                                                                            data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
-                                                                            data-mtc="{{ $transactionClearance->mtc_clearance ?? '' }}"
-                                                                            data-rtc="{{ $transactionClearance->rtc_clearance ?? '' }}"
-                                                                            data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
-                                                                            data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}">
-                                                                            <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
-                                                                        </button>
-                                                                    </li>
-                                                                @else
-                                                                    <li>
-                                                                        <button class="dropdown-item" type="button"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}">
-                                                                            <i class="bi bi-paperclip me-2 text-info"></i>View Requirements
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    @if (auth()->user()->hasPermission('generate_clearance') && $transactionClearance->isComplete())
-                                                                        <li>
-                                                                            <a class="dropdown-item"
-                                                                                href="{{ route('clearances.printLetter', $applicant->id) }}"
-                                                                                target="_blank">
-                                                                                <i
-                                                                                    class="bi bi-eye me-2 text-success"></i>View Clearance Letter
-                                                                            </a>
-                                                                        </li>
-                                                                    @else
-                                                                        <li>
-                                                                            <span class="dropdown-item-text text-muted"
-                                                                                style="opacity:0.5;">
-                                                                                <i class="bi bi-eye-slash me-2"></i>View Clearance Letter
-                                                                            </span>
-                                                                        </li>
-                                                                    @endif
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    @if (auth()->user()->hasPermission('update_clearance'))
-                                                                        <li>
-                                                                            <button
-                                                                                class="dropdown-item js-edit-clearance-btn"
-                                                                                type="button"
-                                                                                data-clearance-id="{{ $transactionClearance->id }}"
-                                                                                data-or-no="{{ $transactionClearance->clearance_or_no ?? '' }}"
-                                                                                data-issued-on="{{ $transactionClearance->clearance_issued_on ?? '' }}"
-                                                                                data-doc-stamp-no="{{ $transactionClearance->clearance_doc_stamp_control_no ?? '' }}"
-                                                                                data-date-payment="{{ $transactionClearance->clearance_date_of_payment ?? '' }}"
-                                                                                data-hired-company="{{ $transactionClearance->clearance_hired_company ?? '' }}">
-                                                                                <i
-                                                                                    class="bi bi-pencil-square me-2 text-primary"></i>Edit Details
-                                                                            </button>
-                                                                        </li>
-                                                                        <li>
-                                                                            <button class="dropdown-item js-edit-clearance-uploads-btn"
-                                                                                type="button"
-                                                                                data-clearance-id="{{ $transactionClearance->id }}"
-                                                                                data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
-                                                                                data-mtc="{{ $transactionClearance->mtc_clearance ?? '' }}"
-                                                                                data-rtc="{{ $transactionClearance->rtc_clearance ?? '' }}"
-                                                                                data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
-                                                                                data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}">
-                                                                                <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
-                                                                            </button>
-                                                                        </li>
-                                                                    @endif
-                                                                @endif
-                                                            </ul>
-                                                        </div>
+                                                            <button class="btn btn-sm bg-light text-dark js-edit-clearance-uploads-btn"
+                                                                type="button"
+                                                                data-clearance-id="{{ $transactionClearance->id }}"
+                                                                data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
+                                                                data-mtc="{{ $transactionClearance->mtc_clearance ?? '' }}"
+                                                                data-rtc="{{ $transactionClearance->rtc_clearance ?? '' }}"
+                                                                data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
+                                                                data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}"
+                                                                title="Edit Uploads">
+                                                                <i class="bi bi-upload text-warning"></i>
+                                                            </button>
+                                                        @else
+                                                            @if (auth()->user()->hasPermission('generate_clearance') && $transactionClearance->isComplete())
+                                                                <a class="btn btn-sm btn-success text-white"
+                                                                    href="{{ route('clearances.printLetter', $applicant->id) }}"
+                                                                    target="_blank"
+                                                                    title="View Clearance Letter">
+                                                                    <i class="bi bi-file-earmark-text-fill text-success"></i>
+                                                                </a>
+                                                            @elseif (auth()->user()->hasPermission('generate_clearance'))
+                                                                <span class="btn btn-sm btn-outline-secondary"
+                                                                    title="View Clearance Letter (not available)"
+                                                                    style="opacity:0.5; cursor:not-allowed;">
+                                                                    <i class="bi bi-eye-slash text-success"></i>
+                                                                </span>
+                                                            @endif
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#clearanceReqModal-{{ $transactionClearance->id }}"
+                                                                title="View Requirements">
+                                                                <i class="bi bi-paperclip text-info"></i>
+                                                            </button>
+                                                            @if (auth()->user()->hasPermission('update_clearance'))
+                                                                <button class="btn btn-sm btn-primary text-white js-edit-clearance-btn"
+                                                                    type="button"
+                                                                    data-clearance-id="{{ $transactionClearance->id }}"
+                                                                    data-or-no="{{ $transactionClearance->clearance_or_no ?? '' }}"
+                                                                    data-issued-on="{{ $transactionClearance->clearance_issued_on ?? '' }}"
+                                                                    data-doc-stamp-no="{{ $transactionClearance->clearance_doc_stamp_control_no ?? '' }}"
+                                                                    data-date-payment="{{ $transactionClearance->clearance_date_of_payment ?? '' }}"
+                                                                    data-hired-company="{{ $transactionClearance->clearance_hired_company ?? '' }}"
+                                                                    title="Edit Details">
+                                                                    <i class="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-primary text-white js-edit-clearance-uploads-btn"
+                                                                    type="button"
+                                                                    data-clearance-id="{{ $transactionClearance->id }}"
+                                                                    data-prosecutor="{{ $transactionClearance->prosecutor_clearance ?? '' }}"
+                                                                    data-mtc="{{ $transactionClearance->mtc_clearance ?? '' }}"
+                                                                    data-rtc="{{ $transactionClearance->rtc_clearance ?? '' }}"
+                                                                    data-nbi="{{ $transactionClearance->nbi_clearance ?? '' }}"
+                                                                    data-barangay="{{ $transactionClearance->barangay_clearance ?? '' }}"
+                                                                    title="Edit Uploads">
+                                                                    <i class="bi bi-upload text-warning"></i>
+                                                                </button>
+                                                            @endif
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
@@ -4223,14 +4161,14 @@
                         <span class="transaction-row-count">{{ $transactionReferralCount }}</span>
                         <i class="bi bi-chevron-down ms-auto transaction-chevron"></i>
                     </div>
-                    <div id="referralCollapse" class="collapse">
+                    <div id="referralCollapse" class="collapse" data-bs-parent=".transaction-panel">
                         @if ($allReferralRows->isNotEmpty())
                             @php
                                 $referralTransactionRow = 1;
                             @endphp
                             <div class="transaction-table-wrap">
                                 <table class="table transaction-table">
-                                    <thead style="font-weight: 700">
+                                    <thead style="font-weight: 800">
                                         <tr>
                                             <th>#</th>
                                             <th>Referral Type</th>
@@ -4251,9 +4189,7 @@
                                                     {{ $referralTransactionRow++ }}</td>
                                                 <td data-label="Referral Type">{{ $refRow['type'] }}</td>
                                                 <td data-label="Peso OCRL">
-                                                    <span class="transaction-id-text">
-                                                        <i
-                                                            class="fa-solid fa-file-export"></i>{{ $refRow['control_no'] }}
+                                                    <span class="transaction-id-text">{{ $refRow['control_no'] }}
                                                     </span>
                                                 </td>
                                                 <td data-label="Employer / Recipient"
@@ -4272,96 +4208,66 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center" data-label="Action">
-                                                    <div class="d-flex justify-content-center">
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-sm dropdown-toggle transaction-action"
-                                                                type="button" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <i class="bi bi-three-dots-vertical"></i>
+                                                    <div class="d-flex justify-content-center gap-1 flex-wrap" style="min-width:140px;">
+                                                        @if ($isApplicantUser)
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}"
+                                                                title="View Requirements">
+                                                                <i class="bi bi-paperclip text-info"></i>
                                                             </button>
-                                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                                                                style="min-width:170px;">
-                                                                @if ($isApplicantUser)
-                                                                    <li>
-                                                                        <button class="dropdown-item" type="button"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}">
-                                                                            <i
-                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    <li>
-                                                                        <button class="dropdown-item js-edit-referral-uploads-btn"
-                                                                            type="button"
-                                                                            data-referral-id="{{ $refRow['referral_id'] }}"
-                                                                            data-resume="{{ $refRow['resume'] ?? '' }}"
-                                                                            data-brgy="{{ $refRow['brgy'] ?? '' }}"
-                                                                            data-police="{{ $refRow['police'] ?? '' }}"
-                                                                            data-nbi="{{ $refRow['nbi'] ?? '' }}">
-                                                                            <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
-                                                                        </button>
-                                                                    </li>
-                                                                @else
-                                                                    <li>
-                                                                        <button class="dropdown-item" type="button"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}">
-                                                                            <i
-                                                                                class="bi bi-paperclip me-2 text-info"></i>View Requirements
-                                                                        </button>
-                                                                    </li>
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    @if (auth()->user()->canViewReferralLetter() && $refRow['can_view'])
-                                                                        <li>
-                                                                            <a class="dropdown-item"
-                                                                                href="{{ $refRow['route'] }}"
-                                                                                target="_blank">
-                                                                                <i
-                                                                                    class="bi bi-eye me-2 text-success"></i>View Referral Letter
-                                                                            </a>
-                                                                        </li>
-                                                                    @else
-                                                                        <li>
-                                                                            <span class="dropdown-item-text text-muted"
-                                                                                style="opacity:0.5;">
-                                                                                <i class="bi bi-eye-slash me-2"></i>View Referral Letter
-                                                                            </span>
-                                                                        </li>
-                                                                    @endif
-                                                                    <li>
-                                                                        <hr class="dropdown-divider">
-                                                                    </li>
-                                                                    @if (auth()->user()->hasPermission('update_referral'))
-                                                                        <li>
-                                                                            <button class="dropdown-item js-edit-referral-btn"
-                                                                                type="button"
-                                                                                data-referral-id="{{ $refRow['referral_id'] }}"
-                                                                                @foreach ($refRow['edit_data'] as $editKey => $editVal)
-                                                                                data-{{ $editKey }}="{{ $editVal }}" @endforeach>
-                                                                                <i
-                                                                                    class="bi bi-pencil-square me-2 text-primary"></i>Edit Details
-                                                                            </button>
-                                                                        </li>
-                                                                        <li>
-                                                                            <button class="dropdown-item js-edit-referral-uploads-btn"
-                                                                                type="button"
-                                                                                data-referral-id="{{ $refRow['referral_id'] }}"
-                                                                                data-resume="{{ $refRow['resume'] ?? '' }}"
-                                                                                data-brgy="{{ $refRow['brgy'] ?? '' }}"
-                                                                                data-police="{{ $refRow['police'] ?? '' }}"
-                                                                                data-nbi="{{ $refRow['nbi'] ?? '' }}">
-                                                                                <i class="bi bi-upload me-2 text-warning"></i>Edit Uploads
-                                                                            </button>
-                                                                        </li>
-                                                                    @endif
-                                                                @endif
-                                                            </ul>
-                                                        </div>
+                                                            <button class="btn btn-sm btn-warning text-white js-edit-referral-uploads-btn"
+                                                                type="button"
+                                                                data-referral-id="{{ $refRow['referral_id'] }}"
+                                                                data-resume="{{ $refRow['resume'] ?? '' }}"
+                                                                data-brgy="{{ $refRow['brgy'] ?? '' }}"
+                                                                data-police="{{ $refRow['police'] ?? '' }}"
+                                                                data-nbi="{{ $refRow['nbi'] ?? '' }}"
+                                                                title="Edit Uploads">
+                                                                <i class="bi bi-upload"></i>
+                                                            </button>
+                                                        @else
+                                                            @if (auth()->user()->canViewReferralLetter() && $refRow['can_view'])
+                                                                <a class="btn btn-sm btn-success text-white"
+                                                                    href="{{ $refRow['route'] }}"
+                                                                    target="_blank"
+                                                                    title="View Referral Letter">
+                                                                    <i class="bi bi-file-earmark-text-fill text-success"></i>
+                                                                </a>
+                                                            @elseif (auth()->user()->canViewReferralLetter())
+                                                                <span class="btn btn-sm btn-outline-secondary"
+                                                                    title="View Referral Letter (not available)"
+                                                                    style="opacity:0.5; cursor:not-allowed;">
+                                                                    <i class="bi bi-eye-slash"></i>
+                                                                </span>
+                                                            @endif
+                                                            <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#referralReqModal-{{ $refRow['referral_id'] }}"
+                                                                title="View Requirements">
+                                                                <i class="bi bi-paperclip text-info"></i>
+                                                            </button>
+                                                            @if (auth()->user()->hasPermission('update_referral'))
+                                                                <button class="btn btn-sm btn-primary text-white js-edit-referral-btn"
+                                                                    type="button"
+                                                                    data-referral-id="{{ $refRow['referral_id'] }}"
+                                                                    @foreach ($refRow['edit_data'] as $editKey => $editVal)
+                                                                    data-{{ $editKey }}="{{ $editVal }}" @endforeach
+                                                                    title="Edit Details">
+                                                                    <i class="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-primary bg-light text-dark" type="button"
+                                                                    type="button"
+                                                                    data-referral-id="{{ $refRow['referral_id'] }}"
+                                                                    data-resume="{{ $refRow['resume'] ?? '' }}"
+                                                                    data-brgy="{{ $refRow['brgy'] ?? '' }}"
+                                                                    data-police="{{ $refRow['police'] ?? '' }}"
+                                                                    data-nbi="{{ $refRow['nbi'] ?? '' }}"
+                                                                    title="Edit Uploads">
+                                                                    <i class="bi bi-upload text-warning"></i>
+                                                                </button>
+                                                            @endif
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>
