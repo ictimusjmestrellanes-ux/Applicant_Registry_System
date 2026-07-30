@@ -307,8 +307,13 @@
                         </div>
                     </div>
                     <div class="modal-footer border-0 bg-light" style="border-radius: 0 0 20px 20px;">
-                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Records created today</small>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        <span id="todayRecordsModalFooter">
+                            <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Records created today</small>
+                        </span>
+                        <div>
+                            <a href="#" id="todayRecordsViewAllBtn" class="btn btn-sm btn-primary me-2 d-none" target="_blank"><i class="bi bi-eye me-1"></i>View All</a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1338,6 +1343,23 @@
                         .then(function (r) { return r.json(); })
                         .then(function (data) { body.innerHTML = data.html; })
                         .catch(function () { body.innerHTML = '<div class="text-center py-5 text-muted">Failed to load records.</div>'; });
+
+                    var viewAllBtn = document.getElementById('todayRecordsViewAllBtn');
+                    var footerSpan = document.getElementById('todayRecordsModalFooter');
+                    var viewAllUrls = {
+                        applicants: '{{ route("applicants.index") }}',
+                        archive: '{{ route("applicants.archive") }}',
+                        permit: '{{ route("applicants.index", ["transaction_type" => "permit"]) }}',
+                        clearance: '{{ route("applicants.index", ["transaction_type" => "clearance"]) }}',
+                        referral: '{{ route("applicants.index", ["transaction_type" => "referral"]) }}',
+                    };
+                    if (viewAllUrls[type]) {
+                        viewAllBtn.href = viewAllUrls[type];
+                        viewAllBtn.classList.remove('d-none');
+                    } else {
+                        viewAllBtn.classList.add('d-none');
+                    }
+                    footerSpan.innerHTML = '<small class="text-muted"><i class="bi bi-info-circle me-1"></i>' + (isAll ? 'All-time records' : 'Records created today') + '</small>';
                 });
             }
         });
