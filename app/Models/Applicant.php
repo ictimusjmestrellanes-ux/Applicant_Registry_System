@@ -34,7 +34,7 @@ class Applicant extends Model
     ];
 
     protected $casts = [
-        'birthdate' => 'date',
+        'birthdate' => 'date:Y-m-d',
     ];
 
     public function permit()

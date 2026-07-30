@@ -560,14 +560,12 @@ class AuthController extends Controller
         if ($user && $user->auth_provider === 'azure') {
             $tenant = trim((string) config('services.azure.tenant'));
 
-            if ($tenant === '') {
-                return redirect()->route('login');
+            if ($tenant !== '') {
+                $logoutRedirect = route('login');
+                $logoutUrl = 'https://login.microsoftonline.com/' . $tenant . '/oauth2/v2.0/logout?post_logout_redirect_uri=' . urlencode($logoutRedirect);
+
+                return redirect()->away($logoutUrl);
             }
-
-            $logoutRedirect = config('services.azure.logout_redirect', url('/login'));
-            $logoutUrl = 'https://login.microsoftonline.com/' . $tenant . '/oauth2/v2.0/logout?post_logout_redirect_uri=' . urlencode($logoutRedirect);
-
-            return redirect()->away($logoutUrl);
         }
 
         return redirect()->route('login');

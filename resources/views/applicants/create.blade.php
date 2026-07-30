@@ -1634,6 +1634,8 @@
 
             const firstName = (document.querySelector('[name="first_name"]').value || '').trim();
             const lastName = (document.querySelector('[name="last_name"]').value || '').trim();
+            const middleName = (document.querySelector('[name="middle_name"]').value || '').trim();
+            const birthdate = (document.querySelector('[name="birthdate"]').value || '').trim();
 
             if (!firstName || !lastName) {
                 submitForm();
@@ -1644,14 +1646,22 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Checking...';
 
-            fetch('{{ route("applicants.check-duplicates") }}?first_name=' + encodeURIComponent(firstName) + '&last_name=' + encodeURIComponent(lastName))
+            var url = '{{ route("applicants.check-duplicates") }}?first_name=' + encodeURIComponent(firstName) + '&last_name=' + encodeURIComponent(lastName);
+            if (middleName) {
+                url += '&middle_name=' + encodeURIComponent(middleName);
+            }
+            if (birthdate) {
+                url += '&birthdate=' + encodeURIComponent(birthdate);
+            }
+
+            fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Save Applicant';
 
                     if (data.duplicates && data.duplicates.length > 0) {
-                        showDuplicateModal(data.duplicates);
+                        showDuplicateModal(data.duplicates, birthdate);
                     } else {
                         submitForm();
                     }
@@ -1663,7 +1673,8 @@
                 });
         }
 
-        function showDuplicateModal(duplicates) {
+        function showDuplicateModal(duplicates, birthdateInput) {
+            var baseUrl = '{{ url('') }}';
             const banner = document.getElementById('dupBanner');
             const bannerCount = document.getElementById('dupBannerCount');
             const bannerHint = document.getElementById('dupBannerHint');
@@ -1671,7 +1682,7 @@
 
             banner.style.display = 'flex';
             bannerCount.textContent = duplicates.length + ' potential duplicate' + (duplicates.length > 1 ? 's' : '') + ' found';
-            bannerHint.textContent = 'Review the matches below. You can still save this record if you are sure it is a new applicant.';
+            bannerHint.textContent = 'Review the matches below (matched by name and birthdate). You can still save this record if you are sure it is a new applicant.';
 
             const firstNameInput = (document.querySelector('[name="first_name"]').value || '').trim().toUpperCase();
             const middleNameInput = (document.querySelector('[name="middle_name"]').value || '').trim().toUpperCase();
@@ -1682,21 +1693,30 @@
                 const fullName = [d.first_name, d.middle_name, d.last_name, d.suffix].filter(Boolean).join(' ');
                 const parts = [];
 
+                
                 if (d.birthdate) {
-                    const bday = new Date(d.birthdate + 'T00:00:00');
-                    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                    parts.push('<span><i class="bi bi-calendar3"></i> ' + months[bday.getMonth()] + ' ' + bday.getDate() + ', ' + bday.getFullYear() + '</span>');
+                    var bdayStr = (d.birthdate || '').substring(0, 10);
+                    var bdayParts = bdayStr.split('-');
+                    var bday = new Date(parseInt(bdayParts[0], 10), parseInt(bdayParts[1], 10) - 1, parseInt(bdayParts[2], 10));
+                    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    if (!isNaN(bday.getTime())) {
+                        parts.push('<span><i class="bi bi-calendar3"></i> ' + months[bday.getMonth()] + ' ' + bday.getDate() + ', ' + bday.getFullYear() + '</span>');
+                    } else {
+                        parts.push('<span><i class="bi bi-calendar3"></i> ' + bdayStr + '</span>');
+                    }
                 }
+                if (d.id) parts.splice(0, 0, '<span><i class="bi bi-hash"></i> ' + d.id + '</span>');
                 if (d.gender) parts.push('<span><i class="bi bi-person"></i> ' + d.gender + '</span>');
                 if (d.civil_status) parts.push('<span><i class="bi bi-heart"></i> ' + d.civil_status + '</span>');
-                if (d.city) parts.push('<span><i class="bi bi-geo-alt"></i> ' + d.city + '</span>');
-                if (d.barangay) parts.push('<span><i class="bi bi-pin-map"></i> ' + d.barangay + '</span>');
-                if (d.contact_no) parts.push('<span><i class="bi bi-telephone"></i> ' + d.contact_no + '</span>');
 
                 const matchTypes = [];
                 if (d.first_name && d.first_name.toUpperCase() === firstNameInput) matchTypes.push('First Name');
                 if (d.last_name && d.last_name.toUpperCase() === lastNameInput) matchTypes.push('Last Name');
                 if (d.middle_name && d.middle_name.toUpperCase() === middleNameInput) matchTypes.push('Middle Name');
+                if (birthdateInput && d.birthdate) {
+                    var dupBday = (d.birthdate || '').substring(0, 10);
+                    if (dupBday === birthdateInput) matchTypes.push('Birthdate');
+                }
 
                 let badgeHtml = '';
                 if (matchTypes.length > 0) {
@@ -1711,6 +1731,7 @@
                         '<div class="dup-name">' + fullName + '</div>' +
                         '<div class="dup-meta">' + parts.join('') + '</div>' +
                         badgeHtml +
+                        '<div class="mt-2"><a href="' + baseUrl + '/applicants/' + d.id + '/edit" class="btn btn-sm btn-outline-primary" target="_blank"><i class="fa-solid fa-eye"></i> View</a></div>' +
                     '</div>' +
                 '</div>';
             }).join('');

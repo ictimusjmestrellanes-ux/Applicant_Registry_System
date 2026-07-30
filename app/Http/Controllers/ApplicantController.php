@@ -66,14 +66,26 @@ class ApplicantController extends Controller
     {
         $firstName = trim($request->query('first_name', ''));
         $lastName = trim($request->query('last_name', ''));
+        $middleName = trim($request->query('middle_name', ''));
+        $birthdate = trim($request->query('birthdate', ''));
 
         if ($firstName === '' || $lastName === '') {
             return response()->json(['duplicates' => []]);
         }
 
-        $duplicates = Applicant::query()
+        $query = Applicant::query()
             ->whereRaw('LOWER(TRIM(first_name)) = ?', [mb_strtolower($firstName)])
-            ->whereRaw('LOWER(TRIM(last_name)) = ?', [mb_strtolower($lastName)])
+            ->whereRaw('LOWER(TRIM(last_name)) = ?', [mb_strtolower($lastName)]);
+
+        if ($middleName !== '') {
+            $query->whereRaw('LOWER(TRIM(COALESCE(middle_name, \'\'))) = ?', [mb_strtolower($middleName)]);
+        }
+
+        if ($birthdate !== '') {
+            $query->whereDate('birthdate', $birthdate);
+        }
+
+        $duplicates = $query
             ->select('id', 'first_name', 'middle_name', 'last_name', 'suffix', 'birthdate', 'gender', 'civil_status', 'contact_no', 'city', 'barangay')
             ->orderByDesc('id')
             ->limit(10)
@@ -591,7 +603,7 @@ class ApplicantController extends Controller
             'Date Visited',
             'Last Name',
             'First Name',
-            'Middle Name (or Initial)',
+            'Middle Name',
             'Suffix',
             'Age',
             'Sex',
