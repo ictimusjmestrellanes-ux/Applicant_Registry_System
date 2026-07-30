@@ -247,6 +247,16 @@ class ApplicantController extends Controller
         $filePath = $this->createApplicantsExportXlsx($rows);
         $fileName = 'applicants-export-'.now()->format('Y-m-d-His').'.xlsx';
 
+        $count = $applicants->count();
+        ActivityLogger::log(
+            'applicant',
+            'exported',
+            "Exported {$count} applicant record(s) to {$fileName}.",
+            null,
+            null,
+            $request->user()
+        );
+
         return response()->download(
             $filePath,
             $fileName,
