@@ -80,14 +80,6 @@
             text-transform: uppercase;
         }
 
-        .page-kicker {
-            margin-bottom: 10px;
-            padding: 7px 12px;
-            border-radius: 999px;
-            background: var(--users-primary-soft);
-            color: var(--users-primary);
-        }
-
         .hero-top,
         .panel-header,
         .table-header,
@@ -158,17 +150,6 @@
             color: var(--users-slate);
         }
 
-        .panel-chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.45rem 0.8rem;
-            border-radius: 999px;
-            background: var(--users-success-soft);
-            color: var(--users-success);
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
         .search-card {
             padding: 1rem;
             border-radius: 18px;
@@ -227,10 +208,9 @@
         }
 
         .btn-ghost,
-        .btn-primary-soft,
-        .btn-edit-user {
+        .btn-primary-soft {
             border-radius: 14px;
-            padding: 2px 10px;
+            padding: 10px 18px;
             font-weight: 700;
             transition: all 0.2s ease;
         }
@@ -261,8 +241,13 @@
         }
 
         .btn-delete-user {
-            border-radius: 14px;
-            padding: 2px 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            padding: 9px 13px;
+            border-radius: 12px;
+            font-size: 0.95rem;
             font-weight: 700;
             border: 1px solid #fecaca;
             color: #dc2626;
@@ -335,23 +320,24 @@
             color: var(--users-ink);
             font-weight: 700;
             word-break: break-word;
-            font-size: 10px;
+            font-size: 0.95rem;
         }
 
         .user-meta,
         .provider-meta {
             color: var(--users-slate);
-            font-size: 10px;
+            font-size: 0.78rem;
             word-break: break-word;
         }
 
-        .role-pills{
+        .role-pills,
+        .role-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.42rem 0.72rem;
             border-radius: 999px;
-            font-size: 10px;
+            font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.04em;
         }
@@ -362,7 +348,7 @@
             justify-content: center;
             padding: 0.42rem 0.72rem;
             border-radius: 999px;
-            font-size: 8px;
+            font-size: 0.68rem;
             font-weight: 800;
             letter-spacing: 0.04em;
         }
@@ -382,61 +368,16 @@
             color: #475569;
         }
 
-        .approval-pill-pending {
-            background: var(--users-warm-soft);
-            color: var(--users-warm);
-        }
-
-        .approval-pill-approved {
-            background: var(--users-success-soft);
-            color: var(--users-success);
-        }
-
-        .approval-pill-disapproved {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .approval-pill-pending,
-        .approval-pill-approved,
-        .approval-pill-disapproved {
-            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, color 0.18s ease;
-        }
-
-        .approval-pill-pending:hover,
-        .approval-pill-approved:hover,
-        .approval-pill-disapproved:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
-        }
-
-        .approval-pill-pending:hover {
-            background: #fde68a;
-            color: #92400e;
-        }
-
-        .approval-pill-approved:hover {
-            background: #bbf7d0;
-            color: #047857;
-        }
-
-        .approval-pill-disapproved:hover {
-            background: #5a5a5a;
-            color: #991b1b;
-        }
-
         .permission-pills {
             display: flex;
             flex-wrap: wrap;
             gap: 0.45rem;
-            font-size: 8px;
         }
 
         .permission-pill {
             background: #f8fbff;
             color: #42566f;
             border: 1px solid #dbe6f2;
-            font-size: 8px;
             text-transform: uppercase;
         }
 
@@ -458,6 +399,9 @@
             align-items: center;
             justify-content: center;
             min-width: 44px;
+            padding: 9px 13px;
+            border-radius: 12px;
+            font-size: 0.95rem;
         }
 
         .btn-edit-user:hover {
@@ -722,154 +666,155 @@
                 width: 100%;
             }
         }
-        html[data-theme="night"] body {
+        html.theme-night body {
             background: #050816;
         }
 
-        html[data-theme="night"] .page-subtitle,
-        html[data-theme="night"] .metric-copy,
-        html[data-theme="night"] .panel-copy,
-        html[data-theme="night"] .table-copy,
-        html[data-theme="night"] .pagination-copy,
-        html[data-theme="night"] .empty-copy,
-        html[data-theme="night"] .user-meta,
-        html[data-theme="night"] .provider-meta,
-        html[data-theme="night"] .form-label,
-        html[data-theme="night"] .section-kicker,
-        html[data-theme="night"] .user-search-icon {
+        html.theme-night .page-subtitle,
+        html.theme-night .metric-copy,
+        html.theme-night .panel-copy,
+        html.theme-night .table-copy,
+        html.theme-night .pagination-copy,
+        html.theme-night .empty-copy,
+        html.theme-night .user-meta,
+        html.theme-night .provider-meta,
+        html.theme-night .form-label,
+        html.theme-night .section-kicker,
+        html.theme-night .user-search-icon {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .users-hero,
-        html[data-theme="night"] .users-panel,
-        html[data-theme="night"] .users-table-shell,
-        html[data-theme="night"] .search-card,
-        html[data-theme="night"] .users-table-wrap,
-        html[data-theme="night"] .mobile-user-card,
-        html[data-theme="night"] .empty-state,
-        html[data-theme="night"] .user-search-wrap,
-        html[data-theme="night"] .permission-pill,
-        html[data-theme="night"] .role-pill,
-        html[data-theme="night"] .page-link {
+        html.theme-night .users-hero,
+        html.theme-night .users-panel,
+        html.theme-night .users-table-shell,
+        html.theme-night .search-card,
+        html.theme-night .users-table-wrap,
+        html.theme-night .metric-card,
+        html.theme-night .mobile-user-card,
+        html.theme-night .empty-state,
+        html.theme-night .user-search-wrap,
+        html.theme-night .permission-pill,
+        html.theme-night .role-pill,
+        html.theme-night .role-pills,
+        html.theme-night .page-link {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .users-hero::after {
+        html.theme-night .users-hero::after {
             background: rgba(59, 130, 246, 0.08);
         }
 
-        html[data-theme="night"] .users-hero h2,
-        html[data-theme="night"] .metric-value,
-        html[data-theme="night"] .empty-title,
-        html[data-theme="night"] .user-name,
-        html[data-theme="night"] .provider-main {
+        html.theme-night .users-hero h2,
+        html.theme-night .metric-value,
+        html.theme-night .empty-title,
+        html.theme-night .user-name,
+        html.theme-night .provider-main {
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .page-kicker {
-            background: rgba(37, 99, 235, 0.16);
-            color: #bfdbfe;
+        html.theme-night .metric-label {
+            color: #94a3b8;
         }
 
-        html[data-theme="night"] .users-table thead th {
+        html.theme-night .users-table thead th {
             background: #111827 !important;
             color: #cbd5e1;
             border-bottom-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .users-table tbody td {
+        html.theme-night .users-table tbody td {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.12) !important;
         }
 
-        html[data-theme="night"] .users-table tbody tr:hover {
+        html.theme-night .users-table tbody tr:hover {
             background: rgba(59, 130, 246, 0.06) !important;
         }
 
-        html[data-theme="night"] .btn-ghost {
+        html.theme-night .btn-ghost {
             background: #111827;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .btn-ghost:hover {
+        html.theme-night .btn-ghost:hover {
             background: #1f2937;
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .btn-primary-soft {
+        html.theme-night .btn-primary-soft {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
         }
 
-        html[data-theme="night"] .btn-delete-user {
+        html.theme-night .btn-delete-user {
             background: rgba(248, 113, 113, 0.14);
             color: #fecaca;
             border-color: rgba(248, 113, 113, 0.22);
         }
 
-        html[data-theme="night"] .btn-delete-user:hover {
+        html.theme-night .btn-delete-user:hover {
             background: rgba(248, 113, 113, 0.22);
             color: #fff1f2;
         }
 
-        html[data-theme="night"] .btn-edit-user {
+        html.theme-night .btn-edit-user {
             background: rgba(96, 165, 250, 0.16);
             color: #bfdbfe;
             border-color: rgba(96, 165, 250, 0.22);
         }
 
-        html[data-theme="night"] .btn-edit-user:hover {
+        html.theme-night .btn-edit-user:hover {
             background: rgba(96, 165, 250, 0.24);
             color: #eff6ff;
         }
 
-        html[data-theme="night"] .user-avatar {
+        html.theme-night .user-avatar {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             color: #bfdbfe;
         }
 
-        html[data-theme="night"] .role-pill-user {
+        html.theme-night .role-pill-user {
             background: #1f2937;
             color: #cbd5e1;
         }
 
-        html[data-theme="night"] .permission-pill {
+        html.theme-night .permission-pill {
             background: #111827;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.16);
         }
 
-        html[data-theme="night"] .permission-pill-success {
+        html.theme-night .permission-pill-success {
             background: rgba(16, 185, 129, 0.16);
             color: #a7f3d0;
             border-color: rgba(16, 185, 129, 0.2);
         }
 
-        html[data-theme="night"] .mobile-user-card {
+        html.theme-night .mobile-user-card {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .empty-state {
+        html.theme-night .empty-state {
             background: rgba(15, 23, 42, 0.95) !important;
             border-color: rgba(148, 163, 184, 0.18) !important;
         }
 
-        html[data-theme="night"] .page-link {
+        html.theme-night .page-link {
             background: #111827 !important;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .page-link:hover {
+        html.theme-night .page-link:hover {
             background: #1f2937;
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .page-item.active .page-link {
+        html.theme-night .page-item.active .page-link {
             background: #2563eb !important;
             border-color: #2563eb !important;
             color: #fff;
@@ -886,6 +831,28 @@
                         <p class="page-subtitle mb-0">Manage synced accounts, review access levels, and update document permissions from one workspace.</p>
                     </div>
                 </div>
+
+                <form method="GET" action="{{ route('users.index') }}">
+                    <div class="row g-3 align-items-end mt-3">
+                        <div class="col-lg-9">
+                            <label class="form-label">Search User Directory</label>
+                            <div class="user-search-wrap">
+                                <i class="bi bi-search user-search-icon"></i>
+                                <input type="text" name="search" class="user-search-input"
+                                    placeholder="Search by name, email, or role..."
+                                    value="{{ $search ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="users-actions">
+                                <button type="submit" class="btn btn-primary-soft">
+                                    <i class="bi bi-search me-2"></i>Search
+                                </button>
+                                <a href="{{ route('users.index') }}" class="btn btn-ghost">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </section>
 
             @if(session('success'))
@@ -893,6 +860,24 @@
                     <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
                 </div>
             @endif
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label"><i class="bi bi-people"></i> Total Accounts</div>
+                    <div class="metric-value">{{ number_format($userStats['total']) }}</div>
+                    <span class="metric-copy">Synced and managed user accounts</span>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label"><i class="bi bi-shield-lock"></i> Administrators</div>
+                    <div class="metric-value">{{ number_format($userStats['admins']) }}</div>
+                    <span class="metric-copy">Full system access and permissions</span>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label"><i class="bi bi-person-gear"></i> Staff</div>
+                    <div class="metric-value">{{ number_format($userStats['staff']) }}</div>
+                    <span class="metric-copy">Managed document permissions</span>
+                </div>
+            </div>
 
             <section class="users-table-shell">
                 <div class="table-header">

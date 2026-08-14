@@ -326,81 +326,82 @@
             }
         }
 
-        html[data-theme="night"] body {
+        html.theme-night body {
             background: #050816;
         }
 
-        html[data-theme="night"] .role-hero,
-        html[data-theme="night"] .role-panel,
-        html[data-theme="night"] .role-table-shell,
-        html[data-theme="night"] .role-table-wrap,
-        html[data-theme="night"] .mobile-role-card,
-        html[data-theme="night"] .empty-state,
-        html[data-theme="night"] .role-slug-badge {
+        html.theme-night .role-hero,
+        html.theme-night .role-panel,
+        html.theme-night .role-table-shell,
+        html.theme-night .role-table-wrap,
+        html.theme-night .mobile-role-card,
+        html.theme-night .empty-state,
+        html.theme-night .role-slug-badge,
+        html.theme-night table tbody td {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .role-hero::after {
+        html.theme-night .role-hero::after {
             background: rgba(59, 130, 246, 0.08);
         }
 
-        html[data-theme="night"] .role-hero h2,
-        html[data-theme="night"] .empty-title,
-        html[data-theme="night"] .role-label-text,
-        html[data-theme="night"] .mobile-role-label {
+        html.theme-night .role-hero h2,
+        html.theme-night .empty-title,
+        html.theme-night .role-label-text,
+        html.theme-night .mobile-role-label {
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .page-subtitle,
-        html[data-theme="night"] .section-kicker,
-        html[data-theme="night"] .empty-copy {
+        html.theme-night .page-subtitle,
+        html.theme-night .section-kicker,
+        html.theme-night .empty-copy {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .role-table thead th {
+        html.theme-night .role-table thead th {
             background: #1e293b;
             border-bottom-color: rgba(148, 163, 184, 0.14);
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .role-table tbody td {
+        html.theme-night .role-table tbody td {
             border-color: rgba(148, 163, 184, 0.1);
         }
 
-        html[data-theme="night"] .role-table tbody tr:hover {
+        html.theme-night .role-table tbody tr:hover {
             background: #1e293b;
         }
 
-        html[data-theme="night"] .form-control,
-        html[data-theme="night"] .form-text {
+        html.theme-night .form-control,
+        html.theme-night .form-text {
             background: #111827;
             border-color: rgba(148, 163, 184, 0.2);
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .form-text {
+        html.theme-night .form-text {
             color: #94a3b8 !important;
         }
 
-        html[data-theme="night"] .btn-delete-role {
+        html.theme-night .btn-delete-role {
             background: rgba(248, 113, 113, 0.14);
             color: #fecaca;
             border-color: rgba(248, 113, 113, 0.22);
         }
 
-        html[data-theme="night"] .btn-delete-role:hover {
+        html.theme-night .btn-delete-role:hover {
             background: rgba(248, 113, 113, 0.22);
             color: #fff1f2;
         }
 
-        html[data-theme="night"] .mobile-role-card {
+        html.theme-night .mobile-role-card {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .empty-icon {
+        html.theme-night .empty-icon {
             background: #1e293b;
             color: #64748b;
         }

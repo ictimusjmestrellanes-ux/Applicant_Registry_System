@@ -31,9 +31,16 @@ class UserController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        $userStats = [
+            'total' => (int) User::count(),
+            'admins' => (int) User::where('role', User::ROLE_ADMIN)->count(),
+            'staff' => (int) User::where('role', User::ROLE_STAFF)->count(),
+        ];
+
         return view('users.index', [
             'users' => $users,
             'search' => $search,
+            'userStats' => $userStats,
             'permissionOptions' => User::permissionOptions(),
         ]);
     }

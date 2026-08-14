@@ -241,88 +241,88 @@
                 grid-template-columns: 1fr;
             }
         }
-        html[data-theme="night"] body {
+        html.theme-night body {
             background: #050816;
         }
 
-        html[data-theme="night"] .page-subtitle,
-        html[data-theme="night"] .panel-copy,
-        html[data-theme="night"] .meta-copy,
-        html[data-theme="night"] .helper-copy,
-        html[data-theme="night"] .form-label,
-        html[data-theme="night"] .section-kicker,
-        html[data-theme="night"] .empty-copy {
+        html.theme-night .page-subtitle,
+        html.theme-night .panel-copy,
+        html.theme-night .meta-copy,
+        html.theme-night .helper-copy,
+        html.theme-night .form-label,
+        html.theme-night .section-kicker,
+        html.theme-night .empty-copy {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .user-edit-hero,
-        html[data-theme="night"] .user-edit-panel,
-        html[data-theme="night"] .hero-meta-card,
-        html[data-theme="night"] .edit-form-shell,
-        html[data-theme="night"] .helper-card,
-        html[data-theme="night"] .error-card {
+        html.theme-night .user-edit-hero,
+        html.theme-night .user-edit-panel,
+        html.theme-night .hero-meta-card,
+        html.theme-night .edit-form-shell,
+        html.theme-night .helper-card,
+        html.theme-night .error-card {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .user-edit-hero::after {
+        html.theme-night .user-edit-hero::after {
             background: rgba(59, 130, 246, 0.08);
         }
 
-        html[data-theme="night"] .user-edit-hero h2,
-        html[data-theme="night"] .meta-value,
-        html[data-theme="night"] .helper-title,
-        html[data-theme="night"] .fw-bold,
-        html[data-theme="night"] .empty-title {
+        html.theme-night .user-edit-hero h2,
+        html.theme-night .meta-value,
+        html.theme-night .helper-title,
+        html.theme-night .fw-bold,
+        html.theme-night .empty-title {
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .page-kicker {
+        html.theme-night .page-kicker {
             background: rgba(37, 99, 235, 0.16);
             color: #bfdbfe;
         }
 
-        html[data-theme="night"] .panel-chip {
+        html.theme-night .panel-chip {
             background: rgba(16, 185, 129, 0.16);
             color: #a7f3d0;
         }
 
-        html[data-theme="night"] .edit-form-shell,
-        html[data-theme="night"] .helper-card {
+        html.theme-night .edit-form-shell,
+        html.theme-night .helper-card {
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
         }
 
-        html[data-theme="night"] .form-control,
-        html[data-theme="night"] .form-select {
+        html.theme-night .form-control,
+        html.theme-night .form-select {
             background: #0b1220;
             border-color: rgba(148, 163, 184, 0.18);
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .form-control::placeholder {
+        html.theme-night .form-control::placeholder {
             color: #64748b;
         }
 
-        html[data-theme="night"] .form-control:focus,
-        html[data-theme="night"] .form-select:focus {
+        html.theme-night .form-control:focus,
+        html.theme-night .form-select:focus {
             background: #111827;
             border-color: rgba(96, 165, 250, 0.5);
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
         }
 
-        html[data-theme="night"] .btn-back-directory {
+        html.theme-night .btn-back-directory {
             background: #111827;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .btn-back-directory:hover {
+        html.theme-night .btn-back-directory:hover {
             background: #1f2937;
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .error-card {
+        html.theme-night .error-card {
             background: rgba(127, 29, 29, 0.18);
             color: #fecaca;
             border-color: rgba(248, 113, 113, 0.22) !important;

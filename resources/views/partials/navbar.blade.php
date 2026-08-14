@@ -468,7 +468,7 @@
         .notification-menu { width: 290px; }
     }
 
-    html[data-theme="night"] {
+    html.theme-night {
         --bg-white: #0f172a;
         --navbar-surface: #0b1220;
         --muted: #94a3b8;
@@ -479,63 +479,63 @@
         --danger: #f87171;
     }
 
-    html[data-theme="night"] .dashboard-navbar {
+    html.theme-night .dashboard-navbar {
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
     }
 
-    html[data-theme="night"] .nav-toggle-btn,
-    html[data-theme="night"] .nav-notification-btn,
-    html[data-theme="night"] .nav-theme-btn,
-    html[data-theme="night"] .nav-utility {
+    html.theme-night .nav-toggle-btn,
+    html.theme-night .nav-notification-btn,
+    html.theme-night .nav-theme-btn,
+    html.theme-night .nav-utility {
         box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
     }
 
-    html[data-theme="night"] .nav-theme-btn:hover {
+    html.theme-night .nav-theme-btn:hover {
         background: rgba(255, 255, 255, 0.05);
     }
 
-    html[data-theme="night"] .notification-menu {
+    html.theme-night .notification-menu {
         background: #0f172a;
         border: 1px solid rgba(148, 163, 184, 0.18);
     }
 
-    html[data-theme="night"] .notification-menu-header {
+    html.theme-night .notification-menu-header {
         background: linear-gradient(180deg, rgba(59, 130, 246, 0.16), rgba(59, 130, 246, 0.02));
     }
 
-    html[data-theme="night"] .notification-menu-footer {
+    html.theme-night .notification-menu-footer {
         background: #0f172a;
     }
 
-    html[data-theme="night"] .notification-item:hover {
+    html.theme-night .notification-item:hover {
         background: rgba(59, 130, 246, 0.08);
     }
 
-    html[data-theme="night"] .notification-item-icon {
+    html.theme-night .notification-item-icon {
         background: rgba(59, 130, 246, 0.16);
         color: #93c5fd;
     }
 
-    html[data-theme="night"] .notification-empty-icon {
+    html.theme-night .notification-empty-icon {
         background: rgba(255, 255, 255, 0.04);
         color: #94a3b8;
     }
 
-    html[data-theme="night"] .notification-empty .text-dark {
+    html.theme-night .notification-empty .text-dark {
         color: #e2e8f0 !important;
     }
 
-    html[data-theme="night"] .notification-empty .text-muted {
+    html.theme-night .notification-empty .text-muted {
         color: #94a3b8 !important;
     }
 
-    html[data-theme="night"] .notification-count,
-    html[data-theme="night"] .notification-dot {
+    html.theme-night .notification-count,
+    html.theme-night .notification-dot {
         box-shadow: 0 0 0 2px #0b1220;
     }
 
-    html[data-theme="night"] .user-menu-link:hover,
-    html[data-theme="night"] .navbar-item:hover {
+    html.theme-night .user-menu-link:hover,
+    html.theme-night .navbar-item:hover {
         background: rgba(255, 255, 255, 0.05);
     }
 

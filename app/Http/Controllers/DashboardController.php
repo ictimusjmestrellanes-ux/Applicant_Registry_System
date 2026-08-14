@@ -8,7 +8,12 @@ use App\Models\MayorsPermit;
 use App\Models\MayorsClearance;
 use App\Models\MayorsReferral;
 use App\Models\User;
+use App\Support\ActivityLogger;
+use App\Support\XlsxWriter;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
@@ -105,49 +110,24 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        $normalizeValue = static function ($value, string $fallback = 'UNSPECIFIED') {
-            $value = is_string($value) ? trim($value) : '';
-
-            if ($value === '') {
-                return $fallback;
-            }
-
-            return strtoupper(preg_replace('/\s+/', ' ', $value));
-        };
-
-        $mapBreakdown = static function ($items, array $labels, callable $resolver) {
-            return collect($labels)->map(function (string $label) use ($items, $resolver) {
-                return [
-                    'label' => $label,
-                    'count' => $items->filter(fn (Applicant $applicant) => $resolver($applicant) === $label)->count(),
-                ];
-            });
-        };
-
-        $genderBreakdown = $mapBreakdown(
+        $genderBreakdown = $this->breakdownCounts(
             $applicants,
             ['MALE', 'FEMALE'],
-            function (Applicant $applicant) use ($normalizeValue) {
-                return $normalizeValue($applicant->gender, 'UNSPECIFIED');
-            }
+            fn (Applicant $applicant) => $this->normalizeValue($applicant->gender, 'UNSPECIFIED')
         );
-        $pwdBreakdown = $mapBreakdown(
+        $pwdBreakdown = $this->breakdownCounts(
             $applicants,
             ['YES', 'NO'],
-            function (Applicant $applicant) use ($normalizeValue) {
-                return $normalizeValue($applicant->pwd, 'NO');
-            }
+            fn (Applicant $applicant) => $this->normalizeValue($applicant->pwd, 'NO')
         );
-        $fourPsBreakdown = $mapBreakdown(
+        $fourPsBreakdown = $this->breakdownCounts(
             $applicants,
             ['YES', 'NO'],
-            function (Applicant $applicant) use ($normalizeValue) {
-                return $normalizeValue($applicant->four_ps, 'NO');
-            }
+            fn (Applicant $applicant) => $this->normalizeValue($applicant->four_ps, 'NO')
         );
 
         $cityBreakdown = $applicants
-            ->groupBy(fn (Applicant $applicant) => $normalizeValue($applicant->city))
+            ->groupBy(fn (Applicant $applicant) => $this->normalizeValue($applicant->city))
             ->map(fn ($group, $label) => [
                 'label' => $label,
                 'count' => $group->count(),
@@ -157,7 +137,7 @@ class DashboardController extends Controller
             ->values();
 
         $provinceBreakdown = $applicants
-            ->groupBy(fn (Applicant $applicant) => $normalizeValue($applicant->province))
+            ->groupBy(fn (Applicant $applicant) => $this->normalizeValue($applicant->province))
             ->map(fn ($group, $label) => [
                 'label' => $label,
                 'count' => $group->count(),
@@ -266,6 +246,20 @@ class DashboardController extends Controller
         $maxPwdApplicants = max($pwdBreakdown->max('count') ?? 0, 1);
         $maxFourPsApplicants = max($fourPsBreakdown->max('count') ?? 0, 1);
 
+        $trendDataByPeriod = [
+            'year' => $this->registrationTrend('year'),
+            'month' => $this->registrationTrend('month'),
+            'week' => $this->registrationTrend('week'),
+            'day' => $this->registrationTrend('day', 90),
+        ];
+
+        $breakdownDataByPeriod = [
+            'year' => $this->breakdownsForPeriod($applicants, now()->startOfYear()),
+            'month' => $this->breakdownsForPeriod($applicants, now()->startOfMonth()),
+            'week' => $this->breakdownsForPeriod($applicants, now()->startOfWeek()),
+            'day' => $this->breakdownsForPeriod($applicants, now()->startOfDay()),
+        ];
+
         return view('dashboard', compact(
             'menuItems',
             'summary',
@@ -289,8 +283,356 @@ class DashboardController extends Controller
             'fourPsBreakdown',
             'maxFourPsApplicants',
             'recentApplicants',
-            'recentActivity'
+            'recentActivity',
+            'trendDataByPeriod',
+            'breakdownDataByPeriod'
         ));
+    }
+
+    public function exportCharts(Request $request)
+    {
+        $user = Auth::user();
+
+        abort_if(! $user || $user->role === User::ROLE_USER, 403);
+
+        $period = $request->query('period', 'month');
+
+        abort_if(! in_array($period, ['year', 'month', 'week', 'day'], true), 422);
+
+        $trend = $this->registrationTrend($period);
+        $trendRows = [];
+
+        if (count($trend['datasets']) > 1) {
+            $trendRows[] = ['Year', 'Month', 'Registrations'];
+
+            foreach ($trend['datasets'] as $dataset) {
+                foreach ($trend['labels'] as $index => $label) {
+                    $trendRows[] = [(string) $dataset['label'], $label, (int) ($dataset['data'][$index] ?? 0)];
+                }
+            }
+        } else {
+            $trendRows[] = ['Period', 'Registrations'];
+            $data = $trend['datasets'][0]['data'] ?? [];
+
+            foreach ($trend['labels'] as $index => $label) {
+                $trendRows[] = [$label, (int) ($data[$index] ?? 0)];
+            }
+        }
+
+        $sheets = [
+            'Registration Trend' => ['rows' => $trendRows],
+        ];
+
+        $applicants = Applicant::with(['permit', 'clearance', 'referral'])
+            ->withoutTrashed()
+            ->latest()
+            ->get();
+
+        $summaryLabels = [
+            'Total Applicants' => Applicant::withTrashed()->count(),
+            'Total Archived Applicants' => Applicant::onlyTrashed()->count(),
+            'Total Permits' => MayorsPermit::query()
+                ->whereHas('applicant', fn ($query) => $query->withoutTrashed())
+                ->count(),
+            'New This Month' => Applicant::query()
+                ->withoutTrashed()
+                ->whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->count(),
+            'Total Clearances' => Applicant::query()
+                ->whereHas('clearance', fn ($query) => $query->whereNotNull('clearance_peso_control_no'))
+                ->count(),
+            'Total Referrals' => $applicants->sum(function (Applicant $applicant) {
+                $referral = $applicant->referral;
+
+                if (! $referral) {
+                    return 0;
+                }
+
+                $count = ! empty($referral->ref_imus_ocrl) ? 1 : 0;
+                $details = is_array($referral->referral_details ?? null) ? array_slice($referral->referral_details, 1) : [];
+
+                foreach ($details as $detail) {
+                    $detail = is_array($detail) ? $detail : [];
+
+                    if (! empty(trim((string) ($detail['ref_imus_ocrl'] ?? '')))) {
+                        $count += 1;
+                    }
+                }
+
+                return $count;
+            }),
+            'Fully Ready Applicants' => $applicants->filter(
+                fn (Applicant $applicant) => $applicant->isPermitComplete()
+                    && $applicant->isClearanceComplete()
+                    && $applicant->isReferralComplete()
+            )->count(),
+            'Total Users' => User::count(),
+            'Permits Today' => MayorsPermit::whereDate('created_at', today())->count(),
+            'Clearances Today' => MayorsClearance::whereDate('created_at', today())->count(),
+            'Referrals Today' => MayorsReferral::whereDate('created_at', today())->count(),
+        ];
+
+        $summaryRows = [['Metric', 'Value']];
+
+        foreach ($summaryLabels as $label => $value) {
+            $summaryRows[] = [$label, (int) $value];
+        }
+
+        $sheets['Summary'] = ['rows' => $summaryRows];
+
+        $start = match ($period) {
+            'year' => now()->startOfYear(),
+            'month' => now()->startOfMonth(),
+            'week' => now()->startOfWeek(),
+            'day' => now()->startOfDay(),
+        };
+
+        $breakdown = $this->breakdownsForPeriod($applicants, $start);
+
+        foreach ([
+            'Gender' => $breakdown['sex'],
+            'PWD' => $breakdown['pwd'],
+            '4Ps' => $breakdown['fourPs'],
+            'City' => $breakdown['city'],
+            'Province' => $breakdown['province'],
+        ] as $sheetName => $series) {
+            $rows = [['Label', 'Count']];
+
+            foreach ($series['labels'] as $index => $label) {
+                $rows[] = [(string) $label, (int) ($series['data'][$index] ?? 0)];
+            }
+
+            $sheets[$sheetName] = ['rows' => $rows];
+        }
+
+        $xlsxPath = XlsxWriter::create('dashboard_export_', $sheets);
+        $fileName = 'dashboard-export-'.now()->format('Y-m-d-His').'.xlsx';
+
+        ActivityLogger::log(
+            'dashboard',
+            'exported',
+            "Exported dashboard data ({$period} registration trend) to {$fileName}.",
+            null,
+            null,
+            $user
+        );
+
+        return response()->download($xlsxPath, $fileName)->deleteFileAfterSend(true);
+    }
+
+    protected function normalizeValue(mixed $value, string $fallback = 'UNSPECIFIED'): string
+    {
+        $value = is_string($value) ? trim($value) : '';
+
+        if ($value === '') {
+            return $fallback;
+        }
+
+        return strtoupper(preg_replace('/\s+/', ' ', $value));
+    }
+
+    protected function breakdownCounts(Collection $applicants, array $labels, callable $resolver): Collection
+    {
+        return collect($labels)->map(function (string $label) use ($applicants, $resolver) {
+            return [
+                'label' => $label,
+                'count' => $applicants->filter(fn (Applicant $applicant) => $resolver($applicant) === $label)->count(),
+            ];
+        });
+    }
+
+    protected function breakdownsForPeriod(Collection $applicants, Carbon $start): array
+    {
+        $filtered = $applicants->filter(fn (Applicant $applicant) => $applicant->created_at->gte($start));
+
+        return [
+            'sex' => $this->breakdownSeries(
+                $filtered,
+                ['Male', 'Female'],
+                fn (Applicant $applicant) => ucfirst(strtolower($this->normalizeValue($applicant->gender, 'UNSPECIFIED')))
+            ),
+            'pwd' => $this->breakdownSeries(
+                $filtered,
+                ['PWD YES', 'PWD NO'],
+                fn (Applicant $applicant) => $this->normalizeValue($applicant->pwd, 'NO') === 'YES' ? 'PWD YES' : 'PWD NO'
+            ),
+            'fourPs' => $this->breakdownSeries(
+                $filtered,
+                ['4Ps YES', '4Ps NO'],
+                fn (Applicant $applicant) => $this->normalizeValue($applicant->four_ps, 'NO') === 'YES' ? '4Ps YES' : '4Ps NO'
+            ),
+            'city' => $this->topBreakdown($filtered, fn (Applicant $applicant) => $this->normalizeValue($applicant->city)),
+            'province' => $this->topBreakdown($filtered, fn (Applicant $applicant) => $this->normalizeValue($applicant->province)),
+        ];
+    }
+
+    protected function breakdownSeries(Collection $applicants, array $labels, callable $resolver): array
+    {
+        $data = collect($labels)
+            ->map(fn (string $label) => $applicants->filter(fn (Applicant $applicant) => $resolver($applicant) === $label)->count());
+
+        return [
+            'labels' => $labels,
+            'data' => $data->all(),
+        ];
+    }
+
+    protected function topBreakdown(Collection $applicants, callable $resolver): array
+    {
+        $grouped = $applicants
+            ->groupBy($resolver)
+            ->sortByDesc(fn ($group) => $group->count())
+            ->take(10);
+
+        return [
+            'labels' => $grouped->keys()->all(),
+            'data' => $grouped->map(fn ($group) => $group->count())->values()->all(),
+        ];
+    }
+
+    protected function registrationTrend(string $period, ?int $dayLimit = null): array
+    {
+        $palette = [
+            ['border' => '#7c3aed', 'background' => 'rgba(124, 58, 237, 0.18)'],
+            ['border' => '#3b82f6', 'background' => 'rgba(59, 130, 246, 0.18)'],
+            ['border' => '#16a34a', 'background' => 'rgba(22, 163, 74, 0.18)'],
+            ['border' => '#f97316', 'background' => 'rgba(249, 115, 22, 0.18)'],
+        ];
+
+        $query = Applicant::query()->withoutTrashed();
+
+        return match ($period) {
+            'year' => $this->trendYearlyRegistrations($query, $palette),
+            'month' => $this->trendMonthlyRegistrations($query, $palette),
+            'week' => $this->trendWeeklyRegistrations($query, $palette),
+            'day' => $this->trendDailyRegistrations($query, $palette, $dayLimit),
+            default => abort(422),
+        };
+    }
+
+    protected function trendYearlyRegistrations(Builder $query, array $palette): array
+    {
+        $rows = (clone $query)
+            ->selectRaw('YEAR(created_at) as year, COUNT(*) as total')
+            ->groupByRaw('YEAR(created_at)')
+            ->orderByRaw('YEAR(created_at)')
+            ->get();
+
+        $color = $palette[0]['border'];
+
+        return [
+            'type' => 'bar',
+            'labels' => $rows->map(fn ($row) => (string) (int) $row->year)->values()->all(),
+            'datasets' => [[
+                'label' => 'Registrations',
+                'data' => $rows->map(fn ($row) => (int) $row->total)->values()->all(),
+                'backgroundColor' => 'rgba(124, 58, 237, 0.55)',
+                'borderColor' => $color,
+                'borderWidth' => 1,
+                'borderRadius' => 6,
+            ]],
+        ];
+    }
+
+    protected function trendMonthlyRegistrations(Builder $query, array $palette): array
+    {
+        $rows = (clone $query)
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as total')
+            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->orderByRaw('YEAR(created_at), MONTH(created_at)')
+            ->get();
+
+        $years = $rows->pluck('year')->map(fn ($year) => (int) $year)->unique()->values();
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        $datasets = $years->map(function (int $year, int $index) use ($rows, $palette) {
+            $yearRows = $rows->where('year', $year)->keyBy('month');
+            $data = collect(range(1, 12))
+                ->map(fn (int $month) => (int) ($yearRows->get($month)?->total ?? 0))
+                ->values();
+            $color = $palette[$index % count($palette)]['border'];
+
+            return [
+                'label' => (string) $year,
+                'data' => $data,
+                'borderColor' => $color,
+                'backgroundColor' => $color,
+                'pointBackgroundColor' => $color,
+                'pointBorderColor' => '#ffffff',
+                'fill' => false,
+                'tension' => 0.35,
+            ];
+        })->values();
+
+        return [
+            'type' => 'line',
+            'labels' => $months,
+            'datasets' => $datasets->all(),
+        ];
+    }
+
+    protected function trendWeeklyRegistrations(Builder $query, array $palette): array
+    {
+        $rows = (clone $query)
+            ->selectRaw('YEARWEEK(created_at, 3) as yw, COUNT(*) as total')
+            ->groupBy('yw')
+            ->orderBy('yw')
+            ->get();
+
+        $labels = $rows->map(function ($row) {
+            $year = (int) substr((string) $row->yw, 0, 4);
+            $week = (int) substr((string) $row->yw, 4);
+
+            return (new \DateTimeImmutable)->setISODate($year, $week, 1)->format('M d, Y');
+        })->values()->all();
+
+        $color = $palette[2]['border'];
+
+        return [
+            'type' => 'line',
+            'labels' => $labels,
+            'datasets' => [[
+                'label' => 'Registrations',
+                'data' => $rows->map(fn ($row) => (int) $row->total)->values()->all(),
+                'borderColor' => $color,
+                'backgroundColor' => $color,
+                'pointBackgroundColor' => $color,
+                'pointBorderColor' => '#ffffff',
+                'fill' => false,
+                'tension' => 0.35,
+            ]],
+        ];
+    }
+
+    protected function trendDailyRegistrations(Builder $query, array $palette, ?int $dayLimit = null): array
+    {
+        $rows = (clone $query)
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        if ($dayLimit !== null && $rows->count() > $dayLimit) {
+            $rows = $rows->slice(-$dayLimit)->values();
+        }
+
+        $color = $palette[1]['border'];
+
+        return [
+            'type' => 'line',
+            'labels' => $rows->map(fn ($row) => Carbon::parse($row->date)->format('M d, Y'))->values()->all(),
+            'datasets' => [[
+                'label' => 'Registrations',
+                'data' => $rows->map(fn ($row) => (int) $row->total)->values()->all(),
+                'borderColor' => $color,
+                'backgroundColor' => $color,
+                'pointBackgroundColor' => $color,
+                'pointBorderColor' => '#ffffff',
+                'fill' => false,
+                'tension' => 0.35,
+            ]],
+        ];
     }
 
     public function todayRecords(Request $request, string $type)

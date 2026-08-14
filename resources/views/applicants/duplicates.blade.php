@@ -97,7 +97,7 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 16px;
             margin-top: 22px;
         }
@@ -513,6 +513,12 @@
             color: #065f46;
         }
 
+        @media (max-width: 1399.98px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
         @media (max-width: 1200px) {
             .metrics-grid {
                 grid-template-columns: 1fr;
@@ -570,6 +576,11 @@
                 align-self: flex-start;
             }
 
+            .group-card-header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
             .group-card {
                 border-radius: 18px;
             }
@@ -622,125 +633,385 @@
             }
         }
 
-        html[data-theme="night"] body {
+        html.theme-night body {
             background: #050816;
         }
 
-        html[data-theme="night"] .page-subtitle,
-        html[data-theme="night"] .metric-copy,
-        html[data-theme="night"] .table-copy,
-        html[data-theme="night"] .empty-copy,
-        html[data-theme="night"] .pagination-copy,
-        html[data-theme="night"] .contact-meta,
-        html[data-theme="night"] .mobile-dup-label,
-        html[data-theme="night"] .form-label,
-        html[data-theme="night"] .dup-search-icon,
-        html[data-theme="night"] .group-subtitle {
+        html.theme-night .page-subtitle,
+        html.theme-night .metric-copy,
+        html.theme-night .table-copy,
+        html.theme-night .empty-copy,
+        html.theme-night .pagination-copy,
+        html.theme-night .contact-meta,
+        html.theme-night .mobile-dup-label,
+        html.theme-night .form-label,
+        html.theme-night .dup-search-icon,
+        html.theme-night .group-subtitle {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .dup-hero,
-        html[data-theme="night"] .metric-card,
-        html[data-theme="night"] .dup-table-shell,
-        html[data-theme="night"] .search-card,
-        html[data-theme="night"] .dup-table-wrap,
-        html[data-theme="night"] .group-card,
-        html[data-theme="night"] .mobile-dup-card,
-        html[data-theme="night"] .empty-state,
-        html[data-theme="night"] .dup-search-wrap,
-        html[data-theme="night"] .address-pill,
-        html[data-theme="night"] .pagination-wrap .page-link {
+        html.theme-night .dup-hero,
+        html.theme-night .metric-card,
+        html.theme-night .dup-table-shell,
+        html.theme-night .search-card,
+        html.theme-night .dup-table-wrap,
+        html.theme-night .group-card,
+        html.theme-night .mobile-dup-card,
+        html.theme-night .empty-state,
+        html.theme-night .dup-search-wrap,
+        html.theme-night .address-pill,
+        html.theme-night .pagination-wrap .page-link {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .dup-hero::after {
+        html.theme-night .dup-hero::after {
             background: rgba(59, 130, 246, 0.08);
         }
 
-        html[data-theme="night"] .dup-hero h2,
-        html[data-theme="night"] .metric-value,
-        html[data-theme="night"] .empty-title,
-        html[data-theme="night"] .applicant-name,
-        html[data-theme="night"] .group-name {
+        html.theme-night .dup-hero h2,
+        html.theme-night .metric-value,
+        html.theme-night .empty-title,
+        html.theme-night .applicant-name,
+        html.theme-night .group-name,
+        html.theme-night .contact-main{
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .page-kicker {
+        html.theme-night .page-kicker {
             background: rgba(245, 158, 11, 0.16);
             color: #fcd34d;
         }
 
-        html[data-theme="night"] .group-card-header {
+        html.theme-night .group-card-header {
             background: #111827 !important;
             border-bottom-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .dup-table thead th {
+        html.theme-night .dup-table thead th {
             background: #111827 !important;
             color: #cbd5e1;
             border-bottom-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .dup-table tbody td {
+        html.theme-night .dup-table tbody td {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.12) !important;
         }
 
-        html[data-theme="night"] .dup-table tbody tr:hover {
+        html.theme-night .dup-table tbody tr:hover {
             background: rgba(59, 130, 246, 0.06) !important;
         }
 
-        html[data-theme="night"] .group-avatar {
+        html.theme-night .group-avatar {
             background: rgba(248, 113, 113, 0.16);
             color: #fca5a5;
         }
 
-        html[data-theme="night"] .group-count-badge {
+        html.theme-night .group-count-badge {
             background: rgba(248, 113, 113, 0.16);
             color: #fca5a5;
         }
 
-        html[data-theme="night"] .applicant-avatar {
+        html.theme-night .applicant-avatar {
             background: #111827;
             color: #cbd5e1;
         }
 
-        html[data-theme="night"] .btn-ghost {
+        html.theme-night .btn-ghost {
             background: #111827;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .btn-ghost:hover {
+        html.theme-night .btn-ghost:hover {
             background: #1f2937;
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .btn-primary-soft {
+        html.theme-night .btn-primary-soft {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
         }
 
-        html[data-theme="night"] .btn-edit-sm {
+        html.theme-night .btn-edit-sm {
             background: rgba(96, 165, 250, 0.14);
             color: #93c5fd;
         }
 
-        html[data-theme="night"] .btn-edit-sm:hover {
+        html.theme-night .btn-edit-sm:hover {
             background: rgba(96, 165, 250, 0.22);
             color: #bfdbfe;
         }
 
-        html[data-theme="night"] .btn-dup-sm {
+        html.theme-night .btn-dup-sm {
             background: rgba(52, 211, 153, 0.14);
             color: #6ee7b7;
         }
 
-        html[data-theme="night"] .btn-dup-sm:hover {
+        html.theme-night .btn-dup-sm:hover {
             background: rgba(52, 211, 153, 0.22);
             color: #d1fae5;
+        }
+
+        .metric-icon {
+            font-size: 0.95rem;
+        }
+
+        .metric-exact .metric-icon {
+            color: #dc2626;
+        }
+
+        .metric-likely .metric-icon {
+            color: #b45309;
+        }
+
+        .metric-possible .metric-icon {
+            color: #1d4ed8;
+        }
+
+        .metric-total .metric-icon {
+            color: var(--dup-slate);
+        }
+
+        .tier-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding: 13px 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 34, 58, 0.05);
+        }
+
+        .tier-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .tier-title {
+            color: var(--dup-ink);
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .tier-criteria {
+            color: var(--dup-slate);
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+
+        .tier-action {
+            margin-left: auto;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .tier-exact .tier-icon,
+        .tier-exact .tier-action {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .tier-likely .tier-icon,
+        .tier-likely .tier-action {
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+        }
+
+        .tier-possible .tier-icon,
+        .tier-possible .tier-action {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .tier-exact .group-avatar,
+        .tier-exact .group-count-badge {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .tier-likely .group-avatar,
+        .tier-likely .group-count-badge {
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+        }
+
+        .tier-possible .group-avatar,
+        .tier-possible .group-count-badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .birthdate-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .birthdate-missing {
+            background: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+        }
+
+        .group-card-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-dismiss-sm,
+        .btn-restore-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: none;
+            transition: all 0.15s ease;
+        }
+
+        .btn-dismiss-sm {
+            background: #ffffff;
+            color: #1e8023;
+            border: 1px solid #1e8023;
+        }
+
+        .btn-dismiss-sm:hover {
+            background: rgba(97, 239, 68, 0.08);
+            border-color: rgba(97, 239, 68, 0.35);
+            color: #1e8023;
+            border: 1px solid #1e8023;
+        }
+
+        .btn-restore-sm {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .btn-restore-sm:hover {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .tier-dismissed .tier-icon,
+        .tier-dismissed .tier-action {
+            background: rgba(100, 116, 139, 0.12);
+            color: #475569;
+        }
+
+        .dismissed-card .group-card-header {
+            background: #f6f8fb;
+        }
+
+        .dismissed-card .group-avatar {
+            background: rgba(100, 116, 139, 0.12);
+            color: #475569;
+        }
+
+        html.theme-night .metric-possible .metric-icon {
+            color: #93c5fd;
+        }
+
+        html.theme-night .tier-head {
+            background: #0f172a !important;
+            border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+
+        html.theme-night .tier-title {
+            color: #f8fafc;
+        }
+
+        html.theme-night .tier-criteria {
+            color: #94a3b8;
+        }
+
+        html.theme-night .tier-exact .tier-icon,
+        html.theme-night .tier-exact .tier-action,
+        html.theme-night .tier-exact .group-avatar,
+        html.theme-night .tier-exact .group-count-badge {
+            background: rgba(248, 113, 113, 0.16);
+            color: #fca5a5;
+        }
+
+        html.theme-night .tier-likely .tier-icon,
+        html.theme-night .tier-likely .tier-action,
+        html.theme-night .tier-likely .group-avatar,
+        html.theme-night .tier-likely .group-count-badge {
+            background: rgba(251, 191, 36, 0.14);
+            color: #fcd34d;
+        }
+
+        html.theme-night .tier-possible .tier-icon,
+        html.theme-night .tier-possible .tier-action,
+        html.theme-night .tier-possible .group-avatar,
+        html.theme-night .tier-possible .group-count-badge {
+            background: rgba(96, 165, 250, 0.16);
+            color: #93c5fd;
+        }
+
+        html.theme-night .birthdate-pill {
+            background: rgba(148, 163, 184, 0.14);
+            color: #cbd5e1;
+        }
+
+        html.theme-night .btn-dismiss-sm {
+            background: #1f2937;
+            border-color: rgba(148, 163, 184, 0.25);
+            color: #cbd5e1;
+        }
+
+        html.theme-night .btn-dismiss-sm:hover {
+            background: rgba(97, 239, 68, 0.16);
+            border-color: rgba(97, 239, 68, 0.4);
+            color: #a8fca5;
+        }
+
+        html.theme-night .btn-restore-sm {
+            background: rgba(96, 165, 250, 0.14);
+            color: #93c5fd;
+        }
+
+        html.theme-night .btn-restore-sm:hover {
+            background: rgba(96, 165, 250, 0.22);
+            color: #bfdbfe;
+        }
+
+        html.theme-night .tier-dismissed .tier-icon,
+        html.theme-night .tier-dismissed .tier-action {
+            background: rgba(148, 163, 184, 0.14);
+            color: #94a3b8;
+        }
+
+        html.theme-night .dismissed-card .group-card-header {
+            background: #111827 !important;
+        }
+
+        html.theme-night .dismissed-card .group-avatar {
+            background: rgba(148, 163, 184, 0.14);
+            color: #94a3b8;
         }
     </style>
 
@@ -751,8 +1022,9 @@
                 <div class="hero-top">
                     <div>   
                         <h2>Duplicate Applicants</h2>
-                        <p class="page-subtitle mb-0">Identify applicants with matching names across records. Review
-                            groups to find potential double entries that need merging or cleanup.</p>
+                        <p class="page-subtitle">Detect potential double entries grouped by match confidence — exact-same name and
+                            birthdate, likely-same name with birthdate missing or year-only match,<br> and possible-similar
+                            name spelling that needs verification before acting.</p>
                     </div>
                     <a href="{{ route('applicants.index') }}" class="btn btn-ghost">
                         <i class="bi bi-arrow-left me-2"></i>Back to Active List
@@ -782,21 +1054,33 @@
                 </form>
             </section>
 
+            @if (session('success'))
+                <div class="alert alert-success d-flex align-items-center shadow-sm">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
+
             <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-label"><i class="bi bi-layers"></i> Duplicate Groups</div>
-                    <div class="metric-value">{{ number_format($totalGroups) }}</div>
-                    <span class="metric-copy">Unique name combinations with duplicates</span>
+                <div class="metric-card metric-exact">
+                    <div class="metric-label"><i class="bi bi-exclamation-octagon metric-icon"></i> Exact Matches</div>
+                    <div class="metric-value">{{ number_format($exactCount) }}</div>
+                    <span class="metric-copy">Same full name and exact-same birthdate</span>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-label"><i class="bi bi-people"></i> Total Records</div>
+                <div class="metric-card metric-likely">
+                    <div class="metric-label"><i class="bi bi-exclamation-triangle metric-icon"></i> Likely Matches</div>
+                    <div class="metric-value">{{ number_format($likelyCount) }}</div>
+                    <span class="metric-copy">Same name — birthdate missing or year-only match</span>
+                </div>
+                <div class="metric-card metric-possible">
+                    <div class="metric-label"><i class="bi bi-question-circle metric-icon"></i> Possible Matches</div>
+                    <div class="metric-value">{{ number_format($possibleCount) }}</div>
+                    <span class="metric-copy">Similar name spelling — verify before acting</span>
+                </div>
+                <div class="metric-card metric-total">
+                    <div class="metric-label"><i class="bi bi-people metric-icon"></i> Records Involved</div>
                     <div class="metric-value">{{ number_format($totalDuplicates) }}</div>
-                    <span class="metric-copy">Applicants involved in duplicate groups</span>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label"><i class="bi bi-exclamation-triangle"></i> Action Needed</div>
-                    <div class="metric-value">{{ number_format($totalDuplicates - $totalGroups) }}</div>
-                    <span class="metric-copy">Extra records that may need review</span>
+                    <span class="metric-copy">Applicants inside duplicate groups</span>
                 </div>
             </div>
 
@@ -804,49 +1088,127 @@
                 <div class="table-header">
                     <div>
                         <div class="table-label">Duplicate Records</div>
-                        <h5 class="fw-bold mb-1">Grouped by full name match</h5>
-                        <p class="table-copy mb-0">Each group shows applicants sharing the same first and last name.
-                            Open the applicant workspace to manage document compliance.</p>
+                        <h5 class="fw-bold mb-1">Grouped by match confidence</h5>
+                        <p class="table-copy mb-0">Records are ranked as exact, likely, or possible matches. Always
+                            verify identity before acting on any duplicate group.</p>
                     </div>
                 </div>
 
-                @forelse($duplicateGroups as $group)
-                    <div class="group-card mb-4">
-                        <div class="group-card-header">
-                            <div class="group-card-header-left">
-                                <div class="group-avatar">
-                                    {{ strtoupper(substr($group['first_name'], 0, 1)) }}{{ strtoupper(substr($group['last_name'], 0, 1)) }}
-                                </div>
-                                <div>
-                                    <div class="group-name">
-                                        {{ trim($group['first_name'] . ' ' . $group['last_name']) }}
-                                    </div>
-                                    <div class="group-subtitle">
-                                        {{ $group['count'] }} records found in the system
-                                    </div>
-                                </div>
+                @php($hasAny = collect($tiers)->contains(fn ($tier) => $tier['groups']->isNotEmpty()))
+
+                @foreach($tiers as $tier)
+                    @if($tier['groups']->isNotEmpty())
+                        <div class="tier-head tier-{{ $tier['key'] }}">
+                            <div class="tier-icon"><i class="bi {{ $tier['icon'] }}"></i></div>
+                            <div>
+                                <div class="tier-title">{{ $tier['label'] }}</div>
+                                <div class="tier-criteria">{{ $tier['criteria'] }}</div>
                             </div>
-                            <div class="group-count-badge">
-                                <i class="bi bi-copy"></i>
-                                {{ $group['count'] }} duplicates
-                            </div>
+                            <span class="tier-action">{{ $tier['action'] }}</span>
                         </div>
 
-                        <div class="dup-table-wrap">
-                            <table class="table dup-table align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Applicant</th>
-                                        <th>Contact</th>
-                                        <th>Address</th>
-                                        <th>Created</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                        @foreach($tier['groups'] as $group)
+                            <div class="group-card mb-4">
+                                <div class="group-card-header">
+                                    <div class="group-card-header-left">
+                                        <div class="group-avatar">
+                                            {{ strtoupper(substr($group['first_name'], 0, 1)) }}{{ strtoupper(substr($group['last_name'], 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="group-name">
+                                                {{ trim($group['first_name'] . ' ' . $group['last_name']) }}
+                                            </div>
+                                            <div class="group-subtitle">
+                                                {{ $group['count'] }} records — {{ $group['reason'] }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="group-card-header-right">
+                                    <div class="group-count-badge">
+                                        <i class="bi bi-copy"></i>
+                                        {{ $group['count'] }} records
+                                    </div>
+                                    <form method="POST" action="{{ route('applicants.duplicates.dismiss') }}" class="m-0">
+                                        @csrf
+                                        @foreach($group['applicants'] as $applicant)
+                                            <input type="hidden" name="applicant_ids[]" value="{{ $applicant->id }}">
+                                        @endforeach
+                                        <button type="submit" class="btn-dismiss-sm" title="Mark this group as not a duplicate">
+                                            <i class="bi bi-check-square"></i> Not a duplicate
+                                        </button>
+                                    </form>
+                                </div>
+                                </div>
+
+                                <div class="dup-table-wrap">
+                                    <table class="table dup-table align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Applicant</th>
+                                                <th>Birthdate</th>
+                                                <th>Contact</th>
+                                                <th>Address</th>
+                                                <th>Created</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($group['applicants'] as $applicant)
+                                                <tr>
+                                                    <td>
+                                                        <div class="applicant-cell">
+                                                            <div class="applicant-avatar">
+                                                                {{ strtoupper(substr($applicant->first_name, 0, 1)) }}{{ strtoupper(substr($applicant->last_name, 0, 1)) }}
+                                                            </div>
+                                                            <div>
+                                                                <div class="applicant-name">
+                                                                    {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
+                                                                </div>
+                                                                <div class="applicant-meta">ID:
+                                                                    #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @if($applicant->birthdate)
+                                                            <div class="contact-main">{{ $applicant->birthdate->format('M d, Y') }}</div>
+                                                        @else
+                                                            <span class="birthdate-pill birthdate-missing">Not recorded</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
+                                                        <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} /
+                                                            {{ $applicant->civil_status ?: 'N/A' }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="address-pill">
+                                                            {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="contact-main">
+                                                            {{ $applicant->created_at?->format('M d, Y') ?? 'N/A' }}
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <a href="{{ route('applicants.edit', $applicant->id) }}"
+                                                            class="btn-edit-sm" title="View Applicant">
+                                                            <i class="bi bi-eye-fill"></i> View
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="mobile-dup-list">
                                     @foreach($group['applicants'] as $applicant)
-                                        <tr>
-                                            <td>
+                                        <article class="mobile-dup-card">
+                                            <div class="mobile-dup-head">
                                                 <div class="applicant-cell">
                                                     <div class="applicant-avatar">
                                                         {{ strtoupper(substr($applicant->first_name, 0, 1)) }}{{ strtoupper(substr($applicant->last_name, 0, 1)) }}
@@ -860,86 +1222,91 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
-                                                <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} /
-                                                    {{ $applicant->civil_status ?: 'N/A' }}
+                                            </div>
+                                            <div class="mobile-dup-grid">
+                                                <div class="mobile-dup-row">
+                                                    <div class="mobile-dup-label">Birthdate</div>
+                                                    @if($applicant->birthdate)
+                                                        <div class="contact-main">{{ $applicant->birthdate->format('M d, Y') }}</div>
+                                                    @else
+                                                        <span class="birthdate-pill birthdate-missing">Not recorded</span>
+                                                    @endif
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span class="address-pill">
-                                                    {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="contact-main">
-                                                    {{ $applicant->created_at?->format('M d, Y') ?? 'N/A' }}
+                                                <div class="mobile-dup-row">
+                                                    <div class="mobile-dup-label">Contact</div>
+                                                    <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
+                                                    <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} /
+                                                        {{ $applicant->civil_status ?: 'N/A' }}</div>
                                                 </div>
-                                            </td>
-                                            <td class="text-end">
-                                                <a href="{{ route('applicants.edit', $applicant->id) }}"
-                                                    class="btn-edit-sm" title="View Applicant">
+                                                <div class="mobile-dup-row">
+                                                    <div class="mobile-dup-label">Address</div>
+                                                    <span class="address-pill">
+                                                        {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="mobile-dup-actions">
+                                                <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-edit-sm">
                                                     <i class="bi bi-eye-fill"></i> View
                                                 </a>
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        </article>
                                     @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                @endforeach
 
-                        <div class="mobile-dup-list">
-                            @foreach($group['applicants'] as $applicant)
-                                <article class="mobile-dup-card">
-                                    <div class="mobile-dup-head">
-                                        <div class="applicant-cell">
-                                            <div class="applicant-avatar">
-                                                {{ strtoupper(substr($applicant->first_name, 0, 1)) }}{{ strtoupper(substr($applicant->last_name, 0, 1)) }}
-                                            </div>
-                                            <div>
-                                                <div class="applicant-name">
-                                                    {{ trim($applicant->first_name . ' ' . ($applicant->middle_name ? strtoupper(substr($applicant->middle_name, 0, 1)) . '. ' : '') . $applicant->last_name . ' ' . ($applicant->suffix ?? '')) }}
-                                                </div>
-                                                <div class="applicant-meta">ID:
-                                                    #{{ str_pad($applicant->id, 5, '0', STR_PAD_LEFT) }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mobile-dup-grid">
-                                        <div class="mobile-dup-row">
-                                            <div class="mobile-dup-label">Contact</div>
-                                            <div class="contact-main">{{ $applicant->contact_no ?: 'N/A' }}</div>
-                                            <div class="contact-meta">{{ $applicant->gender ?: 'N/A' }} /
-                                                {{ $applicant->civil_status ?: 'N/A' }}</div>
-                                        </div>
-                                        <div class="mobile-dup-row">
-                                            <div class="mobile-dup-label">Address</div>
-                                            <span class="address-pill">
-                                                {{ trim(collect([$applicant->address_line, $applicant->barangay, $applicant->city])->filter()->implode(', ')) ?: 'N/A' }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="mobile-dup-actions">
-                                        <a href="{{ route('applicants.edit', $applicant->id) }}" class="btn btn-edit-sm">
-                                            <i class="bi bi-eye-fill"></i> View
-                                        </a>
-                                    </div>
-                                </article>
-                            @endforeach
+                @if($dismissedGroups->isNotEmpty())
+                    <div class="tier-head tier-dismissed">
+                        <div class="tier-icon"><i class="bi bi-x-circle"></i></div>
+                        <div>
+                            <div class="tier-title">Not Duplicates</div>
+                            <div class="tier-criteria">Groups marked as not duplicates by reviewers. They stay hidden
+                                until restored.</div>
                         </div>
+                        <span class="tier-action">{{ $dismissedGroups->count() }} dismissed</span>
                     </div>
-                @empty
+
+                    @foreach($dismissedGroups as $group)
+                        <div class="group-card dismissed-card mb-4">
+                            <div class="group-card-header">
+                                <div class="group-card-header-left">
+                                    <div class="group-avatar">
+                                        {{ strtoupper(substr($group['first_name'], 0, 1)) }}{{ strtoupper(substr($group['last_name'], 0, 1)) }}
+                                    </div>
+                                    <div>
+                                        <div class="group-name">
+                                            {{ trim($group['first_name'] . ' ' . $group['last_name']) }}
+                                        </div>
+                                        <div class="group-subtitle">
+                                            {{ $group['count'] }} records — marked not a duplicate on {{ $group['dismissed_at']?->format('M d, Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <form method="POST" action="{{ route('applicants.duplicates.restore') }}" class="m-0">
+                                    @csrf
+                                    <input type="hidden" name="group_hash" value="{{ $group['hash'] }}">
+                                    <button type="submit" class="btn-restore-sm" title="Restore this group to the duplicate list">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Undo
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+
+                @if(!$hasAny)
                     <div class="empty-state">
                         <div class="empty-icon">
                             <i class="bi bi-check-circle"></i>
                         </div>
                         <div class="empty-title">No duplicate applicants found</div>
-                        <p class="empty-copy mb-0">All applicant records are unique. No matching name combinations were
-                            detected.</p>
+                        <p class="empty-copy mb-0">All applicant records are unique. No exact, likely, or possible
+                            duplicate matches were detected.</p>
                     </div>
-                @endforelse
+                @endif
             </section>
 
         </div>

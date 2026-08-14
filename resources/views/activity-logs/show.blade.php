@@ -289,106 +289,106 @@
             width: 24%;
         }
 
-        html[data-theme="night"] body {
+        html.theme-night body {
             background: #050816 !important;
         }
 
-        html[data-theme="night"] .activity-log-detail-page {
+        html.theme-night .activity-log-detail-page {
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .activity-log-hero,
-        html[data-theme="night"] .activity-log-summary,
-        html[data-theme="night"] .activity-log-changes {
+        html.theme-night .activity-log-hero,
+        html.theme-night .activity-log-summary,
+        html.theme-night .activity-log-changes {
             background: #0f172a !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28) !important;
         }
 
-        html[data-theme="night"] .activity-log-hero h3,
-        html[data-theme="night"] .activity-log-detail-page h5,
-        html[data-theme="night"] .activity-log-detail-page .fw-semibold {
+        html.theme-night .activity-log-hero h3,
+        html.theme-night .activity-log-detail-page h5,
+        html.theme-night .activity-log-detail-page .fw-semibold {
             color: #f8fafc !important;
         }
 
-        html[data-theme="night"] .activity-log-detail-page .text-muted,
-        html[data-theme="night"] .activity-log-detail-page .activity-count {
+        html.theme-night .activity-log-detail-page .text-muted,
+        html.theme-night .activity-log-detail-page .activity-count {
             color: #94a3b8 !important;
         }
 
-        html[data-theme="night"] .activity-count {
+        html.theme-night .activity-count {
             background: rgba(59, 130, 246, 0.16);
             border-color: rgba(96, 165, 250, 0.22);
             color: #93c5fd !important;
         }
 
-        html[data-theme="night"] .activity-log-detail-page .activity-count-empty {
+        html.theme-night .activity-log-detail-page .activity-count-empty {
             background: rgba(148, 163, 184, 0.14);
             border-color: rgba(148, 163, 184, 0.2);
             color: #cbd5e1 !important;
         }
 
-        html[data-theme="night"] .activity-log-back {
+        html.theme-night .activity-log-back {
             background: #111827;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .activity-log-back:hover {
+        html.theme-night .activity-log-back:hover {
             background: #1f2937;
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .activity-meta {
+        html.theme-night .activity-meta {
             background: #0b1324;
             border-color: rgba(148, 163, 184, 0.16);
         }
 
-        html[data-theme="night"] .activity-meta small {
+        html.theme-night .activity-meta small {
             color: #94a3b8 !important;
         }
 
-        html[data-theme="night"] .activity-pill-module {
+        html.theme-night .activity-pill-module {
             background: rgba(59, 130, 246, 0.18);
             color: #93c5fd;
         }
 
-        html[data-theme="night"] .activity-pill-action {
+        html.theme-night .activity-pill-action {
             background: rgba(16, 185, 129, 0.16);
             color: #6ee7b7;
         }
 
-        html[data-theme="night"] .activity-empty {
+        html.theme-night .activity-empty {
             background: #0b1324;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .activity-empty-icon {
+        html.theme-night .activity-empty-icon {
             background: rgba(59, 130, 246, 0.16);
             color: #93c5fd;
         }
 
-        html[data-theme="night"] .activity-table {
+        html.theme-night .activity-table {
             color: #e2e8f0 !important;
         }
 
-        html[data-theme="night"] .activity-table thead th {
+        html.theme-night .activity-table thead th {
             background: #111827 !important;
             color: #cbd5e1 !important;
             border-bottom-color: rgba(148, 163, 184, 0.16) !important;
         }
 
-        html[data-theme="night"] .activity-table tbody td {
+        html.theme-night .activity-table tbody td {
             background: #0f172a !important;
             color: #e2e8f0 !important;
             border-color: rgba(148, 163, 184, 0.12) !important;
         }
 
-        html[data-theme="night"] .activity-table tbody tr:hover {
+        html.theme-night .activity-table tbody tr:hover {
             background: #101a30 !important;
         }
 
-        html[data-theme="night"] .activity-table-wrap {
+        html.theme-night .activity-table-wrap {
             border-color: rgba(148, 163, 184, 0.16);
         }
 

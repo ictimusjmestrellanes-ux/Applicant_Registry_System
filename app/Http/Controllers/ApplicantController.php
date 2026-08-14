@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applicant;
+use App\Models\DuplicateDismissal;
 use App\Models\User;
 use App\Support\ActivityLogger;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ApplicantController extends Controller
 {
@@ -443,56 +445,407 @@ class ApplicantController extends Controller
     {
         $search = trim((string) $request->query('search', ''));
 
-        $duplicateGroups = Applicant::query()
-            ->selectRaw("
-                LOWER(TRIM(COALESCE(first_name, ''))) as fn,
-                LOWER(TRIM(COALESCE(last_name, ''))) as ln,
-                COUNT(*) as total
-            ")
-            ->whereNull('deleted_at')
-            ->groupByRaw("LOWER(TRIM(COALESCE(first_name, ''))), LOWER(TRIM(COALESCE(last_name, '')))")
-            ->having('total', '>', 1)
-            ->orderByDesc('total')
-            ->get()
-            ->map(function ($group) use ($search) {
-                $applicants = Applicant::whereNull('deleted_at')
-                    ->whereRaw("LOWER(TRIM(COALESCE(first_name, ''))) = ?", [$group->fn])
-                    ->whereRaw("LOWER(TRIM(COALESCE(last_name, ''))) = ?", [$group->ln])
-                    ->when($search !== '', function ($q) use ($search) {
-                        $q->where(function ($inner) use ($search) {
-                            $inner->where('first_name', 'like', "%{$search}%")
-                                ->orWhere('last_name', 'like', "%{$search}%")
-                                ->orWhere('contact_no', 'like', "%{$search}%")
-                                ->orWhere('city', 'like', "%{$search}%")
-                                ->orWhere('barangay', 'like', "%{$search}%");
-                        });
-                    })
-                    ->with(['permit', 'clearance', 'referral'])
-                    ->orderBy('id')
-                    ->get();
+        $cacheKey = 'duplicates:groups:'.($search !== '' ? 'search-'.md5($search) : 'all');
+
+        [$exactGroups, $likelyGroups, $possibleGroups] = Cache::remember($cacheKey, 900, function () use ($search) {
+            $applicants = Applicant::whereNull('deleted_at')
+                ->when($search !== '', function ($q) use ($search) {
+                    $q->where(function ($inner) use ($search) {
+                        $inner->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('middle_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('contact_no', 'like', "%{$search}%")
+                            ->orWhere('city', 'like', "%{$search}%")
+                            ->orWhere('barangay', 'like', "%{$search}%");
+                    });
+                })
+                ->get([
+                    'id', 'first_name', 'middle_name', 'last_name', 'suffix',
+                    'birthdate', 'contact_no', 'gender', 'civil_status',
+                    'address_line', 'city', 'barangay', 'created_at',
+                ]);
+
+            $rows = $applicants->map(function ($applicant) {
+                $baseName = trim(
+                    $this->normalizeName($applicant->first_name)
+                    .' '.$this->normalizeName($applicant->last_name)
+                );
+                $fullName = trim($baseName.' '.$this->normalizeName($applicant->middle_name)
+                    .' '.$this->normalizeName($applicant->suffix));
 
                 return [
-                    'first_name' => $applicants->first()->first_name,
-                    'last_name' => $applicants->first()->last_name,
-                    'count' => $applicants->count(),
-                    'applicants' => $applicants,
+                    'applicant' => $applicant,
+                    'base' => $baseName,
+                    'full' => $fullName,
+                    'birthdate' => $applicant->birthdate?->format('Y-m-d'),
                 ];
-            })
-            ->filter(fn ($group) => $group['count'] > 1)
-            ->values();
+            });
 
-        $totalDuplicates = $duplicateGroups->sum('count');
-        $totalGroups = $duplicateGroups->count();
+            $exactGroups = collect();
+            $likelyGroups = collect();
+
+            foreach ($rows->groupBy('base') as $baseKey => $baseRows) {
+                if ($baseKey === '' || $baseRows->count() < 2) {
+                    continue;
+                }
+
+                $assignedIds = [];
+
+                foreach ($baseRows->groupBy('full') as $fullKey => $fullRows) {
+                    if ($fullKey === '' || $fullRows->count() < 2) {
+                        continue;
+                    }
+
+                    foreach ($fullRows->groupBy('birthdate') as $birthdate => $birthRows) {
+                        if ($birthdate === null || $birthdate === '' || $birthRows->count() < 2) {
+                            continue;
+                        }
+
+                        $exactGroups->push($this->makeDuplicateGroup($birthRows->values(), 'exact'));
+                        $assignedIds = array_merge(
+                            $assignedIds,
+                            $birthRows->pluck('applicant.id')->all()
+                        );
+                    }
+                }
+
+                $leftoverRows = $baseRows
+                    ->reject(fn ($row) => in_array($row['applicant']->id, $assignedIds, true))
+                    ->values();
+
+                if ($leftoverRows->count() >= 2) {
+                    $likelyGroups->push($this->makeDuplicateGroup($leftoverRows, 'likely'));
+                }
+            }
+
+            $possibleGroups = collect($this->buildPossibleGroups($rows));
+
+            $exactGroups = $exactGroups->sortByDesc('count')->sortBy('first_name')->values();
+            $likelyGroups = $likelyGroups->sortByDesc('count')->sortBy('first_name')->values();
+            $possibleGroups = $possibleGroups->sortByDesc('count')->sortBy('first_name')->values();
+
+            return [$exactGroups, $likelyGroups, $possibleGroups];
+        });
+
+        $dismissals = DuplicateDismissal::orderByDesc('id')->get()->keyBy('group_hash');
+
+        $dismissedGroups = collect();
+        $isDismissed = function ($group) use ($dismissals) {
+            return $dismissals->has($this->duplicateGroupHash($group['applicants']));
+        };
+
+        foreach ($exactGroups->concat($likelyGroups)->concat($possibleGroups) as $group) {
+            if (! $isDismissed($group)) {
+                continue;
+            }
+
+            $dismissal = $dismissals->get($this->duplicateGroupHash($group['applicants']));
+            $group['hash'] = $dismissal->group_hash;
+            $group['dismissed_at'] = $dismissal->created_at;
+            $dismissedGroups->push($group);
+        }
+
+        $exactGroups = $exactGroups->reject($isDismissed)->values();
+        $likelyGroups = $likelyGroups->reject($isDismissed)->values();
+        $possibleGroups = $possibleGroups->reject($isDismissed)->values();
+
+        $dismissedGroups = $dismissedGroups->sortByDesc('dismissed_at')->values();
+
+        $totalGroups = $exactGroups->count() + $likelyGroups->count() + $possibleGroups->count();
+        $totalDuplicates = $exactGroups->sum('count')
+            + $likelyGroups->sum('count')
+            + $possibleGroups->sum('count');
+
+        $exactCount = $exactGroups->sum('count');
+        $likelyCount = $likelyGroups->sum('count');
+        $possibleCount = $possibleGroups->sum('count');
 
         $isApplicantUser = auth()->check() && auth()->user()->role === 'user';
 
+        $tiers = [
+            [
+                'key' => 'exact',
+                'label' => 'Exact Match',
+                'icon' => 'bi-exclamation-octagon',
+                'criteria' => 'Same full name and exact-same birthdate. Almost certainly the same person.',
+                'action' => 'Review and merge duplicates',
+                'groups' => $exactGroups,
+            ],
+            [
+                'key' => 'likely',
+                'label' => 'Likely Match',
+                'icon' => 'bi-exclamation-triangle',
+                'criteria' => 'Likely-same name. Birthdate is missing on a record or matches by year only.',
+                'action' => 'Verify before acting',
+                'groups' => $likelyGroups,
+            ],
+            [
+                'key' => 'possible',
+                'label' => 'Possible Match',
+                'icon' => 'bi-question-circle',
+                'criteria' => 'Possible-similar name spelling (e.g. Juan vs Juana, Dela Cruz vs Delacruz).',
+                'action' => 'Verify before acting',
+                'groups' => $possibleGroups,
+            ],
+        ];
+
         return view('applicants.duplicates', compact(
-            'duplicateGroups',
+            'tiers',
             'totalDuplicates',
             'totalGroups',
+            'exactCount',
+            'likelyCount',
+            'possibleCount',
+            'dismissedGroups',
             'search',
             'isApplicantUser'
         ));
+    }
+
+    public function dismissDuplicateGroup(Request $request)
+    {
+        $request->validate([
+            'applicant_ids' => 'required|array|min:2',
+            'applicant_ids.*' => 'integer',
+        ]);
+
+        $ids = collect($request->input('applicant_ids'))
+            ->map(fn ($id) => (int) $id)
+            ->sort()
+            ->values();
+
+        DuplicateDismissal::updateOrCreate(
+            ['group_hash' => md5($ids->implode('-'))],
+            [
+                'applicant_ids' => $ids->all(),
+                'user_id' => $request->user()?->id,
+            ]
+        );
+
+        return back()->with('success', 'Group marked as not a duplicate.');
+    }
+
+    public function restoreDuplicateGroup(Request $request)
+    {
+        $request->validate([
+            'group_hash' => 'required|string',
+        ]);
+
+        DuplicateDismissal::where('group_hash', $request->input('group_hash'))->delete();
+
+        return back()->with('success', 'Duplicate group restored.');
+    }
+
+    private function duplicateGroupHash($applicants): string
+    {
+        return md5(
+            collect($applicants)->pluck('id')->sort()->values()->implode('-')
+        );
+    }
+
+    private function normalizeName(?string $value): string
+    {
+        $value = trim((string) ($value ?? ''));
+
+        return $value === '' ? '' : mb_strtolower((string) preg_replace('/\s+/', ' ', $value));
+    }
+
+    private function makeDuplicateGroup($rows, string $tier): array
+    {
+        $applicants = collect($rows)
+            ->map(fn ($row) => $row['applicant'])
+            ->sortBy('id')
+            ->values();
+
+        return [
+            'tier' => $tier,
+            'first_name' => $applicants->first()->first_name,
+            'last_name' => $applicants->first()->last_name,
+            'count' => $applicants->count(),
+            'applicants' => $applicants,
+            'reason' => $this->duplicateGroupReason($applicants, $tier),
+        ];
+    }
+
+    private function duplicateGroupReason($applicants, string $tier): string
+    {
+        if ($tier === 'exact') {
+            return 'Same full name and exact-same birthdate across all records';
+        }
+
+        $birthdates = $applicants->filter(fn ($a) => $a->birthdate !== null);
+        $missing = $birthdates->count() < $applicants->count();
+        $years = $birthdates
+            ->map(fn ($a) => $a->birthdate->format('Y'))
+            ->unique()
+            ->values();
+
+        if ($birthdates->isEmpty()) {
+            return 'Same name — birthdate not recorded on any record';
+        }
+
+        if ($years->count() === 1) {
+            return $missing
+                ? 'Same name — birthdate missing or matches by year only'
+                : 'Same name — birthdates differ but match by year only';
+        }
+
+        return 'Same name — birthdates differ or are missing, verify identity';
+    }
+
+    private function buildPossibleGroups($rows): array
+    {
+        $rows = collect($rows)->values();
+        $n = $rows->count();
+
+        if ($n < 2) {
+            return [];
+        }
+
+        $bases = $rows->pluck('base')->all();
+        $firstEdges = $rows->map(fn ($row) => $this->nameEdgeChars($row['base'])[0])->all();
+        $lastEdges = $rows->map(fn ($row) => $this->nameEdgeChars($row['base'])[1])->all();
+
+        $byFirstEdge = [];
+        $byLastEdge = [];
+
+        for ($i = 0; $i < $n; $i++) {
+            if ($bases[$i] === '') {
+                continue;
+            }
+
+            $byFirstEdge[$firstEdges[$i]][] = $i;
+            $byLastEdge[$lastEdges[$i]][] = $i;
+        }
+
+        $parent = range(0, $n - 1);
+
+        $find = function (int $x) use (&$parent) {
+            while ($parent[$x] !== $x) {
+                $parent[$x] = $parent[$parent[$x]];
+                $x = $parent[$x];
+            }
+
+            return $x;
+        };
+
+        $union = function (int $x, int $y) use (&$parent, $find) {
+            $rootX = $find($x);
+            $rootY = $find($y);
+
+            if ($rootX !== $rootY) {
+                $parent[$rootY] = $rootX;
+            }
+        };
+
+        foreach ($byFirstEdge as $indices) {
+            $count = count($indices);
+
+            for ($i = 0; $i < $count; $i++) {
+                $a = $bases[$indices[$i]];
+
+                for ($j = $i + 1; $j < $count; $j++) {
+                    if ($a === $bases[$indices[$j]] || !$this->namesSimilar($a, $bases[$indices[$j]])) {
+                        continue;
+                    }
+
+                    $union($indices[$i], $indices[$j]);
+                }
+            }
+        }
+
+        foreach ($byLastEdge as $indices) {
+            $count = count($indices);
+
+            for ($i = 0; $i < $count; $i++) {
+                $x = $indices[$i];
+                $a = $bases[$x];
+
+                for ($j = $i + 1; $j < $count; $j++) {
+                    $y = $indices[$j];
+
+                    if ($firstEdges[$x] === $firstEdges[$y]) {
+                        continue;
+                    }
+
+                    if ($a === $bases[$y] || !$this->namesSimilar($a, $bases[$y])) {
+                        continue;
+                    }
+
+                    $union($x, $y);
+                }
+            }
+        }
+
+        $membersByRoot = [];
+
+        for ($i = 0; $i < $n; $i++) {
+            $membersByRoot[$find($i)][] = $rows[$i]['applicant'];
+        }
+
+        $groups = [];
+
+        foreach ($membersByRoot as $members) {
+            if (count($members) < 2) {
+                continue;
+            }
+
+            $applicants = collect($members)->sortBy('id')->values();
+            $firstName = $applicants->first()->first_name;
+            $lastName = $applicants->first()->last_name;
+            $differentSpellings = $applicants
+                ->map(fn ($a) => trim($a->first_name.' '.$a->last_name))
+                ->unique()
+                ->count();
+
+            $groups[] = [
+                'tier' => 'possible',
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'count' => $applicants->count(),
+                'applicants' => $applicants,
+                'reason' => $differentSpellings > 1
+                    ? 'Similar name spelling across records — verify before acting'
+                    : 'Similar name spelling — verify before acting',
+            ];
+        }
+
+        return $groups;
+    }
+
+    private function nameEdgeChars(string $base): array
+    {
+        $tokens = preg_split('/\s+/', trim($base));
+        $first = $tokens[0] ?? '';
+        $last = count($tokens) > 1 ? end($tokens) : '';
+
+        return [mb_substr($first, 0, 1), mb_substr($last, 0, 1)];
+    }
+
+    private function namesSimilar(string $a, string $b): bool
+    {
+        $a = trim($a);
+        $b = trim($b);
+
+        if ($a === '' || $b === '' || $a === $b) {
+            return false;
+        }
+
+        if (str_contains($a, $b) || str_contains($b, $a)) {
+            return true;
+        }
+
+        if (abs(strlen($a) - strlen($b)) > 2) {
+            return false;
+        }
+
+        $distance = levenshtein($a, $b);
+
+        if ($distance <= 1) {
+            return true;
+        }
+
+        return max(strlen($a), strlen($b)) >= 4 && $distance <= 2;
     }
 
     private function buildApplicantSearchQuery(array $filters)
@@ -640,193 +993,18 @@ class ApplicantController extends Controller
             );
         }
 
-        $tempFile = tempnam(sys_get_temp_dir(), 'applicants_export_');
-        $xlsxPath = $tempFile.'.xlsx';
-
-        if (file_exists($tempFile)) {
-            unlink($tempFile);
-        }
-
-        $zip = new \ZipArchive;
-
-        if ($zip->open($xlsxPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
-            abort(500, 'Unable to create export file.');
-        }
-
-        $zip->addFromString('[Content_Types].xml', $this->buildContentTypesXml());
-        $zip->addFromString('_rels/.rels', $this->buildRootRelsXml());
-        $zip->addFromString('xl/workbook.xml', $this->buildWorkbookXml());
-        $zip->addFromString('xl/_rels/workbook.xml.rels', $this->buildWorkbookRelsXml());
-        $zip->addFromString('xl/worksheets/sheet1.xml', $this->buildWorksheetXml($sheetRows));
-        $zip->addFromString('xl/styles.xml', $this->buildStylesXml());
-        $zip->addFromString('docProps/core.xml', $this->buildCorePropertiesXml());
-        $zip->addFromString('docProps/app.xml', $this->buildAppPropertiesXml());
-        $zip->close();
-
-        return $xlsxPath;
-    }
-
-    private function buildWorksheetXml(array $rows): string
-    {
-        $sheetData = '';
-
-        foreach ($rows as $rowIndex => $row) {
-            $sheetData .= '<row r="'.($rowIndex + 1).'">';
-
-            foreach ($row as $columnIndex => $value) {
-                $cellReference = $this->excelColumnName($columnIndex + 1).($rowIndex + 1);
-                $styleIndex = $rowIndex === 0 ? ' s="1"' : '';
-
-                $sheetData .= '<c r="'.$cellReference.'" t="inlineStr"'.$styleIndex.'><is><t>'
-                    .$this->escapeXml($value)
-                    .'</t></is></c>';
-            }
-
-            $sheetData .= '</row>';
-        }
-
-        $lastColumn = $this->excelColumnName(count($rows[0]));
-        $lastRow = count($rows);
-
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
-            .' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
-            .'<dimension ref="A1:'.$lastColumn.$lastRow.'"/>'
-            .'<sheetViews><sheetView workbookViewId="0"/></sheetViews>'
-            .'<sheetFormatPr defaultRowHeight="15"/>'
-            .'<cols>'
-            .'<col min="1" max="1" width="10" customWidth="1"/>'
-            .'<col min="2" max="5" width="18" customWidth="1"/>'
-            .'<col min="6" max="6" width="10" customWidth="1"/>'
-            .'<col min="7" max="11" width="16" customWidth="1"/>'
-            .'<col min="12" max="15" width="22" customWidth="1"/>'
-            .'<col min="16" max="20" width="24" customWidth="1"/>'
-            .'</cols>'
-            .'<sheetData>'.$sheetData.'</sheetData>'
-            .'</worksheet>';
-    }
-
-    private function buildContentTypesXml(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
-            .'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
-            .'<Default Extension="xml" ContentType="application/xml"/>'
-            .'<Override PartName="/xl/workbook.xml"'
-            .' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
-            .'<Override PartName="/xl/worksheets/sheet1.xml"'
-            .' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'
-            .'<Override PartName="/xl/styles.xml"'
-            .' ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
-            .'<Override PartName="/docProps/core.xml"'
-            .' ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'
-            .'<Override PartName="/docProps/app.xml"'
-            .' ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'
-            .'</Types>';
-    }
-
-    private function buildRootRelsXml(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-            .'<Relationship Id="rId1"'
-            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"'
-            .' Target="xl/workbook.xml"/>'
-            .'<Relationship Id="rId2"'
-            .' Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties"'
-            .' Target="docProps/core.xml"/>'
-            .'<Relationship Id="rId3"'
-            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties"'
-            .' Target="docProps/app.xml"/>'
-            .'</Relationships>';
-    }
-
-    private function buildWorkbookXml(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"'
-            .' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
-            .'<sheets><sheet name="Applicants" sheetId="1" r:id="rId1"/></sheets>'
-            .'</workbook>';
-    }
-
-    private function buildWorkbookRelsXml(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-            .'<Relationship Id="rId1"'
-            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"'
-            .' Target="worksheets/sheet1.xml"/>'
-            .'<Relationship Id="rId2"'
-            .' Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"'
-            .' Target="styles.xml"/>'
-            .'</Relationships>';
-    }
-
-    private function buildStylesXml(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-            .'<fonts count="2">'
-            .'<font><sz val="11"/><name val="Calibri"/><family val="2"/></font>'
-            .'<font><b/><sz val="11"/><name val="Calibri"/><family val="2"/></font>'
-            .'</fonts>'
-            .'<fills count="2">'
-            .'<fill><patternFill patternType="none"/></fill>'
-            .'<fill><patternFill patternType="gray125"/></fill>'
-            .'</fills>'
-            .'<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
-            .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-            .'<cellXfs count="2">'
-            .'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
-            .'<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>'
-            .'</cellXfs>'
-            .'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>'
-            .'</styleSheet>';
-    }
-
-    private function buildCorePropertiesXml(): string
-    {
-        $timestamp = now()->utc()->format('Y-m-d\TH:i:s\Z');
-
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"'
-            .' xmlns:dc="http://purl.org/dc/elements/1.1/"'
-            .' xmlns:dcterms="http://purl.org/dc/terms/"'
-            .' xmlns:dcmitype="http://purl.org/dc/dcmitype/"'
-            .' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
-            .'<dc:title>Applicants Export</dc:title>'
-            .'<dc:creator>Applicant Registry System</dc:creator>'
-            .'<cp:lastModifiedBy>Applicant Registry System</cp:lastModifiedBy>'
-            .'<dcterms:created xsi:type="dcterms:W3CDTF">'.$timestamp.'</dcterms:created>'
-            .'<dcterms:modified xsi:type="dcterms:W3CDTF">'.$timestamp.'</dcterms:modified>'
-            .'</cp:coreProperties>';
-    }
-
-    private function buildAppPropertiesXml(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-            .'<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"'
-            .' xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">'
-            .'<Application>Applicant Registry System</Application>'
-            .'</Properties>';
-    }
-
-    private function excelColumnName(int $index): string
-    {
-        $name = '';
-
-        while ($index > 0) {
-            $index--;
-            $name = chr(65 + ($index % 26)).$name;
-            $index = intdiv($index, 26);
-        }
-
-        return $name;
-    }
-
-    private function escapeXml(string $value): string
-    {
-        return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        return \App\Support\XlsxWriter::create('applicants_export_', [
+            'Applicants' => [
+                'rows' => $sheetRows,
+                'widths' => [
+                    [1, 1, 10],
+                    [2, 5, 18],
+                    [6, 6, 10],
+                    [7, 11, 16],
+                    [12, 15, 22],
+                    [16, 20, 24],
+                ],
+            ],
+        ]);
     }
 }

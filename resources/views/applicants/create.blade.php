@@ -270,134 +270,134 @@
             }
         }
 
-        html[data-theme="night"] .create-hero {
+        html.theme-night .create-hero {
             background: linear-gradient(180deg, #0f172a 0%, #111827 100%) !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28) !important;
         }
 
-        html[data-theme="night"] .create-hero::after {
+        html.theme-night .create-hero::after {
             background: rgba(59, 130, 246, 0.08);
         }
 
-        html[data-theme="night"] .page-title,
-        html[data-theme="night"] .section-title {
+        html.theme-night .page-title,
+        html.theme-night .section-title {
             color: #f8fafc !important;
         }
 
-        html[data-theme="night"] .page-copy,
-        html[data-theme="night"] .form-label {
+        html.theme-night .page-copy,
+        html.theme-night .form-label {
             color: #94a3b8 !important;
         }
 
-        html[data-theme="night"] .page-kicker {
+        html.theme-night .page-kicker {
             background: rgba(59, 130, 246, 0.18) !important;
             color: #bfdbfe !important;
             border-color: rgba(96, 165, 250, 0.24) !important;
         }
 
-        html[data-theme="night"] .hero-chip {
+        html.theme-night .hero-chip {
             background: rgba(15, 23, 42, 0.92) !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             color: #cbd5e1 !important;
         }
 
-        html[data-theme="night"] .form-shell {
+        html.theme-night .form-shell {
             background: rgba(15, 23, 42, 0.96) !important;
             border-color: rgba(148, 163, 184, 0.16) !important;
             box-shadow: 0 22px 48px rgba(0, 0, 0, 0.32) !important;
         }
 
-        html[data-theme="night"] .form-section {
+        html.theme-night .form-section {
             background: #111827 !important;
             border-radius: 24px;
             border: 1px solid rgba(148, 163, 184, 0.14) !important;
         }
 
-        html[data-theme="night"] .section-title::before {
+        html.theme-night .section-title::before {
             background: linear-gradient(135deg, #60a5fa, #38bdf8);
             box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.14);
         }
 
-        html[data-theme="night"] .form-control,
-        html[data-theme="night"] .form-select,
-        html[data-theme="night"] .select2-container .select2-selection--single {
+        html.theme-night .form-control,
+        html.theme-night .form-select,
+        html.theme-night .select2-container .select2-selection--single {
             background: #0b1220 !important;
             border-color: rgba(148, 163, 184, 0.18) !important;
             color: #e2e8f0 !important;
         }
 
-        html[data-theme="night"] .form-control::placeholder {
+        html.theme-night .form-control::placeholder {
             color: #64748b;
         }
 
-        html[data-theme="night"] .form-control:hover,
-        html[data-theme="night"] .form-select:hover,
-        html[data-theme="night"] .select2-container .select2-selection--single:hover {
+        html.theme-night .form-control:hover,
+        html.theme-night .form-select:hover,
+        html.theme-night .select2-container .select2-selection--single:hover {
             background: #111827 !important;
             border-color: rgba(96, 165, 250, 0.28) !important;
         }
 
-        html[data-theme="night"] .form-control:focus,
-        html[data-theme="night"] .form-select:focus,
-        html[data-theme="night"] .select2-container--default .select2-selection--single:focus,
-        html[data-theme="night"] .select2-container--default.select2-container--focus .select2-selection--single,
-        html[data-theme="night"] .select2-container--open .select2-selection--single {
+        html.theme-night .form-control:focus,
+        html.theme-night .form-select:focus,
+        html.theme-night .select2-container--default .select2-selection--single:focus,
+        html.theme-night .select2-container--default.select2-container--focus .select2-selection--single,
+        html.theme-night .select2-container--open .select2-selection--single {
             background: #111827 !important;
             border-color: rgba(96, 165, 250, 0.55) !important;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18) !important;
         }
 
-        html[data-theme="night"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+        html.theme-night .select2-container--default .select2-selection--single .select2-selection__rendered {
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        html.theme-night .select2-container--default .select2-selection--single .select2-selection__arrow b {
             border-color: #94a3b8 transparent transparent transparent;
         }
 
-        html[data-theme="night"] .select2-dropdown {
+        html.theme-night .select2-dropdown {
             background: #0f172a;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .select2-search--dropdown .select2-search__field {
+        html.theme-night .select2-search--dropdown .select2-search__field {
             background: #111827;
             color: #e2e8f0;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .select2-results__option {
+        html.theme-night .select2-results__option {
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .select2-results__option--highlighted[aria-selected] {
+        html.theme-night .select2-results__option--highlighted[aria-selected] {
             background: rgba(59, 130, 246, 0.22);
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .form-footer {
+        html.theme-night .form-footer {
             border-top-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .btn-cancel {
+        html.theme-night .btn-cancel {
             background: #111827;
             color: #cbd5e1;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .btn-cancel:hover {
+        html.theme-night .btn-cancel:hover {
             background: #1f2937;
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .btn-save {
+        html.theme-night .btn-save {
             background: linear-gradient(180deg, #2563eb, #1d4ed8);
             color: #ffffff;
             box-shadow: 0 10px 22px rgba(37, 99, 235, 0.3);
         }
 
-        html[data-theme="night"] .btn-save:hover {
+        html.theme-night .btn-save:hover {
             color: #ffffff;
         }
 
@@ -580,52 +580,52 @@
             color: #fff;
         }
 
-        html[data-theme="night"] .dup-modal .dup-banner {
+        html.theme-night .dup-modal .dup-banner {
             background: rgba(245, 158, 11, 0.1);
             border-color: rgba(245, 158, 11, 0.2);
         }
 
-        html[data-theme="night"] .dup-modal .dup-banner-icon {
+        html.theme-night .dup-modal .dup-banner-icon {
             background: rgba(245, 158, 11, 0.85);
         }
 
-        html[data-theme="night"] .dup-modal .dup-banner-text strong {
+        html.theme-night .dup-modal .dup-banner-text strong {
             color: #fde68a;
         }
 
-        html[data-theme="night"] .dup-modal .dup-banner-text {
+        html.theme-night .dup-modal .dup-banner-text {
             color: #fbbf24;
         }
 
-        html[data-theme="night"] .dup-modal .dup-match-card {
+        html.theme-night .dup-modal .dup-match-card {
             background: #1e293b;
             border-color: rgba(148, 163, 184, 0.14);
         }
 
-        html[data-theme="night"] .dup-modal .dup-match-card:hover {
+        html.theme-night .dup-modal .dup-match-card:hover {
             border-color: rgba(245, 158, 11, 0.35);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        html[data-theme="night"] .dup-modal .dup-name {
+        html.theme-night .dup-modal .dup-name {
             color: #f1f5f9;
         }
 
-        html[data-theme="night"] .dup-modal .dup-meta {
+        html.theme-night .dup-modal .dup-meta {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .dup-modal .modal-footer {
+        html.theme-night .dup-modal .modal-footer {
             border-top-color: rgba(148, 163, 184, 0.14);
         }
 
-        html[data-theme="night"] .dup-modal .btn-cancel-dup {
+        html.theme-night .dup-modal .btn-cancel-dup {
             background: #1e293b;
             color: #94a3b8;
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .dup-modal .btn-cancel-dup:hover {
+        html.theme-night .dup-modal .btn-cancel-dup:hover {
             background: #334155;
             color: #e2e8f0;
         }
@@ -782,70 +782,70 @@
             border-color: transparent;
         }
 
-        html[data-theme="night"] .flatpickr-calendar {
+        html.theme-night .flatpickr-calendar {
             background: #1e293b;
             border-color: rgba(148, 163, 184, 0.18);
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
         }
 
-        html[data-theme="night"] .flatpickr-months {
+        html.theme-night .flatpickr-months {
             background: linear-gradient(135deg, #1e40af, #1d4ed8);
         }
 
-        html[data-theme="night"] .flatpickr-current-month .flatpickr-monthDropdown-months {
+        html.theme-night .flatpickr-current-month .flatpickr-monthDropdown-months {
             color: #fff;
             background: rgba(255, 255, 255, 0.12);
         }
 
-        html[data-theme="night"] .flatpickr-current-month .flatpickr-monthDropdown-months option {
+        html.theme-night .flatpickr-current-month .flatpickr-monthDropdown-months option {
             background: #1e40af;
             color: #fff;
         }
 
-        html[data-theme="night"] .flatpickr-current-month input.cur-year {
+        html.theme-night .flatpickr-current-month input.cur-year {
             color: #fff;
         }
 
-        html[data-theme="night"] .flatpickr-current-month input.cur-year option {
+        html.theme-night .flatpickr-current-month input.cur-year option {
             background: #1e40af;
             color: #fff;
         }
 
-        html[data-theme="night"] span.flatpickr-weekday {
+        html.theme-night span.flatpickr-weekday {
             background: rgba(30, 64, 175, 0.12);
             color: #60a5fa;
         }
 
-        html[data-theme="night"] .flatpickr-day {
+        html.theme-night .flatpickr-day {
             color: #cbd5e1;
         }
 
-        html[data-theme="night"] .flatpickr-day:hover {
+        html.theme-night .flatpickr-day:hover {
             background: rgba(59, 130, 246, 0.18);
             color: #93bbfd;
         }
 
-        html[data-theme="night"] .flatpickr-day.selected,
-        html[data-theme="night"] .flatpickr-day.selected:hover {
+        html.theme-night .flatpickr-day.selected,
+        html.theme-night .flatpickr-day.selected:hover {
             background: linear-gradient(135deg, #2563eb, #3b82f6);
             color: #fff;
         }
 
-        html[data-theme="night"] .flatpickr-day.today {
+        html.theme-night .flatpickr-day.today {
             background: rgba(245, 158, 11, 0.18);
             color: #fbbf24;
         }
 
-        html[data-theme="night"] .flatpickr-day.today:hover {
+        html.theme-night .flatpickr-day.today:hover {
             background: rgba(245, 158, 11, 0.28);
         }
 
-        html[data-theme="night"] span.flatpickr-weekNumber {
+        html.theme-night span.flatpickr-weekNumber {
             color: #64748b;
             border-right-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] .flatpickr-day.inRange {
+        html.theme-night .flatpickr-day.inRange {
             background: rgba(59, 130, 246, 0.18);
             color: #93bbfd;
             box-shadow: none;

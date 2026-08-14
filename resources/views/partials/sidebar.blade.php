@@ -216,7 +216,7 @@
         --danger: #dc2626;
     }
 
-    html[data-theme="night"] {
+    html.theme-night {
         --sidebar-bg: #0b1220;
         --sidebar-surface: #111827;
         --sidebar-border: rgba(148, 163, 184, 0.16);
@@ -542,59 +542,59 @@
         transform: scale(1.05);
     }
 
-    html[data-theme="night"] .sidebar {
+    html.theme-night .sidebar {
         box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
     }
 
-    html[data-theme="night"] .sidebar-top,
-    html[data-theme="night"] .sidebar-footer {
+    html.theme-night .sidebar-top,
+    html.theme-night .sidebar-footer {
         background: #0b1220;
     }
 
-    html[data-theme="night"] .brand-card,
-    html[data-theme="night"] .sidebar-account,
-    html[data-theme="night"] .system-status,
-    html[data-theme="night"] .user-menu-link,
-    html[data-theme="night"] .btn-toggle-sidebar {
+    html.theme-night .brand-card,
+    html.theme-night .sidebar-account,
+    html.theme-night .system-status,
+    html.theme-night .user-menu-link,
+    html.theme-night .btn-toggle-sidebar {
         box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03);
     }
 
-    html[data-theme="night"] .sidebar-link:hover,
-    html[data-theme="night"] .sidebar-child-link:hover,
-    html[data-theme="night"] .user-menu-link:hover,
-    html[data-theme="night"] .btn-toggle-sidebar:hover {
+    html.theme-night .sidebar-link:hover,
+    html.theme-night .sidebar-child-link:hover,
+    html.theme-night .user-menu-link:hover,
+    html.theme-night .btn-toggle-sidebar:hover {
         background: rgba(255, 255, 255, 0.05);
     }
 
-    html[data-theme="night"] .sidebar-link.active {
+    html.theme-night .sidebar-link.active {
         background: rgba(96, 165, 250, 0.12);
         border-color: rgba(96, 165, 250, 0.18);
     }
 
-    html[data-theme="night"] .sidebar-link.active .sidebar-icon {
+    html.theme-night .sidebar-link.active .sidebar-icon {
         background: rgba(96, 165, 250, 0.22);
         color: #eff6ff;
     }
 
-    html[data-theme="night"] .sidebar-submenu {
+    html.theme-night .sidebar-submenu {
         border-left-color: rgba(148, 163, 184, 0.18);
     }
 
-    html[data-theme="night"] .sidebar-child-link.active-child {
+    html.theme-night .sidebar-child-link.active-child {
         background: rgba(96, 165, 250, 0.12);
         color: #eff6ff;
     }
 
-    html[data-theme="night"] .navbar-dropdown {
+    html.theme-night .navbar-dropdown {
         background: #0f172a;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
     }
 
-    html[data-theme="night"] .navbar-item:hover {
+    html.theme-night .navbar-item:hover {
         background: rgba(255, 255, 255, 0.05);
     }
 
-    html[data-theme="night"] .logout-item:hover {
+    html.theme-night .logout-item:hover {
         background: rgba(248, 113, 113, 0.12);
         color: #fecaca;
     }

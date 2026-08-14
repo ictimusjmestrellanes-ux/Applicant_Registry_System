@@ -21,10 +21,18 @@
             --sidebar-bg: #0f172a;
         }
 
-        html[data-theme="night"] {
+        html.theme-night {
             color-scheme: dark;
             --app-bg: #050816;
             --app-text: #e2e8f0;
+        }
+
+        html.theme-switching,
+        html.theme-switching *,
+        html.theme-switching *::before,
+        html.theme-switching *::after {
+            transition: none !important;
+            animation: none !important;
         }
 
         body {
@@ -109,31 +117,45 @@
             const theme = storedTheme === 'night' ? 'night' : 'day';
 
             document.documentElement.dataset.theme = theme;
+            document.documentElement.classList.toggle('theme-night', theme === 'night');
             document.documentElement.style.colorScheme = theme === 'night' ? 'dark' : 'light';
+
+            const endThemeSwitch = function () {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        document.documentElement.classList.remove('theme-switching');
+                    });
+                });
+            };
 
             window.setAppTheme = function (nextTheme) {
                 const normalizedTheme = nextTheme === 'night' ? 'night' : 'day';
+                const isNight = normalizedTheme === 'night';
+
+                document.documentElement.classList.add('theme-switching');
                 document.documentElement.dataset.theme = normalizedTheme;
-                document.documentElement.style.colorScheme = normalizedTheme === 'night' ? 'dark' : 'light';
+                document.documentElement.classList.toggle('theme-night', isNight);
+                document.documentElement.style.colorScheme = isNight ? 'dark' : 'light';
                 localStorage.setItem(storageKey, normalizedTheme);
 
                 document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-                    const isNight = normalizedTheme === 'night';
                     button.setAttribute('aria-label', isNight ? 'Switch to day mode' : 'Switch to night mode');
                     button.setAttribute('title', isNight ? 'Switch to day mode' : 'Switch to night mode');
                     button.innerHTML = isNight
                         ? '<i class="bi bi-sun-fill"></i>'
                         : '<i class="bi bi-moon-stars"></i>';
                 });
+
+                endThemeSwitch();
             };
 
             window.toggleAppTheme = function () {
-                const currentTheme = document.documentElement.dataset.theme === 'night' ? 'night' : 'day';
+                const currentTheme = document.documentElement.classList.contains('theme-night') ? 'night' : 'day';
                 window.setAppTheme(currentTheme === 'night' ? 'day' : 'night');
             };
 
             document.addEventListener('DOMContentLoaded', function () {
-                window.setAppTheme(document.documentElement.dataset.theme === 'night' ? 'night' : 'day');
+                window.setAppTheme(document.documentElement.classList.contains('theme-night') ? 'night' : 'day');
             });
         })();
     </script>

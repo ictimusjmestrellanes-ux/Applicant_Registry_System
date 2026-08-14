@@ -10,15 +10,6 @@
         $newThisMonth = data_get($summary, 'newThisMonth', 0);
         $totalClearances = data_get($summary, 'totalClearances', 0);
         $totalReferrals = data_get($summary, 'totalReferrals', 0);
-        $maleCount = data_get($genderBreakdown->firstWhere('label', 'MALE'), 'count', 0);
-        $femaleCount = data_get($genderBreakdown->firstWhere('label', 'FEMALE'), 'count', 0);
-        $pwdYesCount = data_get($pwdBreakdown->firstWhere('label', 'YES'), 'count', 0);
-        $pwdNoCount = data_get($pwdBreakdown->firstWhere('label', 'NO'), 'count', 0);
-        $fourPsYesCount = data_get($fourPsBreakdown->firstWhere('label', 'YES'), 'count', 0);
-        $fourPsNoCount = data_get($fourPsBreakdown->firstWhere('label', 'NO'), 'count', 0);
-        $monthlyRegistrationLabels = $trendMonths ?? [];
-        $yearlyApplicantTrendLabels = $trendMonths ?? [];
-        $yearlyApplicantTrendDatasets = $yearlyApplicantTrendDatasets ?? [];
         $timeGreeting =
             now()->hour >= 0 && now()->hour <= 11
                 ? 'Good Morning'
@@ -41,10 +32,22 @@
                     </p>
                 </div>
                 @if ($isAdminOrStaff)
-                    <div class="col-lg-4 d-flex justify-content-lg-end align-items-start">
+                    <div class="col-lg-4 d-flex justify-content-lg-end align-items-center gap-2 flex-wrap">
+                        <div class="year-filter-wrap mb-0">
+                            <label for="trendPeriodFilter" class="visually-hidden">Export period</label>
+                            <select id="trendPeriodFilter" class="form-select form-select-sm year-filter">
+                                <option value="year" selected>Year</option>
+                                <option value="month">Month</option>
+                                <option value="week">Week</option>
+                                <option value="day">Day</option>
+                            </select>
+                        </div>
                         <button type="button" id="exportChartsButton" class="btn btn-light fw-bold px-4">
-                            <i class="bi bi-download me-2"></i>Export Charts
+                            <i class="bi bi-download me-2"></i>Export PDF
                         </button>
+                        <a href="{{ route('dashboard.export', ['period' => 'year']) }}" id="exportExcelButton" class="btn btn-light fw-bold px-4">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Export Excel
+                        </a>
                     </div>
                 @endif
             </div>
@@ -175,16 +178,8 @@
                         <div class="dashboard-card monthly-registration-card">
                             <div class="section-header">
                                 <div>
-                                    <h5 class="section-title mb-1">Monthly Registration</h5>
-                                </div>
-                                <div class="year-filter-wrap">
-                                    <label for="trendYearFilter" class="visually-hidden">Filter by year</label>
-                                    <select id="trendYearFilter" class="form-select form-select-sm year-filter">
-                                        <option value="all">All years</option>
-                                        @foreach ($trendYears as $trendYear)
-                                            <option value="{{ $trendYear }}">{{ $trendYear }}</option>
-                                        @endforeach
-                                    </select>
+                                    <h5 class="section-title mb-1">Registration Trend</h5>
+                                    <p class="section-copy mb-0">Applicant registrations per period.</p>
                                 </div>
                             </div>
 
@@ -806,73 +801,73 @@
             }
         }
 
-        html[data-theme="night"] .hero-panel,
-        html[data-theme="night"] .metric-card,
-        html[data-theme="night"] .dashboard-card,
-        html[data-theme="night"] .list-item,
-        html[data-theme="night"] .action-card,
-        html[data-theme="night"] .summary-card,
-        html[data-theme="night"] .progress-card {
+        html.theme-night .hero-panel,
+        html.theme-night .metric-card,
+        html.theme-night .dashboard-card,
+        html.theme-night .list-item,
+        html.theme-night .action-card,
+        html.theme-night .summary-card,
+        html.theme-night .progress-card {
             background: #0f172a;
             border-color: rgba(148, 163, 184, 0.16);
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
         }
 
-        html[data-theme="night"] .hero-title,
-        html[data-theme="night"] .section-title,
-        html[data-theme="night"] .metric-value,
-        html[data-theme="night"] .progress-title,
-        html[data-theme="night"] .list-title,
-        html[data-theme="night"] .action-title,
-        html[data-theme="night"] .chart-value {
+        html.theme-night .hero-title,
+        html.theme-night .section-title,
+        html.theme-night .metric-value,
+        html.theme-night .progress-title,
+        html.theme-night .list-title,
+        html.theme-night .action-title,
+        html.theme-night .chart-value {
             color: #f8fafc;
         }
 
-        html[data-theme="night"] .hero-copy,
-        html[data-theme="night"] .section-copy,
-        html[data-theme="night"] .list-copy,
-        html[data-theme="night"] .metric-note,
-        html[data-theme="night"] .progress-subtitle,
-        html[data-theme="night"] .empty-state {
+        html.theme-night .hero-copy,
+        html.theme-night .section-copy,
+        html.theme-night .list-copy,
+        html.theme-night .metric-note,
+        html.theme-night .progress-subtitle,
+        html.theme-night .empty-state {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .eyebrow {
+        html.theme-night .eyebrow {
             background: rgba(59, 130, 246, 0.16);
             color: #bfdbfe;
         }
 
-        html[data-theme="night"] .hero-highlight {
+        html.theme-night .hero-highlight {
             background: linear-gradient(180deg, #111827, #0f172a);
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .metric-label,
-        html[data-theme="night"] .hero-highlight-label,
-        html[data-theme="night"] .empty-state i {
+        html.theme-night .metric-label,
+        html.theme-night .hero-highlight-label,
+        html.theme-night .empty-state i {
             color: #94a3b8;
         }
 
-        html[data-theme="night"] .year-filter {
+        html.theme-night .year-filter {
             background: #111827;
             border-color: rgba(148, 163, 184, 0.2);
             color: #e2e8f0;
         }
 
-        html[data-theme="night"] .dashboard-progress {
+        html.theme-night .dashboard-progress {
             background: #1e293b;
         }
 
-        html[data-theme="night"] .chart-bar-wrap {
+        html.theme-night .chart-bar-wrap {
             background: linear-gradient(to top, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.14));
         }
 
-        html[data-theme="night"] .empty-state {
+        html.theme-night .empty-state {
             background: rgba(15, 23, 42, 0.9);
             border-color: rgba(148, 163, 184, 0.18);
         }
 
-        html[data-theme="night"] #exportChartsButton {
+        html.theme-night #exportChartsButton {
             background: #1e293b;
             color: #e2e8f0;
             border-color: rgba(148, 163, 184, 0.2);
@@ -884,67 +879,39 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const exportChartsButton = document.getElementById('exportChartsButton');
-            const monthlyRegistrationLabels = @json($monthlyRegistrationLabels);
-            const yearlyTrendDatasets = @json($yearlyApplicantTrendDatasets);
-            const trendYearFilter = document.getElementById('trendYearFilter');
+            const trendPeriodFilter = document.getElementById('trendPeriodFilter');
+            const trendDataByPeriod = @json($trendDataByPeriod);
+            const exportExcelButton = document.getElementById('exportExcelButton');
+            const periodLabels = { year: 'Year', month: 'Month', week: 'Week', day: 'Day' };
 
             const chartMaxForDatasets = (datasets) => Math.max(...datasets.flatMap((dataset) => dataset.data), 0) +
                 2;
-            const getDatasetsForYear = (year) => {
-                if (year === 'all') {
-                    return yearlyTrendDatasets;
-                }
 
-                return yearlyTrendDatasets.filter((dataset) => dataset.label === year);
-            };
-            const initialTrendDatasets = getDatasetsForYear(trendYearFilter?.value ?? 'all');
-            const yearlyTrendMax = chartMaxForDatasets(initialTrendDatasets);
-
-            const sexLabels = ['Male', 'Female'];
-            const sexData = [
-                @json((int) $maleCount),
-                @json((int) $femaleCount),
-            ];
-
-            const pwdData = [
-                @json((int) $pwdYesCount),
-                @json((int) $pwdNoCount),
-            ];
-
-            const fourPsData = [
-                @json((int) $fourPsYesCount),
-                @json((int) $fourPsNoCount),
-            ];
-
-            const cityLabels = @json($cityBreakdown->pluck('label')->values());
-            const cityData = @json($cityBreakdown->pluck('count')->values());
-
-            const provinceLabels = @json($provinceBreakdown->pluck('label')->values());
-            const provinceData = @json($provinceBreakdown->pluck('count')->values());
+            const breakdownDataByPeriod = @json($breakdownDataByPeriod);
 
             const chartExportItems = [{
                     id: 'monthlyRegistrationChart',
-                    title: 'Monthly Registration'
+                    baseTitle: 'Registration Trend'
                 },
                 {
                     id: 'sexPolarChart',
-                    title: 'Male and Female Summary'
+                    baseTitle: 'Male and Female Summary'
                 },
                 {
                     id: 'pwdPolarChart',
-                    title: 'PWD Summary'
+                    baseTitle: 'PWD Summary'
                 },
                 {
                     id: 'fourPsPolarChart',
-                    title: '4Ps Summary'
+                    baseTitle: '4Ps Summary'
                 },
                 {
                     id: 'cityColumnChart',
-                    title: 'City Summary'
+                    baseTitle: 'City Summary'
                 },
                 {
                     id: 'provinceColumnChart',
-                    title: 'Province Summary'
+                    baseTitle: 'Province Summary'
                 },
             ];
 
@@ -961,6 +928,9 @@
                     alert('PDF export is not available right now.');
                     return;
                 }
+
+                const currentPeriod = trendPeriodFilter?.value || 'year';
+                const currentPeriodLabel = periodLabels[currentPeriod] || 'Year';
 
                 const {
                     jsPDF
@@ -1007,7 +977,7 @@
 
                     pdf.setFont('helvetica', 'bold');
                     pdf.setFontSize(11);
-                    pdf.text(item.title, x, y + 4);
+                    pdf.text(`${item.baseTitle} (${currentPeriodLabel})`, x, y + 4);
                     pdf.addImage(image, 'PNG', drawX, drawY, drawWidth, drawHeight);
                 });
 
@@ -1075,257 +1045,215 @@
                 const canvas = document.getElementById(id);
 
                 if (!canvas) {
-                    return;
+                    return null;
                 }
 
-                new Chart(canvas, config);
+                return new Chart(canvas, config);
             };
 
             const monthlyCanvas = document.getElementById('monthlyRegistrationChart');
 
-            if (monthlyCanvas) {
-                const monthlyRegistrationChart = new Chart(monthlyCanvas, {
-                    type: 'line',
-                    data: {
-                        labels: monthlyRegistrationLabels,
-                        datasets: initialTrendDatasets,
-                    },
-                    options: {
-                        ...lineOptions,
-                        plugins: {
-                            ...lineOptions.plugins,
-                            title: {
-                                display: false,
-                            },
-                        },
-                        scales: {
-                            ...lineOptions.scales,
-                            y: {
-                                ...lineOptions.scales.y,
-                                suggestedMax: yearlyTrendMax,
-                            },
+            const buildTrendOptions = (datasets, type) => {
+                const options = {
+                    ...lineOptions,
+                    plugins: {
+                        ...lineOptions.plugins,
+                        title: {
+                            display: false,
                         },
                     },
-                });
+                    scales: {
+                        ...lineOptions.scales,
+                        y: {
+                            ...lineOptions.scales.y,
+                            suggestedMax: chartMaxForDatasets(datasets),
+                        },
+                    },
+                };
 
-                if (trendYearFilter) {
-                    trendYearFilter.addEventListener('change', function() {
-                        const selectedYear = this.value;
-                        const datasets = getDatasetsForYear(selectedYear);
-
-                        monthlyRegistrationChart.data.datasets = datasets;
-                        monthlyRegistrationChart.options.scales.y.suggestedMax = chartMaxForDatasets(
-                            datasets);
-                        monthlyRegistrationChart.update();
-                    });
+                if (type === 'bar') {
+                    options.elements = {
+                        ...options.elements,
+                        bar: {
+                            borderWidth: 1,
+                        },
+                    };
                 }
+
+                return options;
+            };
+
+            const renderTrendChart = () => {
+                const period = trendPeriodFilter?.value || 'year';
+                const data = trendDataByPeriod[period] || trendDataByPeriod.month;
+
+                if (!monthlyCanvas) {
+                    return;
+                }
+
+                const chart = Chart.getChart(monthlyCanvas);
+
+                if (!chart) {
+                    new Chart(monthlyCanvas, {
+                        type: data.type,
+                        data: {
+                            labels: data.labels,
+                            datasets: data.datasets,
+                        },
+                        options: buildTrendOptions(data.datasets, data.type),
+                    });
+
+                    return;
+                }
+
+                chart.config.type = data.type;
+                chart.data = {
+                    labels: data.labels,
+                    datasets: data.datasets,
+                };
+                chart.options = buildTrendOptions(data.datasets, data.type);
+                chart.update();
+            };
+
+            renderTrendChart();
+
+            if (trendPeriodFilter) {
+                trendPeriodFilter.addEventListener('change', function() {
+                    renderTrendChart();
+                    renderBreakdownCharts(this.value);
+
+                    if (exportExcelButton) {
+                        exportExcelButton.href = @json(route('dashboard.export')) + '?period=' + this.value;
+                    }
+                });
             }
 
-            createChart('sexPolarChart', {
-                type: 'polarArea',
-                data: {
-                    labels: sexLabels,
-                    datasets: [{
-                        data: sexData,
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.72)',
-                            'rgba(244, 114, 182, 0.72)',
-                        ],
-                        borderColor: '#ffffff',
-                        borderWidth: 2,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 18,
-                            },
+            const polarOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 18,
                         },
                     },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                backdropColor: 'transparent',
-                                color: '#64748b',
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.18)',
-                            },
-                            angleLines: {
-                                color: 'rgba(148, 163, 184, 0.18)',
-                            },
-                            pointLabels: {
-                                color: '#334155',
-                                font: {
-                                    size: 13,
-                                    weight: '600',
-                                },
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            backdropColor: 'transparent',
+                            color: '#64748b',
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.18)',
+                        },
+                        angleLines: {
+                            color: 'rgba(148, 163, 184, 0.18)',
+                        },
+                        pointLabels: {
+                            color: '#334155',
+                            font: {
+                                size: 13,
+                                weight: '600',
                             },
                         },
                     },
                 },
-            });
+            };
 
-            createChart('pwdPolarChart', {
-                type: 'polarArea',
-                data: {
-                    labels: ['PWD YES', 'PWD NO'],
-                    datasets: [{
-                        data: pwdData,
-                        backgroundColor: [
-                            'rgba(245, 158, 11, 0.82)',
-                            'rgba(245, 158, 11, 0.34)',
-                        ],
-                        borderColor: '#ffffff',
-                        borderWidth: 2,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 18,
-                            },
-                        },
-                    },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                backdropColor: 'transparent',
-                                color: '#64748b',
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.18)',
-                            },
-                            angleLines: {
-                                color: 'rgba(148, 163, 184, 0.18)',
-                            },
-                            pointLabels: {
-                                color: '#334155',
-                                font: {
-                                    size: 13,
-                                    weight: '600',
-                                },
-                            },
-                        },
+            const barLineOptions = {
+                ...lineOptions,
+                plugins: {
+                    ...lineOptions.plugins,
+                    legend: {
+                        display: false,
                     },
                 },
-            });
+            };
 
-            createChart('fourPsPolarChart', {
-                type: 'polarArea',
-                data: {
-                    labels: ['4Ps YES', '4Ps NO'],
-                    datasets: [{
-                        data: fourPsData,
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.82)',
-                            'rgba(16, 185, 129, 0.34)',
-                        ],
-                        borderColor: '#ffffff',
-                        borderWidth: 2,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 18,
-                            },
-                        },
+            const makePolarChart = (id, series, colors) => {
+                return createChart(id, {
+                    type: 'polarArea',
+                    data: {
+                        labels: series.labels,
+                        datasets: [{
+                            data: series.data,
+                            backgroundColor: colors,
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                        }],
                     },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            ticks: {
-                                precision: 0,
-                                backdropColor: 'transparent',
-                                color: '#64748b',
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.18)',
-                            },
-                            angleLines: {
-                                color: 'rgba(148, 163, 184, 0.18)',
-                            },
-                            pointLabels: {
-                                color: '#334155',
-                                font: {
-                                    size: 13,
-                                    weight: '600',
-                                },
-                            },
-                        },
-                    },
-                },
-            });
+                    options: polarOptions,
+                });
+            };
 
-            createChart('cityColumnChart', {
-                type: 'line',
-                data: {
-                    labels: cityLabels,
-                    datasets: [{
-                        data: cityData,
-                        label: 'City Count',
-                        borderColor: '#e7ed3a',
-                        backgroundColor: 'rgba(58, 237, 118, 0.14)',
-                        pointBackgroundColor: '#e7ed3a',
-                        pointBorderColor: '#ffffff',
-                        fill: false,
-                    }],
-                },
-                options: {
-                    ...lineOptions,
-                    plugins: {
-                        ...lineOptions.plugins,
-                        legend: {
-                            display: false,
-                        },
+            const makeColumnChart = (id, series, label, borderColor, backgroundColor) => {
+                return createChart(id, {
+                    type: 'line',
+                    data: {
+                        labels: series.labels,
+                        datasets: [{
+                            data: series.data,
+                            label,
+                            borderColor,
+                            backgroundColor,
+                            pointBackgroundColor: borderColor,
+                            pointBorderColor: '#ffffff',
+                            fill: false,
+                        }],
                     },
-                },
-            });
+                    options: barLineOptions,
+                });
+            };
 
-            createChart('provinceColumnChart', {
-                type: 'line',
-                data: {
-                    labels: provinceLabels,
-                    datasets: [{
-                        data: provinceData,
-                        label: 'Province Count',
-                        borderColor: '#248a3d',
-                        backgroundColor: 'rgba(71, 85, 105, 0.14)',
-                        pointBackgroundColor: '#248a3d',
-                        pointBorderColor: '#ffffff',
-                        fill: false,
-                    }],
-                },
-                options: {
-                    ...lineOptions,
-                    plugins: {
-                        ...lineOptions.plugins,
-                        legend: {
-                            display: false,
-                        },
-                    },
-                },
-            });
+            const renderBreakdownCharts = (period) => {
+                const data = breakdownDataByPeriod[period] || breakdownDataByPeriod.month;
+
+                [
+                    ['sexPolarChart', data.sex],
+                    ['pwdPolarChart', data.pwd],
+                    ['fourPsPolarChart', data.fourPs],
+                    ['cityColumnChart', data.city],
+                    ['provinceColumnChart', data.province],
+                ].forEach(([id, series]) => {
+                    const canvas = document.getElementById(id);
+
+                    if (!canvas) {
+                        return;
+                    }
+
+                    const chart = Chart.getChart(canvas);
+
+                    if (!chart) {
+                        return;
+                    }
+
+                    chart.data.labels = series.labels;
+                    chart.data.datasets[0].data = series.data;
+                    chart.update();
+                });
+            };
+
+            const initialBreakdown = breakdownDataByPeriod[trendPeriodFilter?.value || 'year'] || breakdownDataByPeriod.month;
+
+            makePolarChart('sexPolarChart', initialBreakdown.sex, [
+                'rgba(59, 130, 246, 0.72)',
+                'rgba(244, 114, 182, 0.72)',
+            ]);
+            makePolarChart('pwdPolarChart', initialBreakdown.pwd, [
+                'rgba(245, 158, 11, 0.82)',
+                'rgba(245, 158, 11, 0.34)',
+            ]);
+            makePolarChart('fourPsPolarChart', initialBreakdown.fourPs, [
+                'rgba(16, 185, 129, 0.82)',
+                'rgba(16, 185, 129, 0.34)',
+            ]);
+            makeColumnChart('cityColumnChart', initialBreakdown.city, 'City Count', '#e7ed3a', 'rgba(58, 237, 118, 0.14)');
+            makeColumnChart('provinceColumnChart', initialBreakdown.province, 'Province Count', '#248a3d', 'rgba(71, 85, 105, 0.14)');
 
             const todayModal = document.getElementById('todayRecordsModal');
             if (todayModal) {
